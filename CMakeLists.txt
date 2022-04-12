@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(Compiler
-                VERSION 0.0.0
-                LANGUAGES CXX
+project(Compiler 
+                VERSION 0.0.0 
+                LANGUAGES CXX 
                 HOMEPAGE_URL "https://github.com/ETOgaosion/UCAS_Compiler")
 
 # shuild only be under cmake_minimum_required
