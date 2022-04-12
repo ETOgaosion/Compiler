@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(Compiler 
                 VERSION 0.0.0 
-                LANGUAGES CXX 
-                HOMEPAGE_URL "https://github.com/ETOgaosion/UCAS_Compiler")
+                LANGUAGES CXX)
 
 # shuild only be under cmake_minimum_required
 # should be set as g++-7, otherwise will report error
