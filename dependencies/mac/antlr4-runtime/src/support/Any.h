@@ -65,31 +65,21 @@ struct ANTLR4CPP_PUBLIC Any
     return derived->value;
   }
 
-  template<class U, typename std::enable_if<std::is_copy_constructible<U>::value || std::is_copy_assignable<U>::value>::value>
+  template<class U>
   operator U() {
     return as<StorageType<U>>();
   }
 
-  template<class U, typename std::enable_if<(!std::is_copy_constructible<U>::value && !std::is_copy_assignable<U>::value) && (std::is_move_constructible<U>::value || std::is_move_assignable<U>::value)>::value>
-  operator U() {
-    return std::move(as<StorageType<U>>());
-  }
-
-  template<class U, typename std::enable_if<std::is_copy_constructible<U>::value || std::is_copy_assignable<U>::value>::value>
+  template<class U>
   operator const U() const {
     return as<const StorageType<U>>();
-  }
-
-  template<class U, typename std::enable_if<!(!std::is_copy_constructible<U>::value && !std::is_copy_assignable<U>::value) && (std::is_move_constructible<U>::value || std::is_move_assignable<U>::value)>::value>
-  operator const U() const {
-    return std::move(as<const StorageType<U>>());
   }
 
   Any& operator = (const Any& a) {
     if (_ptr == a._ptr)
       return *this;
 
-    auto * old_ptr = _ptr;
+    auto old_ptr = _ptr;
     _ptr = a.clone();
 
     if (old_ptr)
@@ -109,7 +99,7 @@ struct ANTLR4CPP_PUBLIC Any
 
   virtual ~Any();
 
-  virtual bool equals(const Any& other) const {
+  virtual bool equals(Any other) const {
     return _ptr == other._ptr;
   }
 

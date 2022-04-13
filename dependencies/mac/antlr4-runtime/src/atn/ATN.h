@@ -7,24 +7,12 @@
 
 #include "RuleContext.h"
 
-// GCC generates a warning when forward-declaring ATN if ATN has already been
-// declared due to the attributes added by ANTLR4CPP_PUBLIC.
-// See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=39159
-// Add constant that can be checked so forward-declarations can be omitted.
-#define ANTLR4CPP_ATN_DECLARED
-
 namespace antlr4 {
 namespace atn {
 
   class ANTLR4CPP_PUBLIC ATN {
   public:
-#if __cplusplus >= 201703L
-    static constexpr size_t INVALID_ALT_NUMBER = 0;
-#else
-    enum : size_t {
-      INVALID_ALT_NUMBER = 0,
-    };
-#endif
+    static const size_t INVALID_ALT_NUMBER = 0;
 
     /// Used for runtime deserialization of ATNs from strings.
     ATN();

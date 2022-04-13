@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <atomic>
-
 #include "atn/ATNSimulator.h"
 #include "atn/LexerATNConfig.h"
 #include "atn/ATNConfigSet.h"
@@ -40,15 +38,8 @@ namespace atn {
 
 
   public:
-#if __cplusplus >= 201703L
-    static constexpr size_t MIN_DFA_EDGE = 0;
-    static constexpr size_t MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
-#else
-    enum : size_t {
-      MIN_DFA_EDGE = 0,
-      MAX_DFA_EDGE = 127, // forces unicode to stay in ATN
-    };
-#endif
+    static const size_t MIN_DFA_EDGE = 0;
+    static const size_t MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
   protected:
     /// <summary>
@@ -91,7 +82,7 @@ namespace atn {
     SimState _prevAccept;
 
   public:
-    static std::atomic<int> match_calls;
+    static int match_calls;
 
     LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
     LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);

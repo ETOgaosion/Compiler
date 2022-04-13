@@ -114,13 +114,7 @@ namespace atn {
      * {@link #isPrecedenceFilterSuppressed} property as a bit within the
      * existing {@link #reachesIntoOuterContext} field.
      */
-#if __cplusplus >= 201703L
-    static constexpr size_t SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
-#else
-    enum : size_t {
-      SUPPRESS_PRECEDENCE_FILTER = 0x40000000,
-    };
-#endif
+    static const size_t SUPPRESS_PRECEDENCE_FILTER;
   };
 
 } // namespace atn
@@ -145,7 +139,7 @@ namespace std {
     size_t operator() (const std::vector<Ref<ATNConfig>> &vector) const
     {
       std::size_t seed = 0;
-      for (const auto &config : vector) {
+      for (auto &config : vector) {
         seed ^= config->hashCode() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
       }
       return seed;
