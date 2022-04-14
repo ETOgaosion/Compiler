@@ -235,7 +235,7 @@ class ANTLR4CPP_PUBLIC Lexer : public Recognizer, public TokenSource
 
 `TokenSource`事实上是接口(interface)，`Lexer`类对其进行了实现，因此此处体现了面向接口编程的思想，通过使用`nextToken`函数，按照设计思路处的分析，能够进行词法分析并且根据出错打印出错信息并且修改`_syntaxErrors`。
 
-事实上语法分析也是在`compUnit`这个函数调用实现的，因此在此后进行错误获取是合理的。
+事实上语法分析也是在`compUnit`这个函数调用实现的，最终生成语法树，因此在此后进行错误获取是合理的。
 
 具体设计时，若出错统一跳转到函数末尾，此外复用`errorNum`变量节省时间空间：
 
@@ -268,7 +268,33 @@ exit:
 
 #### 多平台适配
 
+由于服务器无法使用super user创建ssh公钥，进行git提交极不方便，因此使用本地手段，由于使用MacOS Monterey而非Linux，开虚拟机不很方便，于是搭建Mac下ANTLR环境。
+
+注意需要下载匹配版本的`antlr-complete.jar`和`antlr-runtime`环境，最好是和Linux中相同的4.8版本（4.10版本测试失败），按照STFW获取的方法进行安装，需要能够使用`antlr4`命令。
+
+antlr-runtime相关文件包括预编译需要的头文件，运行时动态链接的库文件，后者在linux下是`.so`结尾，Mac下为`.dylib`结尾，并且由于仍然未能解决的cmake问题，在运行时Mac无法找到本来添加至路径的动态链接，而是固定的访问几个路径下的对应文件，笔者暂时放置在`/usr/local/lib/`目录下。
+
+而后需要做的就是修改cmake，使其能够根据运行平台自动适配，识别平台的常量是`${CMAKE_SYSTEM_NAME}`，Linux下值为`Linux`，目前Mac下值为`Darwin`，使用比较操作`STREQUAL`即可判断平台，将两者runtime相关文件放在不同之处，`include_directories`操作时进行修改即可，制定编译器根据机器而异。*详见根目录下[CMakeLists.txt]*
+
 #### 相关debug过程
+
+##### 语义规则书写
+
+- 经历过最多的bug是关于继承属性和综合属性的locals少加入，课件中指出constExp需要加入`int basic_or_array_and_type`，事实上还有`number, constInitVal`需要加入；
+
+- 此外的问题还有Parser终结符首字母大写，Lexer非终结符首字母小写；
+
+- `fragment`的使用也曾带来问题，`fragment`相当于C语言`inline`函数，起到直接替换、使代码易读的作用，并不是单独的终结符。
+
+##### main函数处理错误
+
+若在之前讨论的2,4处使用goto跳转到结尾进行错误处理返回，那么会跳过`SemanticAnalysis listener;`的声明，这在C++中不被允许，报错。
+
+按照面向过程的思想，尽早进行错误判断能过避免资源的浪费和开销。但是在OOP，需要类的良好排布和预编译的内存分配支持，因此不便如此考虑，空间不会被节省，因此可以后移到声明之后进行错误处理。
+
+##### 环境安装过程
+
+经过一系列错误才能过正确使用mac进行实验，首先是`CMakeLists.txt`中`${CMAKE_SYSTEM_NAME}`变量并非任何时候都可以使用，需要先对`PROJECT`进行配置。在配置`PROJECT`时，服务器Linux环境下无法识别`HOMEPAGE_URL`字段，未找到原因与解决办法，遂删除。
 
 ## 总结
 
@@ -286,7 +312,7 @@ exit:
 
 #### 高梓源
 
-主要完成了mac环境的搭建、`main.cpp`中错误处理、运行脚本及测试调试相关工作，以及撰写相应部分的实验报告。此番实验对于编译环境的理解和代码阅读的能力提升非常大，上学期面向对象课程所学又派上了用场
+主要完成了mac环境的搭建、`main.cpp`中错误处理、运行脚本及测试调试相关工作，以及撰写相应部分的实验报告。此番实验对于编译环境的理解和代码阅读的能力提升非常大，上学期面向对象课程所学又派上了用场。
 
 > OOP是好文明
 
