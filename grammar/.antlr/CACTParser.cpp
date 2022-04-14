@@ -2008,13 +2008,13 @@ void CACTParser::ConstExpContext::copyFrom(ConstExpContext *ctx) {
   this->basic_or_array_and_type = ctx->basic_or_array_and_type;
 }
 
-//----------------- ConstBoolConstContext ------------------------------------------------------------------
+//----------------- ConstExpBoolConstContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::ConstBoolConstContext::BoolConst() {
+tree::TerminalNode* CACTParser::ConstExpBoolConstContext::BoolConst() {
   return getToken(CACTParser::BoolConst, 0);
 }
 
-CACTParser::ConstBoolConstContext::ConstBoolConstContext(ConstExpContext *ctx) { copyFrom(ctx); }
+CACTParser::ConstExpBoolConstContext::ConstExpBoolConstContext(ConstExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- ConstExpNumberContext ------------------------------------------------------------------
@@ -2048,7 +2048,7 @@ CACTParser::ConstExpContext* CACTParser::constExp() {
       }
 
       case CACTParser::BoolConst: {
-        _localctx = dynamic_cast<ConstExpContext *>(_tracker.createInstance<CACTParser::ConstBoolConstContext>(_localctx));
+        _localctx = dynamic_cast<ConstExpContext *>(_tracker.createInstance<CACTParser::ConstExpBoolConstContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(300);
         match(CACTParser::BoolConst);

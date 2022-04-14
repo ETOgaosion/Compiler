@@ -155,8 +155,8 @@ constExp
     locals[
         int basic_or_array_and_type,
     ]
-    : number        #constExpNumber
-    | BoolConst     #constBoolConst
+    : number            #constExpNumber
+    | BoolConst         #constExpBoolConst
     ;
 
 number

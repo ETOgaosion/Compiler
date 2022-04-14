@@ -104,9 +104,6 @@ public:
   virtual void enterLOrExp(CACTParser::LOrExpContext * /*ctx*/) override { }
   virtual void exitLOrExp(CACTParser::LOrExpContext * /*ctx*/) override { }
 
-  virtual void enterConstExp(CACTParser::ConstExpContext * /*ctx*/) override { }
-  virtual void exitConstExp(CACTParser::ConstExpContext * /*ctx*/) override { }
-
   virtual void enterConstExpNumber(CACTParser::ConstExpNumberContext * /*ctx*/) override { }
   virtual void exitConstExpNumber(CACTParser::ConstExpNumberContext * /*ctx*/) override { }
 

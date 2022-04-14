@@ -439,9 +439,9 @@ public:
    
   };
 
-  class  ConstBoolConstContext : public ConstExpContext {
+  class  ConstExpBoolConstContext : public ConstExpContext {
   public:
-    ConstBoolConstContext(ConstExpContext *ctx);
+    ConstExpBoolConstContext(ConstExpContext *ctx);
 
     antlr4::tree::TerminalNode *BoolConst();
   };

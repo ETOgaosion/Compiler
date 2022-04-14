@@ -102,9 +102,6 @@ public:
   virtual void enterLOrExp(CACTParser::LOrExpContext *ctx) = 0;
   virtual void exitLOrExp(CACTParser::LOrExpContext *ctx) = 0;
 
-  virtual void enterConstExp(CACTParser::ConstExpContext *ctx) = 0;
-  virtual void exitConstExp(CACTParser::ConstExpContext *ctx) = 0;
-
   virtual void enterConstExpNumber(CACTParser::ConstExpNumberContext *ctx) = 0;
   virtual void exitConstExpNumber(CACTParser::ConstExpNumberContext *ctx) = 0;
 

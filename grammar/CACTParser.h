@@ -33,8 +33,7 @@ public:
     RuleBlockItem = 13, RuleStmt = 14, RuleExp = 15, RuleCond = 16, RuleLVal = 17, 
     RulePrimaryExp = 18, RuleUnaryExp = 19, RuleUnaryOp = 20, RuleFuncRParams = 21, 
     RuleMulExp = 22, RuleAddExp = 23, RuleRelExp = 24, RuleEqExp = 25, RuleLAndExp = 26, 
-    RuleLOrExp = 27, RuleConstExp = 28, RuleConstExpNumber = 29, RuleConstExpBoolConst = 30, 
-    RuleNumber = 31
+    RuleLOrExp = 27, RuleConstExp = 28, RuleNumber = 29
   };
 
   CACTParser(antlr4::TokenStream *input);
@@ -76,8 +75,6 @@ public:
   class LAndExpContext;
   class LOrExpContext;
   class ConstExpContext;
-  class ConstExpNumberContext;
-  class ConstExpBoolConstContext;
   class NumberContext; 
 
   class  CompUnitContext : public antlr4::ParserRuleContext {
@@ -488,44 +485,35 @@ public:
   public:
     int basic_or_array_and_type;
     ConstExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ConstExpNumberContext *constExpNumber();
-    ConstExpBoolConstContext *constExpBoolConst();
+   
+    ConstExpContext() = default;
+    void copyFrom(ConstExpContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
 
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  ConstExpBoolConstContext : public ConstExpContext {
+  public:
+    ConstExpBoolConstContext(ConstExpContext *ctx);
+
+    antlr4::tree::TerminalNode *BoolConst();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
+  };
+
+  class  ConstExpNumberContext : public ConstExpContext {
+  public:
+    ConstExpNumberContext(ConstExpContext *ctx);
+
+    NumberContext *number();
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };
 
   ConstExpContext* constExp();
-
-  class  ConstExpNumberContext : public antlr4::ParserRuleContext {
-  public:
-    int basic_or_array_and_type;
-    ConstExpNumberContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    NumberContext *number();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  ConstExpNumberContext* constExpNumber();
-
-  class  ConstExpBoolConstContext : public antlr4::ParserRuleContext {
-  public:
-    int basic_or_array_and_type;
-    ConstExpBoolConstContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *BoolConst();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
-  };
-
-  ConstExpBoolConstContext* constExpBoolConst();
 
   class  NumberContext : public antlr4::ParserRuleContext {
   public:
