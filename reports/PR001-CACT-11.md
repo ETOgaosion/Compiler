@@ -48,7 +48,7 @@
 
 根据查找结果，在`CACTLexer`的父类`Lexer`中和`CACTParser`的父类`Parser`中分别找到了对应函数的实现：
 
-```C++
+```cpp
 // size_t Parser::getNumberOfSyntaxErrors()
 size_t Lexer::getNumberOfSyntaxErrors() {
   return _syntaxErrors;
@@ -57,7 +57,7 @@ size_t Lexer::getNumberOfSyntaxErrors() {
 
 `_syntaxErrors`是两个类中的私有变量，而产生错误对其进行修改的只有：
 
-```C++
+```cpp
 void Lexer::notifyListeners(const LexerNoViableAltException & /*e*/) {
   ++_syntaxErrors;
   // ...
@@ -66,7 +66,7 @@ void Lexer::notifyListeners(const LexerNoViableAltException & /*e*/) {
 
 继续回溯同一类中，调用`notifyListeners`的函数只有：
 
-```C++
+```cpp
 std::unique_ptr<Token> Lexer::nextToken() {
     // ...
     do{
@@ -97,7 +97,7 @@ std::unique_ptr<Token> Lexer::nextToken() {
 
 在`main.cpp`中，需要确定获取lexer和parser错误最早的准确位置，有以下可能的位置：
 
-```C++
+```cpp
 CACTLexer lexer(&input);
 // get lex error pos 1
 CommonTokenStream tokens(&lexer);
@@ -115,7 +115,7 @@ tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
 
 但是很快就能够排除前三条语句，能够获取错误的时机一定是词法分析与语法分析进行完成，而对前三条语句，只需要查看派生类和父类的构造函数便可知初始化阶段只设置实例化类的相关参数，并不进行分析动作。以Lexer为例，派生类CACTLexer以及父类Lexer构造函数如下：
 
-```C++
+```cpp
 // class relation
 class  CACTLexer : public antlr4::Lexer
 // CACTLexer constructor:
@@ -159,7 +159,7 @@ void Lexer::InitializeInstanceFields() {
 
 但为了深入ANTLR，对`compUnit`进行进一步了解，我们直接指出核心点：
 
-```C++
+```cpp
 CACTParser::CompUnitContext* CACTParser::compUnit() {
     _la = _input->LA(1);
 }
@@ -167,7 +167,7 @@ CACTParser::CompUnitContext* CACTParser::compUnit() {
 
 于是就需要了解`_input`，该属性继承自父类Parser，对他的赋值如下：
 
-```C++
+```cpp
 // declaration
 /*
  * The input stream
@@ -195,7 +195,7 @@ void Parser::setTokenStream(TokenStream *input) {
 
 了解了`_input`之后，对`_input`调用的操作可以看作调用`token`的动作，那么此处`LA()`函数正是此意，于是锁定在`BufferTokenStream`类中函数：
 
-```C++
+```cpp
 size_t BufferedTokenStream::LA(ssize_t i) {
   return LT(i)->getType();
 }
@@ -218,7 +218,7 @@ size_t BufferedTokenStream::fetch(size_t n) {
 
 `LT`函数中有一个很不起眼的关键语句`sync(i)`，通过它我们最终找到了`nextToken`函数的调用，这里`_tokenSource`字面意即位token处理的源头，事实上的确如此：
 
-```C++
+```cpp
 // class var declaration
   protected:
     /**
@@ -239,7 +239,7 @@ class ANTLR4CPP_PUBLIC Lexer : public Recognizer, public TokenSource
 
 具体设计时，若出错统一跳转到函数末尾，此外复用`errorNum`变量节省时间空间：
 
-```C++
+```cpp
 // main.cpp
 int main(int argc, const char* argv[]) {
     // ...
@@ -288,7 +288,7 @@ antlr-runtime相关文件包括预编译需要的头文件，运行时动态链�
 
 ##### main函数处理错误
 
-若在之前讨论的2,4处使用goto跳转到结尾进行错误处理返回，那么会跳过`SemanticAnalysis listener;`的声明，这在C++中不被允许，报错。
+若在之前讨论的2,4处使用goto跳转到结尾进行错误处理返回，那么会跳过`SemanticAnalysis listener;`的声明，这在cpp中不被允许，报错。
 
 按照面向过程的思想，尽早进行错误判断能过避免资源的浪费和开销。但是在OOP，需要类的良好排布和预编译的内存分配支持，因此不便如此考虑，空间不会被节省，因此可以后移到声明之后进行错误处理。
 
