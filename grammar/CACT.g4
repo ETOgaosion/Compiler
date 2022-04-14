@@ -254,11 +254,6 @@ ExponentPart
     : ('e' | 'E')('+' | '-')? DigitSequence
     ;
 
-fragment
-Index
-    : ('E' | 'e') ('+' | '-')? (Digit)+
-    ;
-
 NewLine
     : ('\r' '\n'? | '\n') 
       -> skip

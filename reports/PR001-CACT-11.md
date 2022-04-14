@@ -4,8 +4,6 @@
 
 [TOC]
 
-[[_TOC_]]
-
 ## 任务说明
 
 本次实验为CACT编译器设计的第一个实验，主要完成的任务如下：
@@ -30,8 +28,89 @@
 
 #### CACT语法规则
 
-<!-- TODO -->
+##### 终结符
 
+终结符中需要自行设计的为`Ident, BoolConst, IntConst, FloatConst, DoubleConst`
+
+其中`BoolConst`过于简单，在此不再赘述；`IntConst`的表达在start code中也已详细给出，不再赘述；
+
+- Ident标识符：
+
+  - 标识符可以由大小写字母、数字以及下划线组成，但必须以字母或者下划线开头。
+
+  - 由于必须以字母或者下划线开头，所以必须以`IdentNondigit`开头
+    - `IdentNondigit`：表示下划线或各大小写字母，即`_|a|b|...|z|A|B|...|Z`
+  - 从第二个字符（若有）开始，标识符可以由大小写字母、数字以及下划线组成，即为`[a-zA-Z_0-9]*`
+
+  综上，标识符的正则表达式为： $Ident \rarr \ IdentNondigit (_|a|b|...|z|A|B|...|Z)*$
+
+- 单/双精度浮点常量：
+
+  CACT中，浮点型字面值分为double与float类型，若字面值后面跟'F'或'f'后缀，则为float型，否则默认为double型。所以先考虑构造double类型的正则表达式。
+
+  有符号浮点型常数有如下几个类型：
+
+  - 普通形式的浮点数：其正则表达式为 $DoubleConst \rarr FractionalConst$
+
+    - 浮点数由一串数字与一个小数点组成，小数点的前或后必须有数字出现，有如下三类情况
+
+      `DigitSequence.DigitSequence`
+
+      `DigitSequence.`
+
+      `.DigitSequence`
+
+    - 合并可得
+
+      $FractionalConst \rarr DigitSequence? '.' DigitSequence \ |\ DigitSequence '.' $
+
+  - 指数形式：包括基数、指数符号和指数三个部分，且三部分依次出现
+
+    - 基数：
+
+      - 可带小数点：即为$FractionalConst$
+      - 可不带小数点：即为$DigitSequence$
+
+    - 指数符号和指数：$ExponentPart$
+
+      - 指数符号为“E”或“e”
+
+      - 指数部分由可带“+”或“-”（也可不带）的一串数字（0-9）组成，“+”或“-“（如果有）必 须出现在数字串之前。
+
+      - 据上描述，可得正则表达式
+
+        $ExponentPart \rarr ('e' | 'E')('+' | '-')? DigitSequence$
+
+    - 综上，指数形式的正则式可以描述为
+
+      $FractionalConst\  ExponentPart \ | \ DigitSequence \ ExponentPart$
+
+  - 结合普通形式和指数形式的浮点数，可以得到double类型的正则表达式
+
+    $DoubleConst \rarr FractionalConst \ \  ExponentPart?
+        \ | \ DigitSequence\ \  ExponentPart$
+
+  - 在CACT中，float类型即为double类型字面值后加"f" 或"F"，所以产生式为
+
+    $FloatConst \rarr DoubleConst \ ('f'|'F')$
+
+##### 非终结符
+
+相比于CACT_specification中所给出的文法，我们在本次实验中集中修改了**表达式**部分的文法，主要是因为该部分文法中含有左递归。即使ANTLR允许直接的左递归，在仍未了解底层实现的情况下，默认还需要进行操作以消除左递归，为了让表达式更加直观明了，并且减小编译器工作量，对一些产生式中的左递归进行消除。
+
+- 左递归消除的形式化过程如下：
+
+  $$A\rightarrow A\alpha_{1} \mid \cdots \mid A\alpha_{m}\mid \beta_{1} \mid \cdots \mid \beta_{n} $$
+
+  消除左递归得：
+
+  $$A\rightarrow \beta_{1}A' \mid \cdots \mid \beta_{n} A'$$$$A'\rightarrow \alpha_{1}A' \mid \cdots \mid \alpha_{m}A'\mid \epsilon $$
+
+- 值得注意的是，CACT的各个表达式的产生文法还隐含了不同运算的**优先级**。每一个产生式的**右部只可包含自己，或比自己优先级更高的非终结符**。具体来说，优先级为：
+
+  一元运算 > 乘除模运算 > 加减运算 > 关系运算 > 相等性运算 > 逻辑与运算 > 逻辑或运算
+  
+  可结合**实验实现·规则文件完善**部分的代码理解。
 #### 错误捕获
 
 ##### 错误获取函数寻找
@@ -91,7 +170,169 @@ std::unique_ptr<Token> Lexer::nextToken() {
 
 #### 规则文件完善
 
-<!-- TODO -->
+##### Ident标识符表示
+
+```antlr
+Ident
+    : IdentNondigit [a-zA-Z_0-9]*
+    ;
+    
+fragment
+IdentNondigit
+    : [a-zA-Z_]
+    ;
+```
+
+##### 单/双精度浮点常量
+
+```antlr
+DigitSequence
+    : Digit+
+    ;
+
+FloatConst
+    : DoubleConst ('f' | 'F')
+    ;
+
+DoubleConst
+    : FractionalConst ExponentPart?
+    | DigitSequence ExponentPart
+    ;
+
+fragment
+FractionalConst
+    : DigitSequence? '.' DigitSequence
+    | DigitSequence '.'
+    ;
+
+fragment
+ExponentPart
+    : ('e' | 'E')('+' | '-')? DigitSequence
+    ;
+```
+
+##### 消除左递归
+
+- 编译单元：
+
+  CACT_specification中所给出的文法为：`CompUnit → [ CompUnit ] ( Decl | FuncDef )`
+
+  上述文法等价于`CompUnit → CompUnit  ( Decl | FuncDef ) | Decl | FuncDef `
+
+  但该文法为左递归的，需要消除左递归，得到：
+
+  `CompUnit → ( Decl | FuncDef )+ `
+
+  由于文件最后一定会有EOF表示文件结束，所以`compUnit`代码为：
+
+  ```antlr
+  compUnit
+      : (decl | funcDef)+ EOF
+      ;
+  ```
+
+- 乘除模表达式 MulExp：
+
+  CACT_specification中所给出的文法为：`MulExp → UnaryExp | MulExp ('*' | '/' | '%') UnaryExp`
+
+  消除左递归：
+
+  ```
+  1. MulExp → UnaryExp MulExp'
+  2. MulExp' → ('*' | '/' | '%') UnaryExp MulExp' | ε
+  ```
+
+  而产生式2等价于
+
+  ```
+  MulExp' → (('*' | '/' | '%') UnaryExp)*
+  ```
+
+  综上，`MulExp → UnaryExp (('*' | '/' | '%') UnaryExp)*`
+
+  对应antlr代码为
+
+  ```antlr
+  mulExp
+      : unaryExp ( ('*'|'/'|'%') unaryExp )*
+      ;
+  ```
+
+- 加减表达式 AddExp：
+
+  CACT_specification中所给出的文法为：`AddExp → MulExp | AddExp ('+' | '−') MulExp`
+
+  消除左递归：
+
+  ```
+  1. AddExp → MulExp AddExp'
+  2. AddExp' → ('+' | '−') MulExp AddExp' | ε
+  ```
+
+  而产生式2等价于:
+
+  ```
+   AddExp' → (('+' | '−') MulExp)*
+  ```
+
+  综上，`AddExp → MulExp (('+' | '−') MulExp)*`
+
+  对应antlr代码为:
+
+  ```
+  addExp
+      : mulExp (('+' | '-') mulExp)*
+      ;
+  ```
+
+- 关系表达式 RelExp ：
+
+  CACT_specification中所给出的文法为：`RelExp → AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp | BoolConst`
+
+  消除左递归后的antlr代码为：
+
+  ```
+  relExp
+      : addExp (('<' | '>' | '<=' | '>=') addExp)*
+      | BoolConst
+      ;
+  ```
+
+- 相等性表达式 EqExp：
+
+  CACT_specification中所给出的文法为：`EqExp → RelExp | EqExp ('==' | '!=') RelExp`
+
+  消除左递归后的antlr代码为：
+
+  ```
+  eqExp
+      : relExp (('==' | '!=') relExp)*
+      ;
+  ```
+
+- 逻辑与表达式 LAndExp:
+
+  CACT_specification中所给出的文法为：`LAndExp → EqExp | LAndExp '&&' EqExp`
+
+  消除左递归后的antlr代码为：
+
+  ```
+  lAndExp
+      : eqExp (('&&') eqExp)*
+      ;
+  ```
+
+- 逻辑或表达式 LOrExp:
+
+  CACT_specification中所给出的文法为：`LOrExp → LAndExp | LOrExp '||' LAndExp`
+
+  消除左递归后的antlr代码为：
+
+  ```
+  lOrExp
+      : lAndExp (('||') lAndExp)*
+      ;
+  ```
 
 #### 主函数修改
 
@@ -310,7 +551,7 @@ antlr-runtime相关文件包括预编译需要的头文件，运行时动态链�
 
 #### 官奕琳
 
-<!-- TODO -->
+完成了CACT语法规则的录入，完善`CACT.g4`并撰写相应部分实验报告。通过对语言进行准确的语法定义，更深入的了解了值得玩味的语法规范。而debug过程根据位置报错对连锁的产生式都需要进行修改，考验耐心细致程度，为以后更复杂的情况做铺垫。
 
 #### 高梓源
 
