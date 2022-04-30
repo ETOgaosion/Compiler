@@ -35,20 +35,18 @@ private:
     MetaDataType metaDataType;
     bool isArray;
     size_t size;
-    bool initialized;
 
 protected:
 
 public:
     AbstractSymbol();
-    AbstractSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    AbstractSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     ~AbstractSymbol();
     virtual string getSymbolName() const;
     virtual SymbolType getSymbolType() const;
     virtual MetaDataType getMetaDataType() const;
     virtual bool getIsArray() const;
     virtual size_t getSize() const;
-    virtual bool getInitialized() const;
 
 };
 
@@ -58,7 +56,7 @@ private:
 protected:
 
 public:
-    ParamSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    ParamSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     ~ParamSymbol();
 
 };
@@ -69,7 +67,7 @@ private:
 protected:
 
 public:
-    VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     ~VarSymbol();
 
 };
@@ -80,7 +78,7 @@ private:
 protected:
 
 public:
-    ConstSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    ConstSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     ~ConstSymbol();
 };
 
@@ -91,7 +89,7 @@ private:
 protected:
 
 public:
-    ParamArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    ParamArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     ~ParamArraySymbol();
 
 };
@@ -102,7 +100,7 @@ private:
 protected:
 
 public:
-    VarArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    VarArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     ~VarArraySymbol();
 
 };
@@ -113,7 +111,7 @@ private:
 protected:
 
 public:
-    ConstArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    ConstArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     ~ConstArraySymbol();
 };
 
@@ -123,7 +121,7 @@ private:
 protected:
 
 public:
-    static AbstractSymbol *createSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    static AbstractSymbol *createSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
 
 };
 
@@ -184,7 +182,7 @@ public:
     SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable);
     ~SymbolTable();
 
-    virtual AbstractSymbol *insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized);
+    virtual AbstractSymbol *insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
     virtual AbstractSymbol *insertParamSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) { return nullptr;};
     virtual bool insertParamType(SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) { return false; };
 

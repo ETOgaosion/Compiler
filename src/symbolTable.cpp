@@ -17,13 +17,12 @@ AbstractSymbol::AbstractSymbol() {
     // only called by default before children's constructor
 }
 
-AbstractSymbol::AbstractSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized){
+AbstractSymbol::AbstractSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
     symbolName = inSymbolName;
     symbolType = inSymbolType;
     metaDataType = inMetaDataType;
     isArray = inIsArray;
     size = inSize;
-    initialized = inInitialized;
 
 }
 
@@ -45,15 +44,11 @@ size_t AbstractSymbol::getSize() const {
     return size;
 }
 
-bool AbstractSymbol::getInitialized() const {
-    return initialized;
-}
-
 // --------
 
-ParamSymbol::ParamSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized) {
+ParamSymbol::ParamSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::PARAM){
-        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ParamSymbol", inSymbolType);
@@ -62,9 +57,9 @@ ParamSymbol::ParamSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataT
 
 // --------
 
-VarSymbol::VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized) {
+VarSymbol::VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::VAR){
-        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("VarSymbol", inSymbolType);
@@ -73,9 +68,9 @@ VarSymbol::VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType 
 
 // --------
 
-ConstSymbol::ConstSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized) {
+ConstSymbol::ConstSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::CONST){
-        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ConstSymbol", inSymbolType);
@@ -84,9 +79,9 @@ ConstSymbol::ConstSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataT
 
 // --------
 
-ParamArraySymbol::ParamArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized) {
+ParamArraySymbol::ParamArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::PARAM && inIsArray) {
-        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ParamArraySymbol", inSymbolType);
@@ -95,9 +90,9 @@ ParamArraySymbol::ParamArraySymbol(string inSymbolName, SymbolType inSymbolType,
 
 // --------
 
-VarArraySymbol::VarArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized) {
+VarArraySymbol::VarArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::VAR && inIsArray) {
-        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("VarArraySymbol", inSymbolType);
@@ -106,9 +101,9 @@ VarArraySymbol::VarArraySymbol(string inSymbolName, SymbolType inSymbolType, Met
 
 // --------
 
-ConstArraySymbol::ConstArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized) {
+ConstArraySymbol::ConstArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::CONST && inIsArray) {
-        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+        AbstractSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ConstArraySymbol", inSymbolType);
@@ -116,23 +111,23 @@ ConstArraySymbol::ConstArraySymbol(string inSymbolName, SymbolType inSymbolType,
 }
 
 
-AbstractSymbol *SymbolFactory::createSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized){
+AbstractSymbol *SymbolFactory::createSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
     switch(inSymbolType){
         case SymbolType::PARAM:
             if (inIsArray){
-                return new ParamArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+                return new ParamArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
             }
-            return new ParamSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+            return new ParamSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
         case SymbolType::VAR:
             if (inIsArray) {
-                return new VarArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+                return new VarArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
             }
-            return new VarSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+            return new VarSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
         case SymbolType::CONST:
             if (inIsArray) {
-                return new ConstArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+                return new ConstArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
             }
-            return new ConstSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+            return new ConstSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
         default:
             return nullptr;
     }
@@ -217,11 +212,11 @@ SymbolTable::SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable
 
 SymbolTable::~SymbolTable() {}
 
-AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize, bool inInitialized) {
+AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (findDuplicateName(abstractSymbolList, "AbstractSymbolList", inSymbolName)){
         return nullptr;
     }
-    AbstractSymbol *insertAbstractSymbol = SymbolFactory::createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, inInitialized);
+    AbstractSymbol *insertAbstractSymbol = SymbolFactory::createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     abstractSymbolList.emplace(inSymbolName, insertAbstractSymbol);
     return insertAbstractSymbol;
 }
@@ -296,7 +291,7 @@ AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(string inSymbolName, Sy
     if (findDuplicateName(paramSymbolList, "FuncSymbolTable", inSymbolName)) {
         return nullptr;
     }
-    AbstractSymbol *insertParamSymbol = SymbolFactory::createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize, true);
+    AbstractSymbol *insertParamSymbol = SymbolFactory::createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     paramSymbolList.emplace(inSymbolName, insertParamSymbol);
     return insertParamSymbol;
 }
