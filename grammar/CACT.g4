@@ -12,6 +12,9 @@ options {
 
 /********** Parser **********/
 compUnit
+    locals [
+        SymbolTable *globalSymbolTable
+    ]
     : (decl | funcDef)+ EOF
     ;
 
@@ -25,6 +28,9 @@ constDecl
     ;
 
 bType
+    locals [
+        MetaDataType bMetaDataType
+    ]
     : 'int'
     | 'bool'
     | 'double'
@@ -32,15 +38,18 @@ bType
     ;
 
 constDef
+    locals [
+        AbstractSymbol *symbol
+    ]
     : Ident ('[' IntConst ']')? '=' constInitVal
     ;
 
 constInitVal
-    locals[
-        int basic_or_array_and_type
+    locals [
+        AbstractSymbol *symbol
     ]
-    : constExp
-    | '{' (constExp (',' constExp)*)? '}'                                             
+    : constExp                              #constInitValOfVar
+    | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
     ;
 
 varDecl
@@ -48,10 +57,16 @@ varDecl
     ;
 
 varDef
+    locals [
+        AbstractSymbol *symbol
+    ]
     : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;
 
 funcDef
+    locals [
+        SymbolTable *funcSymbolTable
+    ]
     : funcType Ident '(' (funcFParams)? ')' block
     ;
 
@@ -64,14 +79,23 @@ funcType
     ;
 
 funcFParams
+    locals [
+        SymbolTable *funcSymbolTable
+    ]
     : funcFParam (',' funcFParam)*
     ;
 
 funcFParam
+    locals [
+        AbstractSymbol *symbol
+    ]
     : bType Ident ('[' ']')?
     ;
 
 block
+    locals [
+        SymbolTable *blockSymbolTable
+    ]
     : '{' (blockItem)* '}'
     ;
 
@@ -81,39 +105,64 @@ blockItem
     ;
 
 stmt
-    : lVal '=' exp ';'
-    | (exp)? ';'
-    | block
-    | 'if' '(' cond ')' stmt ('else' stmt)?
-    | 'while' '(' cond ')' stmt
-    | 'break' ';' 
-    | 'contine' ';'
-    | 'return' (exp)? ';'
+    : lVal '=' exp ';'                          #stmtAssignment
+    | (exp)? ';'                                #stmtExpression
+    | block                                     #stmtBlock
+    | 'if' '(' cond ')' stmt ('else' stmt)?     #stmtCtrlSeq
+    | 'while' '(' cond ')' stmt                 #stmtCtrlSeq
+    | 'break' ';'                               #stmtCtrlSeq
+    | 'contine' ';'                             #stmtCtrlSeq
+    | 'return' (exp)? ';'                       #stmtReturn
     ;
 
 exp
-    : addExp
-    | BoolConst
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : addExp        #expAddExp
+    | BoolConst     #expBoolExp
     ;
 
 cond
+    locals [
+        MetaDataType bMetaDataType
+    ]
     : lOrExp
     ;
 
 lVal
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType,
+        AbstractSymbol *symbol
+    ]
     : Ident ('[' exp ']')?
     ;
 
 primaryExp
-    : '(' exp ')' 
-    | lVal 
-    | number 
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : '(' exp ')'   #primaryExpNestExp
+    | lVal          #primaryExplVal
+    | number        #primaryExpNumber
     ;
 
 unaryExp
-    : primaryExp
-    | Ident '(' (funcRParams)? ')'
-    | unaryOp unaryExp
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType,
+        SymbolTable *funcSymbolTable
+    ]
+    : primaryExp                        #unaryExpPrimaryExp
+    | Ident '(' (funcRParams)? ')'      #unaryExpFunc
+    | unaryOp unaryExp                  #unaryExpNestUnaryExp
     ;
 
 unaryOp
@@ -123,37 +172,76 @@ unaryOp
     ;
 
 funcRParams
+    locals [
+        SymbolTable *funcSymbolTable
+    ]
     : exp (',' exp)*
     ;
 
 mulExp
-    : unaryExp ( ('*'|'/'|'%') unaryExp )*
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : unaryExp                              #mulExpUnaryExp
+    | mulExp ('*' | '/' | '%') unaryExp     #mulExpMulExp
     ;
 
 addExp
-    : mulExp (('+' | '-') mulExp)*
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : mulExp                        #addExpMulExp
+    | addExp ('+' | '-') mulExp     #addExpAddExp
     ;
 
 relExp
-    : addExp (('<' | '>' | '<=' | '>=') addExp)*
-    | BoolConst
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : addExp                                    #relExpAddExp
+    | relExp ('<' | '>' | '<=' | '>=') addExp   #relExpRelExp
+    | BoolConst                                 #relExpBoolConst
     ;
 
 eqExp
-    : relExp (('==' | '!=') relExp)*
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : relExp                        #eqExpRelExp
+    | eqExp ('==' | '!=') relExp    #eqExpEqExp
     ;
 
 lAndExp
-    : eqExp (('&&') eqExp)*
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : eqExp                         #lAndExpEqExp
+    | lAndExp ('&&') eqExp          #lAndExpLAndExp
     ;
 
 lOrExp
-    : lAndExp (('||') lAndExp)*
+    locals [
+        bool isArray,
+        size_t size,
+        MetaDataType metaDataType
+    ]
+    : lAndExp                       #lOrExpLAndExp
+    | lOrExp ('||') lAndExp         #lOrExpLOrExp
     ;
 
 constExp
     locals[
-        int basic_or_array_and_type,
+        MetaDataType metaDataType
     ]
     : number            #constExpNumber
     | BoolConst         #constExpBoolConst
@@ -161,11 +249,11 @@ constExp
 
 number
     locals[
-        int basic_or_array_and_type,
+        MetaDataType metaDataType
     ]
-    : IntConst
-    | DoubleConst
-    | FloatConst
+    : IntConst          #numberIntConst
+    | DoubleConst       #numberDoubleConst
+    | FloatConst        #numberFloatConst
     ;
 
 /********** Lexer **********/
