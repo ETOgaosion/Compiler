@@ -169,13 +169,13 @@ BlockSymbolTableList::~BlockSymbolTableList() {}
 
 SymbolTable *BlockSymbolTableList::insertBlockSymbolTable() {
     SymbolTable *insertSymbolTable = new BlockSymbolTable();
-    blockSymbolTableList.push_back(insertSymbolTable);
+    blockSymbolTableList.emplace_back(insertSymbolTable);
     return insertSymbolTable;
 }
 
 SymbolTable *BlockSymbolTableList::insertBlockSymbolTable(SymbolTable *inParentSymbolTable) {
     SymbolTable *insertSymbolTable = new BlockSymbolTable(inParentSymbolTable);
-    blockSymbolTableList.push_back(insertSymbolTable);
+    blockSymbolTableList.emplace_back(insertSymbolTable);
     return insertSymbolTable;
 }
 
@@ -226,10 +226,19 @@ AbstractSymbol *SymbolTable::lookUpAbstractSymbol(string inSymbolName) const {
     if (searchSymbol != abstractSymbolList.end()) {
         return searchSymbol->second;
     }
+    return nullptr;
+}
+
+
+AbstractSymbol *SymbolTable::lookUpAbstractSymbolGlobal(string inSymbolName) const {
+    auto searchSymbol = abstractSymbolList.find(inSymbolName);
+    if (searchSymbol != abstractSymbolList.end()) {
+        return searchSymbol->second;
+    }
     if (symbolTableType == TableType::FUNC) {
-        searchSymbol = paramSymbolList.find(inSymbolName);
-        if (searchSymbol != paramSymbolList.end()) {
-            return searchSymbol->second;
+        AbstractSymbol *paramSymbolRes = lookUpParamSymbol(inSymbolName);
+        if (paramSymbolRes) {
+            return paramSymbolRes;
         }
         return parentSymbolTable->lookUpAbstractSymbol(inSymbolName);
     }
@@ -297,8 +306,28 @@ AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(string inSymbolName, Sy
 }
 
 bool FuncSymbolTable::insertParamType(SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    paramDataTypeList.push_back(tuple<SymbolType, MetaDataType, bool, size_t>(inSymbolType, inMetaDataType, inIsArray, inSize));
+    paramDataTypeList.emplace_back(inSymbolType, inMetaDataType, inIsArray, inSize);
     return true;
+}
+
+AbstractSymbol *FuncSymbolTable::lookUpParamSymbol(string inSymbolNmae) const {
+    auto it = paramSymbolList.find(inSymbolNmae);
+    if (it != paramSymbolList.end()) {
+        return it->second;
+    }
+    else {
+        return nullptr;
+    }
+}
+
+tuple <SymbolType, MetaDataType, bool, size_t> FuncSymbolTable::lookUpParamDataType(string inSymbolName) const {
+    AbstractSymbol *searchSymbol = lookUpParamSymbol(inSymbolName);
+    if (searchSymbol) {
+        return tuple <SymbolType, MetaDataType, bool, size_t>(searchSymbol->getSymbolType(), searchSymbol->getMetaDataType(), searchSymbol->getIsArray(), searchSymbol->getSize());
+    }
+    else {
+        return tuple <SymbolType, MetaDataType, bool, size_t> ();
+    }
 }
 
 string FuncSymbolTable::getFuncName() const {
@@ -329,8 +358,8 @@ int FuncSymbolTable::setParamNum() {
 }
 
 bool FuncSymbolTable::setParamDataTypeList() {
-    for (auto i = SymbolTable::paramSymbolList.begin(); i != SymbolTable::paramSymbolList.end(); ++i) {
-        paramDataTypeList.push_back(tuple<SymbolType, MetaDataType, bool, size_t>(i->second->getSymbolType(), i->second->getMetaDataType(), i->second->getIsArray(), i->second->getSize()));
+    for (auto i = paramSymbolList.begin(); i != paramSymbolList.end(); ++i) {
+        paramDataTypeList.emplace_back(i->second->getSymbolType(), i->second->getMetaDataType(), i->second->getIsArray(), i->second->getSize());
     }
     return true;
 }

@@ -101,13 +101,13 @@
 
 ##### 函数接口
 
-|类|函数名|参数|返回类型|说明|
+|函数名|类|参数|返回类型|说明|
 |:-:|:-:|:-:|:-:|:-:|
-|`AbstractSymbol`|`getSymbolName`|`void`|`string`|返回符号名称|
-|`AbstractSymbol`|`getSymbolType`|`void`|`SymbolType`|返回符号名称|
-|`AbstractSymbol`|`getMetaDataType`|`void`|`MetaDataType`|返回符号名称|
-|`AbstractSymbol`|`getIsArray`|`void`|`bool`|返回符号名称|
-|`AbstractSymbol`|`getSize`|`void`|`size_t`|返回符号名称|
+|`getSymbolName`|`AbstractSymbol`|`void`|`string`|返回符号名称|
+|`getSymbolType`|`AbstractSymbol`|`void`|`SymbolType`|返回符号名称|
+|`getMetaDataType`|`AbstractSymbol`|`void`|`MetaDataType`|返回符号名称|
+|`getIsArray`|`AbstractSymbol`|`void`|`bool`|返回符号名称|
+|`getSize`|`AbstractSymbol`|`void`|`size_t`|返回符号名称|
 |`ParamSymbol`|`ParamSymbol`|`string, SymbolType, MetaDataType, bool, size_t`|`void`|构造函数，直接设置符号信息|
 |`VarSymbol`|`VarSymbol`|同上|`void`|构造函数|
 |`ConstSymbol`|`ConstSymbol`|同上|`void`|构造函数|
@@ -115,6 +115,7 @@
 |`VarArraySymbol`|`VarArraySymbol`|同上|`void`|构造函数|
 |`ConstArraySymbol`|`ConstArraySymbol`|同上|`void`|构造函数|
 |`AbstractSymbol`|`AbstractSymbol`|同上|`void`|构造函数|
+|`createSymbol`|`SymbolFactory`|同上|`void`|工厂模式，推荐使用|
 
 用基类表述的函数在子类中都可以直接使用，面向父类时采用最下定义。
 
@@ -122,13 +123,50 @@
 
 ##### 函数接口
 
-|类|函数名|参数|参数类型|返回类型|说明|
+|函数名|类|参数|参数类型|返回类型|说明|
 |:-:|:-:|:-:|:-:|:-:|:-:|
-|`FuncSymbolTableList`|`insertFuncSymbolTableSafely`|`inFuncName, inReturnType`|`string, MetaDataType`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
-|`FuncSymbolTableList`|`insertFuncSymbolTableSafely`|`inFuncName, inReturnType, inParentSymbolTable`|`string, MetaDataType, SymbolTable *`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
-|`FuncSymbolTableList`|`lookUpFuncSymbolTable`|`inFuncName`|`string`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
-|`BlockSymbolTableList`|`insertBlockSymbolTable`|`inParentSymbolTable`|`SymbolTable *`|`SymbolTable *`|新建一个块结构符号表并加入列表，填入块符号表的父符号表，若成功返回新加入的符号表指针|
-|`BlockSymbolTableList`|`getBlockSymbolTable`|`index`|`int`|`SymbolTable *`|根据下标返回块符号表指针，若输入不合法则报错|
+|`insertFuncSymbolTableSafely`|`FuncSymbolTableList`|`inFuncName, inReturnType`|`string, MetaDataType`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
+|`insertFuncSymbolTableSafely`|`FuncSymbolTableList`|`inFuncName, inReturnType, inParentSymbolTable`|`string, MetaDataType, SymbolTable *`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
+|`lookUpFuncSymbolTable`|`FuncSymbolTableList`|`inFuncName`|`string`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
+|`insertBlockSymbolTable`|`BlockSymbolTableList`|`inParentSymbolTable`|`SymbolTable *`|`SymbolTable *`|新建一个块结构符号表并加入列表，填入块符号表的父符号表，若成功返回新加入的符号表指针|
+|`getBlockSymbolTable`|`BlockSymbolTableList`|`index`|`int`|`SymbolTable *`|根据下标返回块符号表指针，若输入不合法则报错|
+
+##### 实现细节
+
+**Insert操作**
+
+根据STL接口，`unordered_map`使用`emplace`插入元素而不采用`insert`，避免了临时变量的产生，有效利用了C++ 11的新特性：**`变参模版`**和**`完美转发`**，参数类型更加灵活，且不必进行显示类型变换。
+
+首先进行查重的操作运用C++模版的特性，方便不同形式的列表实现进行查重。
+
+```cpp
+template <class T>
+bool findDuplicateName(T list, string className, string name) {
+    auto searchSymbol = list.find(name);
+    if (searchSymbol != list.end()) {
+        ERROR_INSERT_DUPLICATED(className, name);
+        return true;
+    }
+    return false;
+}
+```
+
+若未发现重名，则进行插入操作，事先利用符号工厂创建所需类型的符号：
+
+```cpp
+SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable) {
+    if (findDuplicateName(funcSymbolTableList, "FuncSymbolTableList", inFuncName)){
+        return nullptr;
+    }
+    SymbolTable *insertSymbolTable = new FuncSymbolTable(inFuncName, inReturnType, inParentSymbolTable);
+    funcSymbolTableList.emplace(inFuncName, insertSymbolTable);
+    return insertSymbolTable;
+}
+```
+
+**LookUp操作**
+
+对于unordered_map，查找操作时间复杂度极低，因为底层使用hash table实现，先求解hash值之后直接索引到目标即可。同样可以调用STL模版函数`find`，返回类型是迭代器，若指向列表尾部（在外部）则说明查找失败，否则返回对应位置的AbstractSymbol指针。
 
 #### 符号表
 
@@ -136,27 +174,39 @@
 
 使用基类`SymbolTable`定义的函数在子类中都可以直接调用，使用子类定义的函数为该子类特有，其余函数不允许调用。
 
-|类|函数名|参数|参数类型|返回类型|说明|
+|函数名|类|参数|参数类型|返回类型|说明|
 |:-:|:-:|:-:|:-:|:-:|:-:|
-|`SymbolTable`|`insertAbstractSymbolSafely`|`inSymbolName, inSymbolType, inMetaDataType,inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`AbstractSymbol *`|利用所给参数带查重地插入指代符号列表，若成功返回指代符号指针|
-|`SymbolTable`|`lookUpAbstractSymbol`|`inSymbolName`|`string`|`AbstractSymbol *`|利用指代符号名称查找之，**注意会逐级向上查找，找到存在对应符号的最下嵌套作用域**|
-|`SymbolTable`|`getParentSymbolTable`|`void`|`void`|`SymbolTable *`|找到本符号表的父符号表|
-|`SymbolTable`|`getGlobalSymbolTable`|`void`|`SymbolTable *`|本意只是为了全局符号表单例模式提供，但理论而言确实可以被外部和子类访问|
-|`SymbolTable`|`setParameterSymbolTable`|`parentSymbolTable`|`SymbolTable *`|`bool`|为了弥补，若此前构造函数未能提供父符号表，则可调用此函数定义|
-|`SymbolTable`|`compareAbstractSymbolDataType`|`inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`bool`|比较变量名的相关属性和传入属性是否相同，确定该变量是否类型和要求完全一致|
+|`insertAbstractSymbolSafely`|`SymbolTable`|`inSymbolName, inSymbolType, inMetaDataType,inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`AbstractSymbol *`|利用所给参数带查重地插入指代符号列表，若成功返回指代符号指针|
+|`lookUpAbstractSymbol`|`SymbolTable`|`inSymbolName`|`string`|`AbstractSymbol *`|利用指代符号名称查找之，只在当前作用域内查找|
+|`lookUpAbstractSymbolGlobal`|`SymbolTable`|`inSymbolName`|`string`|`AbstractSymbol *`|利用指代符号名称查找之，**注意会逐级向上查找，找到存在对应符号的最下嵌套作用域**|
+|`getParentSymbolTable`|`SymbolTable`|`void`|`void`|`SymbolTable *`|找到本符号表的父符号表|
+|`getGlobalSymbolTable`|`SymbolTable`|`void`|`SymbolTable *`|本意只是为了全局符号表单例模式提供，但理论而言确实可以被外部和子类访问|
+|`setParameterSymbolTable`|`SymbolTable`|`parentSymbolTable`|`SymbolTable *`|`bool`|为了弥补，若此前构造函数未能提供父符号表，则可调用此函数定义|
+|`compareAbstractSymbolDataType`|`SymbolTable`|`inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`bool`|比较变量名的相关属性和传入属性是否相同，确定该变量是否类型和要求完全一致|
 |`FuncSymbolTable`|`FuncSymbolTable`|`inFuncName, inReturnType, inParentSymbolTable`|`string, MetaDataType, SymbolType *`|`void`|构造函数|
-|`FuncSymbolTable`|`insertParamSymbolSafely`|`inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`AbstractSymbol *`|根据所给参数信息新建参数指代符号，插入参数符号表，若成功，返回参数符号指针|
-|`FuncSymbolTable`|`insertParamType`|`inSymbolType, inMetaDataType, inIsArray, inSize`|`SymbolType, MetaDataType, bool, size_t`|`bool`|根据所给参数信息新建参数指代符号，加入参数类型列表，成功时返回true|
-|`FuncSymbolTable`|`getFuncName`|`void`|`void`|`string`|返回函数名|
-|`FuncSymbolTable`|`getReturnType`|`void`|`void`|`MetaDataType`|返回函数返回类型|
-|`FuncSymbolTable`|`getParamNum`|`void`|`void`|`int`|返回函数参数个数，注意需要先调用计算函数|
-|`FuncSymbolTable`|`setFuncName`|`inFuncName`|`string`|`bool`|设置函数名，弥补构造函数缺漏|
-|`FuncSymbolTable`|`setReturnType`|`inReturnType`|`MetaDataType`|`bool`|设置函数返回类型|
-|`FuncSymbolTable`|`setParamNum`|`void`|`void`|`int`|设置参数个数，调用即可，内部自动计算|
-|`FuncSymbolTable`|`setParamDataTypeList`|`void`|`void`|`void`|bool`|设置参数类型列表，调用即可，内部自动计算|
-|`SymbolTableFactory`|`createSymbolTable`|`inTaleType`|`TableType`|`SymbolTable *`|工厂模式构造符号表类，暂不建议使用|
+|`insertParamSymbolSafely`|`FuncSymbolTable`|`inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`AbstractSymbol *`|根据所给参数信息新建参数指代符号，插入参数符号表，若成功，返回参数符号指针|
+|`insertParamType`|`FuncSymbolTable`|`inSymbolType, inMetaDataType, inIsArray, inSize`|`SymbolType, MetaDataType, bool, size_t`|`bool`|根据所给参数信息新建参数指代符号，加入参数类型列表，成功时返回true|
+|`lookUpParamSymbol`|`FuncSymbolTable`|`inSymbolName`|`string`|`AbstractSymbol *`|在参数符号列表中查找指定名称符号，返回符号指针|
+|`lookUpParamDataType`|`FuncSymbolTable`|`inSymbolName`|`string`|` tuple <SymbolType, MetaDataType, bool, size_t> `|在参数符号列表查找制定符号名称，返回符号相关属性|
+|`getFuncName`|`FuncSymbolTable`|`void`|`void`|`string`|返回函数名|
+|`getReturnType`|`FuncSymbolTable`|`void`|`void`|`MetaDataType`|返回函数返回类型|
+|`getParamNum`|`FuncSymbolTable`|`void`|`void`|`int`|返回函数参数个数，注意需要先调用计算函数|
+|`setFuncName`|`FuncSymbolTable`|`inFuncName`|`string`|`bool`|设置函数名，弥补构造函数缺漏|
+|`setReturnType`|`FuncSymbolTable`|`inReturnType`|`MetaDataType`|`bool`|设置函数返回类型|
+|`setParamNum`|`FuncSymbolTable`|`void`|`void`|`int`|设置参数个数，调用即可，内部自动计算|
+|`setParamDataTypeList`|`FuncSymbolTable`|`void`|`void`|`void`|bool`|设置参数类型列表，调用即可，内部自动计算|
+|`compareParamSymbolDataType`|`FuncSymbolTable`|`index, inSymbolType, inMetaDataType, inIsArray, inSize`|`int, SymbolType, MetaDataType, bool, size_t`|`bool`|直接比较某位置的参数类型|
+|`createSymbolTable`|`SymbolTableFactory`|`inTaleType`|`TableType`|`SymbolTable *`|工厂模式构造符号表类，暂不建议使用|
 
-`GlobalSymbolTable`可以使用`SymbolTable`和`FuncSymbolTableList`中所有接口，`BlockSymbolTable`可以使用`SymbolTable`和`BlockSymbolTableList`中所有接口，`FuncSymbolTableList`可采用全部接口。
+注意`GlobalSymbolTable`只能使用`getGlobalSymbolTable`的方式获取，可以使用`SymbolTable`和`FuncSymbolTableList`中所有接口，`BlockSymbolTable`可以使用`SymbolTable`和`BlockSymbolTableList`中所有接口，`FuncSymbolTableList`可采用全部接口。
+
+##### 实现细节
+
+注意这里提供了向上反递归查找指代符号的接口`lookUpAbstractSymbolGlobal`，查找顺序是：
+
+1. 当前作用域内`AbstractSymbolList`
+2. 若当前为函数符号表，查找`ParamSymbolList`
+3. 向上(`paramSymbolTable`)查找
 
 ### 其它
 

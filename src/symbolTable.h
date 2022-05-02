@@ -173,7 +173,6 @@ private:
 
 protected:
     unordered_map<string, AbstractSymbol *> abstractSymbolList;
-    unordered_map<string, AbstractSymbol *> paramSymbolList;
 
 public:
     SymbolTable();  // note: should promiss GlobalSymbolTable construct for once
@@ -187,6 +186,7 @@ public:
     virtual bool insertParamType(SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) { return false; };
 
     virtual AbstractSymbol *lookUpAbstractSymbol(string inSymbolName) const;
+    virtual AbstractSymbol *lookUpAbstractSymbolGlobal(string inSymbolName) const;
     virtual AbstractSymbol *lookUpParamSymbol(string inSymbolNmae) const { return nullptr; };
     virtual tuple <SymbolType, MetaDataType, bool, size_t> lookUpParamDataType(string inSymbolName) const { return tuple <SymbolType, MetaDataType, bool, size_t>(SymbolType::CONST, MetaDataType::VOID, false, 0); };
 
@@ -226,6 +226,7 @@ private:
     string funcName;
     MetaDataType returnType;
     int paramNum;
+    unordered_map<string, AbstractSymbol *> paramSymbolList;
     vector<tuple <SymbolType, MetaDataType, bool, size_t> > paramDataTypeList;
 
 protected:
@@ -237,6 +238,9 @@ public:
     ~FuncSymbolTable();
     AbstractSymbol *insertParamSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) override;
     bool insertParamType(SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) override;
+
+    AbstractSymbol *lookUpParamSymbol(string inSymbolNmae) const override;
+    tuple <SymbolType, MetaDataType, bool, size_t> lookUpParamDataType(string inSymbolName) const override;
 
     string getFuncName() const override;
     MetaDataType getReturnType() const override;
