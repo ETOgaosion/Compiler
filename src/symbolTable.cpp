@@ -1,6 +1,8 @@
 #include "symbolTable.h"
 #include "errorMsg.h"
 
+using namespace std;
+
 template <class T> bool findDuplicateName(T list, string className, string name) {
     auto searchSymbol = list.find(name);
     if (searchSymbol != list.end()) {
