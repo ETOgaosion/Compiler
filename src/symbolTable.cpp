@@ -3,7 +3,7 @@
 
 using namespace std;
 
-template <class T> bool findDuplicateName(T list, string className, string name) {
+template <class T> bool findDuplicateName(unordered_map<string,T*> list, string className, string name) {
     auto searchSymbol = list.find(name);
     if (searchSymbol != list.end()) {
         ERROR_INSERT_DUPLICATED(className, name);
@@ -144,7 +144,7 @@ FuncSymbolTableList::FuncSymbolTableList() {
 FuncSymbolTableList::~FuncSymbolTableList() {}
 
 SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName, MetaDataType inReturnType) {
-    if (findDuplicateName(funcSymbolTableList, "FuncSymbolTableList", inFuncName)){
+    if (findDuplicateName<SymbolTable>(funcSymbolTableList, "FuncSymbolTableList", inFuncName)){
         return nullptr;
     }
     SymbolTable *insertSymbolTable = new FuncSymbolTable(inFuncName, inReturnType);
@@ -153,7 +153,7 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 }
 
 SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable) {
-    if (findDuplicateName(funcSymbolTableList, "FuncSymbolTableList", inFuncName)){
+    if (findDuplicateName<SymbolTable>(funcSymbolTableList, "FuncSymbolTableList", inFuncName)){
         return nullptr;
     }
     SymbolTable *insertSymbolTable = new FuncSymbolTable(inFuncName, inReturnType, inParentSymbolTable);
@@ -162,7 +162,7 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 }
 
 SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(SymbolTable *inFuncSymbolTable) {
-    if (findDuplicateName(funcSymbolTableList, "FuncSymbolTableList", inFuncSymbolTable->getFuncName())) {
+    if (findDuplicateName<SymbolTable>(funcSymbolTableList, "FuncSymbolTableList", inFuncSymbolTable->getFuncName())) {
         return nullptr;
     }
     funcSymbolTableList.emplace(inFuncSymbolTable->getFuncName(),inFuncSymbolTable);
@@ -238,7 +238,7 @@ SymbolTable::SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable
 SymbolTable::~SymbolTable() {}
 
 AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (findDuplicateName(abstractSymbolList, "AbstractSymbolList", inSymbolName)){
+    if (findDuplicateName<AbstractSymbol>(abstractSymbolList, "AbstractSymbolList", inSymbolName)){
         return nullptr;
     }
     AbstractSymbol *insertAbstractSymbol = SymbolFactory::createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
@@ -247,7 +247,7 @@ AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, Sym
 }
 
 AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol) {
-    if (findDuplicateName(abstractSymbolList, "AbstractSymbolList", inAbstractSymbol->getSymbolName())){
+    if (findDuplicateName<AbstractSymbol>(abstractSymbolList, "AbstractSymbolList", inAbstractSymbol->getSymbolName())){
         return nullptr;
     }
     abstractSymbolList.emplace(inAbstractSymbol->getSymbolName(), inAbstractSymbol);
@@ -330,7 +330,7 @@ FuncSymbolTable::FuncSymbolTable(string inFuncName, MetaDataType inReturnType, S
 }
 
 AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (findDuplicateName(paramSymbolList, "FuncSymbolTable", inSymbolName)) {
+    if (findDuplicateName<AbstractSymbol>(paramSymbolList, "FuncSymbolTable", inSymbolName)) {
         return nullptr;
     }
     AbstractSymbol *insertParamSymbol = SymbolFactory::createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
@@ -339,7 +339,7 @@ AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(string inSymbolName, Sy
 }
 
 AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(AbstractSymbol *inParamSymbol) {
-    if (findDuplicateName(paramSymbolList, "FuncSymbolTable", inParamSymbol->getSymbolName())) {
+    if (findDuplicateName<AbstractSymbol>(paramSymbolList, "FuncSymbolTable", inParamSymbol->getSymbolName())) {
         return nullptr;
     }
     paramSymbolList.emplace(inParamSymbol->getSymbolName(), inParamSymbol);
