@@ -19,11 +19,17 @@ compUnit
     ;
 
 decl
+    locals [
+        std::vector<AbstractSymbol *> declSymbols
+    ]
     : constDecl
     | varDecl
     ;
 
 constDecl
+    locals [
+        std::vector<AbstractSymbol *> symbols
+    ]
     : 'const' bType constDef (',' constDef)* ';'
     ;
 
@@ -39,26 +45,35 @@ bType
 
 constDef
     locals [
-        AbstractSymbol *symbol
+        string symbolName,
+        size_t size,
+        bool isArray
     ]
     : Ident ('[' IntConst ']')? '=' constInitVal
     ;
 
 constInitVal
     locals [
-        AbstractSymbol *symbol
+        MetaDataType type,
+        size_t size,
+        bool isArray
     ]
-    : constExp                              #constInitValOfVar
+    : (constExp)?                              #constInitValOfVar
     | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
     ;
 
 varDecl
+    locals [
+        std::vector<AbstractSymbol*> symbols
+    ]
     : bType varDef (',' varDef)* ';'
     ;
 
 varDef
     locals [
-        AbstractSymbol *symbol
+        string symbolName,
+        size_t size,
+        bool isArray
     ]
     : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;
@@ -71,6 +86,9 @@ funcDef
     ;
 
 funcType
+    locals [
+        MetaDataType funcMetaDataType
+    ]
     : 'void'
     | 'int'
     | 'float'
@@ -80,7 +98,7 @@ funcType
 
 funcFParams
     locals [
-        SymbolTable *funcSymbolTable
+        std::vector<AbstractSymbol*> symbols
     ]
     : funcFParam (',' funcFParam)*
     ;
@@ -89,7 +107,11 @@ funcFParam
     locals [
         AbstractSymbol *symbol
     ]
-    : bType Ident ('[' ']')?
+    : bType Ident (brackets)?
+    ;
+
+brackets
+    :'[' ']'
     ;
 
 block
@@ -136,8 +158,7 @@ lVal
     locals [
         bool isArray,
         size_t size,
-        MetaDataType metaDataType,
-        AbstractSymbol *symbol
+        string idName
     ]
     : Ident ('[' exp ']')?
     ;
@@ -157,8 +178,7 @@ unaryExp
     locals [
         bool isArray,
         size_t size,
-        MetaDataType metaDataType,
-        SymbolTable *funcSymbolTable
+        MetaDataType metaDataType
     ]
     : primaryExp                        #unaryExpPrimaryExp
     | Ident '(' (funcRParams)? ')'      #unaryExpFunc
@@ -172,9 +192,6 @@ unaryOp
     ;
 
 funcRParams
-    locals [
-        SymbolTable *funcSymbolTable
-    ]
     : exp (',' exp)*
     ;
 

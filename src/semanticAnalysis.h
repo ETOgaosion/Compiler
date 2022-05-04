@@ -5,7 +5,7 @@
 class SemanticAnalysis : public CACTBaseListener
 {
 private:
-    /* data */
+    SymbolTable* curSymbolTable;
 public:
     SemanticAnalysis(/* args */){}
     ~SemanticAnalysis(){}
