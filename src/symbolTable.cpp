@@ -161,6 +161,24 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
     return insertSymbolTable;
 }
 
+SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(SymbolTable *inFuncSymbolTable) {
+    if (findDuplicateName(funcSymbolTableList, "FuncSymbolTableList", inFuncSymbolTable->getFuncName())) {
+        return nullptr;
+    }
+    funcSymbolTableList.emplace(inFuncSymbolTable->getFuncName(),inFuncSymbolTable);
+    return inFuncSymbolTable;
+}
+
+SymbolTable *FuncSymbolTableList::lookUpFuncSymbolTable(std::string inFuncName) const {
+    auto searchFuncSymbolTable = funcSymbolTableList.find(inFuncName);
+    if (searchFuncSymbolTable == funcSymbolTableList.end()) {
+        return nullptr;
+    }
+    else{
+        return searchFuncSymbolTable->second;
+    }
+}
+
 // --------
 
 BlockSymbolTableList::BlockSymbolTableList() {
@@ -175,10 +193,15 @@ SymbolTable *BlockSymbolTableList::insertBlockSymbolTable() {
     return insertSymbolTable;
 }
 
-SymbolTable *BlockSymbolTableList::insertBlockSymbolTable(SymbolTable *inParentSymbolTable) {
-    SymbolTable *insertSymbolTable = new BlockSymbolTable(inParentSymbolTable);
-    blockSymbolTableList.emplace_back(insertSymbolTable);
-    return insertSymbolTable;
+// SymbolTable *BlockSymbolTableList::insertBlockSymbolTable(SymbolTable *inParentSymbolTable) {
+//     SymbolTable *insertSymbolTable = new BlockSymbolTable(inParentSymbolTable);
+//     blockSymbolTableList.emplace_back(insertSymbolTable);
+//     return insertSymbolTable;
+// }
+
+SymbolTable *BlockSymbolTableList::insertBlockSymbolTable(SymbolTable *inBlockSymbolTable) {
+    blockSymbolTableList.emplace_back(inBlockSymbolTable);
+    return inBlockSymbolTable;
 }
 
 SymbolTable *BlockSymbolTableList::getBlockSymbolTable(int index) const {
@@ -221,6 +244,14 @@ AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, Sym
     AbstractSymbol *insertAbstractSymbol = SymbolFactory::createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
     abstractSymbolList.emplace(inSymbolName, insertAbstractSymbol);
     return insertAbstractSymbol;
+}
+
+AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol) {
+    if (findDuplicateName(abstractSymbolList, "AbstractSymbolList", inAbstractSymbol->getSymbolName())){
+        return nullptr;
+    }
+    abstractSymbolList.emplace(inAbstractSymbol->getSymbolName(), inAbstractSymbol);
+    return inAbstractSymbol;
 }
 
 AbstractSymbol *SymbolTable::lookUpAbstractSymbol(string inSymbolName) const {
@@ -307,9 +338,21 @@ AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(string inSymbolName, Sy
     return insertParamSymbol;
 }
 
+AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(AbstractSymbol *inParamSymbol) {
+    if (findDuplicateName(paramSymbolList, "FuncSymbolTable", inParamSymbol->getSymbolName())) {
+        return nullptr;
+    }
+    paramSymbolList.emplace(inParamSymbol->getSymbolName(), inParamSymbol);
+    return inParamSymbol;
+}
+
 bool FuncSymbolTable::insertParamType(SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     paramDataTypeList.emplace_back(inSymbolType, inMetaDataType, inIsArray, inSize);
     return true;
+}
+
+bool FuncSymbolTable::insertParamType(AbstractSymbol *inParamSymbol) {
+    return insertParamType(inParamSymbol->getSymbolType(), inParamSymbol->getMetaDataType(), inParamSymbol->getIsArray(), inParamSymbol->getSize());
 }
 
 AbstractSymbol *FuncSymbolTable::lookUpParamSymbol(string inSymbolNmae) const {

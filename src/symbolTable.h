@@ -143,6 +143,7 @@ public:
     ~FuncSymbolTableList();
     virtual SymbolTable *insertFuncSymbolTableSafely(std::string inFuncName, MetaDataType inReturnType);
     virtual SymbolTable *insertFuncSymbolTableSafely(std::string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable);
+    virtual SymbolTable *insertFuncSymbolTableSafely(SymbolTable *inFuncSymbolTable);
 
     virtual SymbolTable *lookUpFuncSymbolTable(std::string inFuncName) const;
 
@@ -158,7 +159,8 @@ public:
     BlockSymbolTableList();
     ~BlockSymbolTableList();
     virtual SymbolTable *insertBlockSymbolTable();
-    virtual SymbolTable *insertBlockSymbolTable(SymbolTable *inParentSymbolTable);
+    //virtual SymbolTable *insertBlockSymbolTable(SymbolTable *inParentSymbolTable);
+    virtual SymbolTable *insertBlockSymbolTable(SymbolTable *inBlockSymbolTable);
     
     virtual SymbolTable *getBlockSymbolTable(int index) const;
 
@@ -180,8 +182,11 @@ public:
     ~SymbolTable();
 
     virtual AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize);
+    virtual AbstractSymbol *insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol);
     virtual AbstractSymbol *insertParamSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) { return nullptr;};
+    virtual AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) { return nullptr;};
     virtual bool insertParamType(SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) { return false; };
+    virtual bool insertParamType(AbstractSymbol *inParamSymbol) { return false; };
 
     virtual AbstractSymbol *lookUpAbstractSymbol(std::string inSymbolName) const;
     virtual AbstractSymbol *lookUpAbstractSymbolGlobal(std::string inSymbolName) const;
@@ -235,7 +240,9 @@ public:
     FuncSymbolTable(std::string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable);
     ~FuncSymbolTable();
     AbstractSymbol *insertParamSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) override;
+    AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) override;
     bool insertParamType(SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) override;
+    bool insertParamType(AbstractSymbol *inParamSymbol) override;
 
     AbstractSymbol *lookUpParamSymbol(std::string inSymbolNmae) const override;
     std::tuple <SymbolType, MetaDataType, bool, size_t> lookUpParamDataType(std::string inSymbolName) const override;
