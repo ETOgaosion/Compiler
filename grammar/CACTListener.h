@@ -1,6 +1,5 @@
 
-    #include <vector>
-    #include <string>
+    #include "../src/symbolTable.h"
 
 
 // Generated from CACT.g4 by ANTLR 4.8
@@ -57,6 +56,9 @@ public:
   virtual void enterFuncFParam(CACTParser::FuncFParamContext *ctx) = 0;
   virtual void exitFuncFParam(CACTParser::FuncFParamContext *ctx) = 0;
 
+  virtual void enterBrackets(CACTParser::BracketsContext *ctx) = 0;
+  virtual void exitBrackets(CACTParser::BracketsContext *ctx) = 0;
+
   virtual void enterBlock(CACTParser::BlockContext *ctx) = 0;
   virtual void exitBlock(CACTParser::BlockContext *ctx) = 0;
 
@@ -77,6 +79,21 @@ public:
 
   virtual void enterStmtReturn(CACTParser::StmtReturnContext *ctx) = 0;
   virtual void exitStmtReturn(CACTParser::StmtReturnContext *ctx) = 0;
+
+  virtual void enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext *ctx) = 0;
+  virtual void exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext *ctx) = 0;
+
+  virtual void enterSubStmtExpression(CACTParser::SubStmtExpressionContext *ctx) = 0;
+  virtual void exitSubStmtExpression(CACTParser::SubStmtExpressionContext *ctx) = 0;
+
+  virtual void enterSubStmtBlock(CACTParser::SubStmtBlockContext *ctx) = 0;
+  virtual void exitSubStmtBlock(CACTParser::SubStmtBlockContext *ctx) = 0;
+
+  virtual void enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext *ctx) = 0;
+  virtual void exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext *ctx) = 0;
+
+  virtual void enterSubStmtReturn(CACTParser::SubStmtReturnContext *ctx) = 0;
+  virtual void exitSubStmtReturn(CACTParser::SubStmtReturnContext *ctx) = 0;
 
   virtual void enterExpAddExp(CACTParser::ExpAddExpContext *ctx) = 0;
   virtual void exitExpAddExp(CACTParser::ExpAddExpContext *ctx) = 0;
@@ -119,6 +136,9 @@ public:
 
   virtual void enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext *ctx) = 0;
   virtual void exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext *ctx) = 0;
+
+  virtual void enterMulOp(CACTParser::MulOpContext *ctx) = 0;
+  virtual void exitMulOp(CACTParser::MulOpContext *ctx) = 0;
 
   virtual void enterAddExpAddExp(CACTParser::AddExpAddExpContext *ctx) = 0;
   virtual void exitAddExpAddExp(CACTParser::AddExpAddExpContext *ctx) = 0;

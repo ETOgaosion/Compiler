@@ -1,6 +1,5 @@
 
-    #include <vector>
-    #include <string>
+    #include "../src/symbolTable.h"
 
 
 // Generated from CACT.g4 by ANTLR 4.8
@@ -59,6 +58,9 @@ public:
   virtual void enterFuncFParam(CACTParser::FuncFParamContext * /*ctx*/) override { }
   virtual void exitFuncFParam(CACTParser::FuncFParamContext * /*ctx*/) override { }
 
+  virtual void enterBrackets(CACTParser::BracketsContext * /*ctx*/) override { }
+  virtual void exitBrackets(CACTParser::BracketsContext * /*ctx*/) override { }
+
   virtual void enterBlock(CACTParser::BlockContext * /*ctx*/) override { }
   virtual void exitBlock(CACTParser::BlockContext * /*ctx*/) override { }
 
@@ -79,6 +81,21 @@ public:
 
   virtual void enterStmtReturn(CACTParser::StmtReturnContext * /*ctx*/) override { }
   virtual void exitStmtReturn(CACTParser::StmtReturnContext * /*ctx*/) override { }
+
+  virtual void enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * /*ctx*/) override { }
+  virtual void exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext * /*ctx*/) override { }
+
+  virtual void enterSubStmtExpression(CACTParser::SubStmtExpressionContext * /*ctx*/) override { }
+  virtual void exitSubStmtExpression(CACTParser::SubStmtExpressionContext * /*ctx*/) override { }
+
+  virtual void enterSubStmtBlock(CACTParser::SubStmtBlockContext * /*ctx*/) override { }
+  virtual void exitSubStmtBlock(CACTParser::SubStmtBlockContext * /*ctx*/) override { }
+
+  virtual void enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * /*ctx*/) override { }
+  virtual void exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * /*ctx*/) override { }
+
+  virtual void enterSubStmtReturn(CACTParser::SubStmtReturnContext * /*ctx*/) override { }
+  virtual void exitSubStmtReturn(CACTParser::SubStmtReturnContext * /*ctx*/) override { }
 
   virtual void enterExpAddExp(CACTParser::ExpAddExpContext * /*ctx*/) override { }
   virtual void exitExpAddExp(CACTParser::ExpAddExpContext * /*ctx*/) override { }
@@ -121,6 +138,9 @@ public:
 
   virtual void enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * /*ctx*/) override { }
   virtual void exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * /*ctx*/) override { }
+
+  virtual void enterMulOp(CACTParser::MulOpContext * /*ctx*/) override { }
+  virtual void exitMulOp(CACTParser::MulOpContext * /*ctx*/) override { }
 
   virtual void enterAddExpAddExp(CACTParser::AddExpAddExpContext * /*ctx*/) override { }
   virtual void exitAddExpAddExp(CACTParser::AddExpAddExpContext * /*ctx*/) override { }

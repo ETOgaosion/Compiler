@@ -1,6 +1,4 @@
 
-    #include <vector>
-    #include <string>
     #include "../src/symbolTable.h"
 
 
@@ -30,11 +28,12 @@ public:
   enum {
     RuleCompUnit = 0, RuleDecl = 1, RuleConstDecl = 2, RuleBType = 3, RuleConstDef = 4, 
     RuleConstInitVal = 5, RuleVarDecl = 6, RuleVarDef = 7, RuleFuncDef = 8, 
-    RuleFuncType = 9, RuleFuncFParams = 10, RuleFuncFParam = 11, RuleBlock = 12, 
-    RuleBlockItem = 13, RuleStmt = 14, RuleExp = 15, RuleCond = 16, RuleLVal = 17, 
-    RulePrimaryExp = 18, RuleUnaryExp = 19, RuleUnaryOp = 20, RuleFuncRParams = 21, 
-    RuleMulExp = 22, RuleAddExp = 23, RuleRelExp = 24, RuleEqExp = 25, RuleLAndExp = 26, 
-    RuleLOrExp = 27, RuleConstExp = 28, RuleNumber = 29
+    RuleFuncType = 9, RuleFuncFParams = 10, RuleFuncFParam = 11, RuleBrackets = 12, 
+    RuleBlock = 13, RuleBlockItem = 14, RuleStmt = 15, RuleSubStmt = 16, 
+    RuleExp = 17, RuleCond = 18, RuleLVal = 19, RulePrimaryExp = 20, RuleUnaryExp = 21, 
+    RuleUnaryOp = 22, RuleFuncRParams = 23, RuleMulExp = 24, RuleMulOp = 25, 
+    RuleAddExp = 26, RuleRelExp = 27, RuleEqExp = 28, RuleLAndExp = 29, 
+    RuleLOrExp = 30, RuleConstExp = 31, RuleNumber = 32
   };
 
   CACTParser(antlr4::TokenStream *input);
@@ -59,9 +58,11 @@ public:
   class FuncTypeContext;
   class FuncFParamsContext;
   class FuncFParamContext;
+  class BracketsContext;
   class BlockContext;
   class BlockItemContext;
   class StmtContext;
+  class SubStmtContext;
   class ExpContext;
   class CondContext;
   class LValContext;
@@ -70,6 +71,7 @@ public:
   class UnaryOpContext;
   class FuncRParamsContext;
   class MulExpContext;
+  class MulOpContext;
   class AddExpContext;
   class RelExpContext;
   class EqExpContext;
@@ -140,7 +142,9 @@ public:
 
   class  ConstDefContext : public antlr4::ParserRuleContext {
   public:
-    AbstractSymbol * symbol;
+    std::string symbolName;
+    std::size_t size;
+    bool isArray;
     ConstDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
@@ -156,7 +160,9 @@ public:
 
   class  ConstInitValContext : public antlr4::ParserRuleContext {
   public:
-    AbstractSymbol * symbol;
+    MetaDataType type;
+    std::size_t size;
+    bool isArray;
     ConstInitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     ConstInitValContext() = default;
@@ -206,7 +212,9 @@ public:
 
   class  VarDefContext : public antlr4::ParserRuleContext {
   public:
-    AbstractSymbol * symbol;
+    std::string symbolName;
+    std::size_t size;
+    bool isArray;
     VarDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
@@ -222,7 +230,6 @@ public:
 
   class  FuncDefContext : public antlr4::ParserRuleContext {
   public:
-    SymbolTable * funcSymbolTable;
     FuncDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     FuncTypeContext *funcType();
@@ -239,6 +246,7 @@ public:
 
   class  FuncTypeContext : public antlr4::ParserRuleContext {
   public:
+    MetaDataType funcMetaDataType;
     FuncTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
 
@@ -251,7 +259,6 @@ public:
 
   class  FuncFParamsContext : public antlr4::ParserRuleContext {
   public:
-    SymbolTable * funcSymbolTable;
     FuncFParamsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<FuncFParamContext *> funcFParam();
@@ -266,11 +273,11 @@ public:
 
   class  FuncFParamContext : public antlr4::ParserRuleContext {
   public:
-    AbstractSymbol * symbol;
     FuncFParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     BTypeContext *bType();
     antlr4::tree::TerminalNode *Ident();
+    BracketsContext *brackets();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -279,9 +286,20 @@ public:
 
   FuncFParamContext* funcFParam();
 
+  class  BracketsContext : public antlr4::ParserRuleContext {
+  public:
+    BracketsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+   
+  };
+
+  BracketsContext* brackets();
+
   class  BlockContext : public antlr4::ParserRuleContext {
   public:
-    SymbolTable * blockSymbolTable;
     BlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<BlockItemContext *> blockItem();
@@ -310,6 +328,8 @@ public:
 
   class  StmtContext : public antlr4::ParserRuleContext {
   public:
+    bool hasReturn;
+    MetaDataType returnType;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StmtContext() = default;
@@ -354,8 +374,8 @@ public:
     StmtCtrlSeqContext(StmtContext *ctx);
 
     CondContext *cond();
-    std::vector<StmtContext *> stmt();
-    StmtContext* stmt(size_t i);
+    std::vector<SubStmtContext *> subStmt();
+    SubStmtContext* subStmt(size_t i);
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };
@@ -371,10 +391,75 @@ public:
 
   StmtContext* stmt();
 
+  class  SubStmtContext : public antlr4::ParserRuleContext {
+  public:
+    bool hasReturn;
+    MetaDataType returnType;
+    SubStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    SubStmtContext() = default;
+    void copyFrom(SubStmtContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  SubStmtExpressionContext : public SubStmtContext {
+  public:
+    SubStmtExpressionContext(SubStmtContext *ctx);
+
+    ExpContext *exp();
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+  };
+
+  class  SubStmtBlockContext : public SubStmtContext {
+  public:
+    SubStmtBlockContext(SubStmtContext *ctx);
+
+    BlockContext *block();
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+  };
+
+  class  SubStmtAssignmentContext : public SubStmtContext {
+  public:
+    SubStmtAssignmentContext(SubStmtContext *ctx);
+
+    LValContext *lVal();
+    ExpContext *exp();
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+  };
+
+  class  SubStmtCtrlSeqContext : public SubStmtContext {
+  public:
+    SubStmtCtrlSeqContext(SubStmtContext *ctx);
+
+    CondContext *cond();
+    std::vector<SubStmtContext *> subStmt();
+    SubStmtContext* subStmt(size_t i);
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+  };
+
+  class  SubStmtReturnContext : public SubStmtContext {
+  public:
+    SubStmtReturnContext(SubStmtContext *ctx);
+
+    ExpContext *exp();
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+  };
+
+  SubStmtContext* subStmt();
+
   class  ExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    size_t size;
+    std::size_t size;
     MetaDataType metaDataType;
     ExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -409,7 +494,7 @@ public:
 
   class  CondContext : public antlr4::ParserRuleContext {
   public:
-    MetaDataType bMetaDataType;
+    MetaDataType metaDataType;
     CondContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     LOrExpContext *lOrExp();
@@ -424,9 +509,9 @@ public:
   class  LValContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    size_t size;
-    MetaDataType metaDataType;
-    AbstractSymbol * symbol;
+    std::size_t size;
+    SymbolType symbolType;
+    MetaDataType lValMetaDataType;
     LValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
@@ -442,7 +527,7 @@ public:
   class  PrimaryExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    size_t size;
+    std::size_t size;
     MetaDataType metaDataType;
     PrimaryExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -487,9 +572,8 @@ public:
   class  UnaryExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    size_t size;
+    std::size_t size;
     MetaDataType metaDataType;
-    SymbolTable * funcSymbolTable;
     UnaryExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     UnaryExpContext() = default;
@@ -546,7 +630,9 @@ public:
 
   class  FuncRParamsContext : public antlr4::ParserRuleContext {
   public:
-    SymbolTable * funcSymbolTable;
+    std::vector<bool> isArrayList;
+    std::vector<std::size_t> sizeList;
+    std::vector<MetaDataType> metaDataTypeList;
     FuncRParamsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<ExpContext *> exp();
@@ -562,7 +648,7 @@ public:
   class  MulExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    size_t size;
+    std::size_t size;
     MetaDataType metaDataType;
     MulExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -580,6 +666,7 @@ public:
     MulExpMulExpContext(MulExpContext *ctx);
 
     MulExpContext *mulExp();
+    MulOpContext *mulOp();
     UnaryExpContext *unaryExp();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -596,10 +683,22 @@ public:
 
   MulExpContext* mulExp();
   MulExpContext* mulExp(int precedence);
+  class  MulOpContext : public antlr4::ParserRuleContext {
+  public:
+    MulOpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+   
+  };
+
+  MulOpContext* mulOp();
+
   class  AddExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    size_t size;
+    std::size_t size;
     MetaDataType metaDataType;
     AddExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -635,8 +734,6 @@ public:
   AddExpContext* addExp(int precedence);
   class  RelExpContext : public antlr4::ParserRuleContext {
   public:
-    bool isArray;
-    size_t size;
     MetaDataType metaDataType;
     RelExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -681,8 +778,6 @@ public:
   RelExpContext* relExp(int precedence);
   class  EqExpContext : public antlr4::ParserRuleContext {
   public:
-    bool isArray;
-    size_t size;
     MetaDataType metaDataType;
     EqExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -718,8 +813,6 @@ public:
   EqExpContext* eqExp(int precedence);
   class  LAndExpContext : public antlr4::ParserRuleContext {
   public:
-    bool isArray;
-    size_t size;
     MetaDataType metaDataType;
     LAndExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -755,8 +848,6 @@ public:
   LAndExpContext* lAndExp(int precedence);
   class  LOrExpContext : public antlr4::ParserRuleContext {
   public:
-    bool isArray;
-    size_t size;
     MetaDataType metaDataType;
     LOrExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    

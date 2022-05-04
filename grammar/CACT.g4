@@ -6,8 +6,7 @@ options {
 }
 
 @header {
-    #include <vector>
-    #include <string>
+    #include "../src/symbolTable.h"
 }
 
 /********** Parser **********/
@@ -19,17 +18,11 @@ compUnit
     ;
 
 decl
-    locals [
-        std::vector<AbstractSymbol *> declSymbols
-    ]
     : constDecl
     | varDecl
     ;
 
 constDecl
-    locals [
-        std::vector<AbstractSymbol *> symbols
-    ]
     : 'const' bType constDef (',' constDef)* ';'
     ;
 
@@ -45,8 +38,8 @@ bType
 
 constDef
     locals [
-        string symbolName,
-        size_t size,
+        std::string symbolName,
+        std::size_t size,
         bool isArray
     ]
     : Ident ('[' IntConst ']')? '=' constInitVal
@@ -55,33 +48,27 @@ constDef
 constInitVal
     locals [
         MetaDataType type,
-        size_t size,
+        std::size_t size,
         bool isArray
     ]
-    : (constExp)?                              #constInitValOfVar
+    : (constExp)?                           #constInitValOfVar
     | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
     ;
 
 varDecl
-    locals [
-        std::vector<AbstractSymbol*> symbols
-    ]
     : bType varDef (',' varDef)* ';'
     ;
 
 varDef
     locals [
-        string symbolName,
-        size_t size,
+        std::string symbolName,
+        std::size_t size,
         bool isArray
     ]
     : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;
 
 funcDef
-    locals [
-        SymbolTable *funcSymbolTable
-    ]
     : funcType Ident '(' (funcFParams)? ')' block
     ;
 
@@ -97,16 +84,10 @@ funcType
     ;
 
 funcFParams
-    locals [
-        std::vector<AbstractSymbol*> symbols
-    ]
     : funcFParam (',' funcFParam)*
     ;
 
 funcFParam
-    locals [
-        AbstractSymbol *symbol
-    ]
     : bType Ident (brackets)?
     ;
 
@@ -115,9 +96,6 @@ brackets
     ;
 
 block
-    locals [
-        SymbolTable *blockSymbolTable
-    ]
     : '{' (blockItem)* '}'
     ;
 
@@ -127,20 +105,37 @@ blockItem
     ;
 
 stmt
-    : lVal '=' exp ';'                          #stmtAssignment
-    | (exp)? ';'                                #stmtExpression
-    | block                                     #stmtBlock
-    | 'if' '(' cond ')' stmt ('else' stmt)?     #stmtCtrlSeq
-    | 'while' '(' cond ')' stmt                 #stmtCtrlSeq
-    | 'break' ';'                               #stmtCtrlSeq
-    | 'contine' ';'                             #stmtCtrlSeq
-    | 'return' (exp)? ';'                       #stmtReturn
+    locals [
+        bool hasReturn,
+        MetaDataType returnType
+    ]
+    : lVal '=' exp ';'                                  #stmtAssignment
+    | (exp)? ';'                                        #stmtExpression
+    | block                                             #stmtBlock
+    | 'if' '(' cond ')' subStmt ('else' subStmt)?       #stmtCtrlSeq
+    | 'while' '(' cond ')' subStmt                      #stmtCtrlSeq
+    | 'return' (exp)? ';'                               #stmtReturn
+    ;
+
+subStmt
+    locals [
+        bool hasReturn,
+        MetaDataType returnType
+    ]
+    : lVal '=' exp ';'                              #subStmtAssignment
+    | (exp)? ';'                                    #subStmtExpression
+    | block                                         #subStmtBlock
+    | 'if' '(' cond ')' subStmt ('else' subStmt)?   #subStmtCtrlSeq
+    | 'while' '(' cond ')' subStmt                  #subStmtCtrlSeq
+    | 'break' ';'                                   #subStmtCtrlSeq
+    | 'continue' ';'                                #subStmtCtrlSeq
+    | 'return' (exp)? ';'                           #subStmtReturn
     ;
 
 exp
     locals [
         bool isArray,
-        size_t size,
+        std::size_t size,
         MetaDataType metaDataType
     ]
     : addExp        #expAddExp
@@ -149,7 +144,7 @@ exp
 
 cond
     locals [
-        MetaDataType bMetaDataType
+        MetaDataType metaDataType
     ]
     : lOrExp
     ;
@@ -157,8 +152,9 @@ cond
 lVal
     locals [
         bool isArray,
-        size_t size,
-        string idName
+        std::size_t size,
+        SymbolType symbolType,
+        MetaDataType lValMetaDataType
     ]
     : Ident ('[' exp ']')?
     ;
@@ -166,7 +162,7 @@ lVal
 primaryExp
     locals [
         bool isArray,
-        size_t size,
+        std::size_t size,
         MetaDataType metaDataType
     ]
     : '(' exp ')'   #primaryExpNestExp
@@ -177,7 +173,7 @@ primaryExp
 unaryExp
     locals [
         bool isArray,
-        size_t size,
+        std::size_t size,
         MetaDataType metaDataType
     ]
     : primaryExp                        #unaryExpPrimaryExp
@@ -192,23 +188,31 @@ unaryOp
     ;
 
 funcRParams
+    locals [
+        std::vector<bool> isArrayList,
+        std::vector<std::size_t> sizeList,
+        std::vector<MetaDataType> metaDataTypeList
+    ]
     : exp (',' exp)*
     ;
 
 mulExp
     locals [
         bool isArray,
-        size_t size,
+        std::size_t size,
         MetaDataType metaDataType
     ]
     : unaryExp                              #mulExpUnaryExp
-    | mulExp ('*' | '/' | '%') unaryExp     #mulExpMulExp
+    | mulExp mulOp unaryExp                 #mulExpMulExp
     ;
+
+mulOp
+    : '*' | '/' | '%';
 
 addExp
     locals [
         bool isArray,
-        size_t size,
+        std::size_t size,
         MetaDataType metaDataType
     ]
     : mulExp                        #addExpMulExp
@@ -217,8 +221,6 @@ addExp
 
 relExp
     locals [
-        bool isArray,
-        size_t size,
         MetaDataType metaDataType
     ]
     : addExp                                    #relExpAddExp
@@ -228,8 +230,6 @@ relExp
 
 eqExp
     locals [
-        bool isArray,
-        size_t size,
         MetaDataType metaDataType
     ]
     : relExp                        #eqExpRelExp
@@ -238,8 +238,6 @@ eqExp
 
 lAndExp
     locals [
-        bool isArray,
-        size_t size,
         MetaDataType metaDataType
     ]
     : eqExp                         #lAndExpEqExp
@@ -248,8 +246,6 @@ lAndExp
 
 lOrExp
     locals [
-        bool isArray,
-        size_t size,
         MetaDataType metaDataType
     ]
     : lAndExp                       #lOrExpLAndExp
