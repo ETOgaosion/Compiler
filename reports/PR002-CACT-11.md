@@ -217,16 +217,434 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 
 根据CACT specification，变量在不同作用域中可以覆盖，变量可以和函数同名，插入操作只需要搜索当前作用域有无重名变量。
 
-### CACT词法描述更新实现
+### CACT语义分析
 
+#### CompUnit
 
+```antlr
+compUnit
+    locals [
+        SymbolTable *globalSymbolTable
+    ]
+    : (decl | funcDef)+ EOF
+    ;
+```
 
+- 增加了`SymbolTable *globalSymbolTable`属性，因为`CompUnit`为语法分析树的根节点，所以在此添加全局符号表属性
+
+- 进入结点时，即开始语义分析时：
+
+  - 将全局符号表赋值给当前符号表
+
+  - 在全局符号表中插入以下函数符号表：
+
+    | 函数名称     | 返回值类型 |
+    | ------------ | ---------- |
+    | print_int    | void       |
+    | print_float  | void       |
+    | print_double | void       |
+    | print_bool   | void       |
+    | get_int      | int        |
+    | get_float    | float      |
+    | get_double   | double     |
+
+  - 在每个函数符号表中插入**参数符号表**，并设置参数的数据类型列表，同时记录参数数量
+
+    以`print_int`函数符号表为例：
+
+    ```c++
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::, false, 0);
+    funcSymbolTable->setParamDataTypeList();
+    funcSymbolTable->setParamNum();
+    ```
+
+- 退出结点时，即结束语义分析时：
+
+  - 判断**当前符号表**是否为全局符号表
+  - 在当前符号表中查找是否存在`main`函数的函数符号表
+  - 若均满足，则结束分析；否则报错。
+
+#### ConstDecl
+
+```antlr
+constDecl
+    : 'const' bType constDef (',' constDef)* ';'
+    ;
+```
+
+- 进入结点时不做操作
+
+- 退出结点时，表示该常量声明已分析完成，此时创建各个常量的符号，并加入当前符号表
+
+```c++
+MetaDataType type = ctx->bType()->bMetaDataType;
+    SymbolFactory symbolFactory;
+
+    for(const auto & const_def : ctx->constDef())
+    {
+        AbstractSymbol *symbol = symbolFactory.createSymbol(const_def->symbolName, SymbolType::CONST, type, const_def->isArray, const_def->size);
+        if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
+            throw std::runtime_error("[ERROR] > Redefine const symbol.\n");
+        }
+    }
+```
+
+  - `btype`的元数据类型作为常量声明的数据类型
+  - 符号类型为`CONST`
+  - 各`constDef`子节点传递上来对应声明的`symbolName`，`isArray`，`size`属性
+
+- 如果将符号插入当前符号表失败，代表当前符号表中已有过相同的声明，报**重复声明**错误
+
+#### BType
+
+```antlr
+bType
+    locals [
+        MetaDataType bMetaDataType
+    ]
+    : 'int'
+    | 'bool'
+    | 'double'
+    | 'float'
+    ;
+```
+
+- 拥有属性`MetaDataType bMetaDataType`，即记录该`btype`的元数据类型
+
+- 进入结点时不做操作
+
+- 退出结点时，用`getText`操作得到输入字符串，匹配字符串后设置该`btype`的元数据类型
+
+```c++
+std::string dataTypeText = ctx->getText();
+    if (dataTypeText == "bool") {
+        ctx->bMetaDataType = MetaDataType::BOOL;
+    }
+    else if (dataTypeText == "int") {
+        ctx->bMetaDataType = MetaDataType::INT;
+    }
+    else if (dataTypeText == "float") {
+        ctx->bMetaDataType = MetaDataType::FLOAT;
+    }
+    else if (dataTypeText == "double") {
+        ctx->bMetaDataType = MetaDataType::DOUBLE;
+    }
+    else{
+        throw std::runtime_error("[ERROR] > Data Type not supported.\n");
+    }  
+```
+
+#### ConstDef
+
+```antlr
+constDef
+    locals [
+        std::string symbolName,
+        std::size_t size,
+        bool isArray
+    ]
+    : Ident ('[' IntConst ']')? '=' constInitVal
+    ;
+```
+
+- 拥有属性`symbolName`，`size` ，`isArray`，分别记录该常量定义的符号名称，符号大小，和是否为数组
+- 进入结点时不做操作
+- 退出结点时
+  - 通过子节点`Ident`调用`getText`方法得到符号名称
+  - 判断`ctx->IntConst()`是否为空
+    - 为空，则说明该处语法规则实现为`constDef -> Ident'='constInitVal`，此时，如果`constInitVal`为数组，则相当于数组赋值给普通常量，报错
+    - 不为空，则说明该处语法规则实现为`constDef -> Ident'['IntConst']'='constInitVal`，则说明该`constDef`为数组，设置其`isArray`属性为`true`，此时
+      - 如果`constInitVal`不为数组，则相当于数组常量初始化时赋予了普通常数，例如`int a[100] = 5;`，报错
+      - 如果`constInitVal`是数组，如果它的大小大于`constDef`的数组大小，相当于`int a[5] = b; // size b is 10`，报错
+
+#### ConstInitVal
+
+```antlr
+constInitVal
+    locals [
+        MetaDataType type,
+        std::size_t size,
+        bool isArray
+    ]
+    : (constExp)?                           #constInitValOfVar
+    | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
+    ;
+```
+
+```c++
+void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
+{
+    if(!ctx->constExp().empty()){
+        ctx->type = ctx->constExp(0)->metaDataType;
+        ctx->size = ctx->constExp().size();
+    } else {
+        ctx->type = MetaDataType::VOID;
+        ctx->size = 0;
+    }
+
+    for(const auto & const_exp : ctx->constExp()){
+        if(const_exp->metaDataType != ctx->type)
+            throw std::runtime_error("[ERROR] > Array data type is not consistent.\n");
+    }
+    ctx->isArray = true;
+}
+```
+
+- 该函数为数组初始化时的右值分析，采用的产生式为`constInitVal-> '{' (constExp (',' constExp)*)? '}'`
+- 此时需要判断右值的类型是否一致，例如，如果出现类似于`int a[5] = {1, 2, 3.1, 4, 5};`的情况，则需要报错。判断方法为：先记录第一个`constExp`的数据类型，如果此后的`constExp`有与其数据类型不一致的情况，则报错
+
+#### VarDecl
+
+```c++
+	MetaDataType type = ctx->bType()->bMetaDataType;
+    SymbolFactory symbolFactory;
+
+    for(const auto & var_def : ctx->varDef())
+    {
+        if (var_def->withType && var_def->type != type && var_def->type != MetaDataType::VOID) {
+            throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
+        }
+        AbstractSymbol *symbol = symbolFactory.createSymbol(var_def->symbolName, SymbolType::VAR, type, var_def->isArray, var_def->size);
+        if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
+            throw std::runtime_error("[ERROR] > Redefine var symbol. " + symbol->getSymbolName());
+        }
+    }
+```
+
+- 退出`VarDecl`结点时，已经可以得到`varDef`的各信息
+  - 需要判断声明的变量类型是否一致，即`varDecl`类型和`varDef`的类型是否一致，不一致则报错
+  - 建立变量符号，并将其加入当前符号表，如果重复声明则报错
+
+#### FuncDef
+
+- 进入结点时
+  - 判断当前符号表是否为全局符号表。由于CACT不支持函数嵌套声明，若当前不为全局符号表，则出错
+  - 根据`funcType()->getText()`设置函数返回值类型属性
+  - 如果该函数为`main`函数，则判断返回值类型是否为`int`，参数列表是否为空，如果有一个不是则报错
+  - 将函数符号表插入当前符号表中，由于CACT不支持函数重载，所以如果插入时发现重载则报错
+
+#### FuncFParam
+
+- 退出时将该函数参数符号插入函数符号表，如果有重复的参数，则报错
+
+#### Block
+
+- 进入`Block`结点时，如果当前符号表不为函数符号表，则创建新的`BlockSymbolTable`对象，并将**当前符号表**赋值为新建的**Block符号表**，相当于进入了该block的作用域
+
+- 退出结点时，将**当前符号表**赋值为**该Block符号表的父表**，相当于退出了当前block的作用域
+
+#### Stmt
+
+- 退出结点时，判断
+  - 如果产生式使用的是`stmt->lVal '=' exp ';' `
+    - 左值`lVal`为常数，相当于给常数赋值，报错
+    - `lVal`与`exp`的数据类型不同，由于CACT不支持强制类型转换，所以报错
+    - `lVal`是数组，而`exp`不是数组，报错
+    - `lVal`不是数组，而`exp`是数组，报错
+  - 如果产生式使用的是`stmt->block`
+    - 相当于进入`block`，操作同`enterBlock`
+  - 如果产生式使用的是`stmt->'return' (exp)? ';'`
+    - 如果`exp`存在且为数组类型，相当于返回了数组，报错
+    - 如果当前为符号表为函数符号表，且`exp`的类型与函数返回类型不一致，报错
+
+本次环境的更改是Stmt外层不存在循环，为此重写`block`为`funcBlock`，`blockItem`为`funcBlockItem`，`blockItem`推出`subStmt`而`funcBlockItem`推出`stmt`。`Stmt`在控制语句和返回语句中判断返回值类型，当运行在`funcSymbolTable`中时比较返回类型，并且新增了一个综合属性：`hasReturn`，而该属性会逐渐上传至`funcDef`，用来判断声明有返回值的函数内部是否存在返回值。
+
+#### SubStmt
+
+考虑到只有循环中才能使用`break`，`continue`，我们将原来的`stmt`拆分为`stmt`和`substmt`，`substmt`的产生式如下：
+
+```antlr
+subStmt
+    locals [
+        bool hasReturn,
+        MetaDataType returnType
+    ]
+    : lVal '=' exp ';'                              #subStmtAssignment
+    | (exp)? ';'                                    #subStmtExpression
+    | block                                         #subStmtBlock
+    | 'if' '(' cond ')' subStmt ('else' subStmt)?   #subStmtCtrlSeq
+    | 'while' '(' cond ')' subStmt                  #subStmtCtrlSeq
+    | 'break' ';'                                   #subStmtCtrlSeq
+    | 'continue' ';'                                #subStmtCtrlSeq
+    | 'return' (exp)? ';'                           #subStmtReturn
+    ;
+```
+
+subStmt节点必然是在循环内部，只有最外层while下的subStmt运行在`curSymbolTable`类型为函数符号表的情况，其他的情况都需要利用继承属性一步步传上去，在最上层判断最终返回值。
+
+在内部的控制语句，若存在返回值要进行每二者类型的比较，直接产生返回值的只有`subStmtReturn`。
+
+#### LVal
+
+- 使用的产生式为`LVal->Ident ('[' exp ']')?`
+
+- 退出结点时，检查
+  - `exp`是否为数组类型变量，或其数据类型不为int，如果`exp`是数组变量，或不为int类型，则报错，因为数组的index只能为整数类型且非数组
+  - 在符号表中递归检查是否存在`lVal`的定义，如果不存在则报错
+  
+  ```c++
+  void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
+  {
+      if (ctx->exp()) {
+          if (ctx->exp()->isArray || ctx->exp()->metaDataType != MetaDataType::INT) {
+              throw std::runtime_error("[ERROR] > array index must be int.\n");
+          }
+      }
+      AbstractSymbol *searchLVal = curSymbolTable->lookUpAbstractSymbolGlobal(ctx->Ident()->getText());
+      if (!searchLVal){
+          throw std::runtime_error("[ERROR] > var symbol used before defined. " + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
+      }
+      if (searchLVal->getIsArray() && !ctx->exp()) {
+          ctx->isArray = true;
+          ctx->size = searchLVal->getSize();
+      }
+      else {
+          ctx->isArray = false;
+      }
+      ctx->symbolType = searchLVal->getSymbolType();
+      ctx->lValMetaDataType = searchLVal->getMetaDataType();
+  }
+  ```
+
+#### Unary
+
+- 如果使用的产生式为`unaryExp -> Ident '(' (funcRParams)? ')'`
+  - 先根据`Ident`搜索符号表，找到对应的函数符号表，如果不存在，则说明函数在声明前调用，报错
+  - 如果存在，则判断调用的函数参数数量，类型，是否与定义一致，如果不一致则报错
+  
+  ```c++
+  void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
+  {
+      SymbolTable *funcSymbolTable = curSymbolTable->lookUpFuncSymbolTable(ctx->Ident()->getText());
+      if (!funcSymbolTable) {
+          throw std::runtime_error("[ERROR] > function called before definined. " + ctx->Ident()->getText());
+      }
+      if (ctx->funcRParams()) {
+          if (ctx->funcRParams()->isArrayList.size() != funcSymbolTable->getParamNum()) {
+              throw std::runtime_error("[ERROR] > in function calling, parameter number not match. " + std::to_string(ctx->funcRParams()->isArrayList.size()) + " " + std::to_string(funcSymbolTable->getParamNum()));
+          }
+          for (int i = 0; i < ctx->funcRParams()->isArrayList.size(); ++i) {
+              if (!funcSymbolTable->compareParamSymbolDataType(i, ctx->funcRParams()->metaDataTypeList[i], ctx->funcRParams()->isArrayList[i], ctx->funcRParams()->sizeList[i])) {
+                  throw std::runtime_error("[ERROR] > calling function parameter type error.\n");
+              }
+          }
+      }
+      else {
+          if (funcSymbolTable->getParamNum()) {
+              throw std::runtime_error("[ERROR] > in function calling, parameter number not match. ");
+          }
+      }
+      ctx->isArray = false;
+      ctx->metaDataType = funcSymbolTable->getReturnType();
+  }
+  ```
+- 如果使用的产生式为`unaryExp -> unaryOp unaryExp`
+  - 如果`unaryOp`为`！`，而`unaryExp`不是布尔类型值，则报错
+  - 如果`unaryOp`为`+/-`，而`unaryExp`是布尔类型值，则报错
+  
+  ```c++
+  void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
+  {
+      ctx->isArray = ctx->unaryExp()->isArray;
+      ctx->metaDataType = ctx->unaryExp()->metaDataType;
+      ctx->size = ctx->unaryExp()->size;
+      if (ctx->unaryOp()->getText() == "!") {
+          if (ctx->metaDataType != MetaDataType::BOOL) {
+              throw std::runtime_error("[ERROR] > use logic operator on non-boolean expression.\n");
+          }
+      }
+      else {
+          if (ctx->metaDataType == MetaDataType::BOOL) {
+              throw std::runtime_error("[ERROR] > use non-logic operator on boolean expression.\n");
+          }
+      }
+  }
+  ```
+
+#### MulExp/AddExp
+
+- 乘法/加法运算时，需要判断
+  - 是否有一方为布尔类型值，如果有，报错
+  - 参与运算的两个对象是否数据类型一致，不一致则报错
+  - 若有一方为数组
+    - 如果另一方不为数组，则报错
+    - 如果两方均为数组但大小不一致，则报错
+
+#### RelExp
+
+- 进行大小关系运算时，需要判断
+  - 是否存在运算对象为数组类型，如果有则报错，因为数组类型不可以参与关系运算
+  - 是否存在运算对象为布尔类型值，布尔值不可以进行大小关系运算，如果有则报错
+  - 两方是否数据类型不一致，如果不一致，则报错
+
+```c++
+void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
+{
+    if (ctx->addExp()->isArray) {
+        throw std::runtime_error("[ERROR] > rel: array cannot be operands of logic operators.\n");
+    }
+    ctx->metaDataType = ctx->relExp()->metaDataType;
+    if (ctx->metaDataType == MetaDataType::BOOL || ctx->addExp()->metaDataType == MetaDataType::BOOL) {
+        throw std::runtime_error("[ERROR] > rel: relation calculation with boolean expression.\n");
+    }
+    if (ctx->metaDataType != ctx->addExp()->metaDataType) {
+        throw std::runtime_error("[ERROR] > rel: relation calculation with different types.\n");
+    }
+    ctx->metaDataType = MetaDataType::BOOL;
+}
+
+void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
+{
+    if (ctx->addExp()->isArray) {
+        throw std::runtime_error("[ERROR] > rel add: array cannot be operands of logic operators. " + curSymbolTable->getFuncName());
+    }
+    ctx->metaDataType = ctx->addExp()->metaDataType;
+}
+```
+#### EqExp
+
+- 进行等或不等关系运算时，需要判断如果运算两方数据类型不一致，则报错
+
+```c++
+void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
+{
+    if (ctx->eqExp()->metaDataType != ctx->relExp()->metaDataType) {
+        throw std::runtime_error("[ERROR] > eq operator with different data type.\n");
+    }
+    ctx->metaDataType = MetaDataType::BOOL;
+}
+```
+
+#### lAndExp/lOrExp
+
+- 进行`&&`，`||`逻辑运算时，需要判断，运算两方是否均为布尔类型值，不是则报错
+  
+```c++
+// LOrExp
+void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
+{
+    ctx->metaDataType = ctx->lAndExp()->metaDataType;
+    if (ctx->metaDataType != MetaDataType::BOOL || ctx->lAndExp()->metaDataType != MetaDataType::BOOL) {
+        throw std::runtime_error("[ERROR] > logic calculation with non-boolean operands.\n");
+    }
+}
+
+// LAndExp
+void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ctx)
+{
+    ctx->metaDataType = ctx->lAndExp()->metaDataType;
+    if (ctx->metaDataType != MetaDataType::BOOL || ctx->eqExp()->metaDataType != MetaDataType::BOOL) {
+        throw std::runtime_error("[ERROR] > logic calculation with non-boolean operands.\n");
+    }
+}
+```
 ### 其它
 
 #### 主要叙述debug过程中的总结
 
 - 首先是在C++中使用名称空间，永远不能在头文件中使用全局性质的名称空间定义。比如std，只能在.cpp中使用，且确保只能使用一个作为主要的全局名称空间
 - 而后是C++中的string类不能在switch case中直接参与比较，需要一些trick加以化用
+- 在服务器上测试时遇到内存不主动清空的问题，在enter每一节点时手动设置清空继承属性、综合属性
 - 在语法分析过程中，对子节点的索引需要注意：
     - 若当前产生式中该名称子节点最多有一个，使用子节点名的函数调用是无需传入参数，若存在则返回其指针，若不存在返回nullptr
     - 若可能有多个同名子节点，则函数调用后返回vector向量，内容为其指针
@@ -240,7 +658,7 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 
 ### 实验结果总结
 
-经过本次实验，我们能够对CACT语言符号表进行搭建，对其进行语义分析和静态类型检查，本组成功通过了27+48个测试样例，但可能还有遗漏的语义错误未能查出。由于运用了大量面向对象的实现，牺牲了一部分语义分析性能和效率，这部分确实还有提升空间。另外这里只做到了静态类型检查，符号表完全可以增加更多记录信息，能够支持更多的错误检测，比如数组下标溢出等等。
+经过本次实验，我们能够对CACT语言符号表进行搭建，对其进行语义分析和静态类型检查，本组成功通过了27+48个测试样例（存在语义错误则设置为false），但可能还有遗漏的语义错误未能查出。由于运用了大量面向对象的实现，牺牲了一部分语义分析性能和效率，这部分确实还有提升空间。另外这里只做到了静态类型检查，符号表完全可以增加更多记录信息，能够支持更多的错误检测，比如数组下标溢出等等。
 
 ### 分成员总结
 

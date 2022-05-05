@@ -61,11 +61,11 @@ public:
   virtual void enterBrackets(CACTParser::BracketsContext * /*ctx*/) override { }
   virtual void exitBrackets(CACTParser::BracketsContext * /*ctx*/) override { }
 
-  virtual void enterBlock(CACTParser::BlockContext * /*ctx*/) override { }
-  virtual void exitBlock(CACTParser::BlockContext * /*ctx*/) override { }
+  virtual void enterFuncBlock(CACTParser::FuncBlockContext * /*ctx*/) override { }
+  virtual void exitFuncBlock(CACTParser::FuncBlockContext * /*ctx*/) override { }
 
-  virtual void enterBlockItem(CACTParser::BlockItemContext * /*ctx*/) override { }
-  virtual void exitBlockItem(CACTParser::BlockItemContext * /*ctx*/) override { }
+  virtual void enterFuncBlockItem(CACTParser::FuncBlockItemContext * /*ctx*/) override { }
+  virtual void exitFuncBlockItem(CACTParser::FuncBlockItemContext * /*ctx*/) override { }
 
   virtual void enterStmtAssignment(CACTParser::StmtAssignmentContext * /*ctx*/) override { }
   virtual void exitStmtAssignment(CACTParser::StmtAssignmentContext * /*ctx*/) override { }
@@ -81,6 +81,12 @@ public:
 
   virtual void enterStmtReturn(CACTParser::StmtReturnContext * /*ctx*/) override { }
   virtual void exitStmtReturn(CACTParser::StmtReturnContext * /*ctx*/) override { }
+
+  virtual void enterBlock(CACTParser::BlockContext * /*ctx*/) override { }
+  virtual void exitBlock(CACTParser::BlockContext * /*ctx*/) override { }
+
+  virtual void enterBlockItem(CACTParser::BlockItemContext * /*ctx*/) override { }
+  virtual void exitBlockItem(CACTParser::BlockItemContext * /*ctx*/) override { }
 
   virtual void enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * /*ctx*/) override { }
   virtual void exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext * /*ctx*/) override { }

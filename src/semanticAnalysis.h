@@ -50,6 +50,15 @@ public:
   void enterFuncFParam(CACTParser::FuncFParamContext * /*ctx*/) override;
   void exitFuncFParam(CACTParser::FuncFParamContext * /*ctx*/) override;
 
+  void enterBrackets(CACTParser::BracketsContext * /*ctx*/) override;
+  void exitBrackets(CACTParser::BracketsContext * /*ctx*/) override;
+
+  void enterFuncBlock(CACTParser::FuncBlockContext * /*ctx*/) override;
+  void exitFuncBlock(CACTParser::FuncBlockContext * /*ctx*/) override;
+
+  void enterFuncBlockItem(CACTParser::FuncBlockItemContext * /*ctx*/) override;
+  void exitFuncBlockItem(CACTParser::FuncBlockItemContext * /*ctx*/) override;
+
   void enterBlock(CACTParser::BlockContext * /*ctx*/) override;
   void exitBlock(CACTParser::BlockContext * /*ctx*/) override;
 

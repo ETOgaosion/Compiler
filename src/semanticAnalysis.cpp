@@ -1,4 +1,5 @@
 #include "semanticAnalysis.h"
+
 void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
 {
     curSymbolTable = SymbolTable::getGlobalSymbolTable();
@@ -71,7 +72,7 @@ void SemanticAnalysis::SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclCont
 
 void SemanticAnalysis::enterBType(CACTParser::BTypeContext * ctx)
 {
-
+    ctx->bMetaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitBType(CACTParser::BTypeContext * ctx)
@@ -97,8 +98,11 @@ void SemanticAnalysis::exitBType(CACTParser::BTypeContext * ctx)
 // ConstDef
 void SemanticAnalysis::enterConstDef(CACTParser::ConstDefContext * ctx)
 {
-
+    ctx->symbolName = "";
+    ctx->size = 0;
+    ctx->isArray = false;
 }
+
 void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
@@ -119,8 +123,11 @@ void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
 // ConstInitVal
 void SemanticAnalysis::enterConstInitValOfVar(CACTParser::ConstInitValOfVarContext * ctx)
 {
-
+    ctx->type = MetaDataType::VOID;
+    ctx->size = 0;
+    ctx->isArray = false;
 }
+
 void SemanticAnalysis::exitConstInitValOfVar(CACTParser::ConstInitValOfVarContext * ctx)
 {
     if(!ctx->constExp()){
@@ -176,8 +183,13 @@ void SemanticAnalysis::SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext 
 
 void SemanticAnalysis::enterVarDef(CACTParser::VarDefContext * ctx)
 {
-
+    ctx->symbolName = "";
+    ctx->type = MetaDataType::VOID;
+    ctx->withType = false;
+    ctx->size = 0;
+    ctx->isArray = false;
 }
+
 void SemanticAnalysis::exitVarDef(CACTParser::VarDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
@@ -239,6 +251,9 @@ void SemanticAnalysis::enterFuncDef(CACTParser::FuncDefContext * ctx)
 
 void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
 {
+    if (!ctx->funcBlock()->hasReturn && (curSymbolTable->getReturnType() != MetaDataType::VOID)) {
+        throw std::runtime_error("[ERROR] > Non void function has no return.\n");
+    }
 }
 
 void SemanticAnalysis::enterFuncType(CACTParser::FuncTypeContext * ctx)
@@ -270,30 +285,87 @@ void SemanticAnalysis::exitFuncFParam(CACTParser::FuncFParamContext * ctx)
         throw std::runtime_error("[ERROR] > Redefine Function ParamSymbol.\n");
     }
 }
+void SemanticAnalysis::enterBrackets(CACTParser::BracketsContext * ctx) {}
+void SemanticAnalysis::exitBrackets(CACTParser::BracketsContext * ctx) { }
 
-void SemanticAnalysis::enterBlock(CACTParser::BlockContext * ctx)
+void SemanticAnalysis::enterFuncBlock(CACTParser::FuncBlockContext * ctx) 
 {
+    ctx->hasReturn = false;
     if (curSymbolTable->getSymbolTableType() != TableType::FUNC) {
         SymbolTable *blkSymbolTable = new BlockSymbolTable(curSymbolTable);
         curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
         curSymbolTable = blkSymbolTable;
     }
 }
+void SemanticAnalysis::exitFuncBlock(CACTParser::FuncBlockContext * ctx) 
+{
+    curSymbolTable = curSymbolTable->getParentSymbolTable();
+    for (auto & it : ctx->funcBlockItem()) {
+        if (it->hasReturn) {
+            ctx->hasReturn = true;
+            break;
+        }
+    }
+}
+
+void SemanticAnalysis::enterFuncBlockItem(CACTParser::FuncBlockItemContext * ctx) 
+{
+    ctx->hasReturn = false;
+}
+
+void SemanticAnalysis::exitFuncBlockItem(CACTParser::FuncBlockItemContext * ctx) 
+{
+    if (ctx->stmt() && ctx->stmt()->hasReturn) {
+        ctx->hasReturn = true;
+    }
+}
+
+void SemanticAnalysis::enterBlock(CACTParser::BlockContext * ctx)
+{
+    ctx->hasReturn = false;
+    ctx->returnType = MetaDataType::VOID;
+    SymbolTable *blkSymbolTable = new BlockSymbolTable(curSymbolTable);
+    curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
+    curSymbolTable = blkSymbolTable;
+}
+
 void SemanticAnalysis::exitBlock(CACTParser::BlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
+    for (auto & it : ctx->blockItem()) {
+        if (it->hasReturn) {
+            throw std::runtime_error("[NO ERROR] Block return");
+            if (ctx->hasReturn) {
+                if (ctx->returnType != it->returnType) {
+                    throw std::runtime_error("[ERROR] > return type mismatch.  " + it->getText());
+                }
+            }
+            else {
+                ctx->hasReturn = true;
+                ctx->returnType = it->returnType;
+            }
+        }
+    }
 }
 
 void SemanticAnalysis::enterBlockItem(CACTParser::BlockItemContext * ctx)
 {
+    ctx->hasReturn = false;
+    ctx->returnType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitBlockItem(CACTParser::BlockItemContext * ctx)
 {
+    if (ctx->subStmt() && ctx->subStmt()->hasReturn) {
+        throw std::runtime_error("[NO ERROR] Block item return");
+        ctx->hasReturn = true;
+        ctx->returnType = ctx->subStmt()->returnType;
+    }
 }
 
 void SemanticAnalysis::enterStmtAssignment(CACTParser::StmtAssignmentContext * ctx)
 {
+    ctx->hasReturn = false;
 }
 
 void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ctx)
@@ -321,6 +393,7 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
 
 void SemanticAnalysis::enterStmtExpression(CACTParser::StmtExpressionContext * ctx)
 {
+    ctx->hasReturn = false;
 }
 
 void SemanticAnalysis::exitStmtExpression(CACTParser::StmtExpressionContext * ctx)
@@ -329,10 +402,12 @@ void SemanticAnalysis::exitStmtExpression(CACTParser::StmtExpressionContext * ct
 
 void SemanticAnalysis::enterStmtBlock(CACTParser::StmtBlockContext * ctx)
 {
+    ctx->hasReturn = false;
     SymbolTable *blkSymbolTable = new BlockSymbolTable(curSymbolTable);
     curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
     curSymbolTable = blkSymbolTable;
 }
+
 void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
@@ -340,42 +415,19 @@ void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
 
 void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
 {
+    ctx->hasReturn = false;
 }
 
 void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
 {
     for (auto & s : ctx->stmt()) {
         if (s->hasReturn) {
-            if (curSymbolTable->getSymbolTableType() == TableType::FUNC) {
-                if (s->returnType != curSymbolTable->getReturnType()) {
-                    throw std::runtime_error("[ERROR] > return type mismatch.\n");
-                }
-            }
-            else {
-                if (ctx->hasReturn) {
-                    if (s->returnType != ctx->returnType) {
-                        throw std::runtime_error("[ERROR] > return type mismatch.\n");
-                    }
-                }
-                else {
-                    ctx->hasReturn = true;
-                    ctx->returnType = s->returnType;
-                }
-            }
+            ctx->hasReturn = true;
+            break;
         }
     }
-    if (ctx->subStmt()) {
-        if (ctx->subStmt()->hasReturn) {
-            if (curSymbolTable->getSymbolTableType() == TableType::FUNC) {
-                if (ctx->subStmt()->returnType != curSymbolTable->getReturnType()) {
-                    throw std::runtime_error("[ERROR] > return type mismatch.\n");
-                }
-            }
-            else {
-                ctx->hasReturn = true;
-                ctx->returnType = ctx->subStmt()->returnType;
-            }
-        }
+    if (ctx->subStmt() && ctx->subStmt()->hasReturn) {
+        ctx->hasReturn = true;
     }
 }
 
@@ -393,10 +445,13 @@ void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
             throw std::runtime_error("[ERROR] > stmt return type mismatch." + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
         }
     }
+    ctx->hasReturn = true;
 }
 
 void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
 {
+    ctx->hasReturn = false;
+    ctx->returnType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
@@ -424,7 +479,10 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
 
 void SemanticAnalysis::enterSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
 {
+    ctx->hasReturn = false;
+    ctx->returnType = MetaDataType::VOID;
 }
+
 void SemanticAnalysis::exitSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
 {
 }
@@ -434,14 +492,25 @@ void SemanticAnalysis::enterSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
     SymbolTable *blkSymbolTable = new BlockSymbolTable(curSymbolTable);
     curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
     curSymbolTable = blkSymbolTable;
+    ctx->hasReturn = false;
+    ctx->returnType = MetaDataType::VOID;
 }
 void SemanticAnalysis::exitSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
+    ctx->hasReturn = ctx->block()->hasReturn;
+    ctx->returnType = ctx->block()->returnType;
+    if (ctx->hasReturn && curSymbolTable->getSymbolTableType() == TableType::FUNC) {
+        if (ctx->returnType != curSymbolTable->getReturnType()) {
+            throw std::runtime_error("[ERROR] > SubStmtBlock return type mismatch.  " + ctx->getText());
+        }
+    }
 }
 
 void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ctx)
 {
+    ctx->hasReturn = false;
+    ctx->returnType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ctx)
@@ -450,13 +519,13 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ct
         if (s->hasReturn) {
             if (curSymbolTable->getSymbolTableType() == TableType::FUNC) {
                 if (s->returnType != curSymbolTable->getReturnType()) {
-                    throw std::runtime_error("[ERROR] > return type mismatch.\n");
+                    throw std::runtime_error("[ERROR] > return type mismatch.  " + s->getText());
                 }
             }
             else {
                 if (ctx->hasReturn) {
                     if (s->returnType != ctx->returnType) {
-                        throw std::runtime_error("[ERROR] > return type mismatch.\n");
+                        throw std::runtime_error("[ERROR] > return type mismatch.  " + s->getText());
                     }
                 }
                 else {
@@ -479,7 +548,7 @@ void SemanticAnalysis::exitSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
     }
     if (curSymbolTable->getSymbolTableType() == TableType::FUNC) {
         if ((!ctx->exp() && curSymbolTable->getReturnType() != MetaDataType::VOID) || ctx->exp()->metaDataType != curSymbolTable->getReturnType()) {
-            throw std::runtime_error("[ERROR] > return type mismatch.\n");
+            throw std::runtime_error("[ERROR] > SubStmtReturn return type mismatch.  " + ctx->getText());
         }
     }
     else {
@@ -497,6 +566,9 @@ void SemanticAnalysis::exitSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
 // Exp
 void SemanticAnalysis::enterExpAddExp(CACTParser::ExpAddExpContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitExpAddExp(CACTParser::ExpAddExpContext * ctx)
@@ -508,6 +580,9 @@ void SemanticAnalysis::exitExpAddExp(CACTParser::ExpAddExpContext * ctx)
 
 void SemanticAnalysis::enterExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
@@ -530,6 +605,10 @@ void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
 
 void SemanticAnalysis::enterLVal(CACTParser::LValContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->symbolType = SymbolType::PARAM;
+    ctx->lValMetaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
@@ -541,7 +620,7 @@ void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
     }
     AbstractSymbol *searchLVal = curSymbolTable->lookUpAbstractSymbolGlobal(ctx->Ident()->getText());
     if (!searchLVal){
-        throw std::runtime_error("[ERROR] > var symbol used before defined. " + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
+        throw std::runtime_error("[ERROR] > var symbol used before defined. " + ctx->Ident()->getText() + " "  + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
     }
     if (searchLVal->getIsArray() && !ctx->exp()) {
         ctx->isArray = true;
@@ -557,6 +636,9 @@ void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
 
 void SemanticAnalysis::enterPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContext * ctx)
@@ -568,8 +650,11 @@ void SemanticAnalysis::exitPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContex
 
 void SemanticAnalysis::enterPrimaryExplVal(CACTParser::PrimaryExplValContext * ctx)
 {
-
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
+
 void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ctx)
 {
     ctx->isArray = ctx->lVal()->isArray;
@@ -579,6 +664,9 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
 
 void SemanticAnalysis::enterPrimaryExpNumber(CACTParser::PrimaryExpNumberContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext * ctx)
@@ -591,6 +679,9 @@ void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext 
 // Unary
 void SemanticAnalysis::enterUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpContext * ctx)
@@ -602,6 +693,9 @@ void SemanticAnalysis::exitUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpCont
 
 void SemanticAnalysis::enterUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
@@ -631,6 +725,9 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
 
 void SemanticAnalysis::enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
@@ -661,6 +758,9 @@ void SemanticAnalysis::exitUnaryOp(CACTParser::UnaryOpContext * ctx)
 // funcRParams
 void SemanticAnalysis::enterFuncRParams(CACTParser::FuncRParamsContext * ctx)
 {
+    ctx->isArrayList.clear();
+    ctx->sizeList.clear();
+    ctx->metaDataTypeList.clear();
 }
 
 void SemanticAnalysis::exitFuncRParams(CACTParser::FuncRParamsContext * ctx)
@@ -675,8 +775,11 @@ void SemanticAnalysis::exitFuncRParams(CACTParser::FuncRParamsContext * ctx)
 // MulExp
 void SemanticAnalysis::enterMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
 {
-
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
+
 void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
 {
     ctx->isArray = ctx->mulExp()->isArray;
@@ -705,8 +808,11 @@ void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
 
 void SemanticAnalysis::enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ctx)
 {
-
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
+
 void SemanticAnalysis::exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ctx)
 {
     ctx->isArray = ctx->unaryExp()->isArray;
@@ -725,8 +831,11 @@ void SemanticAnalysis::exitMulOp(CACTParser::MulOpContext * ctx)
 // AddExp
 void SemanticAnalysis::enterAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
 {
-
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
+
 void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
 {
     ctx->isArray = ctx->addExp()->isArray;
@@ -755,6 +864,9 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
 
 void SemanticAnalysis::enterAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
 {
+    ctx->isArray = false;
+    ctx->size = 0;
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
@@ -767,6 +879,7 @@ void SemanticAnalysis::exitAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
 // RelExp
 void SemanticAnalysis::enterRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
@@ -786,6 +899,7 @@ void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
 
 void SemanticAnalysis::enterRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
@@ -798,8 +912,9 @@ void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
 
 void SemanticAnalysis::enterRelExpBoolConst(CACTParser::RelExpBoolConstContext * ctx)
 {
-
+    ctx->metaDataType = MetaDataType::VOID;
 }
+
 void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::BOOL;
@@ -808,6 +923,7 @@ void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * 
 //EqExp
 void SemanticAnalysis::enterEqExpRelExp(CACTParser::EqExpRelExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 
 }
 void SemanticAnalysis::exitEqExpRelExp(CACTParser::EqExpRelExpContext * ctx)
@@ -817,6 +933,7 @@ void SemanticAnalysis::exitEqExpRelExp(CACTParser::EqExpRelExpContext * ctx)
 
 void SemanticAnalysis::enterEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
@@ -830,6 +947,7 @@ void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
 //LAndExp
 void SemanticAnalysis::enterLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ctx)
@@ -842,6 +960,7 @@ void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ct
 
 void SemanticAnalysis::enterLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
@@ -852,6 +971,7 @@ void SemanticAnalysis::exitLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
 //LOrExp
 void SemanticAnalysis::enterLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx)
@@ -860,6 +980,7 @@ void SemanticAnalysis::exitLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx)
 }
 void SemanticAnalysis::enterLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
@@ -874,6 +995,7 @@ void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
 // ConstExp
 void SemanticAnalysis::enterConstExpNumber(CACTParser::ConstExpNumberContext * ctx)
 {
+    ctx->metaDataType = MetaDataType::VOID;
 
 }
 void SemanticAnalysis::exitConstExpNumber(CACTParser::ConstExpNumberContext * ctx)
@@ -883,8 +1005,8 @@ void SemanticAnalysis::exitConstExpNumber(CACTParser::ConstExpNumberContext * ct
 
 void SemanticAnalysis::enterConstExpBoolConst(CACTParser::ConstExpBoolConstContext * ctx)
 {
-
 }
+
 void SemanticAnalysis::exitConstExpBoolConst(CACTParser::ConstExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::BOOL;

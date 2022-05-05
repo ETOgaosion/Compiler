@@ -71,7 +71,7 @@ varDef
     ;
 
 funcDef
-    : funcType Ident '(' (funcFParams)? ')' block
+    : funcType Ident '(' (funcFParams)? ')' funcBlock
     ;
 
 funcType
@@ -97,26 +97,48 @@ brackets
     :'[' ']'
     ;
 
-block
-    : '{' (blockItem)* '}'
+funcBlock
+    locals [
+        bool hasReturn
+    ]
+    : '{' (funcBlockItem)* '}'
     ;
 
-blockItem
+funcBlockItem
+    locals [
+        bool hasReturn
+    ]
     : decl 
     | stmt
     ;
 
 stmt
     locals [
-        bool hasReturn,
-        MetaDataType returnType
+        bool hasReturn
     ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
-    | block                                             #stmtBlock
+    | funcBlock                                         #stmtBlock
     | 'if' '(' cond ')' stmt ('else' stmt)?             #stmtCtrlSeq
     | 'while' '(' cond ')' subStmt                      #stmtCtrlSeq
     | 'return' (exp)? ';'                               #stmtReturn
+    ;
+
+block
+    locals [
+        bool hasReturn,
+        MetaDataType returnType
+    ]
+    : '{' (blockItem)* '}'
+    ;
+
+blockItem
+    locals [
+        bool hasReturn,
+        MetaDataType returnType
+    ]
+    : decl 
+    | subStmt
     ;
 
 subStmt

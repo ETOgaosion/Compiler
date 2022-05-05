@@ -59,11 +59,11 @@ public:
   virtual void enterBrackets(CACTParser::BracketsContext *ctx) = 0;
   virtual void exitBrackets(CACTParser::BracketsContext *ctx) = 0;
 
-  virtual void enterBlock(CACTParser::BlockContext *ctx) = 0;
-  virtual void exitBlock(CACTParser::BlockContext *ctx) = 0;
+  virtual void enterFuncBlock(CACTParser::FuncBlockContext *ctx) = 0;
+  virtual void exitFuncBlock(CACTParser::FuncBlockContext *ctx) = 0;
 
-  virtual void enterBlockItem(CACTParser::BlockItemContext *ctx) = 0;
-  virtual void exitBlockItem(CACTParser::BlockItemContext *ctx) = 0;
+  virtual void enterFuncBlockItem(CACTParser::FuncBlockItemContext *ctx) = 0;
+  virtual void exitFuncBlockItem(CACTParser::FuncBlockItemContext *ctx) = 0;
 
   virtual void enterStmtAssignment(CACTParser::StmtAssignmentContext *ctx) = 0;
   virtual void exitStmtAssignment(CACTParser::StmtAssignmentContext *ctx) = 0;
@@ -79,6 +79,12 @@ public:
 
   virtual void enterStmtReturn(CACTParser::StmtReturnContext *ctx) = 0;
   virtual void exitStmtReturn(CACTParser::StmtReturnContext *ctx) = 0;
+
+  virtual void enterBlock(CACTParser::BlockContext *ctx) = 0;
+  virtual void exitBlock(CACTParser::BlockContext *ctx) = 0;
+
+  virtual void enterBlockItem(CACTParser::BlockItemContext *ctx) = 0;
+  virtual void exitBlockItem(CACTParser::BlockItemContext *ctx) = 0;
 
   virtual void enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext *ctx) = 0;
   virtual void exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext *ctx) = 0;
