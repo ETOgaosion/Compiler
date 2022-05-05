@@ -7,6 +7,8 @@ Platform support MacOS and Linux, but for specific installation of tools, please
 ## Compile
 
 ```shell
+export DYLD_LIBRARY_PATH=/Volumes/study/code/C++/vscode/compiler/compiler/dependencies/mac/antlr4-runtime/lib:$DYLD_LIBRARY_PATH
+
 mkdir build
 cd build
 cmake ..

@@ -33,9 +33,9 @@ include_directories(grammar)
 include_directories(src)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    link_directories("dependencies/linux/antlr4-runtime/lib")
+    link_directories(dependencies/linux/antlr4-runtime/lib)
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    link_directories("dependencies/mac/antlr4-runtime/lib")
+    link_directories(dependencies/mac/antlr4-runtime/lib)
 endif()
 link_libraries(antlr4-runtime)
 
