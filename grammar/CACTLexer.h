@@ -2,7 +2,7 @@
     #include "../src/symbolTable.h"
 
 
-// Generated from CACT.g4 by ANTLR 4.8
+// Generated from grammar/CACT.g4 by ANTLR 4.8
 
 #pragma once
 

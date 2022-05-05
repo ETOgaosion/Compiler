@@ -62,6 +62,8 @@ varDecl
 varDef
     locals [
         std::string symbolName,
+        MetaDataType type,
+        bool withType,
         std::size_t size,
         bool isArray
     ]
@@ -105,10 +107,6 @@ blockItem
     ;
 
 stmt
-    locals [
-        bool hasReturn,
-        MetaDataType returnType
-    ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
     | block                                             #stmtBlock
@@ -143,9 +141,6 @@ exp
     ;
 
 cond
-    locals [
-        MetaDataType metaDataType
-    ]
     : lOrExp
     ;
 
