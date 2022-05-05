@@ -2,31 +2,19 @@
 
 Antlr and CACT compiler demo.
 
-Platform support MacOS and Linux, but for specific installation of tools, please STFW.
+Platform temporarily only supports Ubuntu with g++-5.
+
+Mac OS not supported. (fail in linking process).
 
 ## Compile
 
 ```shell
-export DYLD_LIBRARY_PATH=/Volumes/study/code/C++/vscode/compiler/compiler/dependencies/mac/antlr4-runtime/lib:$DYLD_LIBRARY_PATH
-
-mkdir build
-cd build
-cmake ..
-make
-```
-
-## Run demo
-
-```shell
-# under build/
-./compiler ../samples/00_main.cact
+./build.sh
 ```
 
 ## Run test
 
 ```shell
-# under project root
-mkdir res
 ./run_test.sh
 ```
 

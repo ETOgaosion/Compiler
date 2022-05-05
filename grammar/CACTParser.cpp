@@ -1211,6 +1211,8 @@ size_t CACTParser::StmtContext::getRuleIndex() const {
 
 void CACTParser::StmtContext::copyFrom(StmtContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
+  this->hasReturn = ctx->hasReturn;
+  this->returnType = ctx->returnType;
 }
 
 //----------------- StmtBlockContext ------------------------------------------------------------------
@@ -1277,12 +1279,16 @@ CACTParser::CondContext* CACTParser::StmtCtrlSeqContext::cond() {
   return getRuleContext<CACTParser::CondContext>(0);
 }
 
-std::vector<CACTParser::SubStmtContext *> CACTParser::StmtCtrlSeqContext::subStmt() {
-  return getRuleContexts<CACTParser::SubStmtContext>();
+std::vector<CACTParser::StmtContext *> CACTParser::StmtCtrlSeqContext::stmt() {
+  return getRuleContexts<CACTParser::StmtContext>();
 }
 
-CACTParser::SubStmtContext* CACTParser::StmtCtrlSeqContext::subStmt(size_t i) {
-  return getRuleContext<CACTParser::SubStmtContext>(i);
+CACTParser::StmtContext* CACTParser::StmtCtrlSeqContext::stmt(size_t i) {
+  return getRuleContext<CACTParser::StmtContext>(i);
+}
+
+CACTParser::SubStmtContext* CACTParser::StmtCtrlSeqContext::subStmt() {
+  return getRuleContext<CACTParser::SubStmtContext>(0);
 }
 
 CACTParser::StmtCtrlSeqContext::StmtCtrlSeqContext(StmtContext *ctx) { copyFrom(ctx); }
@@ -1386,16 +1392,19 @@ CACTParser::StmtContext* CACTParser::stmt() {
       setState(192);
       match(CACTParser::T__13);
       setState(193);
-      subStmt();
+      stmt();
       setState(196);
       _errHandler->sync(this);
 
-      _la = _input->LA(1);
-      if (_la == CACTParser::T__16) {
+      switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 18, _ctx)) {
+      case 1: {
         setState(194);
         match(CACTParser::T__16);
         setState(195);
-        subStmt();
+        stmt();
+        break;
+      }
+
       }
       break;
     }
@@ -3684,8 +3693,8 @@ CACTParser::Initializer::Initializer() {
     0x2, 0x2, 0xbd, 0xd4, 0x7, 0x5, 0x2, 0x2, 0xbe, 0xd4, 0x5, 0x1c, 0xf, 
     0x2, 0xbf, 0xc0, 0x7, 0x12, 0x2, 0x2, 0xc0, 0xc1, 0x7, 0xf, 0x2, 0x2, 
     0xc1, 0xc2, 0x5, 0x26, 0x14, 0x2, 0xc2, 0xc3, 0x7, 0x10, 0x2, 0x2, 0xc3, 
-    0xc6, 0x5, 0x22, 0x12, 0x2, 0xc4, 0xc5, 0x7, 0x13, 0x2, 0x2, 0xc5, 0xc7, 
-    0x5, 0x22, 0x12, 0x2, 0xc6, 0xc4, 0x3, 0x2, 0x2, 0x2, 0xc6, 0xc7, 0x3, 
+    0xc6, 0x5, 0x20, 0x11, 0x2, 0xc4, 0xc5, 0x7, 0x13, 0x2, 0x2, 0xc5, 0xc7, 
+    0x5, 0x20, 0x11, 0x2, 0xc6, 0xc4, 0x3, 0x2, 0x2, 0x2, 0xc6, 0xc7, 0x3, 
     0x2, 0x2, 0x2, 0xc7, 0xd4, 0x3, 0x2, 0x2, 0x2, 0xc8, 0xc9, 0x7, 0x14, 
     0x2, 0x2, 0xc9, 0xca, 0x7, 0xf, 0x2, 0x2, 0xca, 0xcb, 0x5, 0x26, 0x14, 
     0x2, 0xcb, 0xcc, 0x7, 0x10, 0x2, 0x2, 0xcc, 0xcd, 0x5, 0x22, 0x12, 0x2, 

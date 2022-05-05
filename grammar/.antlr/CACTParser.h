@@ -197,6 +197,8 @@ public:
   class  VarDefContext : public antlr4::ParserRuleContext {
   public:
     std::string symbolName;
+    MetaDataType type;
+    bool withType;
     std::size_t size;
     bool isArray;
     VarDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -336,8 +338,9 @@ public:
     StmtCtrlSeqContext(StmtContext *ctx);
 
     CondContext *cond();
-    std::vector<SubStmtContext *> subStmt();
-    SubStmtContext* subStmt(size_t i);
+    std::vector<StmtContext *> stmt();
+    StmtContext* stmt(size_t i);
+    SubStmtContext *subStmt();
   };
 
   class  StmtReturnContext : public StmtContext {
@@ -438,7 +441,6 @@ public:
 
   class  CondContext : public antlr4::ParserRuleContext {
   public:
-    MetaDataType metaDataType;
     CondContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     LOrExpContext *lOrExp();

@@ -107,10 +107,14 @@ blockItem
     ;
 
 stmt
+    locals [
+        bool hasReturn,
+        MetaDataType returnType
+    ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
     | block                                             #stmtBlock
-    | 'if' '(' cond ')' subStmt ('else' subStmt)?       #stmtCtrlSeq
+    | 'if' '(' cond ')' stmt ('else' stmt)?             #stmtCtrlSeq
     | 'while' '(' cond ')' subStmt                      #stmtCtrlSeq
     | 'return' (exp)? ';'                               #stmtReturn
     ;

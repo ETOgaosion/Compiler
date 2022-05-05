@@ -114,6 +114,7 @@
 |`getMetaDataType`|`AbstractSymbol`|`void`|`MetaDataType`|返回符号名称|
 |`getIsArray`|`AbstractSymbol`|`void`|`bool`|返回符号名称|
 |`getSize`|`AbstractSymbol`|`void`|`size_t`|返回符号名称|
+|`setAttributes`|`AbstractSymbol`|`string, SymbolType, MetaDataType, bool, size_t`|`bool`|设置属性，**子类不应调用父类构造函数**|
 |`ParamSymbol`|`ParamSymbol`|`string, SymbolType, MetaDataType, bool, size_t`|`void`|构造函数，直接设置符号信息|
 |`VarSymbol`|`VarSymbol`|同上|`void`|构造函数|
 |`ConstSymbol`|`ConstSymbol`|同上|`void`|构造函数|
@@ -131,10 +132,9 @@
 
 |函数名|类|参数|参数类型|返回类型|说明|
 |:-:|:-:|:-:|:-:|:-:|:-:|
-|`insertFuncSymbolTableSafely`|`FuncSymbolTableList`|`inFuncName, inReturnType`|`string, MetaDataType`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
-|`insertFuncSymbolTableSafely`|`FuncSymbolTableList`|`inFuncName, inReturnType, inParentSymbolTable`|`string, MetaDataType, SymbolTable *`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
+|`insertFuncSymbolTableSafely`|`FuncSymbolTableList`|`inFuncSymbolTable`|`SymbolTable *`|`SymbolTable *`|将传入的函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
 |`lookUpFuncSymbolTable`|`FuncSymbolTableList`|`inFuncName`|`string`|`SymbolTable *`|根据函数名和返回值新建一个函数符号表加入列表（查重），若成功返回加入的函数符号表指针|
-|`insertBlockSymbolTable`|`BlockSymbolTableList`|`inParentSymbolTable`|`SymbolTable *`|`SymbolTable *`|新建一个块结构符号表并加入列表，填入块符号表的父符号表，若成功返回新加入的符号表指针|
+|`insertBlockSymbolTable`|`BlockSymbolTableList`|`inBlockSymbolTable, inParentSymbolTable`|`SymbolTable *`<br>`SymbolTable *`|`SymbolTable *`|将传入的块结构符号表加入列表，填入块符号表的父符号表，若成功返回新加入的符号表指针|
 |`getBlockSymbolTable`|`BlockSymbolTableList`|`index`|`int`|`SymbolTable *`|根据下标返回块符号表指针，若输入不合法则报错|
 
 ##### 实现细节
@@ -183,6 +183,7 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 |函数名|类|参数|参数类型|返回类型|说明|
 |:-:|:-:|:-:|:-:|:-:|:-:|
 |`insertAbstractSymbolSafely`|`SymbolTable`|`inSymbolName, inSymbolType, inMetaDataType,inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`AbstractSymbol *`|利用所给参数带查重地插入指代符号列表，若成功返回指代符号指针|
+|`insertAbstractSymbolSafely`|`SymbolTable`|`inAbstractSymbol`|`AbstractSymbol *`|`AbstractSymbol *`|利用所给参数带查重地插入指代符号列表，若成功返回指代符号指针|
 |`lookUpAbstractSymbol`|`SymbolTable`|`inSymbolName`|`string`|`AbstractSymbol *`|利用指代符号名称查找之，只在当前作用域内查找|
 |`lookUpAbstractSymbolGlobal`|`SymbolTable`|`inSymbolName`|`string`|`AbstractSymbol *`|利用指代符号名称查找之，**注意会逐级向上查找，找到存在对应符号的最下嵌套作用域**|
 |`getParentSymbolTable`|`SymbolTable`|`void`|`void`|`SymbolTable *`|找到本符号表的父符号表|
@@ -190,8 +191,8 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 |`setParameterSymbolTable`|`SymbolTable`|`parentSymbolTable`|`SymbolTable *`|`bool`|为了弥补，若此前构造函数未能提供父符号表，则可调用此函数定义|
 |`compareAbstractSymbolDataType`|`SymbolTable`|`inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`bool`|比较变量名的相关属性和传入属性是否相同，确定该变量是否类型和要求完全一致|
 |`FuncSymbolTable`|`FuncSymbolTable`|`inFuncName, inReturnType, inParentSymbolTable`|`string, MetaDataType, SymbolType *`|`void`|构造函数|
-|`insertParamSymbolSafely`|`FuncSymbolTable`|`inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize`|`string, SymbolType, MetaDataType, bool, size_t`|`AbstractSymbol *`|根据所给参数信息新建参数指代符号，插入参数符号表，若成功，返回参数符号指针|
-|`insertParamType`|`FuncSymbolTable`|`inSymbolType, inMetaDataType, inIsArray, inSize`|`SymbolType, MetaDataType, bool, size_t`|`bool`|根据所给参数信息新建参数指代符号，加入参数类型列表，成功时返回true|
+|`insertParamSymbolSafely`|`FuncSymbolTable`|`inSymbolName, inMetaDataType, inIsArray, inSize`|`string, MetaDataType, bool, size_t`|`AbstractSymbol *`|根据所给参数信息新建参数指代符号，插入参数符号表，若成功，返回参数符号指针|
+|`insertParamType`|`FuncSymbolTable`|`inMetaDataType, inIsArray, inSize`|`MetaDataType, bool, size_t`|`bool`|根据所给参数信息新建参数指代符号，加入参数类型列表，成功时返回true|
 |`lookUpParamSymbol`|`FuncSymbolTable`|`inSymbolName`|`string`|`AbstractSymbol *`|在参数符号列表中查找指定名称符号，返回符号指针|
 |`lookUpParamDataType`|`FuncSymbolTable`|`inSymbolName`|`string`|` tuple <SymbolType, MetaDataType, bool, size_t> `|在参数符号列表查找制定符号名称，返回符号相关属性|
 |`getFuncName`|`FuncSymbolTable`|`void`|`void`|`string`|返回函数名|
@@ -201,7 +202,7 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 |`setReturnType`|`FuncSymbolTable`|`inReturnType`|`MetaDataType`|`bool`|设置函数返回类型|
 |`setParamNum`|`FuncSymbolTable`|`void`|`void`|`int`|设置参数个数，调用即可，内部自动计算|
 |`setParamDataTypeList`|`FuncSymbolTable`|`void`|`void`|`void`|bool`|设置参数类型列表，调用即可，内部自动计算|
-|`compareParamSymbolDataType`|`FuncSymbolTable`|`index, inSymbolType, inMetaDataType, inIsArray, inSize`|`int, SymbolType, MetaDataType, bool, size_t`|`bool`|直接比较某位置的参数类型|
+|`compareParamSymbolDataType`|`FuncSymbolTable`|`index, inMetaDataType, inIsArray, inSize`|`int, MetaDataType, bool, size_t`|`bool`|直接比较某位置的参数类型|
 |`createSymbolTable`|`SymbolTableFactory`|`inTaleType`|`TableType`|`SymbolTable *`|工厂模式构造符号表类，暂不建议使用|
 
 注意`GlobalSymbolTable`只能使用`getGlobalSymbolTable`的方式获取，可以使用`SymbolTable`和`FuncSymbolTableList`中所有接口，`BlockSymbolTable`可以使用`SymbolTable`和`BlockSymbolTableList`中所有接口，`FuncSymbolTableList`可采用全部接口。
@@ -214,17 +215,35 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 2. 若当前为函数符号表，查找`ParamSymbolList`
 3. 向上(`paramSymbolTable`)查找
 
+根据CACT specification，变量在不同作用域中可以覆盖，变量可以和函数同名，插入操作只需要搜索当前作用域有无重名变量。
+
 ### CACT词法描述更新实现
 
 
 
 ### 其它
 
+#### 主要叙述debug过程中的总结
+
+- 首先是在C++中使用名称空间，永远不能在头文件中使用全局性质的名称空间定义。比如std，只能在.cpp中使用，且确保只能使用一个作为主要的全局名称空间
+- 而后是C++中的string类不能在switch case中直接参与比较，需要一些trick加以化用
+- 在语法分析过程中，对子节点的索引需要注意：
+    - 若当前产生式中该名称子节点最多有一个，使用子节点名的函数调用是无需传入参数，若存在则返回其指针，若不存在返回nullptr
+    - 若可能有多个同名子节点，则函数调用后返回vector向量，内容为其指针
+- ANTLR进行自顶向下语法分析，在上层节点enter后未经过下层节点，无法使用下层节点综合属性、继承属性，只能获取文本字面量，只有在需要新建并切换符号表时才在enter中实现
+- CACT specification中未给出的信息：
+    - 单目运算符`!`只能用于`bool`类型的变量或表达式
+    - 单目运算符`+, -`能用于`int, float, double`类型的变量，表达式，数组
+    - `continue/break`只能用在循环内部，CACT只有`while`循环
+
 ## 总结
 
 ### 实验结果总结
 
+经过本次实验，我们能够对CACT语言符号表进行搭建，对其进行语义分析和静态类型检查，本组成功通过了27+48个测试样例，但可能还有遗漏的语义错误未能查出。由于运用了大量面向对象的实现，牺牲了一部分语义分析性能和效率，这部分确实还有提升空间。另外这里只做到了静态类型检查，符号表完全可以增加更多记录信息，能够支持更多的错误检测，比如数组下标溢出等等。
+
 ### 分成员总结
 
+高梓源：本次实验中主要负责符号表设计，参与补全语义分析的错误检测。此次理论上是编译实验，但大量结合了面向对象的设计和思想，这主要是由于C++使用的便捷性造成。由于此前上过相关课程，掌握java面向对象的编程规范，对于这部分上手较为容易，此前也有了解过C++ STL的相关数据结构，因此掌握一些加速方法。通过本次实验对于C++面向对象的编程方式有了较深的感悟和理解，同时对于自顶向下语法制导翻译的理论和实践有了更紧密的结合，加深对编译这部分知识的理解。同时也为语义分析错误的琐碎程度耸然。
 
-
+官奕琳：在本次实验中负责语义分析和错误检测，运用符号表接口实现了CACT自顶向下翻译过程的符号表构建，并且能够在运行过程中准确定位错误。而这依赖对CACT specification的相关描述的熟稔掌握。为以后的编译过程打下良好基础。此外，因为此前接触面向对象编程较少，这也是一次很好的锻炼机会，能够阅读并运用C++接口实现需求。

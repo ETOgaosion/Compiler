@@ -330,6 +330,8 @@ public:
 
   class  StmtContext : public antlr4::ParserRuleContext {
   public:
+    bool hasReturn;
+    MetaDataType returnType;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StmtContext() = default;
@@ -374,8 +376,9 @@ public:
     StmtCtrlSeqContext(StmtContext *ctx);
 
     CondContext *cond();
-    std::vector<SubStmtContext *> subStmt();
-    SubStmtContext* subStmt(size_t i);
+    std::vector<StmtContext *> stmt();
+    StmtContext* stmt(size_t i);
+    SubStmtContext *subStmt();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };

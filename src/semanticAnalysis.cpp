@@ -344,6 +344,39 @@ void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
 
 void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
 {
+    for (auto & s : ctx->stmt()) {
+        if (s->hasReturn) {
+            if (curSymbolTable->getSymbolTableType() == TableType::FUNC) {
+                if (s->returnType != curSymbolTable->getReturnType()) {
+                    throw std::runtime_error("[ERROR] > return type mismatch.\n");
+                }
+            }
+            else {
+                if (ctx->hasReturn) {
+                    if (s->returnType != ctx->returnType) {
+                        throw std::runtime_error("[ERROR] > return type mismatch.\n");
+                    }
+                }
+                else {
+                    ctx->hasReturn = true;
+                    ctx->returnType = s->returnType;
+                }
+            }
+        }
+    }
+    if (ctx->subStmt()) {
+        if (ctx->subStmt()->hasReturn) {
+            if (curSymbolTable->getSymbolTableType() == TableType::FUNC) {
+                if (ctx->subStmt()->returnType != curSymbolTable->getReturnType()) {
+                    throw std::runtime_error("[ERROR] > return type mismatch.\n");
+                }
+            }
+            else {
+                ctx->hasReturn = true;
+                ctx->returnType = ctx->subStmt()->returnType;
+            }
+        }
+    }
 }
 
 void SemanticAnalysis::enterStmtReturn(CACTParser::StmtReturnContext * ctx)
@@ -606,7 +639,7 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExp
     ctx->metaDataType = ctx->unaryExp()->metaDataType;
     ctx->size = ctx->unaryExp()->size;
     if (ctx->unaryOp()->getText() == "!") {
-        if (ctx->metaDataType != MetaDataType::BOOL) {
+        if (ctx->metaDataType != MetaDataType::BOOL || ctx->isArray) {
             throw std::runtime_error("[ERROR] > use logic operator on non-boolean expression.\n");
         }
     }
