@@ -40,6 +40,7 @@ public:
     AbstractSymbol();
     AbstractSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
     ~AbstractSymbol();
+    virtual bool setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
     virtual std::string getSymbolName() const;
     virtual SymbolType getSymbolType() const;
     virtual MetaDataType getMetaDataType() const;
@@ -119,7 +120,7 @@ private:
 protected:
 
 public:
-    static AbstractSymbol *createSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    AbstractSymbol *createSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
 
 };
 
@@ -183,18 +184,15 @@ public:
 
     virtual AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
     virtual AbstractSymbol *insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol);
-    virtual AbstractSymbol *insertParamSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) { return nullptr;};
+    virtual AbstractSymbol *insertParamSymbolSafely(std::string inSymbolName,  MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) { return nullptr;};
     virtual AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) { return nullptr;};
     virtual bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) { return false; };
     virtual bool insertParamType(AbstractSymbol *inParamSymbol) { return false; };
-    virtual SymbolTable *insertFuncSymbolTableSafely(std::string inFuncName, MetaDataType inReturnType) override;
-    virtual SymbolTable *insertFuncSymbolTableSafely(std::string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable) override;
-    virtual SymbolTable *insertFuncSymbolTableSafely(SymbolTable *inFuncSymbolTable) override;
 
     virtual AbstractSymbol *lookUpAbstractSymbol(std::string inSymbolName) const;
     virtual AbstractSymbol *lookUpAbstractSymbolGlobal(std::string inSymbolName) const;
     virtual SymbolTable *lookUpFuncSymbolTable(std::string inFuncName) const override;
-    virtual AbstractSymbol *lookUpParamSymbol(std::string inSymbolNmae) const { return nullptr; };
+    virtual AbstractSymbol *lookUpParamSymbol(std::string inSymbolName) const { return nullptr; };
     virtual std::tuple <MetaDataType, bool, std::size_t> lookUpParamDataType(std::string inSymbolName) const { return std::tuple <MetaDataType, bool, std::size_t>(MetaDataType::VOID, false, 0); };
 
     virtual TableType getSymbolTableType() const;
@@ -245,12 +243,14 @@ public:
     FuncSymbolTable(std::string inFuncName, MetaDataType inReturnType);
     FuncSymbolTable(std::string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable);
     ~FuncSymbolTable();
-    AbstractSymbol *insertParamSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
+    AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
+    AbstractSymbol *insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol) override;
+    AbstractSymbol *insertParamSymbolSafely(std::string inSymbolName, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
     AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) override;
     bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
     bool insertParamType(AbstractSymbol *inParamSymbol) override;
 
-    AbstractSymbol *lookUpParamSymbol(std::string inSymbolNmae) const override;
+    AbstractSymbol *lookUpParamSymbol(std::string inSymbolName) const override;
     std::tuple <MetaDataType, bool, std::size_t> lookUpParamDataType(std::string inSymbolName) const override;
 
     std::string getFuncName() const override;

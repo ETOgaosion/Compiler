@@ -2,7 +2,7 @@
     #include "../src/symbolTable.h"
 
 
-// Generated from CACT.g4 by ANTLR 4.8
+// Generated from grammar/CACT.g4 by ANTLR 4.8
 
 
 #include "CACTListener.h"
@@ -1211,8 +1211,6 @@ size_t CACTParser::StmtContext::getRuleIndex() const {
 
 void CACTParser::StmtContext::copyFrom(StmtContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
-  this->hasReturn = ctx->hasReturn;
-  this->returnType = ctx->returnType;
 }
 
 //----------------- StmtBlockContext ------------------------------------------------------------------

@@ -2,7 +2,7 @@
     #include "../src/symbolTable.h"
 
 
-// Generated from CACT.g4 by ANTLR 4.8
+// Generated from grammar/CACT.g4 by ANTLR 4.8
 
 #pragma once
 
@@ -213,6 +213,8 @@ public:
   class  VarDefContext : public antlr4::ParserRuleContext {
   public:
     std::string symbolName;
+    MetaDataType type;
+    bool withType;
     std::size_t size;
     bool isArray;
     VarDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -328,8 +330,6 @@ public:
 
   class  StmtContext : public antlr4::ParserRuleContext {
   public:
-    bool hasReturn;
-    MetaDataType returnType;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StmtContext() = default;
@@ -494,7 +494,6 @@ public:
 
   class  CondContext : public antlr4::ParserRuleContext {
   public:
-    MetaDataType metaDataType;
     CondContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     LOrExpContext *lOrExp();
