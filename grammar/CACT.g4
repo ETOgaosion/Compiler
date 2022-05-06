@@ -99,14 +99,16 @@ brackets
 
 funcBlock
     locals [
-        bool hasReturn
+        bool hasReturn,
+        MetaDataType returnType
     ]
     : '{' (funcBlockItem)* '}'
     ;
 
 funcBlockItem
     locals [
-        bool hasReturn
+        bool hasReturn,
+        MetaDataType returnType
     ]
     : decl 
     | stmt
@@ -114,7 +116,8 @@ funcBlockItem
 
 stmt
     locals [
-        bool hasReturn
+        bool hasReturn,
+        MetaDataType returnType
     ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression

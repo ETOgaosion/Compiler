@@ -305,6 +305,7 @@ public:
   class  FuncBlockContext : public antlr4::ParserRuleContext {
   public:
     bool hasReturn;
+    MetaDataType returnType;
     FuncBlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<FuncBlockItemContext *> funcBlockItem();
@@ -320,6 +321,7 @@ public:
   class  FuncBlockItemContext : public antlr4::ParserRuleContext {
   public:
     bool hasReturn;
+    MetaDataType returnType;
     FuncBlockItemContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     DeclContext *decl();
@@ -335,6 +337,7 @@ public:
   class  StmtContext : public antlr4::ParserRuleContext {
   public:
     bool hasReturn;
+    MetaDataType returnType;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StmtContext() = default;

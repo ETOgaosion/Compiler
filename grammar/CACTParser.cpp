@@ -1212,6 +1212,7 @@ size_t CACTParser::StmtContext::getRuleIndex() const {
 void CACTParser::StmtContext::copyFrom(StmtContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->hasReturn = ctx->hasReturn;
+  this->returnType = ctx->returnType;
 }
 
 //----------------- StmtBlockContext ------------------------------------------------------------------

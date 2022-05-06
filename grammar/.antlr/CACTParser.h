@@ -29,11 +29,11 @@ public:
     RuleCompUnit = 0, RuleDecl = 1, RuleConstDecl = 2, RuleBType = 3, RuleConstDef = 4, 
     RuleConstInitVal = 5, RuleVarDecl = 6, RuleVarDef = 7, RuleFuncDef = 8, 
     RuleFuncType = 9, RuleFuncFParams = 10, RuleFuncFParam = 11, RuleBrackets = 12, 
-    RuleBlock = 13, RuleBlockItem = 14, RuleStmt = 15, RuleSubStmt = 16, 
-    RuleExp = 17, RuleCond = 18, RuleLVal = 19, RulePrimaryExp = 20, RuleUnaryExp = 21, 
-    RuleUnaryOp = 22, RuleFuncRParams = 23, RuleMulExp = 24, RuleMulOp = 25, 
-    RuleAddExp = 26, RuleRelExp = 27, RuleEqExp = 28, RuleLAndExp = 29, 
-    RuleLOrExp = 30, RuleConstExp = 31, RuleNumber = 32
+    RuleFuncBlock = 13, RuleFuncBlockItem = 14, RuleStmt = 15, RuleBlock = 16, 
+    RuleBlockItem = 17, RuleSubStmt = 18, RuleExp = 19, RuleCond = 20, RuleLVal = 21, 
+    RulePrimaryExp = 22, RuleUnaryExp = 23, RuleUnaryOp = 24, RuleFuncRParams = 25, 
+    RuleMulExp = 26, RuleMulOp = 27, RuleAddExp = 28, RuleRelExp = 29, RuleEqExp = 30, 
+    RuleLAndExp = 31, RuleLOrExp = 32, RuleConstExp = 33, RuleNumber = 34
   };
 
   CACTParser(antlr4::TokenStream *input);
@@ -59,9 +59,11 @@ public:
   class FuncFParamsContext;
   class FuncFParamContext;
   class BracketsContext;
+  class FuncBlockContext;
+  class FuncBlockItemContext;
+  class StmtContext;
   class BlockContext;
   class BlockItemContext;
-  class StmtContext;
   class SubStmtContext;
   class ExpContext;
   class CondContext;
@@ -218,7 +220,7 @@ public:
     virtual size_t getRuleIndex() const override;
     FuncTypeContext *funcType();
     antlr4::tree::TerminalNode *Ident();
-    BlockContext *block();
+    FuncBlockContext *funcBlock();
     FuncFParamsContext *funcFParams();
 
    
@@ -272,21 +274,25 @@ public:
 
   BracketsContext* brackets();
 
-  class  BlockContext : public antlr4::ParserRuleContext {
+  class  FuncBlockContext : public antlr4::ParserRuleContext {
   public:
-    BlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    bool hasReturn;
+    MetaDataType returnType;
+    FuncBlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<BlockItemContext *> blockItem();
-    BlockItemContext* blockItem(size_t i);
+    std::vector<FuncBlockItemContext *> funcBlockItem();
+    FuncBlockItemContext* funcBlockItem(size_t i);
 
    
   };
 
-  BlockContext* block();
+  FuncBlockContext* funcBlock();
 
-  class  BlockItemContext : public antlr4::ParserRuleContext {
+  class  FuncBlockItemContext : public antlr4::ParserRuleContext {
   public:
-    BlockItemContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    bool hasReturn;
+    MetaDataType returnType;
+    FuncBlockItemContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     DeclContext *decl();
     StmtContext *stmt();
@@ -294,7 +300,7 @@ public:
    
   };
 
-  BlockItemContext* blockItem();
+  FuncBlockItemContext* funcBlockItem();
 
   class  StmtContext : public antlr4::ParserRuleContext {
   public:
@@ -315,7 +321,7 @@ public:
   public:
     StmtBlockContext(StmtContext *ctx);
 
-    BlockContext *block();
+    FuncBlockContext *funcBlock();
   };
 
   class  StmtExpressionContext : public StmtContext {
@@ -351,6 +357,34 @@ public:
   };
 
   StmtContext* stmt();
+
+  class  BlockContext : public antlr4::ParserRuleContext {
+  public:
+    bool hasReturn;
+    MetaDataType returnType;
+    BlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<BlockItemContext *> blockItem();
+    BlockItemContext* blockItem(size_t i);
+
+   
+  };
+
+  BlockContext* block();
+
+  class  BlockItemContext : public antlr4::ParserRuleContext {
+  public:
+    bool hasReturn;
+    MetaDataType returnType;
+    BlockItemContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    DeclContext *decl();
+    SubStmtContext *subStmt();
+
+   
+  };
+
+  BlockItemContext* blockItem();
 
   class  SubStmtContext : public antlr4::ParserRuleContext {
   public:

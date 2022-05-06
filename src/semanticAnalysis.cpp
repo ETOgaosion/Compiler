@@ -302,8 +302,15 @@ void SemanticAnalysis::exitFuncBlock(CACTParser::FuncBlockContext * ctx)
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     for (auto & it : ctx->funcBlockItem()) {
         if (it->hasReturn) {
-            ctx->hasReturn = true;
-            break;
+            if (ctx->hasReturn) {
+                if (ctx->returnType != it->returnType) {
+                    throw std::runtime_error("[ERROR] > return type mismatch");
+                }
+            }
+            else {
+                ctx->hasReturn = true;
+                ctx->returnType = it->returnType;
+            }
         }
     }
 }
@@ -317,6 +324,7 @@ void SemanticAnalysis::exitFuncBlockItem(CACTParser::FuncBlockItemContext * ctx)
 {
     if (ctx->stmt() && ctx->stmt()->hasReturn) {
         ctx->hasReturn = true;
+        ctx->returnType = ctx->stmt()->returnType;
     }
 }
 
@@ -411,6 +419,10 @@ void SemanticAnalysis::enterStmtBlock(CACTParser::StmtBlockContext * ctx)
 void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
+    if (ctx->funcBlock() && ctx->funcBlock()->hasReturn) {
+        ctx->hasReturn = true;
+        ctx->returnType = ctx->funcBlock()->returnType;
+    }
 }
 
 void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
@@ -428,6 +440,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     }
     if (ctx->subStmt() && ctx->subStmt()->hasReturn) {
         ctx->hasReturn = true;
+        ctx->returnType = ctx->subStmt()->returnType;
     }
 }
 
@@ -446,6 +459,7 @@ void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
         }
     }
     ctx->hasReturn = true;
+    ctx->returnType = ctx->exp() ? ctx->exp()->metaDataType : MetaDataType::VOID;
 }
 
 void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
