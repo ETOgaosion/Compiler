@@ -1,0 +1,3 @@
+/Volumes/study/code/C++/vscode/compiler/compiler/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Volumes/study/code/C++/vscode/compiler/compiler/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Volumes/study/code/C++/vscode/compiler/compiler/cmake-build-debug/CMakeFiles/compiler.dir
