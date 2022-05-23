@@ -30,7 +30,7 @@ public:
 
     // param is IN/OUT
     bool enterWhile(IRLabel *loopBeginLabel, IRLabel *loopEndLabel);
-    bool exitWhile(IRLabel *loopBeginLabel);
+    bool exitWhile(IRLabel *loopBeginLabel, IRLabel *loopEndLabel);
     bool enterBreak(IRLabel *loopEndLabel);
     bool enterContinue(IRLabel *loopBeginLabel);
 
