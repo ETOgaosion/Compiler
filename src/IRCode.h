@@ -140,6 +140,12 @@ public:
     void print() const override;
 };
 
+class IRReturnV : public IRReturn {
+public:
+    IRReturnV();
+    // void genTargetCode(TargetCodeList * t);
+};
+
 class IRReturnB : public IRReturn {
 public:
     IRReturnB(IROperand *newArg1);

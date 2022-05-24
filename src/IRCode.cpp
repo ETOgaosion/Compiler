@@ -46,6 +46,9 @@ IRCall::IRCall(IROperand *newArg1)
 IRReturn::IRReturn(IROperand *newArg1)
         : IRCode(IROperation::RETURN, nullptr, newArg1, nullptr) {}
 
+IRReturnV::IRReturnV()
+        : IRReturn(nullptr) {}
+
 IRReturnB::IRReturnB(IROperand *newArg1)
         : IRReturn(newArg1) {}
 
@@ -288,7 +291,11 @@ void IRCall::print() const {
 }
 
 void IRReturn::print() const {
-    cout << "return " << getArg1()->getSymbolName() << ";" << endl;
+    cout << "return ";
+    if (getArg1()) {
+        cout << getArg1()->getSymbolName();
+    }
+    cout << ";" << endl;
 }
 
 void IRGetReturn::print() const {
