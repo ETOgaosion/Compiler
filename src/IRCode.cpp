@@ -265,6 +265,9 @@ IRIfLessEqualThanGotoD::IRIfLessEqualThanGotoD(IROperand *newResult, IROperand *
 IRGoto::IRGoto(IROperand *newLabel)
         : IRCode(IROperation::GOTO, newLabel, nullptr, nullptr) {}
 
+IRPhi::IRPhi(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
+        : IRCode(IROperation::PHI, newResult, newArg1, newArg2) {}
+
 void IRAddLabel::print() const {
     cout << getArg1()->getSymbolName() << ":" << endl;
 }
@@ -391,6 +394,12 @@ void IRIfLessEqualThanGoto::print() const {
          << getArg1()->getSymbolName() << " <= "
          << getArg2()->getSymbolName()
          << " Goto " << getResult()->getSymbolName() << ";" << endl;
+}
+
+void IRPhi::print() const {
+    cout << getResult()->getSymbolName() << " = phi("
+         << getArg1()->getSymbolName() << ","
+         << getArg2()->getSymbolName() << ")";
 }
 //
 //void IRAddLabel::genTargetCode(TargetCodeList *t) {

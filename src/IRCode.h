@@ -25,7 +25,8 @@ enum class IROperation {
     IF_GREATER_EQUAL_THAN_GOTO,
     IF_LESS_THAN_GOTO,
     IF_LESS_EQUAL_THAN_GOTO,
-    GOTO
+    GOTO,
+    PHI
 };
 
 class IRCode {
@@ -586,4 +587,11 @@ class IRGoto : public IRCode {
 public:
     IRGoto(IROperand *newLabel);
     // void genTargetCode(TargetCodeList * t);
+};
+
+class IRPhi : public IRCode {
+public:
+    IRPhi(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
 };

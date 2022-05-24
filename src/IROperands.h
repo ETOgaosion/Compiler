@@ -116,7 +116,7 @@ private:
     bool assigned;
     IRValue *curValue;
     bool aliasToSymbol;
-    IROperand *symbolVariable;
+    IROperand *xc1;
 
 public:
     IRTempVariable(std::string newName, SymbolType newSymbolType, MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize);
