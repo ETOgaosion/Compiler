@@ -117,7 +117,8 @@ funcBlockItem
 stmt
     locals [
         bool hasReturn,
-        MetaDataType returnType
+        MetaDataType returnType,
+        IRLabel* label
     ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
@@ -163,7 +164,8 @@ exp
     locals [
         bool isArray,
         std::size_t size,
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand result
     ]
     : addExp        #expAddExp
     | BoolConst     #expBoolExp
@@ -187,7 +189,8 @@ primaryExp
     locals [
         bool isArray,
         std::size_t size,
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : '(' exp ')'   #primaryExpNestExp
     | lVal          #primaryExplVal
@@ -198,7 +201,8 @@ unaryExp
     locals [
         bool isArray,
         std::size_t size,
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : primaryExp                        #unaryExpPrimaryExp
     | Ident '(' (funcRParams)? ')'      #unaryExpFunc
@@ -215,7 +219,8 @@ funcRParams
     locals [
         std::vector<bool> isArrayList,
         std::vector<std::size_t> sizeList,
-        std::vector<MetaDataType> metaDataTypeList
+        std::vector<MetaDataType> metaDataTypeList,
+        std::vector<IROperand*> operandsList
     ]
     : exp (',' exp)*
     ;
@@ -224,7 +229,8 @@ mulExp
     locals [
         bool isArray,
         std::size_t size,
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : unaryExp                              #mulExpUnaryExp
     | mulExp mulOp unaryExp                 #mulExpMulExp
@@ -237,32 +243,45 @@ addExp
     locals [
         bool isArray,
         std::size_t size,
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : mulExp                        #addExpMulExp
-    | addExp ('+' | '-') mulExp     #addExpAddExp
+    | addExp addOp mulExp     #addExpAddExp
     ;
+
+addOp
+    : '+' | '-';
 
 relExp
     locals [
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : addExp                                    #relExpAddExp
-    | relExp ('<' | '>' | '<=' | '>=') addExp   #relExpRelExp
+    | relExp relOp addExp                       #relExpRelExp
     | BoolConst                                 #relExpBoolConst
     ;
 
+relOp
+    : '<' | '>' | '<=' | '>=';
+
 eqExp
     locals [
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : relExp                        #eqExpRelExp
-    | eqExp ('==' | '!=') relExp    #eqExpEqExp
+    | eqExp eqOp relExp             #eqExpEqExp
     ;
+
+eqOp
+    : '==' | '!=';
 
 lAndExp
     locals [
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : eqExp                         #lAndExpEqExp
     | lAndExp ('&&') eqExp          #lAndExpLAndExp
@@ -270,7 +289,8 @@ lAndExp
 
 lOrExp
     locals [
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : lAndExp                       #lOrExpLAndExp
     | lOrExp ('||') lAndExp         #lOrExpLOrExp
@@ -278,7 +298,8 @@ lOrExp
 
 constExp
     locals[
-        MetaDataType metaDataType
+        MetaDataType metaDataType,
+        IROperand* operand
     ]
     : number            #constExpNumber
     | BoolConst         #constExpBoolConst

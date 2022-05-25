@@ -747,8 +747,6 @@ public:
     using antlr4::ParserRuleContext::copyFrom;
 
     virtual size_t getRuleIndex() const override;
-
-   
   };
 
   class  AddExpAddExpContext : public AddExpContext {

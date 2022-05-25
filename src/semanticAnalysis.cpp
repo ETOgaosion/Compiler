@@ -247,6 +247,9 @@ void SemanticAnalysis::enterFuncDef(CACTParser::FuncDefContext * ctx)
     }
     funcSymbolTable->setParentSymbolTable(curSymbolTable);
     curSymbolTable = funcSymbolTable;
+
+    enterFunction(ctx->Ident()->getText());
+
 }
 
 void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
@@ -254,6 +257,7 @@ void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
     if (!ctx->funcBlock()->hasReturn && (curSymbolTable->getReturnType() != MetaDataType::VOID)) {
         throw std::runtime_error("[ERROR] > Non void function has no return.\n");
     }
+    exitFunction();
 }
 
 void SemanticAnalysis::enterFuncType(CACTParser::FuncTypeContext * ctx)
@@ -397,6 +401,8 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
             throw std::runtime_error("[ERROR] > non-array assignment to non-array.\n");
         }
     }
+
+
 }
 
 void SemanticAnalysis::enterStmtExpression(CACTParser::StmtExpressionContext * ctx)
@@ -442,6 +448,14 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
         ctx->hasReturn = true;
         ctx->returnType = ctx->subStmt()->returnType;
     }
+
+    // if(ctx->getText().find('if') == ctx->getText().begin()){
+        
+    // } else if (ctx->getText().find('while') == ctx->getText().begin()){
+
+    // } else {
+    //     throw std::runtime_error("[ERROR] > not if or while stmt\n");
+    // }
 }
 
 void SemanticAnalysis::enterStmtReturn(CACTParser::StmtReturnContext * ctx)
@@ -590,6 +604,7 @@ void SemanticAnalysis::exitExpAddExp(CACTParser::ExpAddExpContext * ctx)
     ctx->isArray = ctx->addExp()->isArray;
     ctx->size = ctx->addExp()->size;
     ctx->metaDataType = ctx->addExp()->metaDataType;
+
 }
 
 void SemanticAnalysis::enterExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
@@ -608,6 +623,7 @@ void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
 // Cond
 void SemanticAnalysis::enterCond(CACTParser::CondContext * ctx)
 {
+    
 }
 
 void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
@@ -615,6 +631,7 @@ void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
     if(ctx->lOrExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > condition must be bool");
     }
+    IRCode* code = IRCode::IRCode();
 }
 
 void SemanticAnalysis::enterLVal(CACTParser::LValContext * ctx)
@@ -735,6 +752,7 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     }
     ctx->isArray = false;
     ctx->metaDataType = funcSymbolTable->getReturnType();
+
 }
 
 void SemanticAnalysis::enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
@@ -759,6 +777,7 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExp
             throw std::runtime_error("[ERROR] > use non-logic operator on boolean expression.\n");
         }
     }
+
 }
 
 void SemanticAnalysis::enterUnaryOp(CACTParser::UnaryOpContext * ctx)
@@ -818,6 +837,19 @@ void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
             throw std::runtime_error("[ERROR] > mul: non-array:array calculation.\n");
         }
     }
+
+    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperation op;
+    if (ctx->mulOp()->getText() == '*')
+        op = IROperation::MUL;
+    else if (ctx->mulOp()->getText() == '/')
+        op = IROperation::DIV;
+    else if (ctx->mulOp()->getText() == '%')
+        op = IROperation::MOD;
+    else
+        throw std::runtime_error("[ERROR] > mulop illegal.\n");
+    IRCode* code = new IRCode::IRCode(op, result, ctx->mulExp()->operand(0), ctx->unaryExp()->operand(0));
+    IRGenerator->addCode(code);
 }
 
 void SemanticAnalysis::enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ctx)
@@ -874,6 +906,17 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
             throw std::runtime_error("[ERROR] > add: non-array:array calculation. " + curSymbolTable->getFuncName() + " " +ctx->mulExp()->getText());
         }
     }
+
+    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperation op;
+    if (ctx->addOp()->getText() == '+')
+        op = IROperation::ADD;
+    else if (ctx->addOp()->getText() == '-')
+        op = IROperation::SUB;
+    else
+        throw std::runtime_error("[ERROR] > addop illegal.\n");
+    IRCode* code = new IRCode::IRCode(op, result, ctx->addExp()->operand(0), ctx->mulExp()->operand(0));
+    IRGenerator->addCode(code);
 }
 
 void SemanticAnalysis::enterAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
@@ -909,6 +952,21 @@ void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
         throw std::runtime_error("[ERROR] > rel: relation calculation with different types.\n");
     }
     ctx->metaDataType = MetaDataType::BOOL;
+
+    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperation op;
+    if (ctx->relOp()->getText() == '<')
+        op = IROperation::SLT;
+    else if (ctx->relOp()->getText() == '>')
+        op = IROperation::SGT;
+    else if (ctx->relOp()->getText() == '<=')
+        op = IROperation::SLEQ;
+    else if (ctx->relOp()->getText() == '>=')
+        op = IROperation::SGEQ;
+    else
+        throw std::runtime_error("[ERROR] > addop illegal.\n");
+    IRCode* code = new IRCode::IRCode(op, result, ctx->relExp()->operand, ctx->addExp()->operand);
+    IRGenerator->addCode(code);
 }
 
 void SemanticAnalysis::enterRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
@@ -922,6 +980,7 @@ void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
         throw std::runtime_error("[ERROR] > rel add: array cannot be operands of logic operators. " + curSymbolTable->getFuncName());
     }
     ctx->metaDataType = ctx->addExp()->metaDataType;
+    ctx->operand = ctx->addExp()->operand;
 }
 
 void SemanticAnalysis::enterRelExpBoolConst(CACTParser::RelExpBoolConstContext * ctx)
@@ -932,6 +991,12 @@ void SemanticAnalysis::enterRelExpBoolConst(CACTParser::RelExpBoolConstContext *
 void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::BOOL;
+    IRValue* boolValue = new IRValue::IRValue(MetaDataType::BOOL, false, 0);
+    if(ctx->BoolConst()->getText() == "true")
+        boolValue->addValue("1");
+    else if (ctx->BOOL()->getText() == "false")
+        boolValue->addValue("0");
+    ctx->oprand = boolValue;
 }
 
 //EqExp
@@ -943,6 +1008,7 @@ void SemanticAnalysis::enterEqExpRelExp(CACTParser::EqExpRelExpContext * ctx)
 void SemanticAnalysis::exitEqExpRelExp(CACTParser::EqExpRelExpContext * ctx)
 {
     ctx->metaDataType = ctx->relExp()->metaDataType;
+    ctx->operand = ctx->relExp()->operand;
 }
 
 void SemanticAnalysis::enterEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
@@ -956,6 +1022,15 @@ void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
         throw std::runtime_error("[ERROR] > eq operator with different data type.\n");
     }
     ctx->metaDataType = MetaDataType::BOOL;
+
+    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperation op;
+    if(ctx->eqOp()->getText() == "==")
+        op = IROperation::SEQ;
+    else if(ctx->eqOp()->getText() == "!=")
+        op = IROperation::SNE;
+    IRCode* code = new IRCode::IRCode(op, result, ctx->eqExp()->operand, ctx->relExp()->operand);
+    IRGenerator->addCode(code);
 }
 
 //LAndExp
@@ -970,6 +1045,9 @@ void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ct
     if (ctx->metaDataType != MetaDataType::BOOL || ctx->eqExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > logic calculation with non-boolean operands.\n");
     }
+    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IRCode* code = new IRCode::IRCode(IROperation::AND, result, ctx->lAndExp()->operand, ctx->eqExp()->operand);
+    IRGenerator->addCode(code);
 }
 
 void SemanticAnalysis::enterLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
@@ -980,6 +1058,7 @@ void SemanticAnalysis::enterLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
 void SemanticAnalysis::exitLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
 {
     ctx->metaDataType = ctx->eqExp()->metaDataType;
+    ctx->operand = ctx->eqExp()->operand;
 }
 
 //LOrExp
@@ -991,6 +1070,7 @@ void SemanticAnalysis::enterLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx
 void SemanticAnalysis::exitLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx)
 {
     ctx->metaDataType = ctx->lAndExp()->metaDataType;
+    ctx->operand = ctx->lAndExp()->operand;
 }
 void SemanticAnalysis::enterLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
 {
@@ -1003,6 +1083,10 @@ void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
     if (ctx->metaDataType != MetaDataType::BOOL || ctx->lAndExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > logic calculation with non-boolean operands.\n");
     }
+
+    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IRCode *code = IRCode(IROperation::OR, result, ctx->lOrExp()->operand, ctx->lAndExp()->operand);
+    IRGenerator->addCode(code);
 }
 
 

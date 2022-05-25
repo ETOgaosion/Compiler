@@ -19,7 +19,7 @@ public:
     IRFunction(std::string newFunctionName);
 
     bool addLocalVariable(IRSymbolVariable *newVariable);
-    bool addTempVariable(SymbolType newSymbolType, MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize);
+    bool addTempVariable(MetaDataType newMetaDataType);
     bool addCode(IRCode *newCode);
     bool addLabel(IRLabel *newLabel);
     int calFrameSize();

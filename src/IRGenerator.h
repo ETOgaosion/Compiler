@@ -40,4 +40,9 @@ public:
 
     IRLabel *enterIf();
     void enterElse(IRLabel *ifEndLabel);
+
+    // add Operand
+    IROperand* addSymbolVariable(MetaDataType newMetaDataType);
 };
+
+

@@ -12,37 +12,15 @@ IRValue::IRValue(MetaDataType newMetaDataType, bool newIsArray, std::size_t newS
     metaDataType = newMetaDataType;
     isArray = newIsArray;
     size = newSize;
-    values.clear();
+    value.clear();
 }
 
 void IRValue::addValue(const string& newValue) {
-    values.push_back(newValue);
+    value.push_back(newValue);
 }
 
-void IRValue::setValues(int len, const string& singleValue) {
-    if (values.size() < len) {
-        values.resize(len);
-    }
-    for (int i = 0; i < len; i++) {
-        values[i] = singleValue;
-    }
-}
-
-void IRValue::setValues(vector<string> inValues) {
-    if(values.size() < inValues.size()) {
-        values.resize(inValues.size());
-    }
-    for(int i = 0; i < inValues.size(); i++) {
-        values[i] = inValues[i];
-    }
-}
-
-string IRValue::getValue(int cnt) const {
-    return values[cnt];
-}
-
-vector<string> IRValue::getValues() const {
-    return values;
+string IRValue::getValue() const {
+    return value;
 }
 
 IRSymbolVariable::IRSymbolVariable(AbstractSymbol *newSymbol) : IROperand(OperandType::SYMBOLVAR) {
@@ -54,12 +32,11 @@ void IRSymbolVariable::setMemOffset(int offset) {}
 
 int IRSymbolVariable::getMemOffset() const {}
 
-IRTempVariable::IRTempVariable(string newName, SymbolType newSymbolType, MetaDataType newMetaDataType, bool newIsArray, size_t newSize) : IROperand(OperandType::TEMPVAR) {
+IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, bool newIsArray, size_t newSize) : IROperand(OperandType::TEMPVAR) {
     symbolName = std::move(newName);
     metaDataType = newMetaDataType;
     isArray = newIsArray;
     size = newSize;
-    curValue = nullptr;
 }
 
 void IRTempVariable::setMemOffset(int offset) {}

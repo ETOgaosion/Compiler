@@ -1,4 +1,5 @@
 #include "../grammar/CACTBaseListener.h"
+#include "IRGenerator.h"
 
 #pragma once
 
@@ -6,7 +7,7 @@ class SemanticAnalysis : public CACTBaseListener
 {
 private:
     SymbolTable* curSymbolTable;
-
+    IRGenerator* irGenerator;
 public:
     SemanticAnalysis(/* args */){}
     ~SemanticAnalysis(){}

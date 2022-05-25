@@ -20,10 +20,11 @@ bool IRFunction::addLocalVariable(IRSymbolVariable *newVariable) {
     return true;
 }
 
-bool IRFunction::addTempVariable(SymbolType newSymbolType, MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize) {
+IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
     string newTempVariableName = functionName + string("_t") + to_string(tempCount++);
-    IRTempVariable *newIRTempVar = new IRTempVariable(newTempVariableName, newSymbolType, newMetaDataType, newIsArray, newSize);
+    IRTempVariable *newIRTempVar = new IRTempVariable(newTempVariableName, newMetaDataType);
     tempVariables.emplace(newTempVariableName, newIRTempVar);
+    return newIRTempVar;
 }
 
 bool IRFunction::addCode(IRCode *newCode) {

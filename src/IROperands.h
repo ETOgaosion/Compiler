@@ -40,7 +40,6 @@ public:
     virtual bool getAliasToSymbol() const { return false; };
     virtual IROperand *getSymbolVariable() const { return nullptr; }
 
-    virtual bool setValue(IRValue *inValue) { return false; };
     virtual bool setAssigned() { return false; }
     virtual bool setLatestVersionSymbol(IROperand *newVersionSymbol) { return false; };
     virtual bool setAliasToSymbol() { return false; };
@@ -66,7 +65,7 @@ private:
     MetaDataType metaDataType;
     bool isArray;
     std::size_t size;
-    std::vector<std::string> values;
+    std::string value;
 
 public:
     IRValue(MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize);
@@ -76,17 +75,13 @@ public:
     std::size_t getSize() const override { return size; };
 
     void addValue(const std::string& newValue);
-    void setValues(int len, const std::string& singleValue);
-    void setValues(std::vector<std::string> inValues);
-    std::string getValue(int cnt) const;
-    std::vector<std::string> getValues() const;
+    std::string getValue() const;
 };
 
 class IRSymbolVariable : public IROperand {
 private:
     AbstractSymbol *symbol;
     bool assigned;
-    IRValue *curValue;
     IROperand *latestVersionSymbol;
 
 public:
@@ -99,7 +94,6 @@ public:
     bool getAssigned() const override { return assigned; };
     IROperand *getLatestVersionSymbol() const override { return latestVersionSymbol; };
     
-    bool setValue(IRValue *inValue) override { curValue = inValue; return true; };
     bool setAssigned() override { assigned = true; return true; };
     bool setLatestVersionSymbol(IROperand *latestSymbol) override { latestVersionSymbol = latestSymbol; return true; }
 
@@ -114,12 +108,11 @@ private:
     bool isArray;
     std::size_t size;
     bool assigned;
-    IRValue *curValue;
     bool aliasToSymbol;
     IROperand *xc1;
 
 public:
-    IRTempVariable(std::string newName, SymbolType newSymbolType, MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize);
+    IRTempVariable(std::string newName, MetaDataType newMetaDataType);
 
     std::string getSymbolName() const override { return symbolName; };
     MetaDataType getMetaDataType() const override { return metaDataType; };
@@ -129,7 +122,6 @@ public:
     bool getAliasToSymbol() const override { return aliasToSymbol; };
     IROperand *getSymbolVariable() const override { return symbolVariable; };
 
-    bool setValue(IRValue *inValue) override { curValue = inValue; return true; };
     bool setAssigned() override { assigned = true; return true; };
     bool setAliasToSymbol() override { aliasToSymbol = true; return true; };
     bool setSymbolVariable(IROperand *inSymbolVariable) override { aliasToSymbol = true; symbolVariable = inSymbolVariable; return true; };
