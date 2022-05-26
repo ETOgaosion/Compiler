@@ -7,13 +7,13 @@ IROperand* IRGenerator::addTempVariable(MetaDataType newMetaDataType) {
     return op;
 }
 
-IRGenerator::IRGenerator(IRProgram *newIR) {
+IRGenerator(IRProgram *newIR) {
     ir = newIR;
     currentIRFunc = nullptr;
     targetCodes->clear();
 }
 
-bool IRGenerator::enterFunction(std::string funtionName)
+bool IRGenrator::enterFunction(std::string funtionName)
 {
     IRFunction *func = new IRFunction(functionName);
     currentIRFunc = func;
@@ -24,23 +24,26 @@ bool IRGenerator::enterFunction(std::string funtionName)
     func->addCode(funcCode);
 }
 
-bool IRGenerator::exitFunction()
+bool IRGenrator::exitFunction()
 {
     IRCode::IRCode* retCode = new IRReturn::IRReturnV();
     return currentIRFunc->addCode(retCode);
 }
 
-bool addCode(IRCode *newCode)
+bool IRGenrator::addCode(IRCode *newCode)
 {
     return currentIRFunc->addCode(newCode);
 }
 
-IRLabel *addLabel()
+IRLabel* IRGenrator::addLabel()
 {
-    
+    return currentIRFunc->addLabel();
 }
 
-bool addCode(IRCode *newCode)
+IRLabel* IRGenrator::enterWhile()
 {
-    return currentIRFunc->addCode(newCode);
+    IRLabel* beginLabel = addLabel();
+    IRCode* beginCode = new IRAddLabel::IRAddLabel(beginLabel);
+    addCode(beginCode);
+    return beginLabel;
 }

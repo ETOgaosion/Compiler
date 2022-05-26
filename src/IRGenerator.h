@@ -21,15 +21,18 @@ public:
     bool addCode(IRCode *newCode);
     bool addCodes(std::vector<IRCode *> newCodes);
 
+    // add Operand
     bool addLocalVariable(IRSymbolVariable *newLocalVariable);
     IRTempVariable *addTempVariable();
     IRLabel *addLabel();
+    IROperand* addSymbolVariable(MetaDataType newMetaDataType);
+
 
     bool enterFunction(std::string funtionName);
     bool exitFunction(); // enter return
 
     // param is IN/OUT
-    bool enterWhile(IRLabel *loopBeginLabel, IRLabel *loopEndLabel);
+    IRLabel* enterWhile();
     bool exitWhile(IRLabel *loopBeginLabel, IRLabel *loopEndLabel);
     bool enterBreak(IRLabel *loopEndLabel);
     bool enterContinue(IRLabel *loopBeginLabel);
@@ -38,11 +41,8 @@ public:
     bool enterArrayAssign(IRLabel *arrayLoopBeginLabel, IRLabel *arrayLoopEndLabel);
     bool exitArrayAssign(IRLabel *arrayLoopBeginLabel);
 
-    IRLabel *enterIf();
-    void enterElse(IRLabel *ifEndLabel);
-
-    // add Operand
-    IROperand* addSymbolVariable(MetaDataType newMetaDataType);
+    // IRLabel *enterIf();
+    // void enterElse(IRLabel *ifEndLabel);
 };
 
 

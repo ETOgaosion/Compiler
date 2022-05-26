@@ -27,7 +27,7 @@ enum class IROperation {
     SGEQ,
     OR,
     AND,
-    BNEZ,
+    BEZ,
     GOTO,
     PHI
 };

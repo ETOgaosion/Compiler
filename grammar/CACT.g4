@@ -118,7 +118,7 @@ stmt
     locals [
         bool hasReturn,
         MetaDataType returnType,
-        IRLabel* label
+        std::vector<IRCode *> codes
     ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
@@ -172,6 +172,9 @@ exp
     ;
 
 cond
+    locals[
+        IRLabel* falseLabel
+    ]
     : lOrExp
     ;
 

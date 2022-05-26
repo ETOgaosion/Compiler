@@ -434,6 +434,24 @@ void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
 void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
 {
     ctx->hasReturn = false;
+    IRLabel* falseLabel = IRGenerator->addLabel();
+    ctx->cond()->falseLabel = falseLabel;
+    std::vector<IRCode *> codes;
+    if(ctx->getText().find('if') == ctx->getText().begin()){
+        IRCode *code = IRAddLabel::IRAddLabel(falseLabel);
+        codes.push_back(code);
+        ctx->stmt(0)->codes = codes;
+    } else if (ctx->getText().find('while') == ctx->getText().begin()){
+        IRLabel* beginLabel = IRGenerator::enterWhile();
+        IRCode *code = IRCode::IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
+        codes.push_back(code);
+        code = IRAddLabel::IRAddLabel(falseLabel);
+        codes.push_back(code);
+        ctx->stmt()->codes = codes;
+    } else {
+        throw std::runtime_error("[ERROR] > not if or while stmt\n");
+    }
+
 }
 
 void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
@@ -449,13 +467,6 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
         ctx->returnType = ctx->subStmt()->returnType;
     }
 
-    // if(ctx->getText().find('if') == ctx->getText().begin()){
-        
-    // } else if (ctx->getText().find('while') == ctx->getText().begin()){
-
-    // } else {
-    //     throw std::runtime_error("[ERROR] > not if or while stmt\n");
-    // }
 }
 
 void SemanticAnalysis::enterStmtReturn(CACTParser::StmtReturnContext * ctx)
@@ -631,7 +642,8 @@ void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
     if(ctx->lOrExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > condition must be bool");
     }
-    IRCode* code = IRCode::IRCode();
+    IRCode* code = IRCode::IRCode(IROperation::BEQZ, nullptr, ctx->falseLabel, ctx->lOrExp()->operand);
+    IRGenerator->addCode(code);
 }
 
 void SemanticAnalysis::enterLVal(CACTParser::LValContext * ctx)
