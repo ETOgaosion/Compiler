@@ -10,13 +10,11 @@ IRLabel::IRLabel(string newName) : IROperand(OperandType::LABEL) {
 
 IRValue::IRValue(MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
-    isArray = newIsArray;
-    size = newSize;
     value.clear();
 }
 
 void IRValue::addValue(const string& newValue) {
-    value.push_back(newValue);
+    value.assign(newValue);
 }
 
 string IRValue::getValue() const {
@@ -25,7 +23,6 @@ string IRValue::getValue() const {
 
 IRSymbolVariable::IRSymbolVariable(AbstractSymbol *newSymbol) : IROperand(OperandType::SYMBOLVAR) {
     symbol = newSymbol;
-    curValue = nullptr;
 }
 
 void IRSymbolVariable::setMemOffset(int offset) {}

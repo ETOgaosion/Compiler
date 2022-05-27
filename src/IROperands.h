@@ -39,11 +39,14 @@ public:
     virtual IROperand *getLatestVersionSymbol() const { return nullptr; };
     virtual bool getAliasToSymbol() const { return false; };
     virtual IROperand *getSymbolVariable() const { return nullptr; }
+    virtual std::string getFunctionName() const { return {}; };
+    virtual SymbolTable *getFunctionSymbolTable() const { return nullptr; };
 
     virtual bool setAssigned() { return false; }
     virtual bool setLatestVersionSymbol(IROperand *newVersionSymbol) { return false; };
     virtual bool setAliasToSymbol() { return false; };
     virtual bool setSymbolVariable(IROperand *inSymbolVariable) { return false; };
+    virtual bool setFunctionSymbolTable(SymbolTable *inFunctionTable) const { return false; };
 
     virtual void setMemOffset(int offset) {};
     virtual int getMemOffset() const { return 0; };
@@ -63,16 +66,12 @@ public:
 class IRValue : public IROperand {
 private:
     MetaDataType metaDataType;
-    bool isArray;
-    std::size_t size;
     std::string value;
 
 public:
     IRValue(MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize);
 
     MetaDataType getMetaDataType() const override { return metaDataType; };
-    bool getIsArray() const override { return isArray; };
-    std::size_t getSize() const override { return size; };
 
     void addValue(const std::string& newValue);
     std::string getValue() const;
@@ -93,12 +92,24 @@ public:
     std::size_t getSize() const override { return symbol->getSize(); };
     bool getAssigned() const override { return assigned; };
     IROperand *getLatestVersionSymbol() const override { return latestVersionSymbol; };
-    
+
     bool setAssigned() override { assigned = true; return true; };
     bool setLatestVersionSymbol(IROperand *latestSymbol) override { latestVersionSymbol = latestSymbol; return true; }
 
     void setMemOffset(int offset) override;
     int getMemOffset() const override;
+};
+
+class IRSymbolFunction : public IROperand {
+private:
+    SymbolTable *functionTable;
+
+public:
+    IRSymbolFunction(FuncSymbolTable *function);
+    std::string getFunctionName() const override { return functionTable->getFuncName(); };
+    SymbolTable *getFunctionSymbolTable() const override { return functionTable; };
+
+    bool setFunctionSymbolTable(SymbolTable *inFunctionTable) const override { functionTable = inFunctionTable; return true; };
 };
 
 class IRTempVariable : public IROperand {
@@ -109,10 +120,10 @@ private:
     std::size_t size;
     bool assigned;
     bool aliasToSymbol;
-    IROperand *xc1;
+    IROperand *symbolVariable;
 
 public:
-    IRTempVariable(std::string newName, MetaDataType newMetaDataType);
+    IRTempVariable(std::string newName, MetaDataType newMetaDataType, bool newIsArray, size_t newSize);
 
     std::string getSymbolName() const override { return symbolName; };
     MetaDataType getMetaDataType() const override { return metaDataType; };
