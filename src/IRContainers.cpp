@@ -31,6 +31,13 @@ bool IRFunction::addCode(IRCode *newCode) {
     codes.emplace_back(newCode);
 }
 
+bool IRFunction::addCodes(std::vector<IRCode *> newCodes){
+    for (auto code : newCodes){
+        codes.emplace_back(code);
+    }
+}
+
+
 bool IRFunction::addLabel(IRLabel *newLabel) {
     labels.emplace(newLabel->getSymbolName(), newLabel);
 }

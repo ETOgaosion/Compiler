@@ -21,6 +21,7 @@ public:
     bool addLocalVariable(IRSymbolVariable *newVariable);
     bool addTempVariable(MetaDataType newMetaDataType);
     bool addCode(IRCode *newCode);
+    bool addCodes(std::vector<IRCode *> newCodes);
     bool addLabel(IRLabel *newLabel);
     int calFrameSize();
 

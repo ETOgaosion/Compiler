@@ -11,7 +11,10 @@ IRAddLabel::IRAddLabel(IROperand *newArg1)
         : IRCode(IROperation::ADD_LABEL, nullptr, newArg1, nullptr) {}
 
 IRAddParam::IRAddParam(IROperand *newArg1)
-        : IRCode(IROperation::ADD_PARAM, nullptr, newArg1, nullptr) {}
+        : IRCode(IROperation::ADD_PARAM, nullptr, newArg1, nullptr) 
+{
+        
+}
 
 IRAddParamB::IRAddParamB(IROperand *newArg1)
         : IRAddParam(newArg1) {}

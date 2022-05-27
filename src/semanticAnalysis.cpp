@@ -402,7 +402,8 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
         }
     }
 
-
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtExpression(CACTParser::StmtExpressionContext * ctx)
@@ -412,6 +413,8 @@ void SemanticAnalysis::enterStmtExpression(CACTParser::StmtExpressionContext * c
 
 void SemanticAnalysis::exitStmtExpression(CACTParser::StmtExpressionContext * ctx)
 {
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtBlock(CACTParser::StmtBlockContext * ctx)
@@ -429,25 +432,30 @@ void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
         ctx->hasReturn = true;
         ctx->returnType = ctx->funcBlock()->returnType;
     }
+
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
 {
     ctx->hasReturn = false;
+
+
     IRLabel* falseLabel = IRGenerator->addLabel();
     ctx->cond()->falseLabel = falseLabel;
     std::vector<IRCode *> codes;
     if(ctx->getText().find('if') == ctx->getText().begin()){
-        IRCode *code = IRAddLabel::IRAddLabel(falseLabel);
+        IRCode *code = new IRAddLabel::IRAddLabel(falseLabel);
         codes.push_back(code);
         ctx->stmt(0)->codes = codes;
     } else if (ctx->getText().find('while') == ctx->getText().begin()){
         IRLabel* beginLabel = IRGenerator::enterWhile();
-        IRCode *code = IRCode::IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
+        IRCode *code = new IRCode::IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
         codes.push_back(code);
-        code = IRAddLabel::IRAddLabel(falseLabel);
+        code = new IRAddLabel::IRAddLabel(falseLabel);
         codes.push_back(code);
-        ctx->stmt()->codes = codes;
+        ctx->subStmt()->codes = codes;
     } else {
         throw std::runtime_error("[ERROR] > not if or while stmt\n");
     }
@@ -466,7 +474,8 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
         ctx->hasReturn = true;
         ctx->returnType = ctx->subStmt()->returnType;
     }
-
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtReturn(CACTParser::StmtReturnContext * ctx)
@@ -485,6 +494,9 @@ void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
     }
     ctx->hasReturn = true;
     ctx->returnType = ctx->exp() ? ctx->exp()->metaDataType : MetaDataType::VOID;
+
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
@@ -514,6 +526,9 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
             throw std::runtime_error("[ERROR] > non-array assignment to non-array.\n");
         }
     }
+
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
@@ -524,6 +539,8 @@ void SemanticAnalysis::enterSubStmtExpression(CACTParser::SubStmtExpressionConte
 
 void SemanticAnalysis::exitSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
 {
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
@@ -544,12 +561,33 @@ void SemanticAnalysis::exitSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
             throw std::runtime_error("[ERROR] > SubStmtBlock return type mismatch.  " + ctx->getText());
         }
     }
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ctx)
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
+
+    
+    IRLabel* falseLabel = IRGenerator->addLabel();
+    ctx->cond()->falseLabel = falseLabel;
+    std::vector<IRCode *> codes;
+    if(ctx->getText().find('if') == ctx->getText().begin()){
+        IRCode *code = new IRAddLabel::IRAddLabel(falseLabel);
+        codes.push_back(code);
+        ctx->subStmt(0)->codes = codes;
+    } else if (ctx->getText().find('while') == ctx->getText().begin()){
+        IRLabel* beginLabel = IRGenerator::enterWhile();
+        IRCode *code = new IRCode::IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
+        codes.push_back(code);
+        code = new IRAddLabel::IRAddLabel(falseLabel);
+        codes.push_back(code);
+        ctx->subStmt()->codes = codes;
+    } else {
+        throw std::runtime_error("[ERROR] > not if or while stmt\n");
+    }
 }
 
 void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ctx)
@@ -574,6 +612,9 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ct
             }
         }
     }
+
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
@@ -599,6 +640,9 @@ void SemanticAnalysis::exitSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
             ctx->returnType = MetaDataType::VOID;
         }
     }
+    
+    if(ctx->codes != nullptr)
+        IRGenerator->addCodes(ctx->codes);
 }
 
 
@@ -732,6 +776,7 @@ void SemanticAnalysis::exitUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpCont
     ctx->isArray = ctx->primaryExp()->isArray;
     ctx->size = ctx->primaryExp()->size;
     ctx->metaDataType = ctx->primaryExp()->metaDataType;
+    ctx->operand = ctx->primaryExp()->operand;
 }
 
 void SemanticAnalysis::enterUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
@@ -739,6 +784,7 @@ void SemanticAnalysis::enterUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
 }
 
 void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
@@ -765,6 +811,7 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     ctx->isArray = false;
     ctx->metaDataType = funcSymbolTable->getReturnType();
 
+    IRCode *code = new IRCall::IRCall();
 }
 
 void SemanticAnalysis::enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
@@ -790,6 +837,14 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExp
         }
     }
 
+    IROperation op;
+    if(ctx->unaryOp()->getText() == "-")
+        op = IROperation::NEG;
+    else if(ctx->unaryOp()->getText() == "!")
+        op = IROperation::NOT;
+    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IRCode * code = new IRCode::IRCode(op, result, ctx->unaryExp()->operand, nullptr);
+    IRGenerator->addCode(code);
 }
 
 void SemanticAnalysis::enterUnaryOp(CACTParser::UnaryOpContext * ctx)
@@ -814,6 +869,28 @@ void SemanticAnalysis::exitFuncRParams(CACTParser::FuncRParamsContext * ctx)
         ctx->isArrayList.emplace_back(it->isArray);
         ctx->sizeList.emplace_back(it->size);
         ctx->metaDataTypeList.emplace_back(it->metaDataType);
+        switch (it->metaDataType) 
+        {
+        case MetaDataType::BOOL:
+            IRGenerator->addCode(new IRAddParamB::IRAddParamB(it->operand));
+            break;
+
+        case MetaDataType::INT:
+            IRGenerator->addCode(new IRAddParamI::IRAddParamI(it->operand));
+            break;
+
+        case MetaDataType::FLOAT:
+            IRGenerator->addCode(new IRAddParamF::IRAddParamF(it->operand));
+            break;
+
+        case MetaDataType::DOUBLE:
+            IRGenerator->addCode(new IRAddParamD::IRAddParamD(it->operand));
+            break;
+
+        default:
+            throw std::runtime_error("[ERROR] > data type fault.\n");
+            break;
+        }
     }
 }
 

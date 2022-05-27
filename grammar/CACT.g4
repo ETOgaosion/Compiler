@@ -148,7 +148,8 @@ blockItem
 subStmt
     locals [
         bool hasReturn,
-        MetaDataType returnType
+        MetaDataType returnType,
+        std::vector<IRCode *> codes
     ]
     : lVal '=' exp ';'                              #subStmtAssignment
     | (exp)? ';'                                    #subStmtExpression
