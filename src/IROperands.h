@@ -69,7 +69,7 @@ private:
     std::string value;
 
 public:
-    IRValue(MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize);
+    IRValue(MetaDataType newMetaDataType, const std::string& inValue);
 
     MetaDataType getMetaDataType() const override { return metaDataType; };
 
