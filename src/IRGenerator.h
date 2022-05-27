@@ -23,7 +23,7 @@ public:
 
     // add Operand
     bool addLocalVariable(IRSymbolVariable *newLocalVariable);
-    IRTempVariable *addTempVariable();
+    IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
     IRLabel *addLabel();
     IROperand* addSymbolVariable(MetaDataType newMetaDataType);
 

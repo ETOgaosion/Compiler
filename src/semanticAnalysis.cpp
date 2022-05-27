@@ -402,6 +402,14 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
         }
     }
 
+    IRCode *code = new IRCode::IRCode(IROperation::ASSIGN)
+    if(ctx->lVal()->isArray && ctx->exp()->isArray) {
+        // while expanding
+    } else {
+        if()
+    }
+
+
     if(ctx->codes != nullptr)
         IRGenerator->addCodes(ctx->codes);
 }
@@ -660,6 +668,7 @@ void SemanticAnalysis::exitExpAddExp(CACTParser::ExpAddExpContext * ctx)
     ctx->size = ctx->addExp()->size;
     ctx->metaDataType = ctx->addExp()->metaDataType;
 
+    ctx->operand = ctx->addExp()->operand;
 }
 
 void SemanticAnalysis::enterExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
@@ -673,6 +682,8 @@ void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->metaDataType = MetaDataType::BOOL;
+
+    ctx->operand = new IRValue::IRValue(MetaDataType::BOOL, ctx->getText());
 }
 
 // Cond
@@ -718,6 +729,10 @@ void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
     }
     ctx->symbolType = searchLVal->getSymbolType();
     ctx->lValMetaDataType = searchLVal->getMetaDataType();
+
+    ctx->identOperand = IRSymbolVariable::IRSymbolVariable(searchLVal);
+    if(ctx->exp())
+        ctx->indexOperand = ctx->exp()->operand;
 }
 
 
@@ -733,6 +748,8 @@ void SemanticAnalysis::exitPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContex
     ctx->isArray = ctx->exp()->isArray;
     ctx->size = ctx->exp()->size;
     ctx->metaDataType = ctx->exp()->metaDataType;
+
+    ctx->operand = ctx->exp()->operand;
 }
 
 void SemanticAnalysis::enterPrimaryExplVal(CACTParser::PrimaryExplValContext * ctx)
@@ -747,6 +764,15 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
     ctx->isArray = ctx->lVal()->isArray;
     ctx->size = ctx->lVal()->size;
     ctx->metaDataType = ctx->lVal()->lValMetaDataType;
+
+    if (ctx->lVal()->indexOperand()){ // array[index]
+        IROperand *result = new IRGenerator::addTempVariable(ctx->metaDataType);
+        IRCode * code = new IRCode::IRCode(IROperation::FETCH_ARRAY_ELEM, result, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
+        IRGenerator->addCode(code);
+        ctx->operand = result;
+    } else {
+        ctx->operand = ctx->lVal()->identOperand;
+    }
 }
 
 void SemanticAnalysis::enterPrimaryExpNumber(CACTParser::PrimaryExpNumberContext * ctx)
@@ -760,6 +786,7 @@ void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext 
 {
     ctx->isArray = false;
     ctx->metaDataType = ctx->number()->metaDataType;
+    ctx->operand = new IRValue::IRValue(ctx->metaDataType, ctx->number()->getText()); 
 }
 
 
@@ -811,7 +838,10 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     ctx->isArray = false;
     ctx->metaDataType = funcSymbolTable->getReturnType();
 
-    IRCode *code = new IRCall::IRCall();
+    IROperand *func = new IRSymbolFunction::IRSymbolFunction(funcSymbolTable);
+    IRCode *code = new IRCall::IRCall(func);
+    IRGenerator->addCode(code);
+    // ??? operand
 }
 
 void SemanticAnalysis::enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
@@ -845,6 +875,7 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExp
     IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
     IRCode * code = new IRCode::IRCode(op, result, ctx->unaryExp()->operand, nullptr);
     IRGenerator->addCode(code);
+    ctx->operand = result;
 }
 
 void SemanticAnalysis::enterUnaryOp(CACTParser::UnaryOpContext * ctx)
@@ -939,6 +970,7 @@ void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
         throw std::runtime_error("[ERROR] > mulop illegal.\n");
     IRCode* code = new IRCode::IRCode(op, result, ctx->mulExp()->operand(0), ctx->unaryExp()->operand(0));
     IRGenerator->addCode(code);
+    ctx->operand = result;
 }
 
 void SemanticAnalysis::enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ctx)
@@ -953,6 +985,8 @@ void SemanticAnalysis::exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ct
     ctx->isArray = ctx->unaryExp()->isArray;
     ctx->metaDataType = ctx->unaryExp()->metaDataType;
     ctx->size = ctx->unaryExp()->size;
+
+    ctx->operand = ctx->unaryExp()->operand;
 }
 
 void SemanticAnalysis::enterMulOp(CACTParser::MulOpContext * ctx) 
@@ -1004,8 +1038,9 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
         op = IROperation::SUB;
     else
         throw std::runtime_error("[ERROR] > addop illegal.\n");
-    IRCode* code = new IRCode::IRCode(op, result, ctx->addExp()->operand(0), ctx->mulExp()->operand(0));
+    IRCode* code = new IRCode::IRCode(op, result, ctx->addExp()->operand(), ctx->mulExp()->operand());
     IRGenerator->addCode(code);
+    ctx->operand = result;
 }
 
 void SemanticAnalysis::enterAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
@@ -1020,6 +1055,8 @@ void SemanticAnalysis::exitAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
     ctx->isArray = ctx->mulExp()->isArray;
     ctx->metaDataType = ctx->mulExp()->metaDataType;
     ctx->size = ctx->mulExp()->size;
+
+    ctx->operand = ctx->mulExp()->operand;
 }
 
 // RelExp
@@ -1056,6 +1093,7 @@ void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
         throw std::runtime_error("[ERROR] > addop illegal.\n");
     IRCode* code = new IRCode::IRCode(op, result, ctx->relExp()->operand, ctx->addExp()->operand);
     IRGenerator->addCode(code);
+    ctx->operand = result;
 }
 
 void SemanticAnalysis::enterRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
@@ -1080,12 +1118,8 @@ void SemanticAnalysis::enterRelExpBoolConst(CACTParser::RelExpBoolConstContext *
 void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::BOOL;
-    IRValue* boolValue = new IRValue::IRValue(MetaDataType::BOOL, false, 0);
-    if(ctx->BoolConst()->getText() == "true")
-        boolValue->addValue("1");
-    else if (ctx->BOOL()->getText() == "false")
-        boolValue->addValue("0");
-    ctx->oprand = boolValue;
+
+    ctx->oprand = new IRValue::IRValue(MetaDataType::BOOL, ctx->BoolConst()->getText());
 }
 
 //EqExp
@@ -1120,6 +1154,7 @@ void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
         op = IROperation::SNE;
     IRCode* code = new IRCode::IRCode(op, result, ctx->eqExp()->operand, ctx->relExp()->operand);
     IRGenerator->addCode(code);
+    ctx->operand = result;
 }
 
 //LAndExp
@@ -1137,6 +1172,7 @@ void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ct
     IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
     IRCode* code = new IRCode::IRCode(IROperation::AND, result, ctx->lAndExp()->operand, ctx->eqExp()->operand);
     IRGenerator->addCode(code);
+    ctx->operand = result;
 }
 
 void SemanticAnalysis::enterLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
@@ -1159,6 +1195,7 @@ void SemanticAnalysis::enterLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx
 void SemanticAnalysis::exitLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx)
 {
     ctx->metaDataType = ctx->lAndExp()->metaDataType;
+
     ctx->operand = ctx->lAndExp()->operand;
 }
 void SemanticAnalysis::enterLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
@@ -1176,6 +1213,7 @@ void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
     IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
     IRCode *code = IRCode(IROperation::OR, result, ctx->lOrExp()->operand, ctx->lAndExp()->operand);
     IRGenerator->addCode(code);
+    ctx->operand = result;
 }
 
 
@@ -1187,7 +1225,8 @@ void SemanticAnalysis::enterConstExpNumber(CACTParser::ConstExpNumberContext * c
 }
 void SemanticAnalysis::exitConstExpNumber(CACTParser::ConstExpNumberContext * ctx)
 {
-    ctx->metaDataType = ctx->number()->metaDataType;   
+    ctx->metaDataType = ctx->number()->metaDataType;
+    ctx->operand = new IRValue::IRValue(ctx->metaDataType, ctx->number()->getText());  
 }
 
 void SemanticAnalysis::enterConstExpBoolConst(CACTParser::ConstExpBoolConstContext * ctx)
@@ -1197,6 +1236,7 @@ void SemanticAnalysis::enterConstExpBoolConst(CACTParser::ConstExpBoolConstConte
 void SemanticAnalysis::exitConstExpBoolConst(CACTParser::ConstExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::BOOL;
+    ctx->operand = new IRValue::IRValue(MetaDataType::BOOL, ctx->BoolConst()->getText());
 }
 
 // Number

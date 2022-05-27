@@ -166,7 +166,7 @@ exp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand result
+        IROperand* operand
     ]
     : addExp        #expAddExp
     | BoolConst     #expBoolExp
@@ -184,7 +184,9 @@ lVal
         bool isArray,
         std::size_t size,
         SymbolType symbolType,
-        MetaDataType lValMetaDataType
+        MetaDataType lValMetaDataType,
+        IROperand* identOperand,
+        IROperand* indexOperand
     ]
     : Ident ('[' exp ']')?
     ;

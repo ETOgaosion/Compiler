@@ -8,7 +8,7 @@ IRLabel::IRLabel(string newName) : IROperand(OperandType::LABEL) {
     labelName = std::move(newName);
 }
 
-IRValue::IRValue(MetaDataType newMetaDataType, bool newIsArray, std::size_t newSize) : IROperand(OperandType::VALUE) {
+IRValue::IRValue(MetaDataType newMetaDataType) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
     value.clear();
 }
