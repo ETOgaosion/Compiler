@@ -69,7 +69,7 @@ private:
     std::string value;
 
 public:
-    IRValue(MetaDataType newMetaDataType);
+    IRValue(MetaDataType newMetaDataType, const std::string& inValue);
 
     MetaDataType getMetaDataType() const override { return metaDataType; };
 

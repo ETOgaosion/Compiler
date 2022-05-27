@@ -8,9 +8,9 @@ IRLabel::IRLabel(string newName) : IROperand(OperandType::LABEL) {
     labelName = std::move(newName);
 }
 
-IRValue::IRValue(MetaDataType newMetaDataType) : IROperand(OperandType::VALUE) {
+IRValue::IRValue(MetaDataType newMetaDataType, const std::string& inValue) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
-    value.clear();
+    value.assign(inValue);
 }
 
 void IRValue::addValue(const string& newValue) {
