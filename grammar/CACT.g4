@@ -131,7 +131,7 @@ stmt
 block
     locals [
         bool hasReturn,
-        MetaDataType returnType
+        MetaDataType returnType,
     ]
     : '{' (blockItem)* '}'
     ;
@@ -139,7 +139,7 @@ block
 blockItem
     locals [
         bool hasReturn,
-        MetaDataType returnType
+        MetaDataType returnType,
     ]
     : decl 
     | subStmt

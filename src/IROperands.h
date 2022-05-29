@@ -123,7 +123,7 @@ private:
     IROperand *symbolVariable;
 
 public:
-    IRTempVariable(std::string newName, MetaDataType newMetaDataType, bool newIsArray, size_t newSize);
+    IRTempVariable(std::string newName, MetaDataType newMetaDataType);
 
     std::string getSymbolName() const override { return symbolName; };
     MetaDataType getMetaDataType() const override { return metaDataType; };

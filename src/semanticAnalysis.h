@@ -8,6 +8,8 @@ class SemanticAnalysis : public CACTBaseListener
 private:
     SymbolTable* curSymbolTable;
     IRGenerator* irGenerator;
+    std::vector<IRLabel*> whileFalse;
+    std::vector<IRLabel*> whileBegin;
 public:
     SemanticAnalysis(/* args */){}
     ~SemanticAnalysis(){}

@@ -13,7 +13,7 @@ IRGenerator::IRGenerator(IRProgram *newIR) {
     targetCodes->clear();
 }
 
-bool IRGenerator::enterFunction(std::string funtionName)
+bool IRGenerator::enterFunction(std::string functionName)
 {
     IRFunction *func = new IRFunction(functionName);
     currentIRFunc = func;
@@ -26,7 +26,7 @@ bool IRGenerator::enterFunction(std::string funtionName)
 
 bool IRGenerator::exitFunction()
 {
-    IRCode::IRCode* retCode = new IRReturn::IRReturnV();
+    IRCode* retCode = new IRReturnV::IRReturnV();
     return currentIRFunc->addCode(retCode);
 }
 
@@ -35,7 +35,7 @@ bool IRGenerator::addCode(IRCode *newCode)
     return currentIRFunc->addCode(newCode);
 }
 
-bool addCodes(std::vector<IRCode *> newCodes)
+bool IRGenerator::addCodes(std::vector<IRCode *> newCodes)
 {
     return currentIRFunc->addCodes(newCodes);
 }

@@ -29,11 +29,9 @@ void IRSymbolVariable::setMemOffset(int offset) {}
 
 int IRSymbolVariable::getMemOffset() const {}
 
-IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, bool newIsArray, size_t newSize) : IROperand(OperandType::TEMPVAR) {
+IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : IROperand(OperandType::TEMPVAR) {
     symbolName = std::move(newName);
     metaDataType = newMetaDataType;
-    isArray = newIsArray;
-    size = newSize;
 }
 
 void IRTempVariable::setMemOffset(int offset) {}

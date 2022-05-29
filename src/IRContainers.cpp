@@ -22,7 +22,7 @@ bool IRFunction::addLocalVariable(IRSymbolVariable *newVariable) {
 
 IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
     string newTempVariableName = functionName + string("_t") + to_string(tempCount++);
-    IRTempVariable *newIRTempVar = new IRTempVariable(newTempVariableName, newMetaDataType);
+    IRTempVariable *newIRTempVar = new IRTempVariable::IRTempVariable(newTempVariableName, newMetaDataType);
     tempVariables.emplace(newTempVariableName, newIRTempVar);
     return newIRTempVar;
 }
@@ -38,7 +38,7 @@ bool IRFunction::addCodes(std::vector<IRCode *> newCodes){
 }
 
 
-bool IRFunction::addLabel(IRLabel *newLabel) {
+IRLabel* IRFunction::addLabel(IRLabel *newLabel) {
     labels.emplace(newLabel->getSymbolName(), newLabel);
 }
 
