@@ -42,7 +42,7 @@ constDef
         std::size_t size,
         bool isArray
     ]
-    : Ident ('[' IntConst ']')? '=' constInitVal
+    : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;
 
 constInitVal
@@ -51,7 +51,7 @@ constInitVal
         std::size_t size,
         bool isArray
     ]
-    : (constExp)?                           #constInitValOfVar
+    : constExp                              #constInitValOfVar
     | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
     ;
 

@@ -67,6 +67,25 @@ void SemanticAnalysis::SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclCont
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
             throw std::runtime_error("[ERROR] > Redefine const symbol.\n");
         }
+        
+        if(curSymbolTable == GlobalSymbolTable){
+
+        } else {
+            if(const_def->isArray){
+                
+            } else if (const_def->IntConst()) {
+                
+            } else {
+                IRSymbolVariable* newConst = new IRSymbolVariable::IRSymbolVariable(symbol);
+                
+                if(const_def->constInitVal()){
+                    newConst->assigned = true;
+                } else {
+                    newConst->assigned = false;
+                }
+
+            }
+        }
     }
 }
 
@@ -118,6 +137,7 @@ void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
         if(ctx->size < ctx->constInitVal()->size)
             throw std::runtime_error("[ERROR] > Const Array size overflow.\n");
     }
+
 }
 
 // ConstInitVal

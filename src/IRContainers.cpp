@@ -21,10 +21,14 @@ bool IRFunction::addLocalVariable(IRSymbolVariable *newVariable) {
 }
 
 IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
-    string newTempVariableName = functionName + string("_t") + to_string(tempCount++);
-    IRTempVariable *newIRTempVar = new IRTempVariable::IRTempVariable(newTempVariableName, newMetaDataType);
+    std::string newTempVariableName = functionName + string("_t") + to_string(tempCount++);
+    IRTempVariable *newIRTempVar = new IRTempVariable(newTempVariableName, newMetaDataType);
     tempVariables.emplace(newTempVariableName, newIRTempVar);
     return newIRTempVar;
+}
+
+IRSymbolVariable* addSymbolVariable(AbstractSymbol *newSymbol) {
+    IRSymbolVariable *newSymVar = new IRSymbolVariable(newSymbol);
 }
 
 bool IRFunction::addCode(IRCode *newCode) {
@@ -38,8 +42,11 @@ bool IRFunction::addCodes(std::vector<IRCode *> newCodes){
 }
 
 
-IRLabel* IRFunction::addLabel(IRLabel *newLabel) {
-    labels.emplace(newLabel->getSymbolName(), newLabel);
+IRLabel* IRFunction::addLabel() {
+    std::string newLabelName = string("L") + to_string(labelCount++);
+    IRLabel *newLabel = new IRLabel(newLabelName);
+    labels.emplace(newLabelName, newLabel);
+    return newLabel;
 }
 
 int IRFunction::calFrameSize() {}

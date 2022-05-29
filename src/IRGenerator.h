@@ -25,7 +25,7 @@ public:
     bool addLocalVariable(IRSymbolVariable *newLocalVariable);
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
     IRLabel *addLabel();
-    IROperand* addSymbolVariable(MetaDataType newMetaDataType);
+    IRSymbolVariable* addSymbolVariable(MetaDataType newMetaDataType);
 
 
     bool enterFunction(std::string funtionName);
