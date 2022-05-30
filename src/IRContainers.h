@@ -44,15 +44,18 @@ private:
     std::string programName;
     std::unordered_map<std::string, IRSymbolVariable *> globalVariables;
     std::unordered_map<std::string, IRFunction *> functions;
+    std::unordered_map<std::string, IRSymbolFunction *> funcSymbols;
     
 public:
     IRProgram(std::string newProgramName);
 
     IRSymbolVariable *addGlobalVariable(AbstractSymbol *symbol);
     bool addFunction(IRFunction *newFunction);
+    bool addSymbolFunction(IRSymbolFunction *funcSymbol);
 
     IRSymbolVariable *getGlobalVariable(const std::string& varName);
     IRFunction *getFunction(const std::string& functionName);
+    IRSymbolFunction *getSymbolFunction(const std::string& functionName);
 
     void print() const;
     // void targetGen(TargetCodeList * t);

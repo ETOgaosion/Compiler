@@ -26,9 +26,9 @@ public:
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
     IRLabel *addLabel();
     IRSymbolVariable* addSymbolVariable(AbstractSymbol *Symbol);
+    IRSymbolFunction* getSymbolFunction(std::string funcName);
 
-
-    bool enterFunction(std::string funtionName);
+    bool IRGenerator::enterFunction(FuncSymbolTable *function);
     bool exitFunction(); // enter return
 
     // param is IN/OUT

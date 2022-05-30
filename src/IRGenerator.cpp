@@ -44,15 +44,23 @@ IRLabel* IRGenerator::enterWhile()
 }
 
 // Function
-bool IRGenerator::enterFunction(std::string functionName)
+bool IRGenerator::enterFunction(FuncSymbolTable *function)
 {
-    IRFunction *func = new IRFunction(functionName);
+    IRFunction *func = new IRFunction(function->getFuncName());
     currentIRFunc = func;
     ir->addFunction(func);
+    IRSymbolFunction* funcSymbol = new IRSymbolFunction(function);
+    ir->addSymbolFunction(funcSymbol);
+    return true;
 }
 
 bool IRGenerator::exitFunction()
 {
     IRCode* retCode = new IRReturnV();
     return currentIRFunc->addCode(retCode);
+}
+
+
+IRSymbolFunction* IRGenerator::getSymbolFunction(std::string funcName){
+    return ir->getSymbolFunction(funcName);
 }

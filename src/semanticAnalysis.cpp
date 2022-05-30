@@ -488,13 +488,13 @@ void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     IRLabel* falseLabel = irGenerator->addLabel();
     ctx->cond()->falseLabel = falseLabel;
     std::vector<IRCode *> codes;
-    if(ctx->getText().find("if") == ctx->getText().begin()){
+    if(find(ctx->getText().begin(), ctx->getText().end(), "if") == ctx->getText().begin()){
         IRCode *code = new IRAddLabel(falseLabel);
         codes.push_back(code);
         ctx->stmt(0)->codes = codes;
-    } else if (ctx->getText().find("while") == ctx->getText().begin()){
+    } else if (find(ctx->getText().begin(), ctx->getText().end(), "while") == ctx->getText().begin()){
         IRLabel* beginLabel = irGenerator->enterWhile();
-        IRCode *code = new IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
+        IRCode *code = new IRGoto(beginLabel);
         codes.push_back(code);
         code = new IRAddLabel(falseLabel);
         codes.push_back(code);
@@ -519,7 +519,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
         ctx->returnType = ctx->subStmt()->returnType;
     }
 
-    if (ctx->getText().find('while') == ctx->getText().begin()){
+    if (find(ctx->getText().begin(), ctx->getText().end(), "while") == ctx->getText().begin()){
         whileBegin.pop_back();
         whileFalse.pop_back();
     }
@@ -548,22 +548,22 @@ void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
     if(ctx->exp()){
         switch(ctx->exp()->metaDataType){
             case MetaDataType::BOOL:
-                code = new IRReturnB::IRReturnB(ctx->exp()->operand);
+                code = new IRReturnB(ctx->exp()->operand);
                 break;
             case MetaDataType::INT:
-                code = new IRReturnI::IRReturnI(ctx->exp()->operand);
+                code = new IRReturnI(ctx->exp()->operand);
                 break;
             case MetaDataType::FLOAT:
-                code = new IRReturnF::IRReturnF(ctx->exp()->operand);
+                code = new IRReturnF(ctx->exp()->operand);
                 break;
             case MetaDataType::DOUBLE:
-                code = new IRReturnD::IRReturnD(ctx->exp()->operand);
+                code = new IRReturnD(ctx->exp()->operand);
                 break;
             default:
                 break;
         }        
     } else {
-        code = new IRReturnV::IRReturnV();
+        code = new IRReturnV();
     }
     irGenerator->addCode(code);
     if(ctx->codes != nullptr)
@@ -666,13 +666,13 @@ void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * c
     IRLabel* falseLabel = irGenerator->addLabel();
     ctx->cond()->falseLabel = falseLabel;
     std::vector<IRCode *> codes;
-    if(ctx->getText().find("if") == ctx->getText().begin()){
+    if(find(ctx->getText().begin(), ctx->getText().end(), "if") == ctx->getText().begin()){
         IRCode *code = new IRAddLabel(falseLabel);
         codes.push_back(code);
         ctx->subStmt(0)->codes = codes;
-    } else if (ctx->getText().find("while") == ctx->getText().begin()){
+    } else if (find(ctx->getText().begin(), ctx->getText().end(), "while") == ctx->getText().begin()){
         IRLabel* beginLabel = irGenerator->enterWhile();
-        IRCode *code = new IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
+        IRCode *code = new IRGoto(beginLabel);
         codes.push_back(code);
         code = new IRAddLabel(falseLabel);
         codes.push_back(code);
@@ -707,15 +707,15 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ct
         }
     }
 
-    if(ctx->getText().find("break") == ctx->getText().begin()){
+    if(find(ctx->getText().begin(), ctx->getText().end(), "break") == ctx->getText().begin()){
         IRLabel* falseLabel = whileFalse.back();
-        IRCode* code = IRGoto::IRGoto(falseLabel)
+        IRCode* code = new IRGoto(falseLabel);
         irGenerator->addCode(code);
-    } else if(ctx->getText().find("continue") == ctx->getText().begin()){
+    } else if(find(ctx->getText().begin(), ctx->getText().end(), "continue") == ctx->getText().begin()){
         IRLabel* beginLabel = whileBegin.back();
-        IRCode* code = IRGoto::IRGoto(beginLabel);
+        IRCode* code = new IRGoto(beginLabel);
         irGenerator->addCode(code);
-    } else if (ctx->getText().find("while") == ctx->getText().begin()){
+    } else if (find(ctx->getText().begin(), ctx->getText().end(), "while") == ctx->getText().begin()){
         whileFalse.pop_back();
         whileBegin.pop_back();
     }
@@ -752,22 +752,22 @@ void SemanticAnalysis::exitSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
     if(ctx->exp()){
         switch(ctx->exp()->metaDataType){
             case MetaDataType::BOOL:
-                code = new IRReturnB::IRReturnB(ctx->exp()->operand);
+                code = new IRReturnB(ctx->exp()->operand);
                 break;
             case MetaDataType::INT:
-                code = new IRReturnI::IRReturnI(ctx->exp()->operand);
+                code = new IRReturnI(ctx->exp()->operand);
                 break;
             case MetaDataType::FLOAT:
-                code = new IRReturnF::IRReturnF(ctx->exp()->operand);
+                code = new IRReturnF(ctx->exp()->operand);
                 break;
             case MetaDataType::DOUBLE:
-                code = new IRReturnD::IRReturnD(ctx->exp()->operand);
+                code = new IRReturnD(ctx->exp()->operand);
                 break;
             default:
                 break;
         }        
     } else {
-        code = new IRReturnV::IRReturnV();
+        code = new IRReturnV();
     }
     irGenerator->addCode(code);
 
@@ -805,7 +805,7 @@ void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
     ctx->isArray = false;
     ctx->metaDataType = MetaDataType::BOOL;
 
-    ctx->operand = new IRValue::IRValue(MetaDataType::BOOL, ctx->getText());
+    ctx->operand = new IRValue(MetaDataType::BOOL, ctx->getText());
 }
 
 // Cond
@@ -819,7 +819,7 @@ void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
     if(ctx->lOrExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > condition must be bool");
     }
-    IRCode* code = IRCode(IROperation::BEQZ, nullptr, ctx->falseLabel, ctx->lOrExp()->operand);
+    IRCode* code = new IRCode(IROperation::BEQZ, nullptr, ctx->falseLabel, ctx->lOrExp()->operand);
     irGenerator->addCode(code);
 }
 
@@ -852,7 +852,8 @@ void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
     ctx->symbolType = searchLVal->getSymbolType();
     ctx->lValMetaDataType = searchLVal->getMetaDataType();
 
-    ctx->identOperand = IRSymbolVariable::IRSymbolVariable(searchLVal);
+    ctx->identOperand = irGenerator->addSymbolVariable(searchLVal);
+    // assigned
     if(ctx->exp())
         ctx->indexOperand = ctx->exp()->operand;
 }
@@ -892,6 +893,7 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
         IRCode * code = new IRCode(IROperation::FETCH_ARRAY_ELEM, result, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
         irGenerator->addCode(code);
         ctx->operand = result;
+        // ????
     } else {
         ctx->operand = ctx->lVal()->identOperand;
     }
@@ -908,7 +910,7 @@ void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext 
 {
     ctx->isArray = false;
     ctx->metaDataType = ctx->number()->metaDataType;
-    ctx->operand = new IRValue::IRValue(ctx->metaDataType, ctx->number()->getText()); 
+    ctx->operand = new IRValue(ctx->metaDataType, ctx->number()->getText()); 
 }
 
 
@@ -960,8 +962,8 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     ctx->isArray = false;
     ctx->metaDataType = funcSymbolTable->getReturnType();
 
-    IROperand *func = new IRSymbolFunction::IRSymbolFunction(funcSymbolTable);
-    IRCode *code = new IRCall::IRCall(func);
+    IRSymbolFunction *func = irGenerator->getSymbolFunction(funcSymbolTable->getFuncName());
+    IRCode *code = new IRCall(func);
     irGenerator->addCode(code);
     
     if(funcSymbolTable->getReturnType() != MetaDataType::VOID){
@@ -969,19 +971,19 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
         switch (funcSymbolTable->getReturnType())
         {
         case MetaDataType::BOOL:
-            code = new IRGetReturnB::IRGetReturnB(newResult);
+            code = new IRGetReturnB(newResult);
             irGenerator->addCode(code);
             break;
         case MetaDataType::INT:
-            code = new IRGetReturnI::IRGetReturnI(newResult);
+            code = new IRGetReturnI(newResult);
             irGenerator->addCode(code);
             break;
         case MetaDataType::FLOAT:
-            code = new IRGetReturnF::IRGetReturnF(newResult);
+            code = new IRGetReturnF(newResult);
             irGenerator->addCode(code);
             break;
         case MetaDataType::DOUBLE:
-            code = new IRGetReturnD::IRGetReturnD(newResult);
+            code = new IRGetReturnD(newResult);
             irGenerator->addCode(code);
             break;
         default:

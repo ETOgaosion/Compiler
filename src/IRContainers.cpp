@@ -89,12 +89,16 @@ IRProgram::IRProgram(std::string newProgramName) {
 
 IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol) {
     IRSymbolVariable* glbSymVar = new IRSymbolVariable(symbol);
-    globalVariables.push_back(glbSymVar);
+    globalVariables.emplace(glbSymVar);
     return glbSymVar;    
 }
 
 bool IRProgram::addFunction(IRFunction *newFunction) {
     functions.emplace(newFunction->getFunctionName(), newFunction);
+}
+
+bool IRProgram::addSymbolFunction(IRSymbolFunction *funcSymbol) {
+    funcSymbols.emplace(funcSymbol->getFunctionName(), funcSymbol);
 }
 
 IRSymbolVariable *IRProgram::getGlobalVariable(const string& varName){
@@ -104,5 +108,10 @@ IRSymbolVariable *IRProgram::getGlobalVariable(const string& varName){
 IRFunction *IRProgram::getFunction(const std::string& functionName){
     return functions.at(functionName);
 }
+
+IRSymbolFunction *IRProgram::getSymbolFunction(const std::string& functionName){
+    return funcSymbols.at(functionName);
+}
+
 
 void IRProgram::print() const {}
