@@ -40,7 +40,8 @@ constDef
     locals [
         std::string symbolName,
         std::size_t size,
-        bool isArray
+        bool isArray,
+        std::vector<std::string> initVal
     ]
     : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;
@@ -49,7 +50,8 @@ constInitVal
     locals [
         MetaDataType type,
         std::size_t size,
-        bool isArray
+        bool isArray,
+        std::vector<std::string> initVal
     ]
     : constExp                              #constInitValOfVar
     | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
@@ -65,7 +67,8 @@ varDef
         MetaDataType type,
         bool withType,
         std::size_t size,
-        bool isArray
+        bool isArray,
+        std::vector<std::string> initVal
     ]
     : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;

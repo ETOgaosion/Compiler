@@ -53,10 +53,10 @@ void SemanticAnalysis::exitDecl(CACTParser::DeclContext * ctx)
 {
 }
 
-void SemanticAnalysis::SemanticAnalysis::enterConstDecl(CACTParser::ConstDeclContext * ctx)
+void SemanticAnalysis::enterConstDecl(CACTParser::ConstDeclContext * ctx)
 {   
 }
-void SemanticAnalysis::SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
+void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
 {
     MetaDataType type = ctx->bType()->bMetaDataType;
     SymbolFactory symbolFactory;
@@ -67,24 +67,12 @@ void SemanticAnalysis::SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclCont
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
             throw std::runtime_error("[ERROR] > Redefine const symbol.\n");
         }
-        
-        if(curSymbolTable == GlobalSymbolTable){
 
+        symbol->setInitValue(const_def->initVal);
+        if(curSymbolTable->getSymbolTableType() == TableType::GLOBAL){
+            IRSymbolVariable* newConst = irGenerator->addGlobalVariable(symbol);
         } else {
-            if(const_def->isArray){
-                
-            } else if (const_def->IntConst()) {
-                
-            } else {
-                IRSymbolVariable* newConst = new IRSymbolVariable::IRSymbolVariable(symbol);
-                
-                if(const_def->constInitVal()){
-                    newConst->assigned = true;
-                } else {
-                    newConst->assigned = false;
-                }
-
-            }
+            IRSymbolVariable* newConst = irGenerator->addSymbolVariable(symbol);
         }
     }
 }
@@ -137,7 +125,9 @@ void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
         if(ctx->size < ctx->constInitVal()->size)
             throw std::runtime_error("[ERROR] > Const Array size overflow.\n");
     }
-
+    
+    if(ctx->constInitVal())
+        ctx->initVal = ctx->constInitVal()->initVal;
 }
 
 // ConstInitVal
@@ -157,6 +147,8 @@ void SemanticAnalysis::exitConstInitValOfVar(CACTParser::ConstInitValOfVarContex
         ctx->size = 1;
     }   
     ctx->isArray = false;
+    ctx->initVal = new TOOLS::split(ctx->getText(), std::string(","));
+
 }
 
 void SemanticAnalysis::enterConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
@@ -178,13 +170,15 @@ void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayCo
             throw std::runtime_error("[ERROR] > Array data type is not consistent.\n");
     }
     ctx->isArray = true;
+    ctx->initVal = new TOOLS::split(ctx->getText(), std::string(","));
+
 }
 
 // VarDecl
-void SemanticAnalysis::SemanticAnalysis::enterVarDecl(CACTParser::VarDeclContext * ctx)
+void SemanticAnalysis::enterVarDecl(CACTParser::VarDeclContext * ctx)
 {
 }
-void SemanticAnalysis::SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
+void SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
 {
     MetaDataType type = ctx->bType()->bMetaDataType;
     SymbolFactory symbolFactory;
@@ -197,6 +191,13 @@ void SemanticAnalysis::SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext 
         AbstractSymbol *symbol = symbolFactory.createSymbol(var_def->symbolName, SymbolType::VAR, type, var_def->isArray, var_def->size);
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
             throw std::runtime_error("[ERROR] > Redefine var symbol. " + symbol->getSymbolName());
+        }
+
+        symbol->setInitValue(var_def->initVal);
+        if(curSymbolTable->getSymbolTableType() == TableType::GLOBAL){
+            IRSymbolVariable* newConst = irGenerator->addGlobalVariable(symbol);
+        } else {
+            IRSymbolVariable* newConst = irGenerator->addSymbolVariable(symbol);
         }
     }
 }
@@ -225,6 +226,7 @@ void SemanticAnalysis::exitVarDef(CACTParser::VarDefContext * ctx)
         }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
+        ctx->initVal = ctx->constInitVal()->initVal;
     }
 }
 
@@ -268,8 +270,7 @@ void SemanticAnalysis::enterFuncDef(CACTParser::FuncDefContext * ctx)
     funcSymbolTable->setParentSymbolTable(curSymbolTable);
     curSymbolTable = funcSymbolTable;
 
-    enterFunction(ctx->Ident()->getText());
-
+    irGenerator->enterFunction(ctx->Ident()->getText());
 }
 
 void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
@@ -277,7 +278,7 @@ void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
     if (!ctx->funcBlock()->hasReturn && (curSymbolTable->getReturnType() != MetaDataType::VOID)) {
         throw std::runtime_error("[ERROR] > Non void function has no return.\n");
     }
-    exitFunction();
+    irGenerator->exitFunction();
 }
 
 void SemanticAnalysis::enterFuncType(CACTParser::FuncTypeContext * ctx)
@@ -425,27 +426,27 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
     }
 
     if(ctx->lVal()->isArray && ctx->exp()->isArray) {
-        IROperand* temp = new IRGenerator::addTempVariable(ctx->lVal()->lValMetaDataType);
+        IRTempVariable* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
         for(int i = 0; i < ctx->lVal()->size; i++){
-            IROperand* index = new IRValue::IRValue(MetaDataType::INT, std::to_string(i));
-            IRCode* fetchCode = new IRCode::IRCode(IROperation::FETCH_ARRAY_ELEM, temp, ctx->exp()->operand, index);
-            IRGenerator->addCode(fetchCode);
-            IRCode* assignCode = new IRCode::IRCode(IROperation::ASSIGN_ARRAY_ELEM, temp, ctx->lVal()->identOperand, index);
-            IRGenerator->addCode(assignCode);
+            IRValue* index = new IRValue(MetaDataType::INT, std::to_string(i));
+            IRCode* fetchCode = new IRCode(IROperation::FETCH_ARRAY_ELEM, temp, ctx->exp()->operand, index);
+            irGenerator->addCode(fetchCode);
+            IRCode* assignCode = new IRCode(IROperation::ASSIGN_ARRAY_ELEM, temp, ctx->lVal()->identOperand, index);
+            irGenerator->addCode(assignCode);
         }
     } else {
         if(ctx->lVal()->indexOperand){ // array[index] = value
-            IRCode* assignCode = new IRCode::IRCode(IROperation::ASSIGN_ARRAY_ELEM, ctx->exp()->operand, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
-            IRGenerator->addCode(assignCode);
+            IRCode* assignCode = new IRCode(IROperation::ASSIGN_ARRAY_ELEM, ctx->exp()->operand, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
+            irGenerator->addCode(assignCode);
         } else { // value_a = value_b
-            IRCode* assignCode = new IRCode::IRCode(IROperation::ASSIGN, ctx->lVal()->identOperand, ctx->exp()->operand, nullptr);
+            IRCode* assignCode = new IRCode(IROperation::ASSIGN, ctx->lVal()->identOperand, ctx->exp()->operand, nullptr);
             // ctx->lVal()->identOperand assigned????
-            IRGenerator->addCode(assignCode);
+            irGenerator->addCode(assignCode);
         }
     }
 
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtExpression(CACTParser::StmtExpressionContext * ctx)
@@ -456,7 +457,7 @@ void SemanticAnalysis::enterStmtExpression(CACTParser::StmtExpressionContext * c
 void SemanticAnalysis::exitStmtExpression(CACTParser::StmtExpressionContext * ctx)
 {
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtBlock(CACTParser::StmtBlockContext * ctx)
@@ -476,7 +477,7 @@ void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
     }
 
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
@@ -484,18 +485,18 @@ void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     ctx->hasReturn = false;
 
 
-    IRLabel* falseLabel = IRGenerator->addLabel();
+    IRLabel* falseLabel = irGenerator->addLabel();
     ctx->cond()->falseLabel = falseLabel;
     std::vector<IRCode *> codes;
-    if(ctx->getText().find('if') == ctx->getText().begin()){
-        IRCode *code = new IRAddLabel::IRAddLabel(falseLabel);
+    if(ctx->getText().find("if") == ctx->getText().begin()){
+        IRCode *code = new IRAddLabel(falseLabel);
         codes.push_back(code);
         ctx->stmt(0)->codes = codes;
-    } else if (ctx->getText().find('while') == ctx->getText().begin()){
-        IRLabel* beginLabel = IRGenerator::enterWhile();
-        IRCode *code = new IRCode::IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
+    } else if (ctx->getText().find("while") == ctx->getText().begin()){
+        IRLabel* beginLabel = irGenerator->enterWhile();
+        IRCode *code = new IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
         codes.push_back(code);
-        code = new IRAddLabel::IRAddLabel(falseLabel);
+        code = new IRAddLabel(falseLabel);
         codes.push_back(code);
         ctx->subStmt()->codes = codes;
         whileFalse.push_back(falseLabel);
@@ -503,7 +504,6 @@ void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     } else {
         throw std::runtime_error("[ERROR] > not if or while stmt\n");
     }
-
 }
 
 void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
@@ -524,7 +524,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
         whileFalse.pop_back();
     }
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterStmtReturn(CACTParser::StmtReturnContext * ctx)
@@ -565,9 +565,9 @@ void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
     } else {
         code = new IRReturnV::IRReturnV();
     }
-    IRGenerator->addCode(code);
+    irGenerator->addCode(code);
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
@@ -599,27 +599,27 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
     }
 
     if(ctx->lVal()->isArray && ctx->exp()->isArray) {
-        IROperand* temp = new IRGenerator::addTempVariable(ctx->lVal()->lValMetaDataType);
+        IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
         for(int i = 0; i < ctx->lVal()->size; i++){
-            IROperand* index = new IRValue::IRValue(MetaDataType::INT, std::to_string(i));
-            IRCode* fetchCode = new IRCode::IRCode(IROperation::FETCH_ARRAY_ELEM, temp, ctx->exp()->operand, index);
-            IRGenerator->addCode(fetchCode);
-            IRCode* assignCode = new IRCode::IRCode(IROperation::ASSIGN_ARRAY_ELEM, temp, ctx->lVal()->identOperand, index);
-            IRGenerator->addCode(assignCode);
+            IROperand* index = new IRValue(MetaDataType::INT, std::to_string(i));
+            IRCode* fetchCode = new IRCode(IROperation::FETCH_ARRAY_ELEM, temp, ctx->exp()->operand, index);
+            irGenerator->addCode(fetchCode);
+            IRCode* assignCode = new IRCode(IROperation::ASSIGN_ARRAY_ELEM, temp, ctx->lVal()->identOperand, index);
+            irGenerator->addCode(assignCode);
         }
     } else {
         if(ctx->lVal()->indexOperand){ // array[index] = value
-            IRCode* assignCode = new IRCode::IRCode(IROperation::ASSIGN_ARRAY_ELEM, ctx->exp()->operand, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
-            IRGenerator->addCode(assignCode);
+            IRCode* assignCode = new IRCode(IROperation::ASSIGN_ARRAY_ELEM, ctx->exp()->operand, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
+            irGenerator->addCode(assignCode);
         } else { // value_a = value_b
-            IRCode* assignCode = new IRCode::IRCode(IROperation::ASSIGN, ctx->lVal()->identOperand, ctx->exp()->operand, nullptr);
+            IRCode* assignCode = new IRCode(IROperation::ASSIGN, ctx->lVal()->identOperand, ctx->exp()->operand, nullptr);
             // ctx->lVal()->identOperand assigned????
-            IRGenerator->addCode(assignCode);
+            irGenerator->addCode(assignCode);
         }
     }
 
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
@@ -631,7 +631,7 @@ void SemanticAnalysis::enterSubStmtExpression(CACTParser::SubStmtExpressionConte
 void SemanticAnalysis::exitSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
 {
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
@@ -654,7 +654,7 @@ void SemanticAnalysis::exitSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
         }
     }
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ctx)
@@ -663,18 +663,18 @@ void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * c
     ctx->returnType = MetaDataType::VOID;
 
     
-    IRLabel* falseLabel = IRGenerator->addLabel();
+    IRLabel* falseLabel = irGenerator->addLabel();
     ctx->cond()->falseLabel = falseLabel;
     std::vector<IRCode *> codes;
     if(ctx->getText().find("if") == ctx->getText().begin()){
-        IRCode *code = new IRAddLabel::IRAddLabel(falseLabel);
+        IRCode *code = new IRAddLabel(falseLabel);
         codes.push_back(code);
         ctx->subStmt(0)->codes = codes;
     } else if (ctx->getText().find("while") == ctx->getText().begin()){
-        IRLabel* beginLabel = IRGenerator::enterWhile();
-        IRCode *code = new IRCode::IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
+        IRLabel* beginLabel = irGenerator->enterWhile();
+        IRCode *code = new IRCode(IROperation::GOTO, nullptr, beginLabel, nullptr);
         codes.push_back(code);
-        code = new IRAddLabel::IRAddLabel(falseLabel);
+        code = new IRAddLabel(falseLabel);
         codes.push_back(code);
         ctx->subStmt()->codes = codes;
         whileFalse.push_back(falseLabel);
@@ -710,18 +710,18 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ct
     if(ctx->getText().find("break") == ctx->getText().begin()){
         IRLabel* falseLabel = whileFalse.back();
         IRCode* code = IRGoto::IRGoto(falseLabel)
-        IRGenerator->addCode(code);
+        irGenerator->addCode(code);
     } else if(ctx->getText().find("continue") == ctx->getText().begin()){
         IRLabel* beginLabel = whileBegin.back();
         IRCode* code = IRGoto::IRGoto(beginLabel);
-        IRGenerator->addCode(code);
+        irGenerator->addCode(code);
     } else if (ctx->getText().find("while") == ctx->getText().begin()){
         whileFalse.pop_back();
         whileBegin.pop_back();
     }
 
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 void SemanticAnalysis::enterSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
@@ -769,10 +769,10 @@ void SemanticAnalysis::exitSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
     } else {
         code = new IRReturnV::IRReturnV();
     }
-    IRGenerator->addCode(code);
+    irGenerator->addCode(code);
 
     if(ctx->codes != nullptr)
-        IRGenerator->addCodes(ctx->codes);
+        irGenerator->addCodes(ctx->codes);
 }
 
 
@@ -819,8 +819,8 @@ void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
     if(ctx->lOrExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > condition must be bool");
     }
-    IRCode* code = IRCode::IRCode(IROperation::BEQZ, nullptr, ctx->falseLabel, ctx->lOrExp()->operand);
-    IRGenerator->addCode(code);
+    IRCode* code = IRCode(IROperation::BEQZ, nullptr, ctx->falseLabel, ctx->lOrExp()->operand);
+    irGenerator->addCode(code);
 }
 
 void SemanticAnalysis::enterLVal(CACTParser::LValContext * ctx)
@@ -888,9 +888,9 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
     ctx->metaDataType = ctx->lVal()->lValMetaDataType;
 
     if (ctx->lVal()->indexOperand()){ // array[index]
-        IROperand *result = new IRGenerator::addTempVariable(ctx->metaDataType);
-        IRCode * code = new IRCode::IRCode(IROperation::FETCH_ARRAY_ELEM, result, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
-        IRGenerator->addCode(code);
+        IROperand *result = irGenerator->addTempVariable(ctx->metaDataType);
+        IRCode * code = new IRCode(IROperation::FETCH_ARRAY_ELEM, result, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
+        irGenerator->addCode(code);
         ctx->operand = result;
     } else {
         ctx->operand = ctx->lVal()->identOperand;
@@ -962,27 +962,27 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
 
     IROperand *func = new IRSymbolFunction::IRSymbolFunction(funcSymbolTable);
     IRCode *code = new IRCall::IRCall(func);
-    IRGenerator->addCode(code);
+    irGenerator->addCode(code);
     
     if(funcSymbolTable->getReturnType() != MetaDataType::VOID){
-        IROperand *newResult = IRGenerator::addTempVariable(funcSymbolTable->getReturnType());
+        IROperand *newResult = irGenerator->addTempVariable(funcSymbolTable->getReturnType());
         switch (funcSymbolTable->getReturnType())
         {
         case MetaDataType::BOOL:
             code = new IRGetReturnB::IRGetReturnB(newResult);
-            IRGenerator->addCode(code);
+            irGenerator->addCode(code);
             break;
         case MetaDataType::INT:
             code = new IRGetReturnI::IRGetReturnI(newResult);
-            IRGenerator->addCode(code);
+            irGenerator->addCode(code);
             break;
         case MetaDataType::FLOAT:
             code = new IRGetReturnF::IRGetReturnF(newResult);
-            IRGenerator->addCode(code);
+            irGenerator->addCode(code);
             break;
         case MetaDataType::DOUBLE:
             code = new IRGetReturnD::IRGetReturnD(newResult);
-            IRGenerator->addCode(code);
+            irGenerator->addCode(code);
             break;
         default:
             break;
@@ -1020,9 +1020,9 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExp
         op = IROperation::NEG;
     else if(ctx->unaryOp()->getText() == "!")
         op = IROperation::NOT;
-    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
-    IRCode * code = new IRCode::IRCode(op, result, ctx->unaryExp()->operand, nullptr);
-    IRGenerator->addCode(code);
+    IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
+    IRCode * code = new IRCode(op, result, ctx->unaryExp()->operand, nullptr);
+    irGenerator->addCode(code);
     ctx->operand = result;
 }
 
@@ -1051,19 +1051,19 @@ void SemanticAnalysis::exitFuncRParams(CACTParser::FuncRParamsContext * ctx)
         switch (it->metaDataType) 
         {
         case MetaDataType::BOOL:
-            IRGenerator->addCode(new IRAddParamB::IRAddParamB(it->operand));
+            irGenerator->addCode(new IRAddParamB::IRAddParamB(it->operand));
             break;
 
         case MetaDataType::INT:
-            IRGenerator->addCode(new IRAddParamI::IRAddParamI(it->operand));
+            irGenerator->addCode(new IRAddParamI::IRAddParamI(it->operand));
             break;
 
         case MetaDataType::FLOAT:
-            IRGenerator->addCode(new IRAddParamF::IRAddParamF(it->operand));
+            irGenerator->addCode(new IRAddParamF::IRAddParamF(it->operand));
             break;
 
         case MetaDataType::DOUBLE:
-            IRGenerator->addCode(new IRAddParamD::IRAddParamD(it->operand));
+            irGenerator->addCode(new IRAddParamD::IRAddParamD(it->operand));
             break;
 
         default:
@@ -1106,7 +1106,7 @@ void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
         }
     }
 
-    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
     IROperation op;
     if (ctx->mulOp()->getText() == '*')
         op = IROperation::MUL;
@@ -1116,8 +1116,8 @@ void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
         op = IROperation::MOD;
     else
         throw std::runtime_error("[ERROR] > mulop illegal.\n");
-    IRCode* code = new IRCode::IRCode(op, result, ctx->mulExp()->operand(0), ctx->unaryExp()->operand(0));
-    IRGenerator->addCode(code);
+    IRCode* code = new IRCode(op, result, ctx->mulExp()->operand(0), ctx->unaryExp()->operand(0));
+    irGenerator->addCode(code);
     ctx->operand = result;
 }
 
@@ -1178,7 +1178,7 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
         }
     }
 
-    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
     IROperation op;
     if (ctx->addOp()->getText() == '+')
         op = IROperation::ADD;
@@ -1186,8 +1186,8 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
         op = IROperation::SUB;
     else
         throw std::runtime_error("[ERROR] > addop illegal.\n");
-    IRCode* code = new IRCode::IRCode(op, result, ctx->addExp()->operand(), ctx->mulExp()->operand());
-    IRGenerator->addCode(code);
+    IRCode* code = new IRCode(op, result, ctx->addExp()->operand(), ctx->mulExp()->operand());
+    irGenerator->addCode(code);
     ctx->operand = result;
 }
 
@@ -1227,7 +1227,7 @@ void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
     }
     ctx->metaDataType = MetaDataType::BOOL;
 
-    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
     IROperation op;
     if (ctx->relOp()->getText() == '<')
         op = IROperation::SLT;
@@ -1239,8 +1239,8 @@ void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
         op = IROperation::SGEQ;
     else
         throw std::runtime_error("[ERROR] > addop illegal.\n");
-    IRCode* code = new IRCode::IRCode(op, result, ctx->relExp()->operand, ctx->addExp()->operand);
-    IRGenerator->addCode(code);
+    IRCode* code = new IRCode(op, result, ctx->relExp()->operand, ctx->addExp()->operand);
+    irGenerator->addCode(code);
     ctx->operand = result;
 }
 
@@ -1294,14 +1294,14 @@ void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
     }
     ctx->metaDataType = MetaDataType::BOOL;
 
-    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
+    IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
     IROperation op;
     if(ctx->eqOp()->getText() == "==")
         op = IROperation::SEQ;
     else if(ctx->eqOp()->getText() == "!=")
         op = IROperation::SNE;
-    IRCode* code = new IRCode::IRCode(op, result, ctx->eqExp()->operand, ctx->relExp()->operand);
-    IRGenerator->addCode(code);
+    IRCode* code = new IRCode(op, result, ctx->eqExp()->operand, ctx->relExp()->operand);
+    irGenerator->addCode(code);
     ctx->operand = result;
 }
 
@@ -1317,9 +1317,9 @@ void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ct
     if (ctx->metaDataType != MetaDataType::BOOL || ctx->eqExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > logic calculation with non-boolean operands.\n");
     }
-    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
-    IRCode* code = new IRCode::IRCode(IROperation::AND, result, ctx->lAndExp()->operand, ctx->eqExp()->operand);
-    IRGenerator->addCode(code);
+    IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
+    IRCode* code = new IRCode(IROperation::AND, result, ctx->lAndExp()->operand, ctx->eqExp()->operand);
+    irGenerator->addCode(code);
     ctx->operand = result;
 }
 
@@ -1358,9 +1358,9 @@ void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
         throw std::runtime_error("[ERROR] > logic calculation with non-boolean operands.\n");
     }
 
-    IROperand* result = new IRGenerator::addTempVariable(ctx->metaDataType);
-    IRCode *code = IRCode(IROperation::OR, result, ctx->lOrExp()->operand, ctx->lAndExp()->operand);
-    IRGenerator->addCode(code);
+    IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
+    IRCode *code = new IRCode(IROperation::OR, result, ctx->lOrExp()->operand, ctx->lAndExp()->operand);
+    irGenerator->addCode(code);
     ctx->operand = result;
 }
 

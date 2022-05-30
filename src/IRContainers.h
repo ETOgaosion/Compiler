@@ -20,7 +20,7 @@ public:
 
     bool addLocalVariable(IRSymbolVariable *newVariable);
     IRTempVariable* addTempVariable(MetaDataType newMetaDataType);
-    IRSymbolVariable* addSymbolVariable(MetaDataType newMetaDataType);
+    IRSymbolVariable* addSymbolVariable(AbstractSymbol *newSymbol);
     IRLabel* addLabel();
     bool addLabel(IRLabel *newLabel);
     bool addCode(IRCode *newCode);
@@ -48,7 +48,7 @@ private:
 public:
     IRProgram(std::string newProgramName);
 
-    bool addGlobalVariable(IRSymbolVariable *newGlobalVariable);
+    IRSymbolVariable *addGlobalVariable(AbstractSymbol *symbol);
     bool addFunction(IRFunction *newFunction);
 
     IRSymbolVariable *getGlobalVariable(const std::string& varName);

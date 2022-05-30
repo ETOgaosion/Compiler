@@ -13,7 +13,7 @@ private:
 public:
     IRGenerator(IRProgram * newIR);
 
-    bool addGlobalVar(IRSymbolVariable *globalVariable);
+    IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol);
     bool setGlobalVarValue(IRSymbolVariable *globalVariable, IRValue *curValue);
     bool setGlobalVarValue(std::string globalVariableName, IRValue *curValue);
     IRSymbolVariable *getGlobalVar(std::string globVariableName);
@@ -25,7 +25,7 @@ public:
     bool addLocalVariable(IRSymbolVariable *newLocalVariable);
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
     IRLabel *addLabel();
-    IRSymbolVariable* addSymbolVariable(MetaDataType newMetaDataType);
+    IRSymbolVariable* addSymbolVariable(AbstractSymbol *Symbol);
 
 
     bool enterFunction(std::string funtionName);

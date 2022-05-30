@@ -39,6 +39,10 @@ bool AbstractSymbol::setAttributes(std::string inSymbolName, SymbolType inSymbol
     size = inSize;
 }
 
+bool AbstractSymbol::setInitValue(std::vector<std::string> inInitValue) {
+    initValue = inInitValue;
+}
+
 string AbstractSymbol::getSymbolName() const {
     return symbolName;
 }

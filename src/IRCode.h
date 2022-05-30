@@ -52,7 +52,7 @@ public:
 
     IROperand * getResult() const { return result; };
 
-    virtual void print() const = 0;
+    // virtual void print() const = 0;
     // void genTargetCode(TargetCodeList * t) = 0;
 };
 

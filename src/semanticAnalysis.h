@@ -1,5 +1,6 @@
 #include "../grammar/CACTBaseListener.h"
 #include "IRGenerator.h"
+#include "tools.h"
 
 #pragma once
 

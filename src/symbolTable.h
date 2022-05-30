@@ -33,7 +33,7 @@ private:
     MetaDataType metaDataType;
     bool isArray;
     std::size_t size;
-
+    std::vector<std::string> initValue;
 protected:
 
 public:
@@ -46,6 +46,7 @@ public:
     virtual MetaDataType getMetaDataType() const;
     virtual bool getIsArray() const;
     virtual std::size_t getSize() const;
+    virtual bool setInitValue (std::vector<std::string> inInitValue);
 
 };
 

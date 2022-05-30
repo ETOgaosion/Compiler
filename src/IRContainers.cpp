@@ -27,8 +27,10 @@ IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
     return newIRTempVar;
 }
 
-IRSymbolVariable* addSymbolVariable(AbstractSymbol *newSymbol) {
+IRSymbolVariable* IRFunction::addSymbolVariable(AbstractSymbol *newSymbol) {
     IRSymbolVariable *newSymVar = new IRSymbolVariable(newSymbol);
+    addLocalVariable(newSymVar);
+    return newSymVar;
 }
 
 bool IRFunction::addCode(IRCode *newCode) {
@@ -85,9 +87,10 @@ IRProgram::IRProgram(std::string newProgramName) {
     programName = std::move(newProgramName);
 }
 
-bool IRProgram::addGlobalVariable(IRSymbolVariable *newGlobalVariable) {
-    globalVariables.emplace(newGlobalVariable->getSymbolName(), newGlobalVariable);
-    return true;
+IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol) {
+    IRSymbolVariable* glbSymVar = new IRSymbolVariable(symbol);
+    globalVariables.push_back(glbSymVar);
+    return glbSymVar;    
 }
 
 bool IRProgram::addFunction(IRFunction *newFunction) {
