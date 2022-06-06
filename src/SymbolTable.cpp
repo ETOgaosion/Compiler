@@ -1,6 +1,7 @@
-#include "symbolTable.h"
+#include "SymbolTable.h"
 #include "errorMsg.h"
 #include <fstream>
+#include <utility>
 
 using namespace std;
 
@@ -16,31 +17,21 @@ template <class T> bool findDuplicateName(unordered_map<string,T*> list, string 
 // -------- Symbols ---------
 
 AbstractSymbol::AbstractSymbol() {
-    // never use this constructor directly
-    // only called by default before children's constructor
+    symbolName = {};
+    symbolType = SymbolType::PARAM;
+    metaDataType = MetaDataType::VOID;
+    isArray = false;
+    size = 0;
+    offset = 0;
 }
 
 AbstractSymbol::AbstractSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
-    symbolName = inSymbolName;
+    symbolName = std::move(inSymbolName);
     symbolType = inSymbolType;
     metaDataType = inMetaDataType;
     isArray = inIsArray;
     size = inSize;
-
-}
-
-AbstractSymbol::~AbstractSymbol() {}
-
-bool AbstractSymbol::setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) {
-    symbolName = inSymbolName;
-    symbolType = inSymbolType;
-    metaDataType = inMetaDataType;
-    isArray = inIsArray;
-    size = inSize;
-}
-
-bool AbstractSymbol::setInitValue(std::vector<std::string> inInitValue) {
-    initValue = inInitValue;
+    offset = 0;
 }
 
 string AbstractSymbol::getSymbolName() const {
@@ -63,24 +54,52 @@ size_t AbstractSymbol::getSize() const {
     return size;
 }
 
+int AbstractSymbol::getOffset() const {
+    return offset;
+}
+
+bool AbstractSymbol::setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) {
+    symbolName = std::move(inSymbolName);
+    symbolType = inSymbolType;
+    metaDataType = inMetaDataType;
+    isArray = inIsArray;
+    size = inSize;
+}
+
+bool AbstractSymbol::setOffset(int inOffset) {
+    offset = inOffset;
+    return true;
+}
+
+int AbstractSymbol::getOffsetFromDataType(MetaDataType inDataType) {
+    switch(inDataType){
+        case MetaDataType::INT:
+        case MetaDataType::BOOL:
+        case MetaDataType::FLOAT:
+            return 4;
+        case MetaDataType::DOUBLE:
+            return 8;
+        default:
+            return 0;
+    }
+}
+
 // --------
 
 ParamSymbol::ParamSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::PARAM){
-        AbstractSymbol::setAttributes(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ParamSymbol", inSymbolType);
     }
 }
 
-ParamSymbol::~ParamSymbol() {}
-
 // --------
 
 VarSymbol::VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::VAR){
-        AbstractSymbol::setAttributes(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("VarSymbol", inSymbolType);
@@ -91,20 +110,18 @@ VarSymbol::VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType 
 
 ConstSymbol::ConstSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::CONST){
-        AbstractSymbol::setAttributes(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ConstSymbol", inSymbolType);
     }
 }
 
-ConstSymbol::~ConstSymbol() {}
-
 // --------
 
 ParamArraySymbol::ParamArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::PARAM && inIsArray) {
-        AbstractSymbol::setAttributes(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ParamArraySymbol", inSymbolType);
@@ -114,31 +131,26 @@ ParamArraySymbol::ParamArraySymbol(string inSymbolName, SymbolType inSymbolType,
 // --------
 
 VarArraySymbol::VarArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    ofstream myfile;
     if (inSymbolType == SymbolType::VAR && inIsArray) {
-        AbstractSymbol::setAttributes(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("VarArraySymbol", inSymbolType);
     }
 }
 
-VarArraySymbol::~VarArraySymbol() {}
-
 // --------
 
 ConstArraySymbol::ConstArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (inSymbolType == SymbolType::CONST && inIsArray) {
-        AbstractSymbol::setAttributes(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
     }
     else {
         ERROR_INSTANCE("ConstArraySymbol", inSymbolType);
     }
 }
 
-ConstArraySymbol::~ConstArraySymbol() {}
-
-AbstractSymbol *SymbolFactory::createSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
+AbstractSymbol *SymbolFactory::createSymbol(const string& inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
     switch(inSymbolType){
         case SymbolType::PARAM:
             if (inIsArray){
@@ -163,10 +175,8 @@ AbstractSymbol *SymbolFactory::createSymbol(string inSymbolName, SymbolType inSy
 // --------- SymbolTables ----------
 
 FuncSymbolTableList::FuncSymbolTableList() {
-    funcSymbolTableList.empty();
+    funcSymbolTableList.clear();
 }
-
-FuncSymbolTableList::~FuncSymbolTableList() {}
 
 SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName, MetaDataType inReturnType) {
     if (findDuplicateName<SymbolTable>(funcSymbolTableList, "FuncSymbolTableList", inFuncName)){
@@ -207,10 +217,8 @@ SymbolTable *FuncSymbolTableList::lookUpFuncSymbolTable(std::string inFuncName) 
 // --------
 
 BlockSymbolTableList::BlockSymbolTableList() {
-    blockSymbolTableList.empty();
+    blockSymbolTableList.clear();
 }
-
-BlockSymbolTableList::~BlockSymbolTableList() {}
 
 SymbolTable *BlockSymbolTableList::insertBlockSymbolTable() {
     SymbolTable *insertSymbolTable = new BlockSymbolTable();
@@ -239,9 +247,13 @@ SymbolTable *BlockSymbolTableList::getBlockSymbolTable(int index) const {
 
 // --------
 
-SymbolTable::SymbolTable() {}
+SymbolTable::SymbolTable() {
+    parentSymbolTable = nullptr;
+    symbolTableType = TableType::GLOBAL;
+}
 
 SymbolTable::SymbolTable(TableType inTableType) {
+    parentSymbolTable = nullptr;
     symbolTableType = inTableType;
     if (symbolTableType ==  TableType::GLOBAL) {
         getGlobalSymbolTable();
@@ -250,6 +262,7 @@ SymbolTable::SymbolTable(TableType inTableType) {
 
 SymbolTable::SymbolTable(SymbolTable *inParentSymbolTable) {
     parentSymbolTable = inParentSymbolTable;
+    symbolTableType = TableType::GLOBAL;
 }
 
 SymbolTable::SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable) {
@@ -259,8 +272,6 @@ SymbolTable::SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable
         getGlobalSymbolTable();
     }
 }
-
-SymbolTable::~SymbolTable() {}
 
 AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
     if (lookUpAbstractSymbol(inSymbolName)){
@@ -455,6 +466,11 @@ int FuncSymbolTable::getParamNum() const {
     return paramNum; 
 }
 
+std::vector<std::tuple<MetaDataType, bool, std::size_t> > FuncSymbolTable::getParamDataTypeList() const {
+    return paramDataTypeList;
+}
+
+
 bool FuncSymbolTable::setFuncName(string inFuncName) {
     funcName = inFuncName;
     return true;
@@ -486,7 +502,6 @@ bool FuncSymbolTable::compareParamSymbolDataType(int index, MetaDataType inMetaD
             get<1>(paramDataTypeList[index]) == inIsArray &&
             (inIsArray ? get<2>(paramDataTypeList[index]) == inSize : true);
 }
-
 BlockSymbolTable::BlockSymbolTable() {
     SymbolTable::setSymbolTableType(TableType::BLOCK);
 }

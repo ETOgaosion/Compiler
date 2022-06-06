@@ -16,15 +16,14 @@ private:
     int frameSize;
 
 public:
-    IRFunction(std::string newFunctionName);
+    explicit IRFunction(std::string newFunctionName);
 
     bool addLocalVariable(IRSymbolVariable *newVariable);
-    IRTempVariable* addTempVariable(MetaDataType newMetaDataType);
-    IRSymbolVariable* addSymbolVariable(AbstractSymbol *newSymbol);
-    IRLabel* addLabel();
-    bool addLabel(IRLabel *newLabel);
+    IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
+    IRSymbolVariable *addSymbolVariable(AbstractSymbol *newSymbol, IRValue *initVal);
+    IRLabel *addLabel();
     bool addCode(IRCode *newCode);
-    bool addCodes(std::vector<IRCode *> newCodes);
+    bool addCodes(const std::vector<IRCode *>& newCodes);
     int calFrameSize();
 
     std::string getFunctionName() const;
@@ -35,28 +34,40 @@ public:
     IRLabel *getLabel(const std::string& labelName);
     int getFrameSize() const;
 
-    void print() const;
-    // void targetCodeGen(TargetCodeList * t);
+    void print(SymbolTable *globalSymbolTable) const;
+    void targetCodeGen(TargetCodes * t);
 };
 
 class IRProgram {
 private:
+    SymbolTable *globalSymbolTable;
     std::string programName;
     std::unordered_map<std::string, IRSymbolVariable *> globalVariables;
     std::unordered_map<std::string, IRFunction *> functions;
     std::unordered_map<std::string, IRSymbolFunction *> funcSymbols;
+    std::unordered_map<std::string, IRValue *> immValues;
+
+    int valueCount;
     
 public:
-    IRProgram(std::string newProgramName);
+    explicit IRProgram(std::string newProgramName, SymbolTable *newGlobalSymbolTable);
 
-    IRSymbolVariable *addGlobalVariable(AbstractSymbol *symbol);
+    IRSymbolVariable *addGlobalVariable(AbstractSymbol *symbol, IRValue *newValue);
     bool addFunction(IRFunction *newFunction);
     bool addSymbolFunction(IRSymbolFunction *funcSymbol);
+    IRValue *addImmValue(MetaDataType inMetaDataType, const std::string &inValue);
+    IRValue *addMulSameImmValue(MetaDataType inMetaDataType, const std::string &inValue, int num);
+    IRValue *addMulImmValue(MetaDataType inMetaDataType, std::vector<std::string> &inValues);
 
+    SymbolTable *getGlobalSymbolTable() const { return globalSymbolTable; };
     IRSymbolVariable *getGlobalVariable(const std::string& varName);
     IRFunction *getFunction(const std::string& functionName);
     IRSymbolFunction *getSymbolFunction(const std::string& functionName);
+    IRValue *getImmValue(const std::string& inImmValue);
+    IRValue *getImmValue(const std::vector<std::string>& inImmValues);
 
-    void print() const;
-    // void targetGen(TargetCodeList * t);
+    void print() ;
+    void targetGen(TargetCodes * t);
+    void targetCodePrint(TargetCodes * t);
+    void targetCodeWrite(TargetCodes * t);
 };

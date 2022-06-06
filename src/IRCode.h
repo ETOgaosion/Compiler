@@ -1,16 +1,9 @@
 #include "IROperands.h"
+#include "TargetCodes.h"
 
 #pragma once
 
 enum class IROperation {
-    ADD_PARAM,
-    GET_PARAM,
-    CALL,
-    RETURN,
-    GET_RETURN,
-    ASSIGN,
-    FETCH_ARRAY_ELEM,
-    ASSIGN_ARRAY_ELEM,
     ADD,
     SUB,
     NEG,
@@ -18,22 +11,30 @@ enum class IROperation {
     DIV,
     MOD,
     NOT,
-    ADD_LABEL,
+    OR,
+    AND,
     SEQ,
     SNE,
     SLT,
     SGT,
     SLEQ,
     SGEQ,
-    OR,
-    AND,
     BEQZ,
     GOTO,
-    PHI
+    PHI,
+    ASSIGN,
+    FETCH_ARRAY_ELEM,
+    ASSIGN_ARRAY_ELEM,
+    ADD_LABEL,
+    ADD_PARAM,
+    GET_PARAM,
+    CALL,
+    RETURN,
+    GET_RETURN
 };
 
 class IRCode {
-private:
+protected:
     IROperation operation;
     IROperand *result;
     IROperand *arg1;
@@ -46,162 +47,402 @@ public:
 
     IROperation getOperation() const { return operation; };
 
-    IROperand * getArg1() const { return arg1; };
+    IROperand *getArg1() const { return arg1; };
 
-    IROperand * getArg2() const { return arg2; };
+    IROperand *getArg2() const { return arg2; };
 
-    IROperand * getResult() const { return result; };
+    IROperand *getResult() const { return result; };
 
-    // virtual void print() const = 0;
-    // void genTargetCode(TargetCodeList * t) = 0;
+    virtual void print() const = 0;
+
+    virtual void genTargetCode(TargetCodes *t) {};
 };
 
 //!!!!!!!! consider immediate and metaDataType when generating target code !!!!!!!!!!
 
-class IRAddLabel : public IRCode {
+class IRAdd : public IRCode {
 public:
-    IRAddLabel(IROperand *newArg1);
-
-    void print() const override;
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRAddParam : public IRCode {
-public:
-    IRAddParam(IROperand *newArg1);
+    IRAdd(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
 
     void print() const override;
 };
 
-class IRAddParamB : public IRAddParam {
+class IRAddI : public IRAdd {
 public:
-    IRAddParamB(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    IRAddI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRAddParamI : public IRAddParam {
+class IRAddF : public IRAdd {
 public:
-    IRAddParamI(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    IRAddF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRAddParamF : public IRAddParam {
+class IRAddD : public IRAdd {
 public:
-    IRAddParamF(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    IRAddD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRAddParamD : public IRAddParam {
+class IRSub : public IRCode {
 public:
-    IRAddParamD(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRGetParam : public IRCode {
-public:
-    IRGetParam(IROperand *newResult);
+    IRSub(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
 
     void print() const override;
 };
 
-class IRGetParamB : public IRGetParam {
+class IRSubI : public IRSub {
 public:
-    IRGetParamB(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
+    IRSubI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRGetParamI : public IRGetParam {
+class IRSubF : public IRSub {
 public:
-    IRGetParamI(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
+    IRSubF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRGetParamF : public IRGetParam {
+class IRSubD : public IRSub {
 public:
-    IRGetParamF(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
+    IRSubD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRGetParamD : public IRGetParam {
+class IRNeg : public IRCode {
 public:
-    IRGetParamD(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRCall : public IRCode {
-public:
-    IRCall(IROperand *newArg1);
-
-    void print() const override;
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRReturn : public IRCode {
-public:
-    IRReturn(IROperand *newArg1);
+    IRNeg(IROperand *newResult, IROperand *newArg1);
 
     void print() const override;
 };
 
-class IRReturnV : public IRReturn {
+class IRNegI : public IRNeg {
 public:
-    IRReturnV();
-    // void genTargetCode(TargetCodeList * t);
+    IRNegI(IROperand *newResult, IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRReturnB : public IRReturn {
+class IRNegF : public IRNeg {
 public:
-    IRReturnB(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    IRNegF(IROperand *newResult, IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRReturnI : public IRReturn {
+class IRNegD : public IRNeg {
 public:
-    IRReturnI(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    IRNegD(IROperand *newResult, IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRReturnF : public IRReturn {
+class IRMul : public IRCode {
 public:
-    IRReturnF(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRReturnD : public IRReturn {
-public:
-    IRReturnD(IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRGetReturn : public IRCode {
-public:
-    IRGetReturn(IROperand *newResult);
+    IRMul(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
 
     void print() const override;
 };
 
-class IRGetReturnB : public IRGetReturn {
+class IRMulI : public IRMul {
 public:
-    IRGetReturnB(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
+    IRMulI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRGetReturnI : public IRGetReturn {
+class IRMulF : public IRMul {
 public:
-    IRGetReturnI(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
+    IRMulF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRGetReturnF : public IRGetReturn {
+class IRMulD : public IRMul {
 public:
-    IRGetReturnF(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
+    IRMulD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRGetReturnD : public IRGetReturn {
+class IRDiv : public IRCode {
 public:
-    IRGetReturnD(IROperand *newResult);
-    // void genTargetCode(TargetCodeList * t);
+    IRDiv(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRDivI : public IRDiv {
+public:
+    IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRDivF : public IRDiv {
+public:
+    IRDivF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRDivD : public IRDiv {
+public:
+    IRDivD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRMod : public IRCode {
+public:
+    IRMod(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRNot : public IRCode {
+public:
+    IRNot(IROperand *newResult, IROperand *newArg1);
+
+    void print() const override;
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IROr : public IRCode {
+public:
+    IROr(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+
+    void print() const override;
+
+};
+
+class IRAnd : public IRCode {
+public:
+    IRAnd(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+
+    void print() const override;
+
+};
+
+class IRSeq: public IRCode {
+public:
+    IRSeq(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRSeqB: public IRSeq {
+public:
+    IRSeqB(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSeqI: public IRSeq {
+public:
+    IRSeqI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSeqF: public IRSeq {
+public:
+    IRSeqF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSeqD: public IRSeq {
+public:
+    IRSeqD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSne: public IRCode {
+public:
+    IRSne(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRSneB: public IRSne {
+public:
+    IRSneB(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSneI: public IRSne {
+public:
+    IRSneI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSneF: public IRSne {
+public:
+    IRSneF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSneD: public IRSne {
+public:
+    IRSneD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSlt: public IRCode {
+public:
+    IRSlt(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRSltI: public IRSlt {
+public:
+    IRSltI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSltF: public IRSlt {
+public:
+    IRSltF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSltD: public IRSlt {
+public:
+    IRSltD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSgt: public IRCode {
+public:
+    IRSgt(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRSgtI: public IRSgt {
+public:
+    IRSgtI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSgtF: public IRSgt {
+public:
+    IRSgtF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSgtD: public IRSgt {
+public:
+    IRSgtD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSleq: public IRCode {
+public:
+    IRSleq(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRSleqI: public IRSleq {
+public:
+    IRSleqI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSleqF: public IRSleq {
+public:
+    IRSleqF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSleqD: public IRSleq {
+public:
+    IRSleqD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSgeq: public IRCode {
+public:
+    IRSgeq(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRSgeqI: public IRSgeq {
+public:
+    IRSgeqI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSgeqF: public IRSgeq {
+public:
+    IRSgeqF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRSgeqD: public IRSgeq {
+public:
+    IRSgeqD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRBeqz : public IRCode {
+public:
+    IRBeqz(IROperand *newArg1, IROperand *newLabel);
+
+    void genTargetCode(TargetCodes *t) override;
+
+    void print() const override;
+};
+
+class IRGoto : public IRCode {
+public:
+    IRGoto(IROperand *newLabel);
+
+    void genTargetCode(TargetCodes *t) override;
+
+    void print() const override;
+};
+
+class IRPhi : public IRCode {
+public:
+    IRPhi(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
 };
 
 class IRAssign : public IRCode {
@@ -211,28 +452,33 @@ public:
     void print() const override;
 };
 
+
 class IRAssignB : public IRAssign {
 public:
     IRAssignB(IROperand *newResult, IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAssignI : public IRAssign {
 public:
     IRAssignI(IROperand *newResult, IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAssignF : public IRAssign {
 public:
     IRAssignF(IROperand *newResult, IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAssignD : public IRAssign {
 public:
     IRAssignD(IROperand *newResult, IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRFetchArrayElem : public IRCode {
@@ -289,318 +535,167 @@ public:
     IRAssignArrayElemD(IROperand *newSource, IROperand *newArg1, IROperand *newArg2);
 };
 
-class IRAdd : public IRCode {
+class IRAddLabel : public IRCode {
 public:
-    IRAdd(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+    explicit IRAddLabel(IROperand *newArg1);
+
+    void print() const override;
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRAddParam : public IRCode {
+public:
+    explicit IRAddParam(IROperand *newArg1);
 
     void print() const override;
 };
 
-class IRAddI : public IRAdd {
+class IRAddParamB : public IRAddParam {
 public:
-    IRAddI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRAddParamB(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRAddF : public IRAdd {
+class IRAddParamI : public IRAddParam {
 public:
-    IRAddF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRAddParamI(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRAddD : public IRAdd {
+class IRAddParamF : public IRAddParam {
 public:
-    IRAddD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRAddParamF(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRSub : public IRCode {
+class IRAddParamD : public IRAddParam {
 public:
-    IRSub(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+    explicit IRAddParamD(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRGetParam : public IRCode {
+public:
+    explicit IRGetParam(IROperand *newResult);
 
     void print() const override;
 };
 
-class IRSubI : public IRSub {
+class IRGetParamB : public IRGetParam {
 public:
-    IRSubI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRGetParamB(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRSubF : public IRSub {
+class IRGetParamI : public IRGetParam {
 public:
-    IRSubF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRGetParamI(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRSubD : public IRSub {
+class IRGetParamF : public IRGetParam {
 public:
-    IRSubD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRGetParamF(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRNeg : public IRCode {
+class IRGetParamD : public IRGetParam {
 public:
-    IRNeg(IROperand *newResult, IROperand *newArg1);
+    explicit IRGetParamD(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRCall : public IRCode {
+public:
+    explicit IRCall(IROperand *newArg1);
+
+    void print() const override;
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRReturn : public IRCode {
+public:
+    explicit IRReturn(IROperand *newArg1);
+
+    void print() const override;
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRReturnV : public IRReturn {
+public:
+    IRReturnV();
+};
+
+class IRReturnB : public IRReturn {
+public:
+    explicit IRReturnB(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRReturnI : public IRReturn {
+public:
+    explicit IRReturnI(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRReturnF : public IRReturn {
+public:
+    explicit IRReturnF(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRReturnD : public IRReturn {
+public:
+    explicit IRReturnD(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRGetReturn : public IRCode {
+public:
+    explicit IRGetReturn(IROperand *newResult);
 
     void print() const override;
 };
 
-class IRNegI : public IRNeg {
+class IRGetReturnB : public IRGetReturn {
 public:
-    IRNegI(IROperand *newResult, IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRGetReturnB(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRNegF : public IRNeg {
+class IRGetReturnI : public IRGetReturn {
 public:
-    IRNegF(IROperand *newResult, IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRGetReturnI(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRNegD : public IRNeg {
+class IRGetReturnF : public IRGetReturn {
 public:
-    IRNegD(IROperand *newResult, IROperand *newArg1);
-    // void genTargetCode(TargetCodeList * t);
+    explicit IRGetReturnF(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
-class IRMul : public IRCode {
+class IRGetReturnD : public IRGetReturn {
 public:
-    IRMul(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+    explicit IRGetReturnD(IROperand *newResult);
 
-    void print() const override;
-};
-
-class IRMulI : public IRMul {
-public:
-    IRMulI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRMulF : public IRMul {
-public:
-    IRMulF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRMulD : public IRMul {
-public:
-    IRMulD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRDiv : public IRCode {
-public:
-    IRDiv(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-};
-
-class IRDivI : public IRDiv {
-public:
-    IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRDivF : public IRDiv {
-public:
-    IRDivF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRDivD : public IRDiv {
-public:
-    IRDivD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRMod : public IRCode {
-public:
-    IRMod(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRNot : public IRCode {
-public:
-    IRNot(IROperand *newResult, IROperand *newArg1);
-
-    void print() const override;
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfEqualGoto : public IRCode {
-public:
-    IRIfEqualGoto(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-};
-
-class IRIfEqualGotoB : public IRIfEqualGoto {
-public:
-    IRIfEqualGotoB(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfEqualGotoI : public IRIfEqualGoto {
-public:
-    IRIfEqualGotoI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfEqualGotoF : public IRIfEqualGoto {
-public:
-    IRIfEqualGotoF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfEqualGotoD : public IRIfEqualGoto {
-public:
-    IRIfEqualGotoD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfNotEqualGoto : public IRCode {
-public:
-    IRIfNotEqualGoto(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-};
-
-class IRIfNotEqualGotoB : public IRIfNotEqualGoto {
-public:
-    IRIfNotEqualGotoB(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfNotEqualGotoI : public IRIfNotEqualGoto {
-public:
-    IRIfNotEqualGotoI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfNotEqualGotoF : public IRIfNotEqualGoto {
-public:
-    IRIfNotEqualGotoF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfNotEqualGotoD : public IRIfNotEqualGoto {
-public:
-    IRIfNotEqualGotoD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfGreaterThanGoto : public IRCode {
-public:
-    IRIfGreaterThanGoto(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-};
-
-class IRIfGreaterThanGotoI : public IRIfGreaterThanGoto {
-public:
-    IRIfGreaterThanGotoI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfGreaterThanGotoF : public IRIfGreaterThanGoto {
-public:
-    IRIfGreaterThanGotoF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfGreaterThanGotoD : public IRIfGreaterThanGoto {
-public:
-    IRIfGreaterThanGotoD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfGreaterEqualThanGoto : public IRCode {
-public:
-    IRIfGreaterEqualThanGoto(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-};
-
-class IRIfGreaterEqualThanGotoI : public IRIfGreaterEqualThanGoto {
-public:
-    IRIfGreaterEqualThanGotoI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfGreaterEqualThanGotoF : public IRIfGreaterEqualThanGoto {
-public:
-    IRIfGreaterEqualThanGotoF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfGreaterEqualThanGotoD : public IRIfGreaterEqualThanGoto {
-public:
-    IRIfGreaterEqualThanGotoD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfLessThanGoto : public IRCode {
-public:
-    IRIfLessThanGoto(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-};
-
-class IRIfLessThanGotoI : public IRIfLessThanGoto {
-public:
-    IRIfLessThanGotoI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfLessThanGotoF : public IRIfLessThanGoto {
-public:
-    IRIfLessThanGotoF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfLessThanGotoD : public IRIfLessThanGoto {
-public:
-    IRIfLessThanGotoD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfLessEqualThanGoto : public IRCode {
-public:
-    IRIfLessEqualThanGoto(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
-};
-
-class IRIfLessEqualThanGotoI : public IRIfLessEqualThanGoto {
-public:
-    IRIfLessEqualThanGotoI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfLessEqualThanGotoF : public IRIfLessEqualThanGoto {
-public:
-    IRIfLessEqualThanGotoF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRIfLessEqualThanGotoD : public IRIfLessEqualThanGoto {
-public:
-    IRIfLessEqualThanGotoD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRGoto : public IRCode {
-public:
-    IRGoto(IROperand *newLabel);
-    // void genTargetCode(TargetCodeList * t);
-};
-
-class IRPhi : public IRCode {
-public:
-    IRPhi(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
-
-    void print() const override;
+    void genTargetCode(TargetCodes *t) override;
 };

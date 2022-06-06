@@ -33,21 +33,24 @@ private:
     MetaDataType metaDataType;
     bool isArray;
     std::size_t size;
-    std::vector<std::string> initValue;
+    int offset;
 protected:
 
 public:
     AbstractSymbol();
     AbstractSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
-    ~AbstractSymbol();
-    virtual bool setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+
     virtual std::string getSymbolName() const;
     virtual SymbolType getSymbolType() const;
     virtual MetaDataType getMetaDataType() const;
     virtual bool getIsArray() const;
     virtual std::size_t getSize() const;
-    virtual bool setInitValue (std::vector<std::string> inInitValue);
+    virtual int getOffset() const;
 
+    virtual bool setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    virtual bool setOffset(int inOffset);
+
+    static int getOffsetFromDataType(MetaDataType inDataType);
 };
 
 class ParamSymbol : public AbstractSymbol {
@@ -57,7 +60,6 @@ protected:
 
 public:
     ParamSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
-    ~ParamSymbol();
 
 };
 
@@ -68,7 +70,6 @@ protected:
 
 public:
     VarSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
-    ~VarSymbol();
 
 };
 
@@ -79,7 +80,6 @@ protected:
 
 public:
     ConstSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
-    ~ConstSymbol();
 };
 
 
@@ -90,7 +90,6 @@ protected:
 
 public:
     ParamArraySymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
-    ~ParamArraySymbol();
 
 };
 
@@ -101,7 +100,6 @@ protected:
 
 public:
     VarArraySymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
-    ~VarArraySymbol();
 
 };
 
@@ -112,7 +110,6 @@ protected:
 
 public:
     ConstArraySymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
-    ~ConstArraySymbol();
 };
 
 class SymbolFactory {
@@ -121,7 +118,7 @@ private:
 protected:
 
 public:
-    AbstractSymbol *createSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    static AbstractSymbol *createSymbol(const std::string& inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
 
 };
 
@@ -142,7 +139,6 @@ protected:
 
 public:
     FuncSymbolTableList();
-    ~FuncSymbolTableList();
     virtual SymbolTable *insertFuncSymbolTableSafely(std::string inFuncName, MetaDataType inReturnType);
     virtual SymbolTable *insertFuncSymbolTableSafely(std::string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable);
     virtual SymbolTable *insertFuncSymbolTableSafely(SymbolTable *inFuncSymbolTable);
@@ -159,7 +155,6 @@ protected:
 
 public:
     BlockSymbolTableList();
-    ~BlockSymbolTableList();
     virtual SymbolTable *insertBlockSymbolTable();
     //virtual SymbolTable *insertBlockSymbolTable(SymbolTable *inParentSymbolTable);
     virtual SymbolTable *insertBlockSymbolTable(SymbolTable *inBlockSymbolTable);
@@ -178,10 +173,9 @@ protected:
 
 public:
     SymbolTable();  // note: should promiss GlobalSymbolTable construct for once
-    SymbolTable(TableType inTableType);
+    explicit SymbolTable(TableType inTableType);
     SymbolTable(SymbolTable *inParentSymbolTable);
     SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable);
-    ~SymbolTable();
 
     virtual AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
     virtual AbstractSymbol *insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol);
@@ -201,6 +195,7 @@ public:
     static SymbolTable *getGlobalSymbolTable();
     virtual std::string getFuncName() const { return std::string(); };
     virtual MetaDataType getReturnType() const { return MetaDataType::VOID; };
+    virtual std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const { return {}; };
     virtual int getParamNum() const { return 0; };
     
     virtual bool setSymbolTableType(TableType inSymbolTableType);
@@ -220,7 +215,6 @@ class GlobalSymbolTable : public SymbolTable {
 private:
     GlobalSymbolTable(GlobalSymbolTable &globalSymbolTable) = delete;
     GlobalSymbolTable &operator = (const GlobalSymbolTable &globalSymbolTable) = delete;
-    ~GlobalSymbolTable();
 
 protected:
 
@@ -243,7 +237,6 @@ public:
     FuncSymbolTable();
     FuncSymbolTable(std::string inFuncName, MetaDataType inReturnType);
     FuncSymbolTable(std::string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable);
-    ~FuncSymbolTable();
     AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
     AbstractSymbol *insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol) override;
     AbstractSymbol *insertParamSymbolSafely(std::string inSymbolName, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
@@ -257,6 +250,7 @@ public:
     std::string getFuncName() const override;
     MetaDataType getReturnType() const override;
     int getParamNum() const override;
+    std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const override;
 
     bool setFuncName(std::string inFuncName) override;
     bool setReturnType(MetaDataType inReturnType) override;

@@ -6,7 +6,7 @@ options {
 }
 
 @header {
-    #include "../src/symbolTable.h"
+    #include "../src/SymbolTable.h"
 }
 
 /********** Parser **********/

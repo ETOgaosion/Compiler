@@ -1,5 +1,5 @@
 
-    #include "../src/symbolTable.h"
+    #include "../src/SymbolTable.h"
 
 
 // Generated from /Volumes/study/code/C++/vscode/compiler/compiler/grammar/CACT.g4 by ANTLR 4.8
