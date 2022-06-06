@@ -17,6 +17,10 @@ enum class ASMOperation {
     NEG,
     MUL,
     DIV,
+    SLL,
+    SLR,
+    SLLI,
+    SLRI,
     REM,
     NOT,
     OR,
@@ -78,6 +82,10 @@ public:
     bool addCodeNeg(Register *rd, Register *rs1, FloatPointType inFloatPointType);
     bool addCodeMul(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeDiv(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
+    bool addCodeSll(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
+    bool addCodeSlr(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
+    bool addCodeSlli(Register *rd, Register *rs1, int shamt);
+    bool addCodeSlri(Register *rd, Register *rs1, int shamt);
     bool addCodeRem(Register *rd, Register *rs1, Register *rs2);
     bool addCodeNot(Register *rd, Register *rs1);
     bool addCodeXor(Register *rd, Register *rs1, Register *rs2);

@@ -34,6 +34,7 @@ private:
     bool isArray;
     std::size_t size;
     int offset;
+    uint64_t memPosition;
 protected:
 
 public:
@@ -46,9 +47,11 @@ public:
     virtual bool getIsArray() const;
     virtual std::size_t getSize() const;
     virtual int getOffset() const;
+    virtual uint64_t getMemPosition() const;
 
     virtual bool setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
     virtual bool setOffset(int inOffset);
+    virtual bool setMemPosition(uint64_t inMemPosition);
 
     static int getOffsetFromDataType(MetaDataType inDataType);
 };

@@ -58,6 +58,10 @@ int AbstractSymbol::getOffset() const {
     return offset;
 }
 
+uint64_t AbstractSymbol::getMemPosition() const {
+    return memPosition;
+}
+
 bool AbstractSymbol::setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) {
     symbolName = std::move(inSymbolName);
     symbolType = inSymbolType;
@@ -68,6 +72,11 @@ bool AbstractSymbol::setAttributes(std::string inSymbolName, SymbolType inSymbol
 
 bool AbstractSymbol::setOffset(int inOffset) {
     offset = inOffset;
+    return true;
+}
+
+bool AbstractSymbol::setMemPosition(uint64_t inMemPosition) {
+    memPosition = inMemPosition;
     return true;
 }
 
@@ -367,8 +376,6 @@ bool SymbolTable::compareAbstractSymbolDataType(string inSymbolName, SymbolType 
 GlobalSymbolTable::GlobalSymbolTable() {
     SymbolTable::setSymbolTableType(TableType::GLOBAL);
 }
-
-GlobalSymbolTable::~GlobalSymbolTable() {}
 
 // --------
 

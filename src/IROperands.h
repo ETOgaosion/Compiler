@@ -3,12 +3,6 @@
 
 #pragma once
 
-enum class MemArea {
-    STACK,
-    DATA,
-    RODATA
-};
-
 enum class OperandType {
     LABEL,
     VALUE,
@@ -47,6 +41,7 @@ public:
     virtual int getMemOffset() const { return 0; };
     virtual IRValue *getInitialValue() const { return nullptr; };
     virtual bool getIsArray() const { return false; };
+    virtual uint64_t getMemPosition() const { return 0; };
 
     virtual bool setAssigned() { return false; }
     virtual bool addHistorySymbol(IROperand *inSymbol) { return false; };
@@ -54,6 +49,7 @@ public:
     virtual bool setSymbolVariable(IROperand *inSymbolVariable) { return false; };
     virtual bool setFunctionSymbolTable(SymbolTable *inFunctionTable) { return false; };
     virtual void setMemOffset(int offset) {};
+    virtual bool setMemPosition(uint64_t inMemPosition) { return false; };
 
     virtual Register *load(TargetCodes * t) { return nullptr; };
     virtual Register *loadTo(TargetCodes * t, const std::string &regName) { return nullptr; };
@@ -86,8 +82,8 @@ private:
 
 public:
     IRValue(MetaDataType newMetaDataType, const std::string &newLabel, bool newIsArray);
-    IRValue(MetaDataType newMetaDataType, const std::string &newValue, const std::string &newLabel, bool newIsArray));
-    IRValue(MetaDataType newMetaDataType, const std::vector<std::string>& newValues, const std::string &newLabel, bool newIsArray));
+    IRValue(MetaDataType newMetaDataType, const std::string &newValue, const std::string &newLabel, bool newIsArray);
+    IRValue(MetaDataType newMetaDataType, const std::vector<std::string>& newValues, const std::string &newLabel, bool newIsArray);
 
     MetaDataType getMetaDataType() const override { return metaDataType; };
     std::string getValue() const override { return values.front(); };
@@ -122,11 +118,14 @@ public:
     IROperand *getLatestVersionSymbol() const override { return historySymbols.back(); };
     int getMemOffset() const override { return symbol->getOffset(); };
     IRValue *getInitialValue() const override { return initialValue; };
+    bool getIsArray() const override { return symbol->getIsArray(); };
+    uint64_t getMemPosition() const override { return symbol->getMemPosition(); };
 
     bool setAssigned() override { assigned = true; return true; };
-    bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; }
+    bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; };
 
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
+    bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); };
 
     Register *load(TargetCodes * t) override;
     Register *loadTo(TargetCodes * t, const std::string &regName) override;

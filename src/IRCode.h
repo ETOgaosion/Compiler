@@ -491,21 +491,29 @@ public:
 class IRFetchArrayElemB : public IRFetchArrayElem {
 public:
     IRFetchArrayElemB(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRFetchArrayElemI : public IRFetchArrayElem {
 public:
     IRFetchArrayElemI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRFetchArrayElemF : public IRFetchArrayElem {
 public:
     IRFetchArrayElemF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRFetchArrayElemD : public IRFetchArrayElem {
 public:
     IRFetchArrayElemD(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAssignArrayElem : public IRCode {
@@ -518,21 +526,29 @@ public:
 class IRAssignArrayElemB : public IRAssignArrayElem {
 public:
     IRAssignArrayElemB(IROperand *newSource, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAssignArrayElemI : public IRAssignArrayElem {
 public:
     IRAssignArrayElemI(IROperand *newSource, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAssignArrayElemF : public IRAssignArrayElem {
 public:
     IRAssignArrayElemF(IROperand *newSource, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAssignArrayElemD : public IRAssignArrayElem {
 public:
     IRAssignArrayElemD(IROperand *newSource, IROperand *newArg1, IROperand *newArg2);
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAddLabel : public IRCode {
@@ -579,6 +595,13 @@ public:
     void genTargetCode(TargetCodes *t) override;
 };
 
+class IRAddParamA : public IRAddParam {
+public:
+    explicit IRAddParamA(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
 class IRGetParam : public IRCode {
 public:
     explicit IRGetParam(IROperand *newResult);
@@ -610,6 +633,13 @@ public:
 class IRGetParamD : public IRGetParam {
 public:
     explicit IRGetParamD(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRGetParamA : public IRGetParam {
+public:
+    explicit IRGetParamA(IROperand *newResult);
 
     void genTargetCode(TargetCodes *t) override;
 };
