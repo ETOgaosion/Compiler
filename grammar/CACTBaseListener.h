@@ -154,6 +154,9 @@ public:
   virtual void enterAddExpMulExp(CACTParser::AddExpMulExpContext * /*ctx*/) override { }
   virtual void exitAddExpMulExp(CACTParser::AddExpMulExpContext * /*ctx*/) override { }
 
+  virtual void enterAddOp(CACTParser::AddOpContext * /*ctx*/) override { }
+  virtual void exitAddOp(CACTParser::AddOpContext * /*ctx*/) override { }
+
   virtual void enterRelExpRelExp(CACTParser::RelExpRelExpContext * /*ctx*/) override { }
   virtual void exitRelExpRelExp(CACTParser::RelExpRelExpContext * /*ctx*/) override { }
 
@@ -163,11 +166,17 @@ public:
   virtual void enterRelExpBoolConst(CACTParser::RelExpBoolConstContext * /*ctx*/) override { }
   virtual void exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * /*ctx*/) override { }
 
+  virtual void enterRelOp(CACTParser::RelOpContext * /*ctx*/) override { }
+  virtual void exitRelOp(CACTParser::RelOpContext * /*ctx*/) override { }
+
   virtual void enterEqExpRelExp(CACTParser::EqExpRelExpContext * /*ctx*/) override { }
   virtual void exitEqExpRelExp(CACTParser::EqExpRelExpContext * /*ctx*/) override { }
 
   virtual void enterEqExpEqExp(CACTParser::EqExpEqExpContext * /*ctx*/) override { }
   virtual void exitEqExpEqExp(CACTParser::EqExpEqExpContext * /*ctx*/) override { }
+
+  virtual void enterEqOp(CACTParser::EqOpContext * /*ctx*/) override { }
+  virtual void exitEqOp(CACTParser::EqOpContext * /*ctx*/) override { }
 
   virtual void enterLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * /*ctx*/) override { }
   virtual void exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * /*ctx*/) override { }

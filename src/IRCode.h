@@ -431,7 +431,7 @@ public:
 
 class IRGoto : public IRCode {
 public:
-    IRGoto(IROperand *newLabel);
+    explicit IRGoto(IROperand *newLabel);
 
     void genTargetCode(TargetCodes *t) override;
 
@@ -604,42 +604,42 @@ public:
 
 class IRGetParam : public IRCode {
 public:
-    explicit IRGetParam(IROperand *newResult);
+    explicit IRGetParam(IROperand *newResult, IROperand *newArg1);
 
     void print() const override;
 };
 
 class IRGetParamB : public IRGetParam {
 public:
-    explicit IRGetParamB(IROperand *newResult);
+    explicit IRGetParamB(IROperand *newResult, IROperand *newArg1);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRGetParamI : public IRGetParam {
 public:
-    explicit IRGetParamI(IROperand *newResult);
+    explicit IRGetParamI(IROperand *newResult, IROperand *newArg1);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRGetParamF : public IRGetParam {
 public:
-    explicit IRGetParamF(IROperand *newResult);
+    explicit IRGetParamF(IROperand *newResult, IROperand *newArg1);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRGetParamD : public IRGetParam {
 public:
-    explicit IRGetParamD(IROperand *newResult);
+    explicit IRGetParamD(IROperand *newResult, IROperand *newArg1);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRGetParamA : public IRGetParam {
 public:
-    explicit IRGetParamA(IROperand *newResult);
+    explicit IRGetParamA(IROperand *newResult, IROperand *newArg1);
 
     void genTargetCode(TargetCodes *t) override;
 };

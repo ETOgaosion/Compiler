@@ -1182,9 +1182,9 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
 
     IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
     IROperation op;
-    if (ctx->addOp()->getText() == '+')
+    if (ctx->addOp()->getText() == "+")
         op = IROperation::ADD;
-    else if (ctx->addOp()->getText() == '-')
+    else if (ctx->addOp()->getText() == "-")
         op = IROperation::SUB;
     else
         throw std::runtime_error("[ERROR] > addop illegal.\n");

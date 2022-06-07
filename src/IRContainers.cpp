@@ -132,7 +132,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     t->addCodeDirectives(".text");
     t->addCodeDirectives(".align 1");
     t->addCodeDirectives(".globl\t" + functionName);
-    t->addCodeDirectives(".type\t" + functionName + "@function");
+    t->addCodeDirectives(".type\t" + functionName + ", @function");
     t->addCodeLabel(functionName);
     bool hasFreeRegister;
     Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
@@ -249,6 +249,9 @@ void IRProgram::print() {
 
 void IRProgram::targetGen(TargetCodes *t) {
     for (auto &globalVar : globalVariables) {
+        t->addCodeDirectives(".data");
+        t->addCodeDirectives(".globl\t" + globalVar.first);
+        t->addCodeDirectives(".type\t" + globalVar.first + ", @object");
         globalVar.second->genTargetValue(t);
     }
     for (auto &imm : immValues) {

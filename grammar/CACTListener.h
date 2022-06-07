@@ -152,6 +152,9 @@ public:
   virtual void enterAddExpMulExp(CACTParser::AddExpMulExpContext *ctx) = 0;
   virtual void exitAddExpMulExp(CACTParser::AddExpMulExpContext *ctx) = 0;
 
+  virtual void enterAddOp(CACTParser::AddOpContext *ctx) = 0;
+  virtual void exitAddOp(CACTParser::AddOpContext *ctx) = 0;
+
   virtual void enterRelExpRelExp(CACTParser::RelExpRelExpContext *ctx) = 0;
   virtual void exitRelExpRelExp(CACTParser::RelExpRelExpContext *ctx) = 0;
 
@@ -161,11 +164,17 @@ public:
   virtual void enterRelExpBoolConst(CACTParser::RelExpBoolConstContext *ctx) = 0;
   virtual void exitRelExpBoolConst(CACTParser::RelExpBoolConstContext *ctx) = 0;
 
+  virtual void enterRelOp(CACTParser::RelOpContext *ctx) = 0;
+  virtual void exitRelOp(CACTParser::RelOpContext *ctx) = 0;
+
   virtual void enterEqExpRelExp(CACTParser::EqExpRelExpContext *ctx) = 0;
   virtual void exitEqExpRelExp(CACTParser::EqExpRelExpContext *ctx) = 0;
 
   virtual void enterEqExpEqExp(CACTParser::EqExpEqExpContext *ctx) = 0;
   virtual void exitEqExpEqExp(CACTParser::EqExpEqExpContext *ctx) = 0;
+
+  virtual void enterEqOp(CACTParser::EqOpContext *ctx) = 0;
+  virtual void exitEqOp(CACTParser::EqOpContext *ctx) = 0;
 
   virtual void enterLAndExpLAndExp(CACTParser::LAndExpLAndExpContext *ctx) = 0;
   virtual void exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext *ctx) = 0;
