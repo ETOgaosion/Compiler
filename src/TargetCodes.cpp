@@ -329,6 +329,8 @@ void Code::print() const {
             cout << "\tret\n";
         case ASMOperation::DIRECTIVE:
             cout << "\t" << directives << "\n";
+        case ASMOperation::ECALL:
+            cout << "\tecall\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset;
     }
 }
 
@@ -620,6 +622,12 @@ bool TargetCodes::addCodeRet() {
 
 bool TargetCodes::addCodeDirectives(const string &directives) {
     Code *newCode = new Code(ASMOperation::DIRECTIVE, directives);
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodeEcall(Register *rd, Register *rs1, int imm, FloatPointType rs1FloatPointType) {
+    Code *newCode = new Code(ASMOperation::ECALL, FloatPointType::NONE, rs1FloatPointType, rd, rs1, nullptr, imm, {});
     addCode(newCode);
     return true;
 }

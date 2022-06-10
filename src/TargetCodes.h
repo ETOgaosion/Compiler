@@ -44,7 +44,8 @@ enum class ASMOperation {
     LABEL,
     CALL,
     RET,
-    DIRECTIVE
+    DIRECTIVE,
+    ECALL
 };
 
 class Code {
@@ -110,6 +111,7 @@ public:
     bool addCodeCall(const std::string &targetLabel);
     bool addCodeRet();
     bool addCodeDirectives(const std::string &directives);
+    bool addCodeEcall(Register *rd, Register *rs1, int imm, FloatPointType rs1FloatPointType);
 
     void printCode() const;
     void codeWrite() const;

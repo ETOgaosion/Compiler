@@ -293,6 +293,33 @@ IRGetReturnF::IRGetReturnF(IROperand *newResult)
 IRGetReturnD::IRGetReturnD(IROperand *newResult)
         : IRGetReturn(newResult) {}
 
+IRPrint::IRPrint(IROperand *newArg1)
+        : IRCode(IROperation::PRINT, nullptr, newArg1, nullptr) {}
+
+IRPrintB::IRPrintB(IROperand *newArg1)
+        : IRPrint(newArg1) {}
+
+IRPrintI::IRPrintI(IROperand *newArg1)
+        : IRPrint(newArg1) {}
+
+IRPrintF::IRPrintF(IROperand *newArg1)
+        : IRPrint(newArg1) {}
+
+IRPrintD::IRPrintD(IROperand *newArg1)
+        : IRPrint(newArg1) {}
+
+IRRead::IRRead(IROperand *newResult)
+        : IRCode(IROperation::READ, newResult, nullptr, nullptr) {}
+
+IRReadI::IRReadI(IROperand *newResult)
+        : IRRead(newResult) {}
+
+IRReadF::IRReadF(IROperand *newResult)
+        : IRRead(newResult) {}
+
+IRReadD::IRReadD(IROperand *newResult)
+        : IRRead(newResult) {}
+
 void IRAdd::print() const {
     cout << result->getSymbolName() << " = "
          << arg1->getSymbolName() << " + "
@@ -377,7 +404,7 @@ void IRSgeq::print() const {
 void IRBeqz::print() const {
     cout << "BEQZ "
          << arg1->getSymbolName() << " "
-         << arg2->getSymbolName()<< endl;
+         << arg2->getSymbolName() << endl;
 }
 
 void IRGoto::print() const {
@@ -437,6 +464,14 @@ void IRReturn::print() const {
 void IRGetReturn::print() const {
     cout << result->getSymbolName() << " = " << " return "
          << ";" << endl;
+}
+
+void IRPrint::print() const {
+    cout << "print(" << arg1->getSymbolName() << ");" << endl;
+}
+
+void IRRead::print() const {
+    cout << result->getSymbolName() << " = read();" << endl;
 }
 
 void IRAddI::genTargetCode(TargetCodes *t) {
@@ -1136,14 +1171,20 @@ void IRGetParamD::genTargetCode(TargetCodes *t) {
 }
 
 void IRGetParamA::genTargetCode(TargetCodes *t) {
-    bool hasOccupiedRegister;
-    Register *resultArg = t->getNextOccupiedRegister(true, FloatPointType::NONE, hasOccupiedRegister);
+    bool hasFreeRegister;
+    Register *resultArg = t->tryGetCertainRegister(true, "a" + arg1->getValue(), hasFreeRegister);
     arg1->storeFrom(t, resultArg);
     resultArg->setFree();
 }
 
 void IRCall::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
+    Register *freeReg = arg2->load(t);
+    t->addCodeSub(sp, sp, freeReg, FloatPointType::NONE);
     t->addCodeCall(arg1->getSymbolName());
+    freeReg->setFree();
+    sp->setFree();
 }
 
 void IRReturn::genTargetCode(TargetCodes *t) {
@@ -1153,6 +1194,25 @@ void IRReturn::genTargetCode(TargetCodes *t) {
     t->addCodeLoad(ra, sp, -8, FloatPointType::NONE);
     t->addCodeRet();
     sp->setFree();
+    ra->setFree();
+}
+
+void IRReturnV::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *retReg;
+    switch (arg1->getMetaDataType()) {
+        case MetaDataType::BOOL:
+        case MetaDataType::INT:
+            retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
+            break;
+        case MetaDataType::FLOAT:
+        case MetaDataType::DOUBLE:
+            retReg = t->tryGetCertainRegister(true, "fa0", hasFreeRegister);
+            break;
+    }
+    arg1->loadTo(t, retReg);
+    IRReturn::genTargetCode(t);
+    retReg->setFree();
 }
 
 void IRReturnB::genTargetCode(TargetCodes *t) {
@@ -1160,6 +1220,7 @@ void IRReturnB::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
+    retReg->setFree();
 }
 
 void IRReturnI::genTargetCode(TargetCodes *t) {
@@ -1167,6 +1228,7 @@ void IRReturnI::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
+    retReg->setFree();
 }
 
 void IRReturnF::genTargetCode(TargetCodes *t) {
@@ -1174,6 +1236,7 @@ void IRReturnF::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
+    retReg->setFree();
 }
 
 void IRReturnD::genTargetCode(TargetCodes *t) {
@@ -1181,22 +1244,99 @@ void IRReturnD::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
+    retReg->setFree();
+}
+
+void IRGetReturnB::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
+    arg1->storeFrom(t, retReg);
+    retReg->setFree();
 }
 
 void IRGetReturnI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
     arg1->storeFrom(t, retReg);
+    retReg->setFree();
 }
 
 void IRGetReturnF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     arg1->storeFrom(t, retReg);
+    retReg->setFree();
 }
 
 void IRGetReturnD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     arg1->storeFrom(t, retReg);
+    retReg->setFree();
+}
+
+void IRPrintB::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+    Register *rs = arg1->load(t);
+    t->addCodeEcall(zero, rs, 0, FloatPointType::NONE);
+    zero->setFree();
+    rs->setFree();
+}
+
+void IRPrintI::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+    Register *rs = arg1->load(t);
+    t->addCodeEcall(zero, rs, 0, FloatPointType::NONE);
+    zero->setFree();
+    rs->setFree();
+}
+
+void IRPrintF::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+    Register *rs = arg1->load(t);
+    t->addCodeEcall(zero, rs, 1, FloatPointType::SINGLE);
+    zero->setFree();
+    rs->setFree();
+}
+
+void IRPrintD::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+    Register *rs = arg1->load(t);
+    t->addCodeEcall(zero, rs, 1, FloatPointType::DOUBLE);
+    zero->setFree();
+    rs->setFree();
+}
+
+void IRReadI::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+    Register *rd = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
+    t->addCodeEcall(rd, zero, 5, FloatPointType::NONE);
+    result->storeFrom(t, rd);
+    zero->setFree();
+    rd->setFree();
+}
+
+void IRReadF::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+    Register *rd = t->getNextFreeRegister(false, false, FloatPointType::SINGLE, hasFreeRegister);
+    t->addCodeEcall(rd, zero, 6, FloatPointType::NONE);
+    result->storeFrom(t, rd);
+    zero->setFree();
+    rd->setFree();
+}
+
+void IRReadD::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+    Register *rd = t->getNextFreeRegister(false, false, FloatPointType::DOUBLE, hasFreeRegister);
+    t->addCodeEcall(rd, zero, 6, FloatPointType::NONE);
+    result->storeFrom(t, rd);
+    zero->setFree();
+    rd->setFree();
 }

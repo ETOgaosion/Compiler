@@ -30,7 +30,9 @@ enum class IROperation {
     GET_PARAM,
     CALL,
     RETURN,
-    GET_RETURN
+    GET_RETURN,
+    PRINT,
+    READ
 };
 
 class IRCode {
@@ -665,6 +667,8 @@ public:
 class IRReturnV : public IRReturn {
 public:
     IRReturnV();
+
+    void genTargetCode(TargetCodes *t) override;
 };
 
 class IRReturnB : public IRReturn {
@@ -726,6 +730,69 @@ public:
 class IRGetReturnD : public IRGetReturn {
 public:
     explicit IRGetReturnD(IROperand *newResult);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRPrint : public IRCode {
+public:
+    explicit IRPrint(IROperand *newArg1);
+
+    void print() const override;
+};
+
+class IRPrintB : public IRPrint {
+public:
+    explicit IRPrintB(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRPrintI : public IRPrint {
+public:
+    explicit IRPrintI(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRPrintF : public IRPrint {
+public:
+    explicit IRPrintF(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRPrintD : public IRPrint {
+public:
+    explicit IRPrintD(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRRead : public IRCode {
+public:
+    explicit IRRead(IROperand *newResult);
+
+    void print() const override;
+};
+
+class IRReadI : public IRRead {
+public:
+    explicit IRReadI(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRReadF : public IRRead {
+public:
+    explicit IRReadF(IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRReadD : public IRRead {
+public:
+    explicit IRReadD(IROperand *newArg1);
 
     void genTargetCode(TargetCodes *t) override;
 };
