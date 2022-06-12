@@ -342,7 +342,10 @@ void SemanticAnalysis::exitFuncFParams(CACTParser::FuncFParamsContext * ctx)
         int gr = 0, fr = 0;
         IRValue* g_index = nullptr;
         IRValue* f_index = nullptr;
+        // add ParamVariable
         irGenerator->currentIRFunc->addParamVariable(param->symbolVar);
+
+        // add getParam code
         IRCode* code = nullptr;
         if(param->isArray){
             g_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(gr));
@@ -1134,7 +1137,7 @@ void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext 
 {
     ctx->isArray = false;
     ctx->metaDataType = ctx->number()->metaDataType;
-    ctx->operand = new IRValue(ctx->metaDataType, ctx->number()->getText()); 
+    ctx->operand = irGenerator->ir->addImmValue(ctx->metaDataType, ctx->getText());
 }
 
 

@@ -83,9 +83,8 @@ string IRFunction::getFunctionName() const {
 
 IRSymbolVariable *IRFunction::getLocalVariable(int block, const string& varName){
     for(int i = block; i > 0; i--){
-        auto iter = localVariables.find(varName + to_string(i));
-        if(iter != localVariables.end())
-            return iter->second;
+        if(localVariables.find(varName + to_string(i)) != localVariables.end())
+            return localVariables[varName+ to_string(i)];
     }
     return nullptr;
 }
