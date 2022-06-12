@@ -6,11 +6,12 @@
 
 class IRGenerator {
 private:
+
+public:
     IRProgram * ir;
     IRFunction * currentIRFunc;
     TargetCodes *targetCodes;
 
-public:
     IRGenerator(IRProgram * newIR);
 
     IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol);
@@ -28,7 +29,7 @@ public:
     IRSymbolVariable* addSymbolVariable(AbstractSymbol *Symbol);
     IRSymbolFunction* getSymbolFunction(std::string funcName);
 
-    bool IRGenerator::enterFunction(FuncSymbolTable *function);
+    bool enterFunction(FuncSymbolTable *function);
     bool exitFunction(); // enter return
 
     // param is IN/OUT

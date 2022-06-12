@@ -41,7 +41,7 @@ constDef
         std::string symbolName,
         std::size_t size,
         bool isArray,
-        std::vector<std::string> initVal
+        IRValue* value
     ]
     : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;
@@ -51,7 +51,7 @@ constInitVal
         MetaDataType type,
         std::size_t size,
         bool isArray,
-        std::vector<std::string> initVal
+        IRValue* value
     ]
     : constExp                              #constInitValOfVar
     | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
@@ -308,7 +308,7 @@ lOrExp
 constExp
     locals[
         MetaDataType metaDataType,
-        IROperand* operand
+        std::string val
     ]
     : number            #constExpNumber
     | BoolConst         #constExpBoolConst
