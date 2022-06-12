@@ -68,7 +68,7 @@ varDef
         bool withType,
         std::size_t size,
         bool isArray,
-        std::vector<std::string> initVal
+        IRValue* value
     ]
     : Ident ('[' IntConst ']')? ('=' constInitVal)?
     ;
@@ -93,6 +93,11 @@ funcFParams
     ;
 
 funcFParam
+    locals [
+        IRSymbolVariable* symbolVar,
+        bool isArray,
+        MetaDataType paramType
+    ]
     : bType Ident (brackets)?
     ;
 
@@ -188,7 +193,7 @@ lVal
         std::size_t size,
         SymbolType symbolType,
         MetaDataType lValMetaDataType,
-        IROperand* identOperand,
+        IRSymbolVariable* identOperand,
         IROperand* indexOperand
     ]
     : Ident ('[' exp ']')?

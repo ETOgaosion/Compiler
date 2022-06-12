@@ -8,12 +8,12 @@ IRGenerator::IRGenerator(IRProgram *newIR) {
     targetCodes->clear();
 }
 
-IRSymbolVariable* IRGenerator::addGlobalVariable(AbstractSymbol *Symbol){
-    return ir->addGlobalVariable(Symbol);
+IRSymbolVariable* IRGenerator::addGlobalVariable(AbstractSymbol *Symbol, IRValue* newValue){
+    return ir->addGlobalVariable(Symbol, newValue);
 }
 
-IRSymbolVariable* IRGenerator::addSymbolVariable(AbstractSymbol* symbol) {
-    return currentIRFunc->addSymbolVariable(symbol);
+IRSymbolVariable* IRGenerator::addSymbolVariable(int block, AbstractSymbol* symbol, IRValue* newValue) {
+    return currentIRFunc->addSymbolVariable(block, symbol, newValue);
 }
 
 IRTempVariable* IRGenerator::addTempVariable(MetaDataType newMetaDataType) {

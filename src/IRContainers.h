@@ -6,6 +6,7 @@
 class IRFunction {
 private:
     std::string functionName;
+    std::unordered_map<std::string, IRSymbolVariable *> paramVariables;
     std::unordered_map<std::string, IRSymbolVariable *> localVariables;
     std::unordered_map<std::string, IRTempVariable *> tempVariables;
     std::vector<IRCode *> codes;
@@ -18,16 +19,19 @@ private:
 public:
     explicit IRFunction(std::string newFunctionName);
 
-    bool addLocalVariable(IRSymbolVariable *newVariable);
+    bool addParamVariable(IRSymbolVariable *newVariable);
+    bool addLocalVariable(int block, IRSymbolVariable *newVariable);
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
-    IRSymbolVariable *addSymbolVariable(AbstractSymbol *newSymbol, IRValue *initVal);
+    IRSymbolVariable *addSymbolVariable(int block, AbstractSymbol *newSymbol, IRValue *initVal);
     IRLabel *addLabel();
     bool addCode(IRCode *newCode);
     bool addCodes(const std::vector<IRCode *>& newCodes);
     int calFrameSize();
 
+
     std::string getFunctionName() const;
-    IRSymbolVariable *getLocalVariable(const std::string& varName);
+    IRSymbolVariable *getLocalVariable(int block, const std::string& varName);
+    IRSymbolVariable *getParamVariable(const std::string& varName);
     IRTempVariable *getTempVariable(const std::string& varName);
     IRCode *getCode(int cnt);
     std::vector<IRCode *> &getCodes();

@@ -1,5 +1,7 @@
 #include "semanticAnalysis.h"
 
+int block = 0;
+
 void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
 {
     curSymbolTable = SymbolTable::getGlobalSymbolTable();
@@ -69,15 +71,10 @@ void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
         }
 
         if(curSymbolTable->getSymbolTableType() == TableType::GLOBAL){
-            IRSymbolVariable* newConst = irGenerator->addGlobalVariable(symbol);
-
+            IRSymbolVariable* newConst = irGenerator->addGlobalVariable(symbol, const_def->value);
         } else {
-            IRSymbolVariable* newConst = irGenerator->addSymbolVariable(symbol);
-            if(const_def->isArray){
-                for(int i = 0; i < const_def->size; i++){
-
-                }
-            } else {
+            IRSymbolVariable* newConst = irGenerator->addSymbolVariable(block, symbol, const_def->value);
+            if(const_def->value){
                 IRCode* code = nullptr;
                 switch (type) {
                     case MetaDataType::BOOL:
@@ -218,12 +215,28 @@ void SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
             throw std::runtime_error("[ERROR] > Redefine var symbol. " + symbol->getSymbolName());
         }
 
-//        symbol->setInitValue(var_def->initVal);
-
         if(curSymbolTable->getSymbolTableType() == TableType::GLOBAL){
-            IRSymbolVariable* newConst = irGenerator->addGlobalVariable(symbol);
+            IRSymbolVariable* newConst = irGenerator->addGlobalVariable(block, symbol, var_def->value);
         } else {
-            IRSymbolVariable* newConst = irGenerator->addSymbolVariable(symbol);
+            IRSymbolVariable* newConst = irGenerator->addSymbolVariable(block, symbol, var_def->value);
+            if(var_def->value){
+                IRCode* code = nullptr;
+                switch (type) {
+                    case MetaDataType::BOOL:
+                        code = new IRAssignB(newConst, var_def->value);
+                        break;
+                    case MetaDataType::INT:
+                        code = new IRAssignI(newConst, var_def->value);
+                        break;
+                    case MetaDataType::FLOAT:
+                        code = new IRAssignF(newConst, var_def->value);
+                        break;
+                    case MetaDataType::DOUBLE:
+                        code = new IRAssignD(newConst, var_def->value);
+                        break;
+                }
+                irGenerator->addCode(code);
+            }
         }
     }
 }
@@ -252,7 +265,8 @@ void SemanticAnalysis::exitVarDef(CACTParser::VarDefContext * ctx)
         }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
-        ctx->initVal = ctx->constInitVal()->initVal;
+        if(ctx->constInitVal())
+            ctx->value = ctx->constInitVal()->value;
     }
 }
 
@@ -323,6 +337,43 @@ void SemanticAnalysis::exitFuncFParams(CACTParser::FuncFParamsContext * ctx)
 {
     curSymbolTable->setParamNum();
     curSymbolTable->setParamDataTypeList();
+
+    for(auto & param : ctx->funcFParam()){
+        int gr = 0, fr = 0;
+        IRValue* g_index = nullptr;
+        IRValue* f_index = nullptr;
+        irGenerator->currentIRFunc->addParamVariable(param->symbolVar);
+        IRCode* code = nullptr;
+        if(param->isArray){
+            g_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(gr));
+            code = new IRGetParamA(param->symbolVar, g_index);
+            gr++;
+        } else {
+            switch (param->paramType) {
+                case MetaDataType::BOOL:
+                    g_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(gr));
+                    code = new IRGetParamB(param->symbolVar, g_index);
+                    gr++;
+                    break;
+                case MetaDataType::INT:
+                    g_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(gr));
+                    code = new IRGetParamB(param->symbolVar, g_index);
+                    gr++;
+                    break;
+                case MetaDataType::FLOAT:
+                    f_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(fr));
+                    code = new IRGetParamB(param->symbolVar, f_index);
+                    fr++;
+                    break;
+                case MetaDataType::DOUBLE:
+                    f_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(fr));
+                    code = new IRGetParamB(param->symbolVar, f_index);
+                    fr++;
+                    break;
+            }
+        }
+        irGenerator->addCode(code);
+    }
 }
 
 void SemanticAnalysis::enterFuncFParam(CACTParser::FuncFParamContext * ctx)
@@ -335,9 +386,13 @@ void SemanticAnalysis::exitFuncFParam(CACTParser::FuncFParamContext * ctx)
     if (!curSymbolTable->insertParamSymbolSafely(funcParamSymbol)) {
         throw std::runtime_error("[ERROR] > Redefine Function ParamSymbol.\n");
     }
+
+    ctx->symbolVar = irGenerator->addSymbolVariable(funcParamSymbol);
+    ctx->isArray = ctx->brackets() ? true : false;
+    ctx->paramType = ctx->bType()->bMetaDataType;
 }
 void SemanticAnalysis::enterBrackets(CACTParser::BracketsContext * ctx) {}
-void SemanticAnalysis::exitBrackets(CACTParser::BracketsContext * ctx) { }
+void SemanticAnalysis::exitBrackets(CACTParser::BracketsContext * ctx) {}
 
 void SemanticAnalysis::enterFuncBlock(CACTParser::FuncBlockContext * ctx) 
 {
@@ -347,7 +402,9 @@ void SemanticAnalysis::enterFuncBlock(CACTParser::FuncBlockContext * ctx)
         curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
         curSymbolTable = blkSymbolTable;
     }
+    block++;
 }
+
 void SemanticAnalysis::exitFuncBlock(CACTParser::FuncBlockContext * ctx) 
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
@@ -364,6 +421,7 @@ void SemanticAnalysis::exitFuncBlock(CACTParser::FuncBlockContext * ctx)
             }
         }
     }
+    block--;
 }
 
 void SemanticAnalysis::enterFuncBlockItem(CACTParser::FuncBlockItemContext * ctx) 
@@ -387,7 +445,7 @@ void SemanticAnalysis::enterBlock(CACTParser::BlockContext * ctx)
     curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
     curSymbolTable = blkSymbolTable;
 
-
+    block++;
 }
 
 void SemanticAnalysis::exitBlock(CACTParser::BlockContext * ctx)
@@ -407,6 +465,8 @@ void SemanticAnalysis::exitBlock(CACTParser::BlockContext * ctx)
             }
         }
     }
+
+    block--;
 }
 
 void SemanticAnalysis::enterBlockItem(CACTParser::BlockItemContext * ctx)
@@ -502,22 +562,31 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
             }
             irGenerator->addCode(assignCode);
         } else { // value_a = value_b
+            // consider assigned attribute of IRSymbolVariable
+            IROperand* operand = nullptr;
+            if(ctx->lVal()->identOperand->getAssigned()) {
+                IRTempVariable *temp = irGenerator->currentIRFunc->addTempVariable(ctx->lVal()->lValMetaDataType);
+                ctx->lVal()->identOperand->addHistorySymbol(temp);
+                operand = temp;
+            } else {
+                ctx->lVal()->identOperand->setAssigned();
+                operand = ctx->lVal()->identOperand;
+            }
             IRCode *assignCode = nullptr;
             switch (ctx->lVal()->lValMetaDataType) {
                 case MetaDataType::BOOL:
-                    assignCode = new IRAssignB(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignB(operand, ctx->exp()->operand);
                     break;
                 case MetaDataType::INT:
-                    assignCode = new IRAssignI(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignI(operand, ctx->exp()->operand);
                     break;
                 case MetaDataType::FLOAT:
-                    assignCode = new IRAssignF(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignF(operand, ctx->exp()->operand);
                     break;
                 case MetaDataType::DOUBLE:
-                    assignCode = new IRAssignD(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignD(operand, ctx->exp()->operand);
                     break;
             }
-            // ctx->lVal()->identOperand assigned????
             irGenerator->addCode(assignCode);
         }
     }
@@ -721,22 +790,31 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
             }
             irGenerator->addCode(assignCode);
         } else { // value_a = value_b
-            IRCode* assignCode = nullptr;
+            // consider assigned attribute of IRSymbolVariable
+            IROperand* operand = nullptr;
+            if(ctx->lVal()->identOperand->getAssigned()) {
+                IRTempVariable *temp = irGenerator->currentIRFunc->addTempVariable(ctx->lVal()->lValMetaDataType);
+                ctx->lVal()->identOperand->addHistorySymbol(temp);
+                operand = temp;
+            } else {
+                ctx->lVal()->identOperand->setAssigned();
+                operand = ctx->lVal()->identOperand;
+            }
+            IRCode *assignCode = nullptr;
             switch (ctx->lVal()->lValMetaDataType) {
                 case MetaDataType::BOOL:
-                    assignCode = new IRAssignB(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignB(operand, ctx->exp()->operand);
                     break;
                 case MetaDataType::INT:
-                    assignCode = new IRAssignI(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignI(operand, ctx->exp()->operand);
                     break;
                 case MetaDataType::FLOAT:
-                    assignCode = new IRAssignF(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignF(operand, ctx->exp()->operand);
                     break;
                 case MetaDataType::DOUBLE:
-                    assignCode = new IRAssignD(ctx->lVal()->identOperand, ctx->exp()->operand);
+                    assignCode = new IRAssignD(operand, ctx->exp()->operand);
                     break;
             }
-            // ctx->lVal()->identOperand assigned????
             irGenerator->addCode(assignCode);
         }
     }
@@ -975,7 +1053,16 @@ void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
     ctx->symbolType = searchLVal->getSymbolType();
     ctx->lValMetaDataType = searchLVal->getMetaDataType();
 
-    ctx->identOperand = irGenerator->addSymbolVariable(searchLVal);
+    // search lVal IRSymbolVariable
+    IRSymbolVariable* symVar = nullptr;
+    std::string varName = searchLVal->getSymbolName();
+    symVar = irGenerator->currentIRFunc->getLocalVariable(block, varName);
+    if(!symVar)
+        symVar = irGenerator->currentIRFunc->getParamVariable(varName);
+    if(!symVar)
+        symVar = irGenerator->ir->getGlobalVariable(varName);
+    ctx->identOperand = symVar;
+
     // assigned
     if(ctx->exp())
         ctx->indexOperand = ctx->exp()->operand;

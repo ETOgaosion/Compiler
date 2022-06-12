@@ -14,7 +14,7 @@ public:
 
     IRGenerator(IRProgram * newIR);
 
-    IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol);
+    IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol, IRValue* newValue);
     bool setGlobalVarValue(IRSymbolVariable *globalVariable, IRValue *curValue);
     bool setGlobalVarValue(std::string globalVariableName, IRValue *curValue);
     IRSymbolVariable *getGlobalVar(std::string globVariableName);
@@ -23,10 +23,9 @@ public:
     bool addCodes(std::vector<IRCode *> newCodes);
 
     // add Operand
-    bool addLocalVariable(IRSymbolVariable *newLocalVariable);
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
     IRLabel *addLabel();
-    IRSymbolVariable* addSymbolVariable(AbstractSymbol *Symbol);
+    IRSymbolVariable* addSymbolVariable(int block, AbstractSymbol *Symbol, IRValue* newValue);
     IRSymbolFunction* getSymbolFunction(std::string funcName);
 
     bool enterFunction(FuncSymbolTable *function);

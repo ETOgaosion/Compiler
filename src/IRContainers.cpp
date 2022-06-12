@@ -16,8 +16,13 @@ IRFunction::IRFunction(string newFunctionName) {
     frameSize = 8;
 }
 
-bool IRFunction::addLocalVariable(IRSymbolVariable *newVariable) {
-    localVariables.emplace(newVariable->getSymbolName(), newVariable);
+bool IRFunction::addParamVariable(IRSymbolVariable *newVariable) {
+    paramVariables.emplace(newVariable->getSymbolName(), newVariable);
+    return true;
+}
+
+bool IRFunction::addLocalVariable(int block, IRSymbolVariable *newVariable) {
+    localVariables.emplace(newVariable->getSymbolName()+to_string(block), newVariable);
     return true;
 }
 
@@ -28,9 +33,9 @@ IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
     return newIRTempVar;
 }
 
-IRSymbolVariable* IRFunction::addSymbolVariable(AbstractSymbol *newSymbol, IRValue *initVal) {
+IRSymbolVariable* IRFunction::addSymbolVariable(int block, AbstractSymbol *newSymbol, IRValue *initVal) {
     auto *newSymVar = new IRSymbolVariable(newSymbol, initVal);
-    addLocalVariable(newSymVar);
+    addLocalVariable(block,newSymVar);
     return newSymVar;
 }
 
@@ -76,8 +81,20 @@ string IRFunction::getFunctionName() const {
     return functionName;
 }
 
-IRSymbolVariable *IRFunction::getLocalVariable(const string& varName){
-    return localVariables.at(varName);
+IRSymbolVariable *IRFunction::getLocalVariable(int block, const string& varName){
+    for(int i = block; i > 0; i--){
+        auto iter = localVariables.find(varName + to_string(i));
+        if(iter != localVariables.end())
+            return iter->second;
+    }
+    return nullptr;
+}
+
+IRSymbolVariable *IRFunction::getParamVariable(const string& varName){
+    auto iter = paramVariables.find(varName);
+    if(iter != paramVariables.end())
+        return iter->second;
+    return nullptr;
 }
 
 IRTempVariable *IRFunction::getTempVariable(const string& varName){
@@ -217,7 +234,10 @@ IRValue *IRProgram::addMulImmValue(MetaDataType inMetaDataType, vector<std::stri
 }
 
 IRSymbolVariable *IRProgram::getGlobalVariable(const string& varName){
-    return globalVariables.at(varName);
+    auto iter = globalVariables.find(varName);
+    if(iter != globalVariables.end())
+        return iter->second;
+    return nullptr;
 }
 
 IRFunction *IRProgram::getFunction(const std::string& functionName){
