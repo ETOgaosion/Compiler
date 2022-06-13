@@ -95,87 +95,57 @@ int AbstractSymbol::getOffsetFromDataType(MetaDataType inDataType) {
 
 // --------
 
-ParamSymbol::ParamSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (inSymbolType == SymbolType::PARAM){
-        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
-    }
-    else {
-        ERROR_INSTANCE("ParamSymbol", inSymbolType);
-    }
+ParamSymbol::ParamSymbol(const string& inSymbolName, MetaDataType inMetaDataType) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::PARAM, inMetaDataType, false, 0);
 }
 
 // --------
 
-VarSymbol::VarSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (inSymbolType == SymbolType::VAR){
-        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
-    }
-    else {
-        ERROR_INSTANCE("VarSymbol", inSymbolType);
-    }
+VarSymbol::VarSymbol(const string& inSymbolName, MetaDataType inMetaDataType) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::VAR, inMetaDataType, false, 0);
 }
 
 // --------
 
-ConstSymbol::ConstSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (inSymbolType == SymbolType::CONST){
-        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
-    }
-    else {
-        ERROR_INSTANCE("ConstSymbol", inSymbolType);
-    }
+ConstSymbol::ConstSymbol(const string& inSymbolName, MetaDataType inMetaDataType) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::CONST, inMetaDataType, false, 0);
 }
 
 // --------
 
-ParamArraySymbol::ParamArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (inSymbolType == SymbolType::PARAM && inIsArray) {
-        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
-    }
-    else {
-        ERROR_INSTANCE("ParamArraySymbol", inSymbolType);
-    }
+ParamArraySymbol::ParamArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, size_t inSize) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::PARAM, inMetaDataType, true, inSize);
 }
 
 // --------
 
-VarArraySymbol::VarArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (inSymbolType == SymbolType::VAR && inIsArray) {
-        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
-    }
-    else {
-        ERROR_INSTANCE("VarArraySymbol", inSymbolType);
-    }
+VarArraySymbol::VarArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, size_t inSize) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::VAR, inMetaDataType, true, inSize);
 }
 
 // --------
 
-ConstArraySymbol::ConstArraySymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    if (inSymbolType == SymbolType::CONST && inIsArray) {
-        AbstractSymbol::setAttributes(std::move(inSymbolName), inSymbolType, inMetaDataType, inIsArray, inSize);
-    }
-    else {
-        ERROR_INSTANCE("ConstArraySymbol", inSymbolType);
-    }
+ConstArraySymbol::ConstArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, size_t inSize) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::CONST, inMetaDataType, true, inSize);
 }
 
 AbstractSymbol *SymbolFactory::createSymbol(const string& inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
     switch(inSymbolType){
         case SymbolType::PARAM:
             if (inIsArray){
-                return new ParamArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+                return new ParamArraySymbol(inSymbolName, inMetaDataType, inSize);
             }
-            return new ParamSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+            return new ParamSymbol(inSymbolName, inMetaDataType);
         case SymbolType::VAR:
             if (inIsArray) {
-                return new VarArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+                return new VarArraySymbol(inSymbolName, inMetaDataType, inSize);
             }
-            return new VarSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+            return new VarSymbol(inSymbolName, inMetaDataType);
         case SymbolType::CONST:
             if (inIsArray) {
-                return new ConstArraySymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+                return new ConstArraySymbol(inSymbolName, inMetaDataType, inSize);
             }
-            return new ConstSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+            return new ConstSymbol(inSymbolName, inMetaDataType);
         default:
             return nullptr;
     }

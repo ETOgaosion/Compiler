@@ -292,7 +292,7 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
     t->addCodeDirectives(stream.str());
 }
 
-IRSymbolFunction::IRSymbolFunction(FuncSymbolTable *function) : IROperand(OperandType::SYMBOLFUNC) {
+IRSymbolFunction::IRSymbolFunction(SymbolTable *function) : IROperand(OperandType::SYMBOLFUNC) {
     functionTable = function;
 }
 

@@ -432,7 +432,7 @@ void CACTParser::ConstInitValContext::copyFrom(ConstInitValContext *ctx) {
   this->type = ctx->type;
   this->size = ctx->size;
   this->isArray = ctx->isArray;
-  this->initVal = ctx->initVal;
+  this->value = ctx->value;
 }
 
 //----------------- ConstInitValOfVarContext ------------------------------------------------------------------
@@ -3552,7 +3552,7 @@ size_t CACTParser::ConstExpContext::getRuleIndex() const {
 void CACTParser::ConstExpContext::copyFrom(ConstExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->metaDataType = ctx->metaDataType;
-  this->operand = ctx->operand;
+  this->val = ctx->val;
 }
 
 //----------------- ConstExpBoolConstContext ------------------------------------------------------------------

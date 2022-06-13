@@ -41,6 +41,7 @@ public:
     virtual int getMemOffset() const { return 0; };
     virtual IRValue *getInitialValue() const { return nullptr; };
     virtual bool getIsArray() const { return false; };
+    virtual int getArraySize() const { return 0; };
     virtual uint64_t getMemPosition() const { return 0; };
 
     virtual bool setAssigned() { return false; }
@@ -119,6 +120,7 @@ public:
     int getMemOffset() const override { return symbol->getOffset(); };
     IRValue *getInitialValue() const override { return initialValue; };
     bool getIsArray() const override { return symbol->getIsArray(); };
+    int getArraySize() const override { return symbol->getSize(); };
     uint64_t getMemPosition() const override { return symbol->getMemPosition(); };
 
     bool setAssigned() override { assigned = true; return true; };
@@ -141,7 +143,7 @@ private:
     SymbolTable *functionTable;
 
 public:
-    explicit IRSymbolFunction(FuncSymbolTable *function);
+    explicit IRSymbolFunction(SymbolTable *function);
     std::string getFunctionName() const override { return functionTable->getFuncName(); };
     SymbolTable *getFunctionSymbolTable() const override { return functionTable; };
 

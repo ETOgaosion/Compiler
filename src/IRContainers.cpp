@@ -60,6 +60,11 @@ IRLabel* IRFunction::addLabel() {
 int IRFunction::calFrameSize() {
     frameSize = 8;
     int varSize = 0;
+    for (const auto& it : paramVariables) {
+        varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
+        it.second->setMemOffset(frameSize + varSize);
+        frameSize += varSize;
+    }
     for (const auto& it : localVariables) {
         varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
         it.second->setMemOffset(frameSize + varSize);

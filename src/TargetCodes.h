@@ -14,6 +14,8 @@
 enum class ASMOperation {
     ADD,
     SUB,
+    ADDI,
+    SUBI,
     NEG,
     MUL,
     DIV,
@@ -80,6 +82,8 @@ public:
 
     bool addCodeAdd(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeSub(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
+    bool addCodeAddi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
+    bool addCodeSubi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
     bool addCodeNeg(Register *rd, Register *rs1, FloatPointType inFloatPointType);
     bool addCodeMul(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeDiv(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);

@@ -44,7 +44,7 @@ IRLabel* IRGenerator::enterWhile()
 }
 
 // Function
-bool IRGenerator::enterFunction(FuncSymbolTable *function)
+bool IRGenerator::enterFunction(SymbolTable *function)
 {
     IRFunction *func = new IRFunction(function->getFuncName());
     currentIRFunc = func;

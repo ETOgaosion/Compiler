@@ -151,7 +151,7 @@ public:
     std::string symbolName;
     std::size_t size;
     bool isArray;
-    std::vector<std::string> initVal;
+    IRValue* value;
     ConstDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
@@ -170,7 +170,7 @@ public:
     MetaDataType type;
     std::size_t size;
     bool isArray;
-    std::vector<std::string> initVal;
+    IRValue* value;
     ConstInitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     ConstInitValContext() = default;
@@ -225,7 +225,7 @@ public:
     bool withType;
     std::size_t size;
     bool isArray;
-    std::vector<std::string> initVal;
+    IRValue* value;
     VarDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
@@ -284,6 +284,9 @@ public:
 
   class  FuncFParamContext : public antlr4::ParserRuleContext {
   public:
+    IRSymbolVariable* symbolVar;
+    bool isArray;
+    MetaDataType paramType;
     FuncFParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     BTypeContext *bType();
@@ -563,7 +566,7 @@ public:
     std::size_t size;
     SymbolType symbolType;
     MetaDataType lValMetaDataType;
-    IROperand* identOperand;
+    IRSymbolVariable* identOperand;
     IROperand* indexOperand;
     LValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
@@ -985,7 +988,7 @@ public:
   class  ConstExpContext : public antlr4::ParserRuleContext {
   public:
     MetaDataType metaDataType;
-    IROperand* operand;
+    std::string val;
     ConstExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     ConstExpContext() = default;

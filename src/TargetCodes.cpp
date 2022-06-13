@@ -63,6 +63,20 @@ void Code::print() const {
             }
             cout << "\tsubw\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
             break;
+        case ASMOperation::ADDI:
+            if (rdFloatPointType != FloatPointType::NONE) {
+                cout << "ERROR: only general purpose registers have REM instruction";
+                exit(-1);
+            }
+            cout << "\taddi\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << "\n";
+            break;
+        case ASMOperation::SUBI:
+            if (rdFloatPointType != FloatPointType::NONE) {
+                cout << "ERROR: only general purpose registers have REM instruction";
+                exit(-1);
+            }
+            cout << "\tsubi\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << "\n";
+            break;
         case ASMOperation::NEG:
             switch (rdFloatPointType) {
                 case FloatPointType::NONE:
@@ -423,6 +437,18 @@ bool TargetCodes::addCodeAdd(Register *rd, Register *rs1, Register *rs2, FloatPo
 
 bool TargetCodes::addCodeSub(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType) {
     Code *newCode = new Code(ASMOperation::SUB, inFloatPointType, FloatPointType::NONE, rd, rs1, rs2, 0, {});
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodeAddi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType) {
+    Code *newCode = new Code(ASMOperation::ADD, inFloatPointType, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodeSubi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType) {
+    Code *newCode = new Code(ASMOperation::SUB, inFloatPointType, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
     addCode(newCode);
     return true;
 }

@@ -62,7 +62,7 @@ private:
 protected:
 
 public:
-    ParamSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    ParamSymbol(const std::string& inSymbolName, MetaDataType inMetaDataType);
 
 };
 
@@ -72,7 +72,7 @@ private:
 protected:
 
 public:
-    VarSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    VarSymbol(const std::string& inSymbolName, MetaDataType inMetaDataType);
 
 };
 
@@ -82,7 +82,7 @@ private:
 protected:
 
 public:
-    ConstSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    ConstSymbol(const std::string& inSymbolName, MetaDataType inMetaDataType);
 };
 
 
@@ -92,7 +92,7 @@ private:
 protected:
 
 public:
-    ParamArraySymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    ParamArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::size_t inSize);
 
 };
 
@@ -102,7 +102,7 @@ private:
 protected:
 
 public:
-    VarArraySymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    VarArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::size_t inSize);
 
 };
 
@@ -112,7 +112,7 @@ private:
 protected:
 
 public:
-    ConstArraySymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    ConstArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::size_t inSize);
 };
 
 class SymbolFactory {

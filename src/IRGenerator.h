@@ -28,7 +28,7 @@ public:
     IRSymbolVariable* addSymbolVariable(int block, AbstractSymbol *Symbol, IRValue* newValue);
     IRSymbolFunction* getSymbolFunction(std::string funcName);
 
-    bool enterFunction(FuncSymbolTable *function);
+    bool enterFunction(SymbolTable *function);
     bool exitFunction(); // enter return
 
     // param is IN/OUT
