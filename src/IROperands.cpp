@@ -133,7 +133,7 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
 void IRValue::print() const {
     if (isArray) {
         cout << "{";
-        for (auto value : std::vector<int>(values.begin(), values.end() - 1)) {
+        for (auto value : std::vector<string>(values.begin(), values.end() - 1)) {
             cout << value << ", ";
         }
         cout << values.back();

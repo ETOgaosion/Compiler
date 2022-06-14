@@ -7,6 +7,8 @@ options {
 
 @header {
     #include "../src/SymbolTable.h"
+    #include "../src/IROperands.h"
+    #include "../src/IRCode.h"
 }
 
 /********** Parser **********/
