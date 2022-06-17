@@ -454,9 +454,9 @@ void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
 
 void IRTempVariable::print() const {
     if (!aliasToSymbol) {
-        cout << symbolName << ":= symbol type: TEMP VAR; data type: " << static_cast<int>(metaDataType)
-             << "; initValue: ";
+        cout << symbolName << ":= symbol type: TEMP VAR; data type: " << static_cast<int>(metaDataType);
         if (initialValue) {
+            cout << "; initValue: ";
             initialValue->print();
         }
         cout << endl;

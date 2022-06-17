@@ -141,12 +141,15 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
         }
     }
     cout << ") => " << static_cast<int>(functionTable->getReturnType()) << ":\n";
+    cout << "----------- localVars -----------" << endl;
     for (auto &symbolVar : localVariables) {
         symbolVar.second->print();
     }
+    cout << "----------- tempVars ------------" << endl;
     for (auto &symbolVar : tempVariables) {
         symbolVar.second->print();
     }
+    cout << "----------- Codes ------------" << endl;
     for (auto &code : codes) {
         code->print();
     }
