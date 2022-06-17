@@ -1,11 +1,23 @@
 #include "IRGenerator.h"
 
+#include <stdio.h>
+
 using namespace std;
 
-IRGenerator::IRGenerator(IRProgram *newIR) {
-    ir = newIR;
-    currentIRFunc = nullptr;
-    targetCodes->clear();
+IRGenerator::IRGenerator() {}
+
+IRGenerator *IRGenerator::getIRGenerator(IRProgram *newIR) {
+    // singleton
+    static IRGenerator instance;
+    static bool initialized = false;
+    if (!initialized) {
+        instance.ir = newIR;
+        instance.currentIRFunc = nullptr;
+        instance.targetCodes = TargetCodes::getTargetCodes();
+        instance.targetCodes->clear();
+        initialized = true;
+    }
+    return &instance;
 }
 
 IRSymbolVariable* IRGenerator::addGlobalVariable(AbstractSymbol *Symbol, IRValue* newValue){

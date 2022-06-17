@@ -348,10 +348,18 @@ void Code::print() const {
     }
 }
 
-TargetCodes::TargetCodes() {
-    codeList.clear();
-    generalPurposeRegisters = new GeneralPurposeRegisters();
-    floatPointRegisters = new FloatPointRegisters();
+TargetCodes::TargetCodes() {}
+
+TargetCodes *TargetCodes::getTargetCodes() {
+    static TargetCodes instance;
+    static bool initialized = false;
+    if (!initialized) {
+        instance.codeList.clear();
+        instance.generalPurposeRegisters = new GeneralPurposeRegisters();
+        instance.floatPointRegisters = new FloatPointRegisters();
+        initialized = true;
+    }
+    return &instance;
 }
 
 bool TargetCodes::addCode(Code *newCode) {

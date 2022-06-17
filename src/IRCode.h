@@ -22,6 +22,7 @@ enum class IROperation {
     BEQZ,
     GOTO,
     PHI,
+    REPLACE,
     ASSIGN,
     FETCH_ARRAY_ELEM,
     ASSIGN_ARRAY_ELEM,
@@ -443,6 +444,15 @@ public:
 class IRPhi : public IRCode {
 public:
     IRPhi(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+};
+
+class IRReplace : public IRCode {
+public:
+    IRReplace(IROperand *newResult, IROperand *newArg1);
+
+    void genTargetCode(TargetCodes *t) override;
 
     void print() const override;
 };

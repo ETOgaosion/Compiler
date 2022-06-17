@@ -6,13 +6,14 @@
 
 class IRGenerator {
 private:
+    IRGenerator();
 
 public:
     IRProgram * ir;
     IRFunction * currentIRFunc;
     TargetCodes *targetCodes;
 
-    IRGenerator(IRProgram * newIR);
+    static IRGenerator *getIRGenerator(IRProgram *newIR);
 
     IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol, IRValue* newValue);
     bool setGlobalVarValue(IRSymbolVariable *globalVariable, IRValue *curValue);

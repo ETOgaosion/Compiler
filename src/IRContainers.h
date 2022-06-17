@@ -44,6 +44,7 @@ public:
 
 class IRProgram {
 private:
+    IRProgram();
     SymbolTable *globalSymbolTable;
     std::string programName;
     std::unordered_map<std::string, IRSymbolVariable *> globalVariables;
@@ -54,7 +55,9 @@ private:
     int valueCount;
     
 public:
-    explicit IRProgram(std::string newProgramName, SymbolTable *newGlobalSymbolTable);
+
+    static IRProgram *getIRProgram(std::string newProgramName, SymbolTable *newGlobalSymbolTable);
+    void initializeFileds(std::string newProgramName, SymbolTable *newGlobalSymbolTable);
 
     IRSymbolVariable *addGlobalVariable(AbstractSymbol *symbol, IRValue *newValue);
     bool addFunction(IRFunction *newFunction);

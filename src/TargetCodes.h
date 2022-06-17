@@ -69,12 +69,13 @@ public:
 
 class TargetCodes {
 private:
+    TargetCodes();
     std::vector<Code *> codeList;
     Registers *generalPurposeRegisters;
     Registers *floatPointRegisters;
 
 public:
-    TargetCodes();
+    static TargetCodes *getTargetCodes();
     bool clear() { codeList.clear(); };
 
     bool addCode(Code *newCode);

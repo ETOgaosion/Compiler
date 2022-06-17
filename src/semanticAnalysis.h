@@ -7,11 +7,14 @@
 class SemanticAnalysis : public CACTBaseListener
 {
 private:
+    int block;
     SymbolTable* curSymbolTable;
     IRGenerator* irGenerator;
     std::vector<IRLabel*> whileFalse;
     std::vector<IRLabel*> whileBegin;
 public:
+    std::string programName;
+
     SemanticAnalysis(/* args */){}
     ~SemanticAnalysis(){}
 

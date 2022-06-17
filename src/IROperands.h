@@ -58,6 +58,7 @@ public:
     virtual void storeFrom(TargetCodes * t, Register *reg) {};
 
     virtual void print() const = 0;
+    virtual std::string getVal() const = 0;
     virtual void genTargetValue(TargetCodes *t) const {};
 
 };
@@ -72,6 +73,7 @@ public:
     std::string getSymbolName() const override { return labelName; };
 
     void print() const override;
+    std::string getVal() const override;
 };
 
 class IRValue : public IROperand {
@@ -100,6 +102,7 @@ public:
     Register *loadTo(TargetCodes * t, Register *inReg) override;
 
     void print() const override;
+    std::string getVal() const override;
     void genTargetValue(TargetCodes *t) const override;
 };
 
@@ -135,6 +138,7 @@ public:
     void storeFrom(TargetCodes * t, Register *reg) override;
 
     void print() const override;
+    std::string getVal() const override;
     void genTargetValue(TargetCodes *t) const override;
 };
 
@@ -150,6 +154,7 @@ public:
     bool setFunctionSymbolTable(SymbolTable *inFunctionTable) override { functionTable = inFunctionTable; return true; };
 
     void print() const override;
+    std::string getVal() const override;
 };
 
 class IRTempVariable : public IROperand {
@@ -187,4 +192,5 @@ public:
     void storeFrom(TargetCodes * t, Register *reg) override;
 
     void print() const override;
+    std::string getVal() const override;
 };

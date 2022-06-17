@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <fstream>
+#include <stdio.h>
 
 using namespace std;
 
@@ -87,7 +88,7 @@ string IRFunction::getFunctionName() const {
 }
 
 IRSymbolVariable *IRFunction::getLocalVariable(int block, const string& varName){
-    for(int i = block; i > 0; i--){
+    for(int i = block; i >= 0; i--){
         if(localVariables.find(varName + to_string(i)) != localVariables.end())
             return localVariables[varName+ to_string(i)];
     }
@@ -125,19 +126,21 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
     auto functionTable = globalSymbolTable->lookUpFuncSymbolTable(functionName);
     cout << functionTable->getFuncName() << "(";
     auto paramTypeList = functionTable->getParamDataTypeList();
-    for (auto param : vector<tuple<MetaDataType, bool, size_t>>(paramTypeList.begin(), paramTypeList.end() - 1)) {
+    if (!paramTypeList.empty()) {
+        for (auto param : vector<tuple<MetaDataType, bool, size_t>>(paramTypeList.begin(), paramTypeList.end() - 1)) {
+            cout << static_cast<int>(get<0>(param));
+            if (get<1>(param)) {
+                cout << "[" << get<2>(param) << "]";
+            }
+            cout << ",";
+        }
+        auto param = paramTypeList.back();
         cout << static_cast<int>(get<0>(param));
         if (get<1>(param)) {
             cout << "[" << get<2>(param) << "]";
         }
-        cout << ",";
     }
-    auto param = paramTypeList.back();
-    cout << static_cast<int>(get<0>(param));
-    if (get<1>(param)) {
-        cout << "[" << get<2>(param) << "]";
-    }
-    cout << ") => " << static_cast<int>(functionTable->getReturnType()) << "\n";
+    cout << ") => " << static_cast<int>(functionTable->getReturnType()) << ":\n";
     for (auto &symbolVar : localVariables) {
         symbolVar.second->print();
     }
@@ -147,6 +150,7 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
     for (auto &code : codes) {
         code->print();
     }
+    cout << endl;
 }
 
 void IRFunction::targetCodeGen(TargetCodes *t) {
@@ -173,7 +177,20 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     }
 }
 
-IRProgram::IRProgram(std::string newProgramName, SymbolTable *newGlobalSymbolTable) {
+IRProgram::IRProgram() {}
+
+IRProgram *IRProgram::getIRProgram(std::string newProgramName, SymbolTable *newGlobalSymbolTable) {
+    // singleton
+    static IRProgram instance;
+    static bool initialized = false;
+    if (!initialized) {
+        instance.initializeFileds(newProgramName, newGlobalSymbolTable);
+        initialized = true;
+    }
+    return &instance;
+}
+
+void IRProgram::initializeFileds(std::string newProgramName, SymbolTable *newGlobalSymbolTable) {
     programName = std::move(newProgramName);
     globalSymbolTable = newGlobalSymbolTable;
     globalVariables.clear();
@@ -189,7 +206,7 @@ IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IRValue *
     }
     auto glbSymVar = new IRSymbolVariable(symbol, newValue);
     globalVariables.emplace(glbSymVar->getSymbolName(), glbSymVar);
-    return glbSymVar;    
+    return glbSymVar;
 }
 
 bool IRProgram::addFunction(IRFunction *newFunction) {
@@ -266,6 +283,15 @@ IRValue *IRProgram::getImmValue(const std::vector<std::string>& inImmValues) {
 }
 
 void IRProgram::print() {
+    cout << "============ global var ================" << endl;
+    for (auto &symbol : globalVariables) {
+        symbol.second->print();
+    }
+    cout << "============ imm value ================" << endl;
+    for (auto &imm : immValues) {
+        imm.second->print();
+    }
+    cout << "============ functions ================" << endl;
     for (const auto& func : functions) {
         func.second->print(globalSymbolTable);
     }

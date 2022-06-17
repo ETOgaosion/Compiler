@@ -6,6 +6,7 @@
 #include "../grammar/CACTBaseListener.h"
 
 #include "semanticAnalysis.h"
+#include <string>
 
 using namespace antlr4;
 
@@ -19,6 +20,7 @@ int main(int argc, const char* argv[]) {
     CACTParser parser(&tokens);
     tree::ParseTree *tree = parser.compUnit();
     SemanticAnalysis listener;
+    listener.programName = std::string(argv[1]).substr(0, std::string(argv[1]).find_last_of("."));
 
     if (errorNum = lexer.getNumberOfSyntaxErrors()) {
         std::cout << "[Error]> Lexer reported " << errorNum << " errors." << std::endl;
@@ -30,8 +32,6 @@ int main(int argc, const char* argv[]) {
     }
 
     tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
-    
-    std::cout << "debug: hello" << std::endl;
 
 
     std::cout << "-------------------------Print AST:--------------------------" << std::endl;

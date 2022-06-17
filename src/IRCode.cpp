@@ -174,6 +174,9 @@ IRGoto::IRGoto(IROperand *newLabel)
 IRPhi::IRPhi(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : IRCode(IROperation::PHI, newResult, newArg1, newArg2) {}
 
+IRReplace::IRReplace(IROperand *newResult, IROperand *newArg1)
+        : IRCode(IROperation::REPLACE, newResult, newArg1, nullptr) {}
+
 IRAssign::IRAssign(IROperand *newResult, IROperand *newArg1)
         : IRCode(IROperation::ASSIGN, newResult, newArg1, nullptr) {}
 
@@ -321,157 +324,162 @@ IRReadD::IRReadD(IROperand *newResult)
         : IRRead(newResult) {}
 
 void IRAdd::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " + "
-         << arg2->getSymbolName() << ";" << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " + "
+         << arg2->getVal() << ";" << endl;
 }
 
 void IRSub::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " - "
-         << arg2->getSymbolName() << ";" << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " - "
+         << arg2->getVal() << ";" << endl;
 }
 
 void IRNeg::print() const {
-    cout << result->getSymbolName() << " = "
+    cout << result->getVal() << " = "
          << " - "
-         << arg1->getSymbolName() << ";" << endl;
+         << arg1->getVal() << ";" << endl;
 }
 
 void IRMul::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " * "
-         << arg2->getSymbolName() << ";" << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " * "
+         << arg2->getVal() << ";" << endl;
 }
 
 void IRDiv::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " / "
-         << arg2->getSymbolName() << ";" << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " / "
+         << arg2->getVal() << ";" << endl;
 }
 
 void IRMod::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " % "
-         << arg2->getSymbolName() << ";" << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " % "
+         << arg2->getVal() << ";" << endl;
 }
 
 void IRNot::print() const {
-    cout << result->getSymbolName() << " = not"
-         << arg1->getSymbolName() << ";" << endl;
+    cout << result->getVal() << " = not"
+         << arg1->getVal() << ";" << endl;
 }
 
 void IROr::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " || " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " || " << arg2->getVal() << endl;
 }
 
 void IRAnd::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " && " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " && " << arg2->getVal() << endl;
 }
 
 void IRSeq::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " == " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " == " << arg2->getVal() << endl;
 }
 
 void IRSne::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " != " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " != " << arg2->getVal() << endl;
 }
 
 void IRSlt::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " < " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " < " << arg2->getVal() << endl;
 }
 
 void IRSgt::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " > " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " > " << arg2->getVal() << endl;
 }
 
 void IRSleq::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " <= " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " <= " << arg2->getVal() << endl;
 }
 
 void IRSgeq::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << " >= " << arg2->getSymbolName() << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << " >= " << arg2->getVal() << endl;
 }
 
 void IRBeqz::print() const {
     cout << "BEQZ "
-         << arg1->getSymbolName() << " "
-         << arg2->getSymbolName() << endl;
+         << arg1->getVal() << " "
+         << arg2->getVal() << endl;
 }
 
 void IRGoto::print() const {
-    cout << "GOTO " << arg1->getSymbolName();
+    cout << "GOTO " << arg1->getVal();
 }
 
 void IRPhi::print() const {
-    cout << result->getSymbolName() << " = phi("
-         << arg1->getSymbolName() << ","
-         << arg2->getSymbolName() << ")";
+    cout << result->getVal() << " = phi("
+         << arg1->getVal() << ","
+         << arg2->getVal() << ")";
+}
+
+void IRReplace::print() const {
+    cout << result->getVal() << " = "
+         << arg1->getVal() << ";" << endl;
 }
 
 void IRAssign::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << ";" << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << ";" << endl;
 }
 
 void IRFetchArrayElem::print() const {
-    cout << result->getSymbolName() << " = "
-         << arg1->getSymbolName() << "["
-         << arg2->getSymbolName() << "];" << endl;
+    cout << result->getVal() << " = "
+         << arg1->getVal() << "["
+         << arg2->getVal() << "];" << endl;
 }
 
 void IRAssignArrayElem::print() const {
-    cout << arg1->getSymbolName() << "["
-         << arg2->getSymbolName() << "] = "
-         << result->getSymbolName() << ";" << endl;
+    cout << arg1->getVal() << "["
+         << arg2->getVal() << "] = "
+         << result->getVal() << ";" << endl;
 }
 
 void IRAddLabel::print() const {
-    cout << arg1->getSymbolName() << ":" << endl;
+    cout << arg1->getVal() << ":" << endl;
 }
 
 void IRAddParam::print() const {
-    cout << "addparam " << arg1->getSymbolName() << ";" << endl;
+    cout << "addparam " << arg1->getVal() << ";" << endl;
 }
 
 void IRGetParam::print() const {
-    cout << result->getSymbolName() << " = " << " param " << arg1->getSymbolName()
+    cout << result->getVal() << " = " << " param " << arg1->getValue()
          << ";" << endl;
 }
 
 void IRCall::print() const {
     cout << "call "
-         << arg1->getSymbolName() << "; " << endl;
+         << arg1->getVal() << "; " << endl;
 
 }
 
 void IRReturn::print() const {
     cout << "return ";
     if (arg1) {
-        cout << arg1->getSymbolName();
+        cout << arg1->getValue();
     }
     cout << ";" << endl;
 }
 
 void IRGetReturn::print() const {
-    cout << result->getSymbolName() << " = " << " return "
+    cout << result->getVal() << " = " << " return "
          << ";" << endl;
 }
 
 void IRPrint::print() const {
-    cout << "print(" << arg1->getSymbolName() << ");" << endl;
+    cout << "print(" << arg1->getVal() << ");" << endl;
 }
 
 void IRRead::print() const {
-    cout << result->getSymbolName() << " = read();" << endl;
+    cout << result->getVal() << " = read();" << endl;
 }
 
 void IRAddI::genTargetCode(TargetCodes *t) {
@@ -973,6 +981,10 @@ void IRGoto::genTargetCode(TargetCodes *t) {
     t->addCodeLla(labelReg, label);
     t->addCodeJr(labelReg);
     labelReg->setFree();
+}
+
+void IRReplace::genTargetCode(TargetCodes *t) {
+    // do nothing
 }
 
 void IRAssignB::genTargetCode(TargetCodes *t) {

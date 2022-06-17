@@ -14,6 +14,10 @@ void IRLabel::print() const {
     cout << "label: " << labelName <<endl;
 }
 
+string IRLabel::getVal() const {
+    return labelName;
+}
+
 IRValue::IRValue(MetaDataType newMetaDataType, const string &newLabel, bool newIsArray) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
     values.clear();
@@ -131,6 +135,9 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
 }
 
 void IRValue::print() const {
+    if (!valueLabel.empty()) {
+        cout << valueLabel << ": ";
+    }
     if (isArray) {
         cout << "{";
         for (auto value : std::vector<string>(values.begin(), values.end() - 1)) {
@@ -139,6 +146,29 @@ void IRValue::print() const {
         cout << values.back();
         cout << "}";
     }
+    else {
+        cout << values.front();
+    }
+    cout << endl;
+}
+
+string IRValue::getVal() const {
+    string retVal = {};
+    if (!valueLabel.empty()) {
+        retVal += (valueLabel + ": ");
+    }
+    if (isArray) {
+        retVal += "{";
+        for (auto value : std::vector<string>(values.begin(), values.end() - 1)) {
+            retVal += (value + ", ");
+        }
+        retVal += values.back();
+        retVal += "}";
+    }
+    else {
+        retVal += values.front();
+    }
+    return retVal;
 }
 
 void IRValue::genTargetValue(TargetCodes *t) const {
@@ -254,9 +284,12 @@ void IRSymbolVariable::storeFrom(TargetCodes *t, Register *reg) {
 }
 
 void IRSymbolVariable::print() const {
-    cout << "\t" << symbol->getSymbolName() << ":= symbol type: " << static_cast<int>(symbol->getSymbolType()) << "; data type: " << static_cast<int>(symbol->getMetaDataType()) << "; initValue: ";
+    cout << symbol->getSymbolName() << " := symbol type: " << static_cast<int>(symbol->getSymbolType()) << "; data type: " << static_cast<int>(symbol->getMetaDataType()) << "; initValue: ";
     initialValue->print();
-    cout << endl;
+}
+
+string IRSymbolVariable::getVal() const {
+    return symbol->getSymbolName();
 }
 
 void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
@@ -312,6 +345,10 @@ void IRSymbolFunction::print() const {
         cout << "[" << get<2>(param) << "]";
     }
     cout << ") => " << static_cast<int>(functionTable->getReturnType()) << "\n";
+}
+
+string IRSymbolFunction::getVal() const {
+    return functionTable->getFuncName();
 }
 
 
@@ -417,9 +454,15 @@ void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
 
 void IRTempVariable::print() const {
     if (!aliasToSymbol) {
-        cout << "\t" << symbolName << ":= symbol type: TEMP VAR; data type: " << static_cast<int>(metaDataType)
+        cout << symbolName << ":= symbol type: TEMP VAR; data type: " << static_cast<int>(metaDataType)
              << "; initValue: ";
-        initialValue->print();
+        if (initialValue) {
+            initialValue->print();
+        }
         cout << endl;
     }
+}
+
+string IRTempVariable::getVal() const {
+    return symbolName;
 }
