@@ -86,7 +86,7 @@ void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->ir->print();
     irGenerator->ir->targetGen(irGenerator->targetCodes);
     irGenerator->ir->targetCodePrint(irGenerator->targetCodes);
-    // irGenerator->ir->targetCodeWrite(irGenerator->targetCodes);
+    irGenerator->ir->targetCodeWrite(irGenerator->targetCodes, programName + ".S");
 }
 
 void SemanticAnalysis::enterDecl(CACTParser::DeclContext * ctx)
@@ -196,10 +196,24 @@ void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
         }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
-        ctx->value = ctx->constInitVal()->value;
+        if (ctx->isArray && ctx->size > ctx->constInitVal()->value->getArraySize()) {
+            std::vector<std::string> valVec = ctx->constInitVal()->value->getValues();
+            for (int i = ctx->constInitVal()->value->getArraySize(); i < ctx->size; i++) {
+                valVec.push_back("0");
+            }
+            ctx->value = irGenerator->ir->addMulImmValue(ctx->type, valVec);
+        }
+        else {
+            ctx->value = ctx->constInitVal()->value;
+        }
     }
     else {
-        ctx->value = irGenerator->ir->addImmValue(MetaDataType::INT, "0");
+        if (ctx->isArray) {
+            ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->size);
+        }
+        else {
+            ctx->value = irGenerator->ir->addImmValue(MetaDataType::INT, "0");
+        }
     }
 }
 
@@ -274,24 +288,24 @@ void SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
         }
 
         if(curSymbolTable->getSymbolTableType() == TableType::GLOBAL){
-            IRSymbolVariable* newConst = irGenerator->addGlobalVariable(symbol, var_def->value);
+            IRSymbolVariable* newVar = irGenerator->addGlobalVariable(symbol, var_def->value);
         } else {
-            IRSymbolVariable* newConst = irGenerator->addSymbolVariable(block, symbol, var_def->value);
-            newConst->setAssigned();
+            IRSymbolVariable* newVar = irGenerator->addSymbolVariable(block, symbol, var_def->value);
+            newVar->setAssigned();
             IRCode* code = nullptr;
             if(var_def->value){
                 switch (type) {
                     case MetaDataType::BOOL:
-                        code = new IRAssignB(newConst, var_def->value);
+                        code = new IRAssignB(newVar, var_def->value);
                         break;
                     case MetaDataType::INT:
-                        code = new IRAssignI(newConst, var_def->value);
+                        code = new IRAssignI(newVar, var_def->value);
                         break;
                     case MetaDataType::FLOAT:
-                        code = new IRAssignF(newConst, var_def->value);
+                        code = new IRAssignF(newVar, var_def->value);
                         break;
                     case MetaDataType::DOUBLE:
-                        code = new IRAssignD(newConst, var_def->value);
+                        code = new IRAssignD(newVar, var_def->value);
                         break;
                 }
             }
@@ -324,10 +338,24 @@ void SemanticAnalysis::exitVarDef(CACTParser::VarDefContext * ctx)
         }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
-        ctx->value = ctx->constInitVal()->value;
+        if (ctx->isArray && ctx->size > ctx->constInitVal()->value->getArraySize()) {
+            std::vector<std::string> valVec = ctx->constInitVal()->value->getValues();
+            for (int i = ctx->constInitVal()->value->getArraySize(); i < ctx->size; i++) {
+                valVec.push_back("0");
+            }
+            ctx->value = irGenerator->ir->addMulImmValue(ctx->type, valVec);
+        }
+        else {
+            ctx->value = ctx->constInitVal()->value;
+        }
     }
     else {
-        ctx->value = irGenerator->ir->addImmValue(MetaDataType::INT, "0");
+        if (ctx->isArray) {
+            ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->size);
+        }
+        else {
+            ctx->value = irGenerator->ir->addImmValue(MetaDataType::INT, "0");
+        }
     }
 }
 

@@ -386,9 +386,9 @@ void TargetCodes::printCode() const {
     }
 }
 
-void TargetCodes::codeWrite() const {
+void TargetCodes::codeWrite(string path) const {
     ofstream out;
-    out.open("exec", ios_base::app);
+    out.open(path, ios_base::out);
     streambuf *coutbuf = cout.rdbuf();
     cout.rdbuf(out.rdbuf());
     for (auto &code : codeList) {

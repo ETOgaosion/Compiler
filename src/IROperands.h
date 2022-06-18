@@ -98,6 +98,7 @@ public:
     std::vector<std::string> getValues() const override { return values; };
     std::string getValueLabel() const override { return valueLabel; };
     bool getIsArray() const override { return  isArray; };
+    int getArraySize() const override { return values.size(); };
 
     void addValue(const std::string& newValue) override;
     void addValues(const std::vector<std::string>& newValues) override;

@@ -119,7 +119,7 @@ public:
     bool addCodeEcall(Register *rd, Register *rs1, int imm, FloatPointType rs1FloatPointType);
 
     void printCode() const;
-    void codeWrite() const;
+    void codeWrite(std::string path) const;
 
     Register *getNextFreeRegister(bool isGeneralPurposeRegister, bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister);
 

@@ -1,2 +1,2 @@
 ./build.sh
-gdb build/compiler test/manual/tests.cact
+./build/compiler test/manual/tests.cact

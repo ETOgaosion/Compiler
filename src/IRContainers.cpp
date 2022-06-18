@@ -7,7 +7,7 @@
 using namespace std;
 
 IRFunction::IRFunction(string newFunctionName, SymbolTable *newFunctionTable) {
-    functionName = std::move(newFunctionName);
+    functionName = move(newFunctionName);
     localVariables.clear();
     tempVariables.clear();
     codes.clear();
@@ -29,7 +29,7 @@ bool IRFunction::addLocalVariable(int block, IRSymbolVariable *newVariable) {
 }
 
 IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
-    std::string newTempVariableName = string("t_") + to_string(tempCount++);
+    string newTempVariableName = string("t_") + to_string(tempCount++);
     auto *newIRTempVar = new IRTempVariable(newTempVariableName, newMetaDataType);
     tempVariables.emplace(newTempVariableName, newIRTempVar);
     return newIRTempVar;
@@ -45,7 +45,7 @@ bool IRFunction::addCode(IRCode *newCode) {
     codes.emplace_back(newCode);
 }
 
-bool IRFunction::addCodes(const std::vector<IRCode *>& newCodes){
+bool IRFunction::addCodes(const vector<IRCode *>& newCodes){
     for (auto code : newCodes){
         codes.emplace_back(code);
     }
@@ -53,7 +53,7 @@ bool IRFunction::addCodes(const std::vector<IRCode *>& newCodes){
 
 
 IRLabel* IRFunction::addLabel() {
-    std::string newLabelName = string("L_") + to_string(labelCount++) + string("_") + functionName;
+    string newLabelName = string("L_") + to_string(labelCount++) + string("_") + functionName;
     auto *newLabel = new IRLabel(newLabelName);
     labels.emplace(newLabelName, newLabel);
     return newLabel;
@@ -73,13 +73,13 @@ int IRFunction::calFrameSize() {
         frameSize += varSize;
     }
     for (const auto& it : tempVariables) {
-        if (!it.second->setAliasToSymbol()) {
+        if (!it.second->getAliasToSymbol()) {
             varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
             it.second->setMemOffset(frameSize + varSize);
             frameSize += varSize;
         }
         else {
-            it.second->setMemOffset(it.second->getMemOffset());
+            it.second->setMemOffset(it.second->getInitialValue()->getMemOffset());
         }
     }
 }
@@ -189,7 +189,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
 
 IRProgram::IRProgram() {}
 
-IRProgram *IRProgram::getIRProgram(std::string newProgramName, SymbolTable *newGlobalSymbolTable) {
+IRProgram *IRProgram::getIRProgram(string newProgramName, SymbolTable *newGlobalSymbolTable) {
     // singleton
     static IRProgram instance;
     static bool initialized = false;
@@ -200,8 +200,8 @@ IRProgram *IRProgram::getIRProgram(std::string newProgramName, SymbolTable *newG
     return &instance;
 }
 
-void IRProgram::initializeFileds(std::string newProgramName, SymbolTable *newGlobalSymbolTable) {
-    programName = std::move(newProgramName);
+void IRProgram::initializeFileds(string newProgramName, SymbolTable *newGlobalSymbolTable) {
+    programName = move(newProgramName);
     globalSymbolTable = newGlobalSymbolTable;
     globalVariables.clear();
     functions.clear();
@@ -213,7 +213,7 @@ void IRProgram::initializeFileds(std::string newProgramName, SymbolTable *newGlo
 IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IRValue *newValue) {
     string valueKey = {};
     for (const auto &val : newValue->getValues()) {
-        valueKey += val;
+        valueKey += (val + ",");
     }
     immValues.erase(valueKey);
     newValue = new IRValue(newValue->getMetaDataType(), newValue->getValues(), symbol->getSymbolName(), false);
@@ -239,7 +239,7 @@ IRValue *IRProgram::addImmValue(MetaDataType inMetaDataType, const string &inVal
     return newValue;
 }
 
-IRValue *IRProgram::addImmValue(const std::string &inLabel, MetaDataType inMetaDataType, const string &inValue) {
+IRValue *IRProgram::addImmValue(const string &inLabel, MetaDataType inMetaDataType, const string &inValue) {
     if (immValues.find(inValue) != immValues.end()) {
         return immValues[inValue];
     }
@@ -253,7 +253,7 @@ IRValue *IRProgram::addMulSameImmValue(MetaDataType inMetaDataType, const string
     string valueKey = {};
     vector<string> values;
     for (int i = 0; i < num; i++) {
-        valueKey += inValue;
+        valueKey += (inValue + ",");
         values.push_back(inValue);
     }
     if (immValues.find(valueKey) != immValues.end()) {
@@ -264,10 +264,10 @@ IRValue *IRProgram::addMulSameImmValue(MetaDataType inMetaDataType, const string
     return newValue;
 }
 
-IRValue *IRProgram::addMulImmValue(MetaDataType inMetaDataType, vector<std::string> &inValues) {
+IRValue *IRProgram::addMulImmValue(MetaDataType inMetaDataType, vector<string> &inValues) {
     string valueKey = {};
     for (auto &value : inValues) {
-        valueKey += value;
+        valueKey += (value + ",");
     }
     if (immValues.find(valueKey) != immValues.end()) {
         return immValues[valueKey];
@@ -284,11 +284,11 @@ IRSymbolVariable *IRProgram::getGlobalVariable(const string& varName){
     return nullptr;
 }
 
-IRFunction *IRProgram::getFunction(const std::string& functionName){
+IRFunction *IRProgram::getFunction(const string& functionName){
     return functions.at(functionName);
 }
 
-IRSymbolFunction *IRProgram::getSymbolFunction(const std::string& functionName){
+IRSymbolFunction *IRProgram::getSymbolFunction(const string& functionName){
     return funcSymbols.at(functionName);
 }
 
@@ -297,7 +297,7 @@ IRValue *IRProgram::getImmValue(const string &inImmValue) {
     return nullptr;
 }
 
-IRValue *IRProgram::getImmValue(const std::vector<std::string>& inImmValues) {
+IRValue *IRProgram::getImmValue(const vector<string>& inImmValues) {
     string valueKey = {};
     for (auto &value : inImmValues) {
         valueKey += value;
@@ -339,6 +339,6 @@ void IRProgram::targetCodePrint(TargetCodes *t) {
     t->printCode();
 }
 
-void IRProgram::targetCodeWrite(TargetCodes *t) {
-    t->codeWrite();
+void IRProgram::targetCodeWrite(TargetCodes *t, string path) {
+    t->codeWrite(path);
 }

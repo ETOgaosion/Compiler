@@ -80,5 +80,5 @@ public:
     void print() ;
     void targetGen(TargetCodes * t);
     void targetCodePrint(TargetCodes * t);
-    void targetCodeWrite(TargetCodes * t);
+    void targetCodeWrite(TargetCodes * t, std::string path);
 };
