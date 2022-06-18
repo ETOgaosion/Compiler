@@ -58,7 +58,7 @@ string Tools::ftoIEEE754s(float value) {
 string Tools::dtoIEEE754s(double value) {
     union {
         double input;   // assumes sizeof(float) == sizeof(int)
-        int output;
+        long int output;
     } data{};
     data.input = value;
     bitset<sizeof(double) * CHAR_BIT> bits(data.output);

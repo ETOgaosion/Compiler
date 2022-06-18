@@ -16,8 +16,10 @@ private:
     int labelCount;
     int frameSize;
 
+    SymbolTable *functionTable;
+
 public:
-    explicit IRFunction(std::string newFunctionName);
+    explicit IRFunction(std::string newFunctionName, SymbolTable *newFunctionTable);
 
     bool addParamVariable(IRSymbolVariable *newVariable);
     bool addLocalVariable(int block, IRSymbolVariable *newVariable);
@@ -30,6 +32,7 @@ public:
 
 
     std::string getFunctionName() const;
+    SymbolTable *getFuncSymbolTable() const { return functionTable; };
     IRSymbolVariable *getLocalVariable(int block, const std::string& varName);
     IRSymbolVariable *getParamVariable(const std::string& varName);
     IRTempVariable *getTempVariable(const std::string& varName);
@@ -63,6 +66,7 @@ public:
     bool addFunction(IRFunction *newFunction);
     bool addSymbolFunction(IRSymbolFunction *funcSymbol);
     IRValue *addImmValue(MetaDataType inMetaDataType, const std::string &inValue);
+    IRValue *addImmValue(const std::string &inLabel, MetaDataType inMetaDataType, const std::string &inValue);
     IRValue *addMulSameImmValue(MetaDataType inMetaDataType, const std::string &inValue, int num);
     IRValue *addMulImmValue(MetaDataType inMetaDataType, std::vector<std::string> &inValues);
 

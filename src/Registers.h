@@ -52,14 +52,14 @@ private:
 public:
     explicit Registers(bool isGeneralRegisterSet);
 
-    virtual Register *getNextFreeRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) { hasFreeRegister = false; return nullptr; };
-    virtual Register *getNextOccupiedRegister(FloatPointType inFloatPointType, bool &hasOccupiedRegister) { hasOccupiedRegister = false; return nullptr; };
+    virtual Register *getNextFreeRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) = 0;
 
-    virtual Register *tryGetCertainRegister(const std::string &regName, bool &isFreeRegister) { isFreeRegister = false; return nullptr; };
+    virtual Register *tryGetCertainRegister(const std::string &regName, bool &isFreeRegister) = 0;
 
-    virtual bool setRegisterFree(const std::string &) { return false; };
+    virtual bool setRegisterFree(const std::string &) = 0;
+    virtual bool setRegisterAllocated (const std::string &) = 0;
 
-    virtual bool setRegistersFree(const std::vector<std::string> &) { return false; };
+    virtual bool setRegistersFree(const std::vector<std::string> &) = 0;
 };
 
 class GeneralPurposeRegisters : public Registers {
@@ -73,11 +73,11 @@ public:
     GeneralPurposeRegisters();
 
     Register *getNextFreeRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) override;
-    Register *getNextOccupiedRegister(FloatPointType inFloatPointType, bool &hasOccupiedRegister) override;
 
     Register *tryGetCertainRegister(const std::string &regName, bool &isFreeRegister) override;
 
     bool setRegisterFree(const std::string &) override;
+    bool setRegisterAllocated(const std::string &) override;
 
     bool setRegistersFree(const std::vector<std::string> &) override;
 };
@@ -93,11 +93,11 @@ public:
     FloatPointRegisters();
 
     Register *getNextFreeRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) override;
-    Register *getNextOccupiedRegister(FloatPointType inFloatPointType, bool &hasOccupiedRegister) override;
 
     Register *tryGetCertainRegister(const std::string &regName, bool &isFreeRegister) override;
 
     bool setRegisterFree(const std::string &) override;
+    bool setRegisterAllocated(const std::string &) override;
 
     bool setRegistersFree(const std::vector<std::string> &) override;
 };

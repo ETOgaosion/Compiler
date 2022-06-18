@@ -41,6 +41,8 @@ bType
 constDef
     locals [
         std::string symbolName,
+        MetaDataType type,
+        bool withType,
         std::size_t size,
         bool isArray,
         IRValue* value

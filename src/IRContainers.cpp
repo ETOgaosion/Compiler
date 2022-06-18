@@ -6,7 +6,7 @@
 
 using namespace std;
 
-IRFunction::IRFunction(string newFunctionName) {
+IRFunction::IRFunction(string newFunctionName, SymbolTable *newFunctionTable) {
     functionName = std::move(newFunctionName);
     localVariables.clear();
     tempVariables.clear();
@@ -15,6 +15,7 @@ IRFunction::IRFunction(string newFunctionName) {
     tempCount = 0;
     labelCount = 0;
     frameSize = 8;
+    functionTable = newFunctionTable;
 }
 
 bool IRFunction::addParamVariable(IRSymbolVariable *newVariable) {
@@ -124,6 +125,7 @@ int IRFunction::getFrameSize() const {
 
 void IRFunction::print(SymbolTable *globalSymbolTable) const {
     auto functionTable = globalSymbolTable->lookUpFuncSymbolTable(functionName);
+    cout << "----------- funcDef -----------" << endl;
     cout << functionTable->getFuncName() << "(";
     auto paramTypeList = functionTable->getParamDataTypeList();
     if (!paramTypeList.empty()) {
@@ -141,6 +143,10 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
         }
     }
     cout << ") => " << static_cast<int>(functionTable->getReturnType()) << ":\n";
+    cout << "----------- paramVars -----------" << endl;
+    for (auto &symbolVar : paramVariables) {
+        symbolVar.second->print();
+    }
     cout << "----------- localVars -----------" << endl;
     for (auto &symbolVar : localVariables) {
         symbolVar.second->print();
@@ -150,6 +156,7 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
         symbolVar.second->print();
     }
     cout << "----------- Codes ------------" << endl;
+    cout << functionName << ":" << endl;
     for (auto &code : codes) {
         code->print();
     }
@@ -166,8 +173,8 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     t->addCodeStore(sp, ra, -8, FloatPointType::NONE);
-    ra->setFree();
-    sp->setFree();
+    t->setRegisterFree(true, ra);
+    t->setRegisterFree(true, sp);
     for (auto &code : codes) {
         code->genTargetCode(t);
     }
@@ -176,7 +183,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
         Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
         t->addCodeLoad(ra, sp, -8, FloatPointType::NONE);
         t->addCodeRet();
-        sp->setFree();
+        t->setRegisterFree(true, sp);
     }
 }
 
@@ -204,9 +211,12 @@ void IRProgram::initializeFileds(std::string newProgramName, SymbolTable *newGlo
 }
 
 IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IRValue *newValue) {
-    if (!newValue) {
-        newValue = addImmValue(symbol->getMetaDataType(), "0");
+    string valueKey = {};
+    for (const auto &val : newValue->getValues()) {
+        valueKey += val;
     }
+    immValues.erase(valueKey);
+    newValue = new IRValue(newValue->getMetaDataType(), newValue->getValues(), symbol->getSymbolName(), false);
     auto glbSymVar = new IRSymbolVariable(symbol, newValue);
     globalVariables.emplace(glbSymVar->getSymbolName(), glbSymVar);
     return glbSymVar;
@@ -225,6 +235,16 @@ IRValue *IRProgram::addImmValue(MetaDataType inMetaDataType, const string &inVal
         return immValues[inValue];
     }
     auto *newValue = new IRValue(inMetaDataType, inValue, "ImmValue_" + to_string(valueCount++), false);
+    immValues[inValue] = newValue;
+    return newValue;
+}
+
+IRValue *IRProgram::addImmValue(const std::string &inLabel, MetaDataType inMetaDataType, const string &inValue) {
+    if (immValues.find(inValue) != immValues.end()) {
+        return immValues[inValue];
+    }
+    auto *newValue = new IRValue(inMetaDataType, inValue, inLabel, false);
+    cout << inValue << endl;
     immValues[inValue] = newValue;
     return newValue;
 }
@@ -305,7 +325,7 @@ void IRProgram::targetGen(TargetCodes *t) {
         t->addCodeDirectives(".data");
         t->addCodeDirectives(".globl\t" + globalVar.first);
         t->addCodeDirectives(".type\t" + globalVar.first + ", @object");
-        globalVar.second->genTargetValue(t);
+        globalVar.second->genTargetGlobalValue(t);
     }
     for (auto &imm : immValues) {
         imm.second->genTargetValue(t);

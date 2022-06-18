@@ -70,14 +70,12 @@ Register *IRValue::load(TargetCodes *t) {
             t->addCodeLi(freeRegister, valueLabel);
             retRegister = t->getNextFreeRegister(false, false, FloatPointType::SINGLE, hasFreeRegister);
             t->addCodeMv(retRegister, freeRegister, FloatPointType::SINGLE, FloatPointType::NONE);
-            freeRegister->setFree();
             return retRegister;
         case MetaDataType::DOUBLE:
             freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
             t->addCodeLi(freeRegister, valueLabel);
             retRegister = t->getNextFreeRegister(false, false, FloatPointType::DOUBLE, hasFreeRegister);
             t->addCodeMv(retRegister, freeRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
-            freeRegister->setFree();
             return retRegister;
     }
 }
@@ -98,14 +96,12 @@ Register *IRValue::loadTo(TargetCodes *t, const std::string &regName) {
             t->addCodeLi(freeRegister, valueLabel);
             targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
             t->addCodeMv(targetRegister, freeRegister, FloatPointType::SINGLE, FloatPointType::NONE);
-            freeRegister->setFree();
             return targetRegister;
         case MetaDataType::DOUBLE:
             freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
             t->addCodeLi(freeRegister, valueLabel);
             targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
             t->addCodeMv(targetRegister, freeRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
-            freeRegister->setFree();
             return targetRegister;
     }
 }
@@ -123,13 +119,11 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
             freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
             t->addCodeLi(freeRegister, valueLabel);
             t->addCodeMv(inReg, freeRegister, FloatPointType::SINGLE, FloatPointType::NONE);
-            freeRegister->setFree();
             return inReg;
         case MetaDataType::DOUBLE:
             freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
             t->addCodeLi(freeRegister, valueLabel);
             t->addCodeMv(inReg, freeRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
-            freeRegister->setFree();
             return inReg;
     }
 }
@@ -178,24 +172,30 @@ void IRValue::genTargetValue(TargetCodes *t) const {
         switch (metaDataType) {
             case MetaDataType::INT:
                 stream << "0x" << std::hex << stoi(values.front());
+                break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
+                break;
             case MetaDataType::DOUBLE:
                 stream << Tools::dtoIEEE754s(stod(values.front()));
+                break;
         }
         stream << endl;
     }
     else {
         t->addCodeLabel(valueLabel);
         for (const auto& value : values) {
-            stream << ".word\t";
+            stream << "\t.word\t";
             switch (metaDataType) {
                 case MetaDataType::INT:
                     stream << "0x" << std::hex << stoi(value);
+                    break;
                 case MetaDataType::FLOAT:
                     stream << Tools::ftoIEEE754s(stof(value));
+                    break;
                 case MetaDataType::DOUBLE:
                     stream << Tools::dtoIEEE754s(stod(value));
+                    break;
             }
             stream << endl;
         }
@@ -230,7 +230,8 @@ Register *IRSymbolVariable::load(TargetCodes *t) {
             t->addCodeLoad(freeRegister, sp, -symbol->getOffset(), FloatPointType::DOUBLE);
             break;
     }
-    sp->setFree();
+    t->setRegisterFree(true, sp);
+    return freeRegister;
 }
 
 Register *IRSymbolVariable::loadTo(TargetCodes *t, const std::string &regName) {
@@ -253,14 +254,16 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const std::string &regName) {
             t->addCodeLoad(targetRegister, sp, -symbol->getOffset(), FloatPointType::DOUBLE);
             break;
     }
-    sp->setFree();
+    t->setRegisterFree(true, sp);
+    return targetRegister;
 }
 
 Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     t->addCodeLoad(inReg, sp, -symbol->getOffset(), inReg->getFloatPointType());
-    sp->setFree();
+    t->setRegisterFree(true, sp);
+    return inReg;
 }
 
 void IRSymbolVariable::storeFrom(TargetCodes *t, Register *reg) {
@@ -279,13 +282,16 @@ void IRSymbolVariable::storeFrom(TargetCodes *t, Register *reg) {
             t->addCodeStore(sp, reg, -symbol->getOffset(), FloatPointType::DOUBLE);
             break;
     }
-    reg->setFree();
-    sp->setFree();
+    t->setRegisterFree(true, sp);
 }
 
 void IRSymbolVariable::print() const {
-    cout << symbol->getSymbolName() << " := symbol type: " << static_cast<int>(symbol->getSymbolType()) << "; data type: " << static_cast<int>(symbol->getMetaDataType()) << "; initValue: ";
-    initialValue->print();
+    cout << symbol->getSymbolName() << " := symbol type: " << static_cast<int>(symbol->getSymbolType()) << "; data type: " << static_cast<int>(symbol->getMetaDataType());
+    if (initialValue) {
+        cout << "; initValue: ";
+        initialValue->print();
+    }
+    cout << endl;
 }
 
 string IRSymbolVariable::getVal() const {
@@ -300,24 +306,70 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
         switch (initialValue->getMetaDataType()) {
             case MetaDataType::INT:
                 stream << "0x" << std::hex << stoi(values.front());
+                break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
+                break;
             case MetaDataType::DOUBLE:
                 stream << Tools::dtoIEEE754s(stod(values.front()));
+                break;
         }
         stream << endl;
     }
     else {
         t->addCodeLabel(initialValue->getValueLabel());
         for (const auto& value : values) {
-            stream << ".word\t";
+            stream << "\t.word\t";
             switch (initialValue->getMetaDataType()) {
                 case MetaDataType::INT:
                     stream << "0x" << std::hex << stoi(value);
+                    break;
                 case MetaDataType::FLOAT:
                     stream << Tools::ftoIEEE754s(stof(value));
+                    break;
                 case MetaDataType::DOUBLE:
                     stream << Tools::dtoIEEE754s(stod(value));
+                    break;
+            }
+            stream << endl;
+        }
+    }
+    t->addCodeDirectives(stream.str());
+}
+
+void IRSymbolVariable::genTargetGlobalValue(TargetCodes *t) const {
+    stringstream stream;
+    vector<string> values = initialValue->getValues();
+    if (values.size() == 1) {
+        t->addCodeLabel(initialValue->getValueLabel());
+        stream << "\t.word\t";
+        switch (initialValue->getMetaDataType()) {
+            case MetaDataType::INT:
+                stream << "0x" << std::hex << stoi(values.front());
+                break;
+            case MetaDataType::FLOAT:
+                stream << Tools::ftoIEEE754s(stof(values.front()));
+                break;
+            case MetaDataType::DOUBLE:
+                stream << Tools::dtoIEEE754s(stod(values.front()));
+                break;
+        }
+        stream << endl;
+    }
+    else {
+        t->addCodeLabel(initialValue->getValueLabel());
+        for (const auto& value : values) {
+            stream << "\t.word\t";
+            switch (initialValue->getMetaDataType()) {
+                case MetaDataType::INT:
+                    stream << "0x" << std::hex << stoi(value);
+                    break;
+                case MetaDataType::FLOAT:
+                    stream << Tools::ftoIEEE754s(stof(value));
+                    break;
+                case MetaDataType::DOUBLE:
+                    stream << Tools::dtoIEEE754s(stod(value));
+                    break;
             }
             stream << endl;
         }
@@ -350,6 +402,7 @@ void IRSymbolFunction::print() const {
 string IRSymbolFunction::getVal() const {
     return functionTable->getFuncName();
 }
+
 
 
 IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : IROperand(OperandType::TEMPVAR) {
@@ -402,7 +455,8 @@ Register *IRTempVariable::load(TargetCodes *t) {
             t->addCodeLoad(freeRegister, sp, -offset, FloatPointType::DOUBLE);
             break;
     }
-    sp->setFree();
+    t->setRegisterFree(true, sp);
+    return freeRegister;
 }
 
 Register *IRTempVariable::loadTo(TargetCodes *t, const std::string &regName) {
@@ -424,14 +478,16 @@ Register *IRTempVariable::loadTo(TargetCodes *t, const std::string &regName) {
             t->addCodeLoad(targetRegister, sp, -offset, FloatPointType::DOUBLE);
             break;
     }
-    sp->setFree();
+    t->setRegisterFree(true, sp);
+    return targetRegister;
 }
 
 Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     t->addCodeLoad(inReg, sp, -offset, inReg->getFloatPointType());
-    sp->setFree();
+    t->setRegisterFree(true, sp);
+    return inReg;
 }
 
 void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
@@ -449,7 +505,7 @@ void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
             t->addCodeStore(sp, reg, -offset, FloatPointType::DOUBLE);
             break;
     }
-    sp->setFree();
+    t->setRegisterFree(true, sp);
 }
 
 void IRTempVariable::print() const {

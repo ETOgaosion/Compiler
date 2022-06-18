@@ -34,8 +34,8 @@ int main(int argc, const char* argv[]) {
     tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
 
 
-    std::cout << "-------------------------Print AST:--------------------------" << std::endl;
-    std::cout << tree->toStringTree(&parser) << std::endl;
+    // std::cout << "-------------------------Print AST:--------------------------" << std::endl;
+    // std::cout << tree->toStringTree(&parser) << std::endl;
 
 exit:
     return errorNum;

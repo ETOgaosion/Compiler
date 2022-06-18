@@ -151,6 +151,8 @@ public:
   class  ConstDefContext : public antlr4::ParserRuleContext {
   public:
     std::string symbolName;
+    MetaDataType type;
+    bool withType;
     std::size_t size;
     bool isArray;
     IRValue* value;

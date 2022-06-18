@@ -658,7 +658,7 @@ public:
 
 class IRCall : public IRCode {
 public:
-    explicit IRCall(IROperand *newArg1);
+    explicit IRCall(IROperand *newArg1, IROperand *newArg2);
 
     void print() const override;
 

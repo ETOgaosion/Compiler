@@ -12,12 +12,7 @@ Register::Register(RegisterType inRegisterType, FloatPointType inFloatPointType,
     number = inNumber;
     abiAliasName = inAliasName;
     value = 0;
-    if (number == 0) {
-        allocated = true;
-    }
-    else {
-        allocated = false;
-    }
+    allocated = false;
 }
 
 Registers::Registers(bool isGeneralRegisterSet) {
@@ -30,9 +25,9 @@ Registers::Registers(bool isGeneralRegisterSet) {
 }
 
 GeneralPurposeRegisters::GeneralPurposeRegisters() : Registers(true) {
-    registerClass = {"t", "a", "s", "tp", "sp", "gp", "ra"};
-    registerClassNum = {{"t", 7}, {"a", 8}, {"s", 12}, {"tp", 1}, {"gp", 1}, {"sp", 1}, {"ra", 1}};
-    registerAllocBitmap = {{"t", 0}, {"a", 0}, {"s", 0}, {"tp", 0}, {"gp", 0}, {"sp", 0}, {"ra", 0}};
+    registerClass = {"t", "a", "s", "tp", "sp", "gp", "ra", "zero"};
+    registerClassNum = {{"t", 7}, {"a", 8}, {"s", 12}, {"tp", 1}, {"gp", 1}, {"sp", 1}, {"ra", 1}, {"zero", 1}};
+    registerAllocBitmap = {{"t", 0}, {"a", 0}, {"s", 0}, {"tp", 0}, {"gp", 0}, {"sp", 0}, {"ra", 0}, {"zero", 0}};
     generalPurposeRegisterList = {
             {"zero", new Register(RegisterType::GENERAL_PURPOSE, FloatPointType::NONE, 0, "zero")},
             {"ra", new Register(RegisterType::GENERAL_PURPOSE, FloatPointType::NONE, 1, "ra")},
@@ -78,7 +73,7 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
             }
             else {
                 hasFreeRegister = true;
-                registerAllocBitmap["a"] &= scanner;
+                registerAllocBitmap["a"] |= scanner;
                 generalPurposeRegisterList["a" + to_string(scanTimes)]->setAllocated();
                 return generalPurposeRegisterList["a" + to_string(scanTimes)];
             }
@@ -95,7 +90,7 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
                 }
                 else {
                     hasFreeRegister = true;
-                    registerAllocBitmap[reg] &= scanner;
+                    registerAllocBitmap[reg] |= scanner;
                     generalPurposeRegisterList[reg + to_string(scanTimes)]->setAllocated();
                     return generalPurposeRegisterList[reg + to_string(scanTimes)];
                 }
@@ -107,27 +102,13 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
     }
 }
 
-Register *GeneralPurposeRegisters::getNextOccupiedRegister(FloatPointType inFloatPointType,
-                                                           bool &hasOccupiedRegister) {
-    int scanner = 0x1, scanTimes = 0;
-    while (scanTimes < registerClassNum["a"]) {
-        if (registerAllocBitmap["a"] & scanner) {
-            registerAllocBitmap["a"] &= ~(scanner);
-            return generalPurposeRegisterList["a" + to_string(scanTimes)];
-        }
-        scanner = scanner << 1;
-        scanTimes++;
-    }
-    return nullptr;
-}
-
 Register *GeneralPurposeRegisters::tryGetCertainRegister(const string &regName, bool &isFreeRegister) {
     if (generalPurposeRegisterList[regName]->getAllocated()) {
         isFreeRegister = false;
         return nullptr;
     }
     isFreeRegister = true;
-    generalPurposeRegisterList[regName]->setAllocated();
+    setRegisterAllocated(regName);
     return generalPurposeRegisterList[regName];
 }
 
@@ -150,6 +131,29 @@ bool GeneralPurposeRegisters::setRegisterFree(const std::string &reg) {
     else {
         registerAllocBitmap[regPrefix] &= ~0x1;
         generalPurposeRegisterList[regPrefix]->setFree();
+    }
+    return true;
+}
+
+bool GeneralPurposeRegisters::setRegisterAllocated(const std::string &reg) {
+    int charLen = 0;
+    for(const auto ch : reg) {
+        if (isalpha(ch)) {
+            charLen++;
+        }
+        else {
+            break;
+        }
+    }
+    string regPrefix = reg.substr(0, charLen);
+    if (charLen < reg.size()) {
+        int regNum = stoi(reg.substr(charLen));
+        registerAllocBitmap[regPrefix] |= (0x1 << regNum);
+        generalPurposeRegisterList[regPrefix + to_string(regNum)]->setAllocated();
+    }
+    else {
+        registerAllocBitmap[regPrefix] |= 0x1;
+        generalPurposeRegisterList[regPrefix]->setAllocated();
     }
     return true;
 }
@@ -245,19 +249,6 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
     }
 }
 
-Register *FloatPointRegisters::getNextOccupiedRegister(FloatPointType inFloatPointType, bool &hasOccupiedRegister) {
-    int scanner = 0x1, scanTimes = 0;
-    while (scanTimes < registerClassNum["fa"]) {
-        if (registerAllocBitmap["fa"] & scanner) {
-            registerAllocBitmap["fa"] &= ~(scanner);
-            return floatPointRegisterList["a" + to_string(scanTimes)];
-        }
-        scanner = scanner << 1;
-        scanTimes++;
-    }
-    return nullptr;
-}
-
 bool FloatPointRegisters::setRegisterFree(const std::string &reg) {
     int charLen = 0;
     for(const auto ch : reg) {
@@ -271,8 +262,25 @@ bool FloatPointRegisters::setRegisterFree(const std::string &reg) {
     string regPrefix = reg.substr(0, charLen);
     int regNum = stoi(reg.substr(charLen));
     registerAllocBitmap[regPrefix] &= ~(0x1 << regNum);
-    floatPointRegisterList[reg + to_string(regNum)]->setFree();
-    floatPointRegisterList[reg + to_string(regNum)]->setFloatPointType(FloatPointType::SINGLE);
+    floatPointRegisterList[reg]->setFree();
+    floatPointRegisterList[reg]->setFloatPointType(FloatPointType::SINGLE);
+    return true;
+}
+
+bool FloatPointRegisters::setRegisterAllocated(const std::string &reg) {
+    int charLen = 0;
+    for(const auto ch : reg) {
+        if (isalpha(ch)) {
+            charLen++;
+        }
+        else {
+            break;
+        }
+    }
+    string regPrefix = reg.substr(0, charLen);
+    int regNum = stoi(reg.substr(charLen));
+    registerAllocBitmap[regPrefix] |= (0x1 << regNum);
+    floatPointRegisterList[reg]->setAllocated();
     return true;
 }
 

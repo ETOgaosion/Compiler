@@ -51,6 +51,10 @@ public:
     virtual bool setFunctionSymbolTable(SymbolTable *inFunctionTable) { return false; };
     virtual void setMemOffset(int offset) {};
     virtual bool setMemPosition(uint64_t inMemPosition) { return false; };
+    virtual void addValue(const std::string& newValue) {};
+    virtual void addValues(const std::vector<std::string>& newValues) {};
+    virtual bool setLabel(const std::string& newLabel) { return false; };
+    virtual bool setMetaDataType(MetaDataType newType) { return false; };
 
     virtual Register *load(TargetCodes * t) { return nullptr; };
     virtual Register *loadTo(TargetCodes * t, const std::string &regName) { return nullptr; };
@@ -60,6 +64,7 @@ public:
     virtual void print() const = 0;
     virtual std::string getVal() const = 0;
     virtual void genTargetValue(TargetCodes *t) const {};
+    virtual void genTargetGlobalValue(TargetCodes *t) const {};
 
 };
 
@@ -94,8 +99,10 @@ public:
     std::string getValueLabel() const override { return valueLabel; };
     bool getIsArray() const override { return  isArray; };
 
-    void addValue(const std::string& newValue);
-    void addValues(const std::vector<std::string>& newValues);
+    void addValue(const std::string& newValue) override;
+    void addValues(const std::vector<std::string>& newValues) override;
+    bool setLabel(const std::string& newLabel) override { valueLabel = newLabel; };
+    bool setMetaDataType(MetaDataType newType) override { metaDataType = newType; };
 
     Register *load(TargetCodes * t) override;
     Register *loadTo(TargetCodes * t, const std::string &regName) override;
@@ -140,6 +147,7 @@ public:
     void print() const override;
     std::string getVal() const override;
     void genTargetValue(TargetCodes *t) const override;
+    void genTargetGlobalValue(TargetCodes *t) const override;
 };
 
 class IRSymbolFunction : public IROperand {
@@ -155,6 +163,7 @@ public:
 
     void print() const override;
     std::string getVal() const override;
+
 };
 
 class IRTempVariable : public IROperand {

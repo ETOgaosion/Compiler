@@ -122,11 +122,11 @@ public:
     void codeWrite() const;
 
     Register *getNextFreeRegister(bool isGeneralPurposeRegister, bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister);
-    Register *getNextOccupiedRegister(bool isGeneralPurposeRegister, FloatPointType inFloatPointType, bool &hasOccupiedRegister);
 
     Register *tryGetCertainRegister(bool isGeneralPurposeRegister, const std::string &regName, bool &isFreeRegister);
 
     bool setRegisterFree(bool isGeneralPurposeRegister, const std::string &reg);
+    bool setRegisterFree(bool isGeneralPurposeRegister, Register *reg);
 
     bool setRegistersFree(bool isGeneralPurposeRegister, const std::vector<std::string> &registers);
 };

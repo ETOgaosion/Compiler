@@ -84,8 +84,8 @@ void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
         throw std::runtime_error("[ERROR] > There is no main function.\n");
     }
     irGenerator->ir->print();
-    // irGenerator->ir->targetGen(irGenerator->targetCodes);
-    // irGenerator->ir->targetCodePrint(irGenerator->targetCodes);
+    irGenerator->ir->targetGen(irGenerator->targetCodes);
+    irGenerator->ir->targetCodePrint(irGenerator->targetCodes);
     // irGenerator->ir->targetCodeWrite(irGenerator->targetCodes);
 }
 
@@ -106,6 +106,15 @@ void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
 
     for(const auto & const_def : ctx->constDef())
     {
+        if (const_def->withType && const_def->type != type && const_def->type != MetaDataType::VOID) {
+            if (const_def->withType && const_def->type == MetaDataType::DOUBLE && type == MetaDataType::FLOAT) {
+                const_def->type = MetaDataType::FLOAT;
+                const_def->value->setMetaDataType(MetaDataType::FLOAT);
+            }
+            else {
+                throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
+            }
+        }
         AbstractSymbol *symbol = SymbolFactory::createSymbol(const_def->symbolName, SymbolType::CONST, type, const_def->isArray, const_def->size);
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
             throw std::runtime_error("[ERROR] > Redefine const symbol.\n");
@@ -166,6 +175,8 @@ void SemanticAnalysis::exitBType(CACTParser::BTypeContext * ctx)
 void SemanticAnalysis::enterConstDef(CACTParser::ConstDefContext * ctx)
 {
     ctx->symbolName = "";
+    ctx->type = MetaDataType::VOID;
+    ctx->withType = false;
     ctx->size = 0;
     ctx->isArray = false;
 }
@@ -174,24 +185,22 @@ void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
     if(!ctx->IntConst()){
-        if(ctx->constInitVal()->isArray)
-            throw std::runtime_error("[ERROR] > Non-array const is mistakenly initialized to be array.\n");
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
-        ctx->size = stoi(ctx->IntConst()->getText());  
-        if(!ctx->constInitVal()->isArray)
-            throw std::runtime_error("[ERROR] > Const Array is falsely initialized to be non-array const.\n");
-        if(ctx->size < ctx->constInitVal()->size)
-            throw std::runtime_error("[ERROR] > Const Array size overflow.\n");
+        ctx->size = stoi(ctx->IntConst()->getText());
     }
-    
-    if(ctx->constInitVal())
+    if (ctx->constInitVal()) {
+        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->size > ctx->size)) {
+            throw std::runtime_error("[ERROR] > Const var initialize failure: type not match. " + std::to_string(ctx->constInitVal()->isArray) + " " + std::to_string(ctx->isArray) + " " + std::to_string(ctx->constInitVal()->size) + " " + std::to_string(ctx->size));
+        }
+        ctx->withType = true;
+        ctx->type = ctx->constInitVal()->type;
         ctx->value = ctx->constInitVal()->value;
+    }
     else {
         ctx->value = irGenerator->ir->addImmValue(MetaDataType::INT, "0");
     }
-
 }
 
 // ConstInitVal
@@ -253,6 +262,7 @@ void SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
         if (var_def->withType && var_def->type != type && var_def->type != MetaDataType::VOID) {
             if (var_def->withType && var_def->type == MetaDataType::DOUBLE && type == MetaDataType::FLOAT) {
                 var_def->type = MetaDataType::FLOAT;
+                var_def->value->setMetaDataType(MetaDataType::FLOAT);
             }
             else {
                 throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
@@ -372,6 +382,7 @@ void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
     if (ctx->funcBlock()->funcBlockItem().back()->getText().find_first_of("return", 0) != 0) {
         irGenerator->exitFunction();
     }
+    irGenerator->currentIRFunc->calFrameSize();
 }
 
 void SemanticAnalysis::enterFuncType(CACTParser::FuncTypeContext * ctx)
@@ -572,7 +583,7 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
     if(ctx->lVal()->isArray && ctx->exp()->isArray) {
         IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
         for(int i = 0; i < ctx->lVal()->size; i++){
-            IRValue* index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(i));
+            IRValue* index = new IRValue(MetaDataType::INT, std::to_string(i), {}, false);
             IRCode* fetchCode = nullptr;
             IRCode* assignCode = nullptr;
             switch (ctx->lVal()->lValMetaDataType) {
@@ -806,7 +817,7 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
     if(ctx->lVal()->isArray && ctx->exp()->isArray) {
         IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
         for(int i = 0; i < ctx->lVal()->size; i++){
-            IRValue* index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(i));
+            IRValue* index =new IRValue(MetaDataType::INT, std::to_string(i), {}, false);
             IRCode* fetchCode = nullptr;
             IRCode* assignCode = nullptr;
             switch (ctx->lVal()->lValMetaDataType) {
@@ -923,25 +934,24 @@ void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * c
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
 
-    
-    IRLabel* falseLabel = irGenerator->addLabel();
-    ctx->cond()->falseLabel = falseLabel;
-    std::vector<IRCode *> codes;
-    if(ctx->getText().rfind("if", 0) == 0){
-        IRCode *code = new IRAddLabel(falseLabel);
-        codes.push_back(code);
-        ctx->subStmt(0)->codes = codes;
-    } else if (ctx->getText().rfind("while", 0) == 0){
-        IRLabel* beginLabel = irGenerator->enterWhile();
-        IRCode *code = new IRGoto(beginLabel);
-        codes.push_back(code);
-        code = new IRAddLabel(falseLabel);
-        codes.push_back(code);
-        ctx->subStmt(0)->codes = codes;
-        whileFalse.push_back(falseLabel);
-        whileBegin.push_back(beginLabel);
-    } else {
-        throw std::runtime_error("[ERROR] > not if or while stmt\n");
+    if (ctx->cond()) {
+        IRLabel* falseLabel = irGenerator->addLabel();
+        ctx->cond()->falseLabel = falseLabel;
+        std::vector<IRCode *> codes;
+        if(ctx->getText().rfind("if", 0) == 0){
+            IRCode *code = new IRAddLabel(falseLabel);
+            codes.push_back(code);
+            ctx->subStmt(0)->codes = codes;
+        } else if (ctx->getText().rfind("while", 0) == 0){
+            IRLabel* beginLabel = irGenerator->enterWhile();
+            IRCode *code = new IRGoto(beginLabel);
+            codes.push_back(code);
+            code = new IRAddLabel(falseLabel);
+            codes.push_back(code);
+            ctx->subStmt(0)->codes = codes;
+            whileFalse.push_back(falseLabel);
+            whileBegin.push_back(beginLabel);
+        }
     }
 }
 
@@ -1079,7 +1089,7 @@ void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
     if(ctx->lOrExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > condition must be bool");
     }
-    IRCode* code = new IRBeqz(ctx->falseLabel, ctx->lOrExp()->operand);
+    IRCode* code = new IRBeqz(ctx->lOrExp()->operand,  ctx->falseLabel);
     irGenerator->addCode(code);
 }
 
@@ -1248,7 +1258,8 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     ctx->metaDataType = funcSymbolTable->getReturnType();
 
     IRSymbolFunction *func = irGenerator->getSymbolFunction(funcSymbolTable->getFuncName());
-    IRCode *code = new IRCall(func);
+    IRFunction *targetFunc = irGenerator->ir->getFunction(funcSymbolTable->getFuncName());
+    IRCode *code = new IRCall(func, new IRValue(MetaDataType::INT, std::to_string(targetFunc->getFrameSize()), {}, false));
     irGenerator->addCode(code);
     
     if(funcSymbolTable->getReturnType() != MetaDataType::VOID){

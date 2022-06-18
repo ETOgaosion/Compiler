@@ -47,175 +47,175 @@ void Code::print() const {
                     cout << "\tfadd.d\t";
                     break;
             }
-            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::SUB:
             switch (rdFloatPointType) {
                 case FloatPointType::NONE:
-                    cout << "\taddw\t";
+                    cout << "\tsubw\t";
                     break;
                 case FloatPointType::SINGLE:
-                    cout << "\tfadd.s\t";
+                    cout << "\tfsub.s\t";
                     break;
                 case FloatPointType::DOUBLE:
-                    cout << "\tfadd.d\t";
+                    cout << "\tfsub.d\t";
                     break;
             }
-            cout << "\tsubw\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::ADDI:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have REM instruction";
                 exit(-1);
             }
-            cout << "\taddi\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << endl;
             break;
         case ASMOperation::SUBI:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have REM instruction";
                 exit(-1);
             }
-            cout << "\tsubi\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << "\n";
+            cout  << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << endl;
             break;
         case ASMOperation::NEG:
             switch (rdFloatPointType) {
                 case FloatPointType::NONE:
-                    cout << "\taddw\t";
+                    cout << "\tnegw\t";
                     break;
                 case FloatPointType::SINGLE:
-                    cout << "\tfadd.s\t";
+                    cout << "\tfneg.s\t";
                     break;
                 case FloatPointType::DOUBLE:
-                    cout << "\tfadd.d\t";
+                    cout << "\tfneg.d\t";
                     break;
             }
-            cout << "\tnegw\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::MUL:
             switch (rdFloatPointType) {
                 case FloatPointType::NONE:
-                    cout << "\taddw\t";
+                    cout << "\tmulw\t";
                     break;
                 case FloatPointType::SINGLE:
-                    cout << "\tfadd.s\t";
+                    cout << "\tfmul.s\t";
                     break;
                 case FloatPointType::DOUBLE:
-                    cout << "\tfadd.d\t";
+                    cout << "\tfmul.d\t";
                     break;
             }
-            cout << "\tmulw\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::DIV:
             switch (rdFloatPointType) {
                 case FloatPointType::NONE:
-                    cout << "\taddw\t";
+                    cout << "\tdivw\t";
                     break;
                 case FloatPointType::SINGLE:
-                    cout << "\tfadd.s\t";
+                    cout << "\tfdiv.s\t";
                     break;
                 case FloatPointType::DOUBLE:
-                    cout << "\tfadd.d\t";
+                    cout << "\tfdiv.d\t";
                     break;
             }
-            cout << "\taddw\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::SLL:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have REM instruction";
                 exit(-1);
             }
-            cout << "\tsll\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << "\tsll\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::SLR:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have REM instruction";
                 exit(-1);
             }
-            cout << "\tslr\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << "\tslr\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::SLLI:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have REM instruction";
                 exit(-1);
             }
-            cout << "\tslli\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << "\n";
+            cout << "\tslli\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << endl;
             break;
         case ASMOperation::SLRI:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have REM instruction";
                 exit(-1);
             }
-            cout << "\tslri\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << "\n";
+            cout << "\tslri\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << endl;
             break;
         case ASMOperation::REM:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have REM instruction";
                 exit(-1);
             }
-            cout << "\tremw\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << "\tremw\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::NOT:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have NOT instruction";
                 exit(-1);
             }
-            cout << "\tnot\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\tnot\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::OR:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have OR instruction";
                 exit(-1);
             }
-            cout << "\tor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\tor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::AND:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have AND instruction";
                 exit(-1);
             }
-            cout << "\tand\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\tand\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::XOR:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have XOR instruction";
                 exit(-1);
             }
-            cout << "\txor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\txor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::SEQZ:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have SEQZ instruction";
                 exit(-1);
             }
-            cout << "\tseqz\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\tseqz\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::SNEZ:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have SLT instruction";
                 exit(-1);
             }
-            cout << "\tsnez\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\tsnez\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::SLTZ:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have SLTZ instruction";
                 exit(-1);
             }
-            cout << "\tsltz\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\tsltz\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::SGTZ:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have SGTZ instruction";
                 exit(-1);
             }
-            cout << "\tsgtz\t" << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << "\tsgtz\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::SLT:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have SLT instruction";
                 exit(-1);
             }
-            cout << "\tslt\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << "\tslt\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::FEQ:
             switch (rdFloatPointType) {
@@ -229,7 +229,7 @@ void Code::print() const {
                     cout << "\tfeq.d\t";
                     break;
             }
-            cout << "\tslt\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::FLT:
             switch (rdFloatPointType) {
@@ -243,7 +243,7 @@ void Code::print() const {
                     cout << "\tflt.d\t";
                     break;
             }
-            cout << "\tslt\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::FLE:
             switch (rdFloatPointType) {
@@ -257,14 +257,14 @@ void Code::print() const {
                     cout << "\tfle.d\t";
                     break;
             }
-            cout << "\tslt\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::BEQZ:
             if (offset != 0 && label.empty()) {
-                cout << "\tbeqz\t" << rs1->getAliasName() << ", " << to_string(offset) << "\n";
+                cout << "\tbeqz\t" << rs1->getAliasName() << ", " << to_string(offset) << endl;
             }
             else {
-                cout << "\tbeqz\t" << rs1->getAliasName() << ", " << label << "\n";
+                cout << "\tbeqz\t" << rs1->getAliasName() << ", " << label << endl;
             }
             break;
         case ASMOperation::JR:
@@ -272,13 +272,14 @@ void Code::print() const {
                 cout << "ERROR: only general purpose registers have JR instruction";
                 exit(-1);
             }
-            cout << "\tjr\t" << rs1->getAliasName() << "\n";
+            cout << "\tjr\t" << rs1->getAliasName() << endl;
             break;
         case ASMOperation::LLA:
-            cout << "\tlla\t" << rd->getAliasName() << ", " << label << "\n";
+            cout << "\tlla\t" << rd->getAliasName() << ", " << label << endl;
             break;
         case ASMOperation::LI:
-            cout <<"\tli\t" << rd->getAliasName() << ", " << label << "\n";
+            cout <<"\tli\t" << rd->getAliasName() << ", " << label << endl;
+            break;
         case ASMOperation::LOAD:
             switch (rdFloatPointType) {
                 case FloatPointType::NONE:
@@ -289,7 +290,7 @@ void Code::print() const {
                     cout << "\tflw\t";
                     break;
             }
-            cout << rd->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::STORE:
             switch (rdFloatPointType) {
@@ -301,7 +302,7 @@ void Code::print() const {
                     cout << "\tfsw\t";
                     break;
             }
-            cout << rs2->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << "\n";
+            cout << rs2->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::MV:
             switch (rdFloatPointType) {
@@ -333,18 +334,23 @@ void Code::print() const {
                             cout << "\tfmv.s.d\t";
                     }
             }
-            cout << rd->getAliasName() << ", " << rs1->getAliasName() << "\n";
+            cout << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
             break;
         case ASMOperation::LABEL:
             cout << label << ":\n";
+            break;
         case ASMOperation::CALL:
-            cout << "\tcall\t" << label << "\n";
+            cout << "\tcall\t" << label << endl;
+            break;
         case ASMOperation::RET:
             cout << "\tret\n";
+            break;
         case ASMOperation::DIRECTIVE:
-            cout << "\t" << directives << "\n";
+            cout << directives << endl;
+            break;
         case ASMOperation::ECALL:
-            cout << "\tecall\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset;
+            cout << "\tecall\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << offset << endl;
+            break;
     }
 }
 
@@ -400,15 +406,6 @@ Register *TargetCodes::getNextFreeRegister(bool isGeneralPurposeRegister, bool i
     }
 }
 
-Register *TargetCodes::getNextOccupiedRegister(bool isGeneralPurposeRegister, FloatPointType inFloatPointType, bool &hasOccupiedRegister) {
-    if (isGeneralPurposeRegister) {
-        return generalPurposeRegisters->getNextOccupiedRegister(inFloatPointType, hasOccupiedRegister);
-    }
-    else {
-        return floatPointRegisters->getNextOccupiedRegister(inFloatPointType, hasOccupiedRegister);
-    }
-}
-
 Register *TargetCodes::tryGetCertainRegister(bool isGeneralPurposeRegister, const string &regName, bool &isFreeRegister) {
     if (isGeneralPurposeRegister) {
         return generalPurposeRegisters->tryGetCertainRegister(regName, isFreeRegister);
@@ -418,13 +415,21 @@ Register *TargetCodes::tryGetCertainRegister(bool isGeneralPurposeRegister, cons
     }
 }
 
-
 bool TargetCodes::setRegisterFree(bool isGeneralPurposeRegister, const string &reg) {
     if (isGeneralPurposeRegister) {
         return generalPurposeRegisters->setRegisterFree(reg);
     }
     else {
         return floatPointRegisters->setRegisterFree(reg);
+    }
+}
+
+bool TargetCodes::setRegisterFree(bool isGeneralPurposeRegister, Register *reg) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->setRegisterFree(reg->getAliasName());
+    }
+    else {
+        return floatPointRegisters->setRegisterFree(reg->getAliasName());
     }
 }
 
