@@ -36,7 +36,7 @@ IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
 }
 
 IRSymbolVariable* IRFunction::addSymbolVariable(int block, AbstractSymbol *newSymbol, IRValue *initVal) {
-    auto *newSymVar = new IRSymbolVariable(newSymbol, initVal);
+    auto *newSymVar = new IRSymbolVariable(newSymbol, initVal, false);
     addLocalVariable(block,newSymVar);
     return newSymVar;
 }
@@ -217,7 +217,7 @@ IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IRValue *
     }
     immValues.erase(valueKey);
     newValue = new IRValue(newValue->getMetaDataType(), newValue->getValues(), symbol->getSymbolName(), false);
-    auto glbSymVar = new IRSymbolVariable(symbol, newValue);
+    auto glbSymVar = new IRSymbolVariable(symbol, newValue, true);
     globalVariables.emplace(glbSymVar->getSymbolName(), glbSymVar);
     return glbSymVar;
 }

@@ -17,13 +17,13 @@ a:
 
 	.equ	ImmValue_6, 0xa
 
-	.equ	ImmValue_0, 0x2
-
-	.equ	ImmValue_3, 0x1
-
 	.equ	ImmValue_5, 0x6
 
-	.equ	ImmValue_2, 0x0
+	.equ	ImmValue_0, 0x0
+
+	.equ	ImmValue_1, 0x2
+
+	.equ	ImmValue_3, 0x1
 
 	.equ	ImmValue_4, 0x5
 
@@ -34,8 +34,8 @@ a:
 get_float:
 	sw	ra, -8(sp)
 	ecall	ft0, zero, 6
-	fsw	ft0, 0(sp)
-	flw	fa0, 0(sp)
+	fsw	ft0, -12(sp)
+	flw	fa0, -12(sp)
 	lw	ra, -8(sp)
 	ret
 .text
@@ -45,8 +45,8 @@ get_float:
 get_double:
 	sw	ra, -8(sp)
 	ecall	ft0, zero, 6
-	fsw	ft0, 0(sp)
-	flw	fa0, 0(sp)
+	fsw	ft0, -16(sp)
+	flw	fa0, -16(sp)
 	lw	ra, -8(sp)
 	ret
 .text
@@ -56,8 +56,8 @@ get_double:
 get_int:
 	sw	ra, -8(sp)
 	ecall	t0, zero, 5
-	sw	t0, 0(sp)
-	lw	a0, 0(sp)
+	fsw	t0, -12(sp)
+	lw	a0, -12(sp)
 	lw	ra, -8(sp)
 	ret
 .text
@@ -66,8 +66,8 @@ get_int:
 .type	print_int, @function
 print_int:
 	sw	ra, -8(sp)
-	sw	a0, 0(sp)
-	lw	t0, 0(sp)
+	sw	a0, -12(sp)
+	lw	t0, -12(sp)
 	ecall	zero, t0, 0
 	lw	ra, -8(sp)
 	ret
@@ -78,16 +78,17 @@ print_int:
 main:
 	sw	ra, -8(sp)
 	li	t0, ImmValue_4
-	sw	t0, 0(sp)
-	li	t0, ImmValue_2
+	lla	t1, a
+	sw	t0, 0(t1)
+	li	t0, ImmValue_0
 	sw	t0, -12(sp)
 L_1_main:
-	lw	t0, 0(sp)
+	li	t0, a
 	li	t1, ImmValue_5
 	slt	t2, t0, t1
 	sw	t2, -72(sp)
 	lw	t0, -12(sp)
-	li	t1, ImmValue_2
+	li	t1, ImmValue_0
 	xor	t2, t0
 	seqz	t3, t2
 	sw	t3, -52(sp)
@@ -97,7 +98,7 @@ L_1_main:
 	sw	t2, -48(sp)
 	lw	t0, -48(sp)
 	beqz	t0, L_0_main
-	lw	t0, 0(sp)
+	li	t0, a
 	lw	t1, -12(sp)
 	addw	t2, t0, t1
 	sw	t2, -40(sp)
@@ -106,7 +107,7 @@ L_1_main:
 	slt	t2, t0, t1
 	not	t2, t2
 	sw	t2, -56(sp)
-	lw	t0, 0(sp)
+	li	t0, a
 	lw	t1, -12(sp)
 	mulw	t2, t0, t1
 	sw	t2, -76(sp)
@@ -115,7 +116,7 @@ L_1_main:
 	remw	t2, t0, t1
 	sw	t2, -64(sp)
 	lw	t0, -64(sp)
-	li	t1, ImmValue_2
+	li	t1, ImmValue_0
 	xor	t2, t0
 	snez	t3, t2
 	sw	t3, -68(sp)
@@ -128,8 +129,8 @@ L_1_main:
 	lla	t0, L_0_main
 	jr	t0
 L_2_main:
-	lw	t0, 0(sp)
-	li	t1, ImmValue_0
+	li	t0, a
+	li	t1, ImmValue_1
 	mulw	t2, t0, t1
 	sw	t2, -80(sp)
 	lw	t0, -80(sp)
@@ -151,7 +152,7 @@ L_2_main:
 	sw	t2, -28(sp)
 	lw	t0, -28(sp)
 	sw	t0, -24(sp)
-	lw	t0, 0(sp)
+	li	t0, a
 	li	t1, ImmValue_3
 	addw	t2, t0, t1
 	sw	t2, -20(sp)
@@ -187,8 +188,8 @@ a:
 .type	print_float, @function
 print_float:
 	sw	ra, -8(sp)
-	fsw	fa0, 0(sp)
-	flw	ft0, 0(sp)
+	fsw	fa0, -12(sp)
+	flw	ft0, -12(sp)
 	ecall	zero, ft0, 1
 	lw	ra, -8(sp)
 	ret
@@ -198,8 +199,8 @@ print_float:
 .type	print_double, @function
 print_double:
 	sw	ra, -8(sp)
-	fsw	fa0, 0(sp)
-	flw	ft0, 0(sp)
+	fsw	fa0, -16(sp)
+	flw	ft0, -16(sp)
 	ecall	zero, ft0, 1
 	lw	ra, -8(sp)
 	ret
@@ -209,8 +210,8 @@ print_double:
 .type	print_bool, @function
 print_bool:
 	sw	ra, -8(sp)
-	sw	a0, 0(sp)
-	lw	t0, 0(sp)
+	sw	a0, -12(sp)
+	lw	t0, -12(sp)
 	ecall	zero, t0, 0
 	lw	ra, -8(sp)
 	ret

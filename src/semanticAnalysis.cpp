@@ -12,72 +12,80 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    auto param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::INT), nullptr);
+    auto param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::INT), nullptr, false);
     irGenerator->currentIRFunc->addParamVariable(param_x);
     irGenerator->addCode(new IRGetParamI(param_x, new IRValue(MetaDataType::INT, "0", {}, false)));
     irGenerator->addCode(new IRPrintI(param_x));
     irGenerator->exitFunction();
+    irGenerator->currentIRFunc->calFrameSize();
     
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_float", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::FLOAT), nullptr);
+    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::FLOAT), nullptr, false);
     irGenerator->currentIRFunc->addParamVariable(param_x);
     irGenerator->addCode(new IRGetParamF(param_x, new IRValue(MetaDataType::INT, "0", {}, false)));
     irGenerator->addCode(new IRPrintF(param_x));
     irGenerator->exitFunction();
+    irGenerator->currentIRFunc->calFrameSize();
     
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_double", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::DOUBLE, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::DOUBLE), nullptr);
+    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::DOUBLE), nullptr, false);
     irGenerator->currentIRFunc->addParamVariable(param_x);
     irGenerator->addCode(new IRGetParamD(param_x, new IRValue(MetaDataType::DOUBLE, "0", {}, false)));
     irGenerator->addCode(new IRPrintD(param_x));
     irGenerator->exitFunction();
+    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_bool", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::BOOL, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::BOOL), nullptr);
+    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::BOOL), nullptr, false);
     irGenerator->currentIRFunc->addParamVariable(param_x);
     irGenerator->addCode(new IRGetParamB(param_x, new IRValue(MetaDataType::BOOL, "0", {}, false)));
     irGenerator->addCode(new IRPrintB(param_x));
     irGenerator->exitFunction();
+    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_int", MetaDataType::INT, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::INT), nullptr);
+    param_x = irGenerator->addSymbolVariable(0, new VarSymbol("x", MetaDataType::FLOAT), irGenerator->ir->addImmValue(MetaDataType::INT, "0"));
     irGenerator->addCode(new IRReadI(param_x));
     irGenerator->addCode(new IRReturnI(param_x));
+    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_float", MetaDataType::FLOAT, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::FLOAT), nullptr);
+    param_x = irGenerator->addSymbolVariable(0, new VarSymbol("x", MetaDataType::FLOAT), irGenerator->ir->addImmValue(MetaDataType::FLOAT, "0"));
     irGenerator->addCode(new IRReadF(param_x));
     irGenerator->addCode(new IRReturnF(param_x));
+    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_double", MetaDataType::DOUBLE, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::DOUBLE), nullptr);
+    param_x = irGenerator->addSymbolVariable(0, new VarSymbol("x", MetaDataType::DOUBLE), irGenerator->ir->addImmValue(MetaDataType::DOUBLE, "0"));
     irGenerator->addCode(new IRReadD(param_x));
     irGenerator->addCode(new IRReturnD(param_x));
+    irGenerator->currentIRFunc->calFrameSize();
 }
+
 void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
 {
     if(curSymbolTable->getSymbolTableType() != TableType::GLOBAL || !curSymbolTable->lookUpFuncSymbolTable("main")) {
@@ -92,6 +100,7 @@ void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
 void SemanticAnalysis::enterDecl(CACTParser::DeclContext * ctx)
 {
 }
+
 void SemanticAnalysis::exitDecl(CACTParser::DeclContext * ctx)
 {
 }
@@ -99,6 +108,7 @@ void SemanticAnalysis::exitDecl(CACTParser::DeclContext * ctx)
 void SemanticAnalysis::enterConstDecl(CACTParser::ConstDeclContext * ctx)
 {   
 }
+
 void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
 {
     MetaDataType type = ctx->bType()->bMetaDataType;
@@ -482,7 +492,7 @@ void SemanticAnalysis::exitFuncFParam(CACTParser::FuncFParamContext * ctx)
         throw std::runtime_error("[ERROR] > Redefine Function ParamSymbol.\n");
     }
 
-    IRSymbolVariable *newParam = new IRSymbolVariable(funcParamSymbol, nullptr);
+    IRSymbolVariable *newParam = new IRSymbolVariable(funcParamSymbol, nullptr, false);
     ctx->symbolVar = newParam;
     irGenerator->currentIRFunc->addParamVariable(newParam);
     ctx->isArray = ctx->brackets() != nullptr;

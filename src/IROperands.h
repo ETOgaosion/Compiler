@@ -120,9 +120,10 @@ private:
     bool assigned;
     std::vector<IROperand *> historySymbols;
     IRValue *initialValue;
+    bool isGlobalSymbolVar;
 
 public:
-    explicit IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue);
+    IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue, bool newIsGlobalSymbolVar);
 
     std::string getSymbolName() const override { return symbol->getSymbolName(); };
     MetaDataType getMetaDataType() const override { return symbol->getMetaDataType(); };
