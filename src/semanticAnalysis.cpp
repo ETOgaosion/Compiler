@@ -6,16 +6,13 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     block = 0;
     curSymbolTable = SymbolTable::getGlobalSymbolTable();
     irGenerator = IRGenerator::getIRGenerator(IRProgram::getIRProgram(programName, curSymbolTable));
-
+    irGenerator->targetCodes->addCodeLabel("iobuff");
+    irGenerator->targetCodes->addCodeDirectives("\t.zero 80");
     SymbolTable *funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_int", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    auto param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::INT), nullptr, false);
-    irGenerator->currentIRFunc->addParamVariable(param_x);
-    irGenerator->addCode(new IRGetParamI(param_x, new IRValue(MetaDataType::INT, "0", {}, false)));
-    irGenerator->addCode(new IRPrintI(param_x));
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
     
@@ -24,22 +21,14 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::FLOAT), nullptr, false);
-    irGenerator->currentIRFunc->addParamVariable(param_x);
-    irGenerator->addCode(new IRGetParamF(param_x, new IRValue(MetaDataType::INT, "0", {}, false)));
-    irGenerator->addCode(new IRPrintF(param_x));
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
-    
+
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_double", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::DOUBLE, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::DOUBLE), nullptr, false);
-    irGenerator->currentIRFunc->addParamVariable(param_x);
-    irGenerator->addCode(new IRGetParamD(param_x, new IRValue(MetaDataType::DOUBLE, "0", {}, false)));
-    irGenerator->addCode(new IRPrintD(param_x));
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
@@ -48,10 +37,6 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = new IRSymbolVariable(new VarSymbol("x", MetaDataType::BOOL), nullptr, false);
-    irGenerator->currentIRFunc->addParamVariable(param_x);
-    irGenerator->addCode(new IRGetParamB(param_x, new IRValue(MetaDataType::BOOL, "0", {}, false)));
-    irGenerator->addCode(new IRPrintB(param_x));
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
@@ -60,9 +45,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = irGenerator->addSymbolVariable(0, new VarSymbol("x", MetaDataType::FLOAT), irGenerator->ir->addImmValue(MetaDataType::INT, "0"));
-    irGenerator->addCode(new IRReadI(param_x));
-    irGenerator->addCode(new IRReturnI(param_x));
+    irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_float", MetaDataType::FLOAT, curSymbolTable);
@@ -70,9 +53,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = irGenerator->addSymbolVariable(0, new VarSymbol("x", MetaDataType::FLOAT), irGenerator->ir->addImmValue(MetaDataType::FLOAT, "0"));
-    irGenerator->addCode(new IRReadF(param_x));
-    irGenerator->addCode(new IRReturnF(param_x));
+    irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_double", MetaDataType::DOUBLE, curSymbolTable);
@@ -80,9 +61,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
-    param_x = irGenerator->addSymbolVariable(0, new VarSymbol("x", MetaDataType::DOUBLE), irGenerator->ir->addImmValue(MetaDataType::DOUBLE, "0"));
-    irGenerator->addCode(new IRReadD(param_x));
-    irGenerator->addCode(new IRReturnD(param_x));
+    irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 }
 
@@ -92,6 +71,7 @@ void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
         throw std::runtime_error("[ERROR] > There is no main function.\n");
     }
     irGenerator->ir->print();
+    irGenerator->ir->write(programName + ".ir");
     irGenerator->ir->targetGen(irGenerator->targetCodes);
     irGenerator->ir->targetCodePrint(irGenerator->targetCodes);
     irGenerator->ir->targetCodeWrite(irGenerator->targetCodes, programName + ".S");
@@ -222,7 +202,7 @@ void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
             ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->size);
         }
         else {
-            ctx->value = irGenerator->ir->addImmValue(MetaDataType::INT, "0");
+            ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
         }
     }
 }
@@ -240,7 +220,17 @@ void SemanticAnalysis::exitConstInitValOfVar(CACTParser::ConstInitValOfVarContex
     ctx->type = ctx->constExp()->metaDataType;
     ctx->size = 1;
     ctx->isArray = false;
-    ctx->value = irGenerator->ir->addImmValue(ctx->constExp()->metaDataType, ctx->constExp()->val);
+    if (ctx->constExp()->metaDataType == MetaDataType::FLOAT || ctx->constExp()->metaDataType == MetaDataType::DOUBLE) {
+        ctx->value = irGenerator->addImmValue(ctx->constExp()->metaDataType, ctx->constExp()->val);
+    }
+    else {
+        if (ctx->constExp()->metaDataType == MetaDataType::BOOL || ctx->constExp()->metaDataType == MetaDataType::INT) {
+            ctx->value = new IRValue(ctx->constExp()->metaDataType, ctx->constExp()->val, {}, false);
+        }
+        else {
+            ctx->value = irGenerator->addImmValue(ctx->constExp()->metaDataType, ctx->constExp()->val);
+        }
+    }
 }
 
 void SemanticAnalysis::enterConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
@@ -364,7 +354,7 @@ void SemanticAnalysis::exitVarDef(CACTParser::VarDefContext * ctx)
             ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->size);
         }
         else {
-            ctx->value = irGenerator->ir->addImmValue(MetaDataType::INT, "0");
+            ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
         }
     }
 }
@@ -450,28 +440,28 @@ void SemanticAnalysis::exitFuncFParams(CACTParser::FuncFParamsContext * ctx)
         // add getParam code
         IRCode* code = nullptr;
         if(param->isArray){
-            g_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(gr));
+            g_index = new IRValue(MetaDataType::INT, std::to_string(gr), {}, false);
             code = new IRGetParamA(param->symbolVar, g_index);
             gr++;
         } else {
             switch (param->paramType) {
                 case MetaDataType::BOOL:
-                    g_index = irGenerator->ir->addImmValue(MetaDataType::BOOL, std::to_string(gr));
+                    g_index = new IRValue(MetaDataType::INT, std::to_string(gr), {}, false);
                     code = new IRGetParamB(param->symbolVar, g_index);
                     gr++;
                     break;
                 case MetaDataType::INT:
-                    g_index = irGenerator->ir->addImmValue(MetaDataType::INT, std::to_string(gr));
+                    g_index = new IRValue(MetaDataType::INT, std::to_string(gr), {}, false);
                     code = new IRGetParamB(param->symbolVar, g_index);
                     gr++;
                     break;
                 case MetaDataType::FLOAT:
-                    f_index = irGenerator->ir->addImmValue(MetaDataType::FLOAT, std::to_string(fr));
+                    f_index = new IRValue(MetaDataType::INT, std::to_string(fr), {}, false);
                     code = new IRGetParamB(param->symbolVar, f_index);
                     fr++;
                     break;
                 case MetaDataType::DOUBLE:
-                    f_index = irGenerator->ir->addImmValue(MetaDataType::DOUBLE, std::to_string(fr));
+                    f_index = new IRValue(MetaDataType::INT, std::to_string(fr), {}, false);
                     code = new IRGetParamB(param->symbolVar, f_index);
                     fr++;
                     break;
@@ -1112,7 +1102,6 @@ void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->metaDataType = MetaDataType::BOOL;
-
     ctx->operand = new IRValue(MetaDataType::BOOL, ctx->getText(), false);
 }
 
@@ -1243,7 +1232,17 @@ void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext 
 {
     ctx->isArray = false;
     ctx->metaDataType = ctx->number()->metaDataType;
-    ctx->operand = irGenerator->ir->addImmValue(ctx->metaDataType, ctx->getText());
+    if (ctx->metaDataType == MetaDataType::FLOAT || ctx->metaDataType == MetaDataType::DOUBLE) {
+        ctx->operand = irGenerator->addImmValue(ctx->metaDataType, ctx->getText());
+    }
+    else {
+        if (ctx->metaDataType == MetaDataType::BOOL || ctx->metaDataType == MetaDataType::INT) {
+            ctx->operand = new IRValue(ctx->metaDataType, ctx->getText(), {}, false);
+        }
+        else {
+            ctx->operand = irGenerator->addImmValue(ctx->metaDataType, ctx->getText());
+        }
+    }
 }
 
 
@@ -1726,7 +1725,10 @@ void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * 
     ctx->metaDataType = MetaDataType::BOOL;
 
     if (ctx->BoolConst()->getText() == "true") {
-        ctx->operand = new IRValue(MetaDataType::BOOL, std::string("1"), false);
+        ctx->operand = new IRValue(MetaDataType::BOOL, "1", false);
+    }
+    else {
+        ctx->operand = new IRValue(MetaDataType::BOOL, "0", false);
     }
 }
 

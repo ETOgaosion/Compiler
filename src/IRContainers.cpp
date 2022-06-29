@@ -172,7 +172,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     bool hasFreeRegister;
     Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-    t->addCodeStore(sp, ra, -8, FloatPointType::NONE);
+    t->addCodeSd(sp, ra, -8, FloatPointType::NONE);
     t->setRegisterFree(true, ra);
     t->setRegisterFree(true, sp);
     for (auto &code : codes) {
@@ -181,7 +181,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     if (codes.back()->getOperation() != IROperation::RETURN) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
-        t->addCodeLoad(ra, sp, -8, FloatPointType::NONE);
+        t->addCodeLd(ra, sp, -8, FloatPointType::NONE);
         t->addCodeRet();
         t->setRegisterFree(true, sp);
     }
@@ -316,8 +316,19 @@ void IRProgram::print() {
     }
     cout << "============ functions ================" << endl;
     for (const auto& func : functions) {
-        func.second->print(globalSymbolTable);
+        if ((func.second->getFunctionName().find_first_of("print_", 0) != 0) && (func.second->getFunctionName().find_first_of("get_", 0) != 0)) {
+            func.second->print(globalSymbolTable);
+        }
     }
+}
+
+void IRProgram::write(const string &path) {
+    ofstream out;
+    out.open(path, ios_base::out);
+    streambuf *coutbuf = cout.rdbuf();
+    cout.rdbuf(out.rdbuf());
+    print();
+    cout.rdbuf(coutbuf);
 }
 
 void IRProgram::targetGen(TargetCodes *t) {
@@ -331,7 +342,9 @@ void IRProgram::targetGen(TargetCodes *t) {
         imm.second->genTargetValue(t);
     }
     for (const auto& func : functions) {
-        func.second->targetCodeGen(t);
+        if ((func.second->getFunctionName().find_first_of("print_", 0) != 0) && (func.second->getFunctionName().find_first_of("get_", 0) != 0)) {
+            func.second->targetCodeGen(t);
+        }
     }
 }
 

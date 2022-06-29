@@ -16,9 +16,8 @@ public:
     static IRGenerator *getIRGenerator(IRProgram *newIR);
 
     IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol, IRValue* newValue);
-    bool setGlobalVarValue(IRSymbolVariable *globalVariable, IRValue *curValue);
-    bool setGlobalVarValue(std::string globalVariableName, IRValue *curValue);
-    IRSymbolVariable *getGlobalVar(std::string globVariableName);
+    IRValue *addImmValue(MetaDataType inMetaDataType, const std::string &inValue);
+    IRValue *addImmValue(const std::string &inLabel, MetaDataType inMetaDataType, const std::string &inValue);
 
     bool addCode(IRCode *newCode);
     bool addCodes(std::vector<IRCode *> newCodes);

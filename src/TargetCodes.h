@@ -15,15 +15,14 @@ enum class ASMOperation {
     ADD,
     SUB,
     ADDI,
-    SUBI,
     NEG,
     MUL,
+    REM,
     DIV,
     SLL,
     SLR,
     SLLI,
     SLRI,
-    REM,
     NOT,
     OR,
     AND,
@@ -40,8 +39,16 @@ enum class ASMOperation {
     JR,
     LLA,
     LI,
-    LOAD,
-    STORE,
+    LB,
+    LW,
+    LD,
+    FLW,
+    FLD,
+    SB,
+    SW,
+    SD,
+    FSW,
+    FSD,
     MV,
     LABEL,
     CALL,
@@ -84,7 +91,6 @@ public:
     bool addCodeAdd(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeSub(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeAddi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
-    bool addCodeSubi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
     bool addCodeNeg(Register *rd, Register *rs1, FloatPointType inFloatPointType);
     bool addCodeMul(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeDiv(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
@@ -109,14 +115,23 @@ public:
     bool addCodeJr(Register *rs1);
     bool addCodeLla(Register *rd, const std::string &targetLabel);
     bool addCodeLi(Register *rd, const std::string &targetLabel);
-    bool addCodeLoad(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
-    bool addCodeStore(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType);
+    bool addCodeLi(Register *rd, int imm);
+    bool addCodeLb(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
+    bool addCodeLw(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
+    bool addCodeLd(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
+    bool addCodeFlw(Register *rd, Register *rs1, int offset);
+    bool addCodeFld(Register *rd, Register *rs1, int offset);
+    bool addCodeSb(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType);
+    bool addCodeSw(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType);
+    bool addCodeSd(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType);
+    bool addCodeFsw(Register *rs1, Register *rs2, int offset);
+    bool addCodeFsd(Register *rs1, Register *rs2, int offset);
     bool addCodeMv(Register *rd, Register *rs1, FloatPointType rdFloatPointType, FloatPointType rs1FloatPointType);
     bool addCodeLabel(const std::string &inLabel);
     bool addCodeCall(const std::string &targetLabel);
     bool addCodeRet();
     bool addCodeDirectives(const std::string &directives);
-    bool addCodeEcall(Register *rd, Register *rs1, int imm, FloatPointType rs1FloatPointType);
+    bool addCodeEcall();
 
     void printCode() const;
     void codeWrite(std::string path) const;

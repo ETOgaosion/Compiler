@@ -77,7 +77,8 @@ public:
     IRValue *getImmValue(const std::string& inImmValue);
     IRValue *getImmValue(const std::vector<std::string>& inImmValues);
 
-    void print() ;
+    void print();
+    void write(const std::string &path);
     void targetGen(TargetCodes * t);
     void targetCodePrint(TargetCodes * t);
     void targetCodeWrite(TargetCodes * t, std::string path);

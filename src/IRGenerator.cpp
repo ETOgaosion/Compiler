@@ -47,6 +47,14 @@ IRLabel* IRGenerator::addLabel()
     return currentIRFunc->addLabel();
 }
 
+IRValue *IRGenerator::addImmValue(MetaDataType inMetaDataType, const string &inValue) {
+    return ir->addImmValue(inMetaDataType, inValue);
+}
+
+IRValue *IRGenerator::addImmValue(const string &inLabel, MetaDataType inMetaDataType, const string &inValue) {
+    return ir->addImmValue(inLabel, inMetaDataType, inValue);
+}
+
 IRLabel* IRGenerator::enterWhile()
 {
     IRLabel* beginLabel = addLabel();
