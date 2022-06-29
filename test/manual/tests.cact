@@ -1,6 +1,6 @@
 int a = 2;
 float m[4] = {1.0, 2.0, 3.0, 4.0};
-int a(int m) {
+int fun(int m) {
     return m + 1;
 }
 int main() {
@@ -10,7 +10,7 @@ int main() {
         if (a + b >= 10 && ((a * b) % 10) != 0) {
             break;
         }
-        b = a * 2 + 10 + 12 + a(5);
+        b = a * 2 + 10 + 12 + fun(5);
         a = a + 1;
     }
     print_int(b);

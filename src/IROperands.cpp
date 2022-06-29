@@ -286,19 +286,19 @@ Register *IRSymbolVariable::load(TargetCodes *t) {
             case MetaDataType::BOOL:
             case MetaDataType::INT:
                 freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-                t->addCodeLi(freeRegister, symbol->getSymbolName());
+                t->addCodeLla(freeRegister, symbol->getSymbolName());
                 break;
             case MetaDataType::FLOAT:
                 tmpRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 freeRegister = t->getNextFreeRegister(false, false, FloatPointType::SINGLE, hasFreeRegister);
-                t->addCodeLi(tmpRegister, symbol->getSymbolName());
+                t->addCodeLla(tmpRegister, symbol->getSymbolName());
                 t->addCodeMv(freeRegister, tmpRegister, FloatPointType::SINGLE, FloatPointType::NONE);
                 t->setRegisterFree(true, tmpRegister);
                 break;
             case MetaDataType::DOUBLE:
                 tmpRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 freeRegister = t->getNextFreeRegister(false, false, FloatPointType::DOUBLE, hasFreeRegister);
-                t->addCodeLi(tmpRegister, symbol->getSymbolName());
+                t->addCodeLla(tmpRegister, symbol->getSymbolName());
                 t->addCodeMv(freeRegister, tmpRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
                 t->setRegisterFree(true, tmpRegister);
                 break;
@@ -339,19 +339,19 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const std::string &regName) {
             case MetaDataType::BOOL:
             case MetaDataType::INT:
                 targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
-                t->addCodeLi(targetRegister, symbol->getSymbolName());
+                t->addCodeLla(targetRegister, symbol->getSymbolName());
                 break;
             case MetaDataType::FLOAT:
                 tmpRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
-                t->addCodeLi(tmpRegister, symbol->getSymbolName());
+                t->addCodeLla(tmpRegister, symbol->getSymbolName());
                 t->addCodeMv(targetRegister, tmpRegister, FloatPointType::SINGLE, FloatPointType::NONE);
                 t->setRegisterFree(true, tmpRegister);
                 break;
             case MetaDataType::DOUBLE:
                 tmpRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
-                t->addCodeLi(tmpRegister, symbol->getSymbolName());
+                t->addCodeLla(tmpRegister, symbol->getSymbolName());
                 t->addCodeMv(targetRegister, tmpRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
                 t->setRegisterFree(true,tmpRegister);
                 break;
@@ -370,12 +370,12 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
     else {
         switch (inReg->getFloatPointType()) {
             case FloatPointType::NONE:
-                t->addCodeLi(inReg, symbol->getSymbolName());
+                t->addCodeLla(inReg, symbol->getSymbolName());
                 break;
             case FloatPointType::SINGLE:
             case FloatPointType::DOUBLE:
                 Register *tmpRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-                t->addCodeLi(tmpRegister, symbol->getSymbolName());
+                t->addCodeLla(tmpRegister, symbol->getSymbolName());
                 t->addCodeMv(inReg, tmpRegister, inReg->getFloatPointType(), FloatPointType::NONE);
                 t->setRegisterFree(true, tmpRegister);
                 break;

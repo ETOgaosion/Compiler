@@ -992,7 +992,7 @@ void IRAssignB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     if (result->getIsArray()) {
         Register *tmpr = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-        t->addCodeLi(tmpr, arg1->getValueLabel());
+        t->addCodeLla(tmpr, arg1->getValueLabel());
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(arg1Reg, arg1->getSymbolName());
         for (int i = 0; i < result->getArraySize(); ++i) {
@@ -1013,7 +1013,7 @@ void IRAssignI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     if (result->getIsArray()) {
         Register *tmpr = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-        t->addCodeLi(tmpr, arg1->getValueLabel());
+        t->addCodeLla(tmpr, arg1->getValueLabel());
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(arg1Reg, arg1->getSymbolName());
         for (int i = 0; i < result->getArraySize(); ++i) {
@@ -1034,7 +1034,7 @@ void IRAssignF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     if (result->getIsArray()) {
         Register *tmpr = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-        t->addCodeLi(tmpr, arg1->getValueLabel());
+        t->addCodeLla(tmpr, arg1->getValueLabel());
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(arg1Reg, arg1->getSymbolName());
         for (int i = 0; i < result->getArraySize(); ++i) {
@@ -1055,7 +1055,7 @@ void IRAssignD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     if (result->getIsArray()) {
         Register *tmpr = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-        t->addCodeLi(tmpr, arg1->getValueLabel());
+        t->addCodeLla(tmpr, arg1->getValueLabel());
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(arg1Reg, arg1->getSymbolName());
         for (int i = 0; i < result->getArraySize(); ++i) {
@@ -1259,7 +1259,7 @@ void IRCall::genTargetCode(TargetCodes *t) {
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     Register *freeReg = arg2->load(t);
     t->addCodeSub(sp, sp, freeReg, FloatPointType::NONE);
-    t->addCodeCall(arg1->getSymbolName());
+    t->addCodeCall(arg1->getFunctionName());
     t->setRegisterFree(true, freeReg);
     t->setRegisterFree(true, sp);
 }

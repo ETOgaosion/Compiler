@@ -6,6 +6,19 @@ a := symbol type: 1; data type: 2; initValue: a: 2
 ============ imm value ================
 ============ functions ================
 ----------- funcDef -----------
+fun(2) => 2:
+----------- paramVars -----------
+m := symbol type: 0; data type: 2
+----------- localVars -----------
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 2
+----------- Codes ------------
+fun:
+	m =  param 0;
+	t_0 = m + 1;
+	return ;
+
+----------- funcDef -----------
 main() => 2:
 ----------- paramVars -----------
 ----------- localVars -----------
@@ -51,7 +64,7 @@ L_2_main:
 	t_10 = t_9 + 10;
 	t_11 = t_10 + 12;
 	addparam 5;
-	call a, frame size: 16; 
+	call fun, frame size: 16; 
 	t_12 =  return ;
 	t_13 = t_11 + t_12;
 	t_14 <= b;
@@ -63,18 +76,5 @@ L_2_main:
 L_0_main:
 	addparam b;
 	call print_int, frame size: 8; 
-	return ;
-
------------ funcDef -----------
-a(2) => 2:
------------ paramVars -----------
-m := symbol type: 0; data type: 2
------------ localVars -----------
------------ tempVars ------------
-t_0:= symbol type: TEMP VAR; data type: 2
------------ Codes ------------
-a:
-	m =  param 0;
-	t_0 = m + 1;
 	return ;
 

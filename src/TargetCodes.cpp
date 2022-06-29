@@ -159,21 +159,21 @@ void Code::print() const {
                 cout << "ERROR: only general purpose registers have OR instruction";
                 exit(-1);
             }
-            cout << "\tor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
+            cout << "\tor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::AND:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have AND instruction";
                 exit(-1);
             }
-            cout << "\tand\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
+            cout << "\tand\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::XOR:
             if (rdFloatPointType != FloatPointType::NONE) {
                 cout << "ERROR: only general purpose registers have XOR instruction";
                 exit(-1);
             }
-            cout << "\txor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << endl;
+            cout << "\txor\t" << rd->getAliasName() << ", " << rs1->getAliasName() << ", " << rs2->getAliasName() << endl;
             break;
         case ASMOperation::SEQZ:
             if (rdFloatPointType != FloatPointType::NONE) {

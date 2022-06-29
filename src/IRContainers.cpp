@@ -244,7 +244,6 @@ IRValue *IRProgram::addImmValue(const string &inLabel, MetaDataType inMetaDataTy
         return immValues[inValue];
     }
     auto *newValue = new IRValue(inMetaDataType, inValue, inLabel, false);
-    cout << inValue << endl;
     immValues[inValue] = newValue;
     return newValue;
 }
