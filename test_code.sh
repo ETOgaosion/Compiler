@@ -1,2 +1,2 @@
 ./build.sh
-./build/compiler test/manual/tests.cact
+./run_test.sh

@@ -447,6 +447,9 @@ std::vector<std::tuple<MetaDataType, bool, std::size_t> > FuncSymbolTable::getPa
     return paramDataTypeList;
 }
 
+int FuncSymbolTable::getFrameSize() const {
+    return frameSize;
+}
 
 bool FuncSymbolTable::setFuncName(const std::string &inFuncName) {
     funcName = inFuncName;
@@ -468,6 +471,10 @@ bool FuncSymbolTable::setParamDataTypeList() {
         paramDataTypeList.emplace_back(i->second->getMetaDataType(), i->second->getIsArray(), i->second->getSize());
     }
     return true;
+}
+
+bool FuncSymbolTable::setFrameSize(int inSize) {
+    frameSize = inSize;
 }
 
 bool FuncSymbolTable::compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) const {

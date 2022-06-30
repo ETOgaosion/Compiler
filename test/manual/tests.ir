@@ -6,29 +6,30 @@ a := symbol type: 1; data type: 2; initValue: a: 2
 ============ imm value ================
 ============ functions ================
 ----------- funcDef -----------
+fun(2) => 2:
+----------- paramVars -----------
+m := symbol type: 0; data type: 2
+----------- localVars -----------
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 2
+----------- Codes ------------
+fun:
+	m =  param 0;
+	t_0 = m + 1;
+	return ;
+
+----------- funcDef -----------
 main() => 2:
 ----------- paramVars -----------
 ----------- localVars -----------
 b := symbol type: 1; data type: 2; initValue: 0
 
 ----------- tempVars ------------
-t_16:= symbol type: TEMP VAR; data type: 2
-t_15:= symbol type: TEMP VAR; data type: 2
-t_14:= symbol type: TEMP VAR; data type: 2
-t_13:= symbol type: TEMP VAR; data type: 2
-t_12:= symbol type: TEMP VAR; data type: 2
-t_11:= symbol type: TEMP VAR; data type: 2
-t_3:= symbol type: TEMP VAR; data type: 2
-t_8:= symbol type: TEMP VAR; data type: 1
-t_2:= symbol type: TEMP VAR; data type: 1
-t_1:= symbol type: TEMP VAR; data type: 1
-t_4:= symbol type: TEMP VAR; data type: 1
-t_10:= symbol type: TEMP VAR; data type: 2
-t_6:= symbol type: TEMP VAR; data type: 2
-t_7:= symbol type: TEMP VAR; data type: 1
-t_0:= symbol type: TEMP VAR; data type: 1
 t_5:= symbol type: TEMP VAR; data type: 2
-t_9:= symbol type: TEMP VAR; data type: 2
+t_0:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 2
 ----------- Codes ------------
 main:
 	a = 5;
@@ -38,43 +39,17 @@ L_1_main:
 	t_1 = b == 0
 	t_2 = t_0 || t_1
 	beqz t_2 L_0_main
-	t_3 = a + b;
-	t_4 = t_3 >= 10
-	t_5 = a * b;
-	t_6 = t_5 % 10;
-	t_7 = t_6 != 0
-	t_8 = t_4 && t_7
-	beqz t_8 L_2_main
-	goto L_0_main
-L_2_main:
-	t_9 = a * 2;
-	t_10 = t_9 + 10;
-	t_11 = t_10 + 12;
-	addparam 5;
-	call a, frame size: 16; 
-	t_12 =  return ;
-	t_13 = t_11 + t_12;
-	t_14 <= b;
-	t_14 = t_13;
-	t_15 = a + 1;
-	t_16 <= a;
-	t_16 = t_15;
+	t_3 = a + 1;
+	t_4 <= a;
+	t_4 = t_3;
+	t_5 = b + 1;
+	t_6 <= b;
+	t_6 = t_5;
 	goto L_1_main
 L_0_main:
 	addparam b;
-	call print_int, frame size: 8; 
-	return ;
-
------------ funcDef -----------
-a(2) => 2:
------------ paramVars -----------
-m := symbol type: 0; data type: 2
------------ localVars -----------
------------ tempVars ------------
-t_0:= symbol type: TEMP VAR; data type: 2
------------ Codes ------------
-a:
-	m =  param 0;
-	t_0 = m + 1;
+	call print_int, frame size: 32; 
+	addparam 8;
+	call print_int, frame size: 32; 
 	return ;
 

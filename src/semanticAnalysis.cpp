@@ -213,6 +213,7 @@ void SemanticAnalysis::enterConstInitValOfVar(CACTParser::ConstInitValOfVarConte
     ctx->type = MetaDataType::VOID;
     ctx->size = 0;
     ctx->isArray = false;
+    ctx->value = nullptr;
 }
 
 void SemanticAnalysis::exitConstInitValOfVar(CACTParser::ConstInitValOfVarContext * ctx)
@@ -235,8 +236,12 @@ void SemanticAnalysis::exitConstInitValOfVar(CACTParser::ConstInitValOfVarContex
 
 void SemanticAnalysis::enterConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
 {
-
+    ctx->type = MetaDataType::VOID;
+    ctx->size = 0;
+    ctx->isArray = false;
+    ctx->value = nullptr;
 }
+
 void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
 {
     if(!ctx->constExp().empty()){
@@ -259,6 +264,9 @@ void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayCo
             immVal.push_back(const_exp->val);
         }
         ctx->value = irGenerator->ir->addMulImmValue(ctx->type, immVal);
+    }
+    else {
+        ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
     }
 }
 
@@ -661,7 +669,7 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
             // consider assigned attribute of IRSymbolVariable
             IROperand* operand = nullptr;
             if(ctx->lVal()->identOperand->getAssigned()) {
-                IRTempVariable *temp = irGenerator->currentIRFunc->addTempVariable(ctx->lVal()->lValMetaDataType);
+                IRTempVariable *temp = irGenerator->currentIRFunc->addTempVariable(ctx->lVal()->identOperand);
                 ctx->lVal()->identOperand->addHistorySymbol(temp);
                 irGenerator->addCode(new IRReplace(temp, ctx->lVal()->identOperand));
                 operand = temp;
@@ -891,7 +899,7 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
             // consider assigned attribute of IRSymbolVariable
             IROperand* operand = nullptr;
             if(ctx->lVal()->identOperand->getAssigned()) {
-                IRTempVariable *temp = irGenerator->currentIRFunc->addTempVariable(ctx->lVal()->lValMetaDataType);
+                IRTempVariable *temp = irGenerator->currentIRFunc->addTempVariable(ctx->lVal()->identOperand);
                 ctx->lVal()->identOperand->addHistorySymbol(temp);
                 irGenerator->addCode(new IRReplace(temp, ctx->lVal()->identOperand));
                 operand = temp;
@@ -1295,8 +1303,8 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     ctx->metaDataType = funcSymbolTable->getReturnType();
 
     IRSymbolFunction *func = irGenerator->getSymbolFunction(funcSymbolTable->getFuncName());
-    IRFunction *targetFunc = irGenerator->ir->getFunction(funcSymbolTable->getFuncName());
-    IRCode *code = new IRCall(func, new IRValue(MetaDataType::INT, std::to_string(targetFunc->getFrameSize()), {}, false));
+    IRSymbolFunction *selfFunc = irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName());
+    IRCode *code = new IRCall(func, selfFunc);
     irGenerator->addCode(code);
     
     if(funcSymbolTable->getReturnType() != MetaDataType::VOID){
