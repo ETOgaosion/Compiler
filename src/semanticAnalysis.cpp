@@ -41,23 +41,17 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_int", MetaDataType::INT, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
-    funcSymbolTable->setParamDataTypeList();
-    funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_float", MetaDataType::FLOAT, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
-    funcSymbolTable->setParamDataTypeList();
-    funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_double", MetaDataType::DOUBLE, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
@@ -116,6 +110,7 @@ void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
             IRSymbolVariable* newConst = irGenerator->addSymbolVariable(block, symbol, const_def->value);
             if(const_def->value){
                 IRCode* code = nullptr;
+                const_def->value->setMetaDataType(type);
                 switch (type) {
                     case MetaDataType::BOOL:
                         code = new IRAssignB(newConst, const_def->value);
@@ -301,6 +296,7 @@ void SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
             IRSymbolVariable* newVar = irGenerator->addSymbolVariable(block, symbol, var_def->value);
             newVar->setAssigned();
             IRCode* code = nullptr;
+            var_def->value->setMetaDataType(type);
             if(var_def->value){
                 switch (type) {
                     case MetaDataType::BOOL:

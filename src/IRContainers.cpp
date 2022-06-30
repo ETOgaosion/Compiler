@@ -420,6 +420,9 @@ int IRFunction::calFrameSize() {
             it.second->setMemOffset(it.second->getSymbolVariable()->getMemOffset());
         }
     }
+    if (frameSize % 8) {
+        frameSize += (frameSize % 8);
+    }
     functionTable->setFrameSize(frameSize);
 }
 

@@ -60,14 +60,28 @@ Register *IRValue::load(TargetCodes *t) {
     Register *freeRegister = nullptr;
     Register *retRegister = nullptr;
     if (valueLabel.empty()) {
-        freeRegister = 
-        t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
-        if (values.front() == "0") {
-            t->addCodeMv(freeRegister, zero,FloatPointType::NONE, FloatPointType::NONE);
+        if (dataType == MetaDataType::BOOL || dataType == MetaDataType::INT) {
+            freeRegister = 
+            t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
+            if (values.front() == "0") {
+                t->addCodeMv(freeRegister, zero,FloatPointType::NONE, FloatPointType::NONE);
+            }
+            else {
+                t->addCodeAddi(freeRegister, zero, stoi(values.front()), FloatPointType::NONE);
+            }
         }
         else {
-            t->addCodeAddi(freeRegister, zero, stoi(values.front()), FloatPointType::NONE);
+            freeRegister = 
+            t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+            if (values.front() == "0") {
+                if (dataType == MetaDataType::FLOAT) {
+                    t->addCodeMv(freeRegister, zero, FloatPointType::SINGLE, FloatPointType::NONE);
+                }
+                else {
+                    t->addCodeMv(freeRegister, zero, FloatPointType::DOUBLE, FloatPointType::NONE);
+                }
+            }
         }
         t->setRegisterFree(true, zero);
         return freeRegister;
@@ -80,16 +94,18 @@ Register *IRValue::load(TargetCodes *t) {
                 t->addCodeLi(freeRegister, valueLabel);
                 return freeRegister;
             case MetaDataType::FLOAT:
-                freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+                freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 t->addCodeLi(freeRegister, valueLabel);
                 retRegister = t->getNextFreeRegister(false, false, FloatPointType::SINGLE, hasFreeRegister);
                 t->addCodeMv(retRegister, freeRegister, FloatPointType::SINGLE, FloatPointType::NONE);
+                t->setRegisterFree(true, freeRegister);
                 return retRegister;
             case MetaDataType::DOUBLE:
-                freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+                freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 t->addCodeLi(freeRegister, valueLabel);
                 retRegister = t->getNextFreeRegister(false, false, FloatPointType::DOUBLE, hasFreeRegister);
                 t->addCodeMv(retRegister, freeRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
+                t->setRegisterFree(true, freeRegister);
                 return retRegister;
         }
     }
@@ -121,16 +137,18 @@ Register *IRValue::loadTo(TargetCodes *t, const std::string &regName) {
                 t->addCodeLi(targetRegister, valueLabel);
                 return targetRegister;
             case MetaDataType::FLOAT:
-                freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+                freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 t->addCodeLi(freeRegister, valueLabel);
-                targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
+                targetRegister = t->tryGetCertainRegister(false, regName, hasFreeRegister);
                 t->addCodeMv(targetRegister, freeRegister, FloatPointType::SINGLE, FloatPointType::NONE);
+                t->setRegisterFree(true, freeRegister);
                 return targetRegister;
             case MetaDataType::DOUBLE:
-                freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+                freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 t->addCodeLi(freeRegister, valueLabel);
-                targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
+                targetRegister = t->tryGetCertainRegister(false, regName, hasFreeRegister);
                 t->addCodeMv(targetRegister, freeRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
+                t->setRegisterFree(true, freeRegister);
                 return targetRegister;
         }
     }
@@ -158,12 +176,12 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
                 t->addCodeLi(inReg, valueLabel);
                 return inReg;
             case MetaDataType::FLOAT:
-                freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+                freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 t->addCodeLi(freeRegister, valueLabel);
                 t->addCodeMv(inReg, freeRegister, FloatPointType::SINGLE, FloatPointType::NONE);
                 return inReg;
             case MetaDataType::DOUBLE:
-                freeRegister = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+                freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
                 t->addCodeLi(freeRegister, valueLabel);
                 t->addCodeMv(inReg, freeRegister, FloatPointType::DOUBLE, FloatPointType::NONE);
                 return inReg;

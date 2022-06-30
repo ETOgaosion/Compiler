@@ -1,0 +1,20 @@
+============ global var ================
+n := symbol type: 2; data type: 2; initValue: n: 6
+
+int_array_b := symbol type: 1; data type: 2; initValue: int_array_b: 7
+
+int_array_a := symbol type: 1; data type: 2; initValue: int_array_a: 1
+
+============ imm value ================
+ImmValue_2: {0, 0, 0, 0, 0, 0}
+============ functions ================
+----------- funcDef -----------
+main() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+main:
+	call int_array_add, frame size: 8; 
+	return 0;
+

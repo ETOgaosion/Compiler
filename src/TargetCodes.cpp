@@ -334,36 +334,36 @@ void Code::print() const {
                             cout << "\tmv\t";
                             break;
                         case FloatPointType::SINGLE:
-                            cout << "\tfmv.s.x\t";
+                            cout << "\tfmv.x.w\t";
                             break;
                         case FloatPointType::DOUBLE:
-                            cout << "\tfmv.d.x\t";
+                            cout << "\tfmv.x.d\t";
                             break;
                     }
                     break;
                 case FloatPointType::SINGLE:
                     switch (srcFloatPointType) {
                         case FloatPointType::NONE:
-                            cout << "\tfmv.x.s\t";
+                            cout << "\tfmv.w.x\t";
                             break;
                         case FloatPointType::SINGLE:
                             cout << "\tfmv.s\t";
                             break;
                         case FloatPointType::DOUBLE:
-                            cout << "\tfmv.d.s\t";
+                            cout << "\tfmv.s.d\t";
                             break;
                     }
                     break;
                 case FloatPointType::DOUBLE:
                     switch (srcFloatPointType) {
                         case FloatPointType::NONE:
-                            cout << "\tfmv.x.d\t";
+                            cout << "\tfmv.d.x\t";
                             break;
                         case FloatPointType::SINGLE:
-                            cout << "\tfmv.d\t";
+                            cout << "\tfmv.d.s\t";
                             break;
                         case FloatPointType::DOUBLE:
-                            cout << "\tfmv.s.d\t";
+                            cout << "\tfmv.d\t";
                             break;
                     }
                     break;

@@ -1,0 +1,22 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+a := symbol type: 1; data type: 4; initValue: 0
+
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 4
+----------- Codes ------------
+main:
+	a = 0;
+	call get_double, frame size: 24; 
+	t_0 =  return ;
+	t_1 <= a;
+	t_1 = t_0;
+	addparam a;
+	call print_double, frame size: 24; 
+	return 0;
+
