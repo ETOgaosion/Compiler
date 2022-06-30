@@ -56,6 +56,12 @@ public:
 
     IROperand *getResult() const { return result; };
 
+    bool setArg1(IROperand *arg);
+
+    bool setArg2(IROperand *arg);
+
+    bool setResult(IROperand *op);
+
     virtual void print() const = 0;
 
     virtual void genTargetCode(TargetCodes *t) {};

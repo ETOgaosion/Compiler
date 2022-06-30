@@ -11,6 +11,21 @@ IRCode::IRCode() {
     arg2 = nullptr;
 }
 
+bool IRCode::setArg1(IROperand *arg){
+    arg1 = arg;
+    return true;
+}
+
+bool IRCode::setArg2(IROperand *arg){
+    arg2 = arg;
+    return true;
+}
+
+bool IRCode::setResult(IROperand *op){
+    result = op;
+    return true;
+}
+
 IRCode::IRCode(IROperation newOp, IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : operation(newOp), result(newResult), arg1(newArg1), arg2(newArg2) {}
 
