@@ -265,7 +265,7 @@ addExp
         IROperand* operand
     ]
     : mulExp                        #addExpMulExp
-    | addExp addOp mulExp     #addExpAddExp
+    | addExp addOp mulExp           #addExpAddExp
     ;
 
 addOp

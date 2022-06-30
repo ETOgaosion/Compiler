@@ -3,6 +3,8 @@
 
 #pragma once
 
+class IRProgram;
+
 class IRFunction {
 private:
     std::string functionName;
@@ -19,6 +21,8 @@ private:
     SymbolTable *functionTable;
 
 public:
+    IRProgram * ir;
+
     explicit IRFunction(std::string newFunctionName, SymbolTable *newFunctionTable);
 
     bool addParamVariable(IRSymbolVariable *newVariable);
@@ -32,6 +36,12 @@ public:
     int calFrameSize();
 
 
+    IRValue* immAddSub(IROperand* op1, IROperand* op2, IROperation op);
+    IRValue* immMul(IROperand* op1, IROperand* op2);
+    IRValue* immDiv(IROperand* op1, IROperand* op2);
+
+
+    void constFolding();
     std::string getFunctionName() const;
     SymbolTable *getFuncSymbolTable() const { return functionTable; };
     IRSymbolVariable *getLocalVariable(int block, const std::string& varName);
@@ -84,3 +94,6 @@ public:
     void targetCodePrint(TargetCodes * t);
     void targetCodeWrite(TargetCodes * t, std::string path);
 };
+
+
+
