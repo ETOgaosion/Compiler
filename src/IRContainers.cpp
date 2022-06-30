@@ -36,81 +36,90 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
     if(type1 == MetaDataType::INT){
         int val_a = stoi(op1->getValue());
         switch(type2){
-            case MetaDataType::INT:
+            case MetaDataType::INT:{
                 int val_b_i = stoi(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = new IRValue(MetaDataType::INT, std::to_string(val_a + val_b_i), {}, false);
                 else if (op == IROperation::SUB)
                     retVal = new IRValue(MetaDataType::INT, std::to_string(val_a - val_b_i), {}, false);
                 break;
-            case MetaDataType::FLOAT:
+            }
+            case MetaDataType::FLOAT:{
                 float val_b_f = stof(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a + val_b_f));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a - val_b_f));
                 break;
-            case MetaDataType::DOUBLE:
+            }
+            case MetaDataType::DOUBLE:{
                 double val_b_d = stod(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_d));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
                 break;
+            }
             default:
                 break;
         }
     } else if (type1 == MetaDataType::FLOAT){
         float val_a = stof(op1->getValue());
         switch(type2){
-           case MetaDataType::INT:
+           case MetaDataType::INT:{
                 int val_b_i = stoi(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a + val_b_i));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a - val_b_i));
                 break;
-            case MetaDataType::FLOAT:
+           }
+            case MetaDataType::FLOAT:{
                 float val_b_f = stof(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a + val_b_f));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a - val_b_f));
                 break;
-            case MetaDataType::DOUBLE:
+            }
+            case MetaDataType::DOUBLE:{
                 double val_b_d = stod(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_d));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
                 break;
+            }
             default:
                 break;
         }
     } else if (type1 == MetaDataType::DOUBLE){
         double val_a = stod(op1->getValue());
         switch(type2){
-            case MetaDataType::INT:
+            case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_i));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_i));
                 break;
-            case MetaDataType::FLOAT:
+            }
+            case MetaDataType::FLOAT:{
                 float val_b_f = stof(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_f));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_f));
                 break;
-            case MetaDataType::DOUBLE:
+            }
+            case MetaDataType::DOUBLE:{
                 double val_b_d = stod(op2->getValue());
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_d));
                 else if (op == IROperation::SUB)
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
                 break;
+            }
             default:
                 break;
         }
@@ -125,54 +134,63 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
     if(type1 == MetaDataType::INT){
         int val_a = stoi(op1->getValue());
         switch(type2) {
-            case MetaDataType::INT: 
+            case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 retVal = new IRValue(MetaDataType::INT, std::to_string(val_a * val_b_i), {}, false);
                 break;
-            case MetaDataType::FLOAT: 
+            }
+            case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a * val_b_f));
                 break;
-            case MetaDataType::DOUBLE: 
+            }
+            case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
                 break;
+            }
             default:
                 break;
         }
     } else if (type1 == MetaDataType::FLOAT){
         float val_a = stof(op1->getValue());
         switch(type2) {
-            case MetaDataType::INT: 
+            case MetaDataType::INT:{ 
                 int val_b_i = stoi(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a * val_b_i));
                 break;
-            case MetaDataType::FLOAT: 
+            }
+            case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a * val_b_f));
                 break;
-            case MetaDataType::DOUBLE: 
+            }
+            case MetaDataType::DOUBLE:{
                 double val_b_d = stod(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
                 break;
+            }
             default:
                 break;
         }
     } else if (type1 == MetaDataType::DOUBLE){
         double val_a = stod(op1->getValue());
         switch(type2) {
-            case MetaDataType::INT: 
+            case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_i));
                 break;
-            case MetaDataType::FLOAT: 
+            }
+            case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_f));
                 break;
-            case MetaDataType::DOUBLE: 
+            }
+            case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
                 break;
+            }
             default:
                 break;
         }
@@ -187,54 +205,63 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
     if(type1 == MetaDataType::INT){
         int val_a = stoi(op1->getValue());
         switch(type2) {
-            case MetaDataType::INT: 
+            case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 retVal = new IRValue(MetaDataType::INT, std::to_string(val_a / val_b_i), {}, false);
                 break;
-            case MetaDataType::FLOAT: 
+            }
+            case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a / val_b_f));
                 break;
-            case MetaDataType::DOUBLE: 
+            }
+            case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
                 break;
+            }
             default:
                 break;
         }
     } else if (type1 == MetaDataType::FLOAT){
         float val_a = stof(op1->getValue());
         switch(type2) {
-            case MetaDataType::INT: 
+            case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a / val_b_i));
                 break;
-            case MetaDataType::FLOAT: 
+            }
+            case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a / val_b_f));
                 break;
-            case MetaDataType::DOUBLE: 
+            }
+            case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
                 break;
+            }
             default:
                 break;
         }
     } else if (type1 == MetaDataType::DOUBLE){
         double val_a = stod(op1->getValue());
         switch(type2) {
-            case MetaDataType::INT: 
+            case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_i));
                 break;
-            case MetaDataType::FLOAT: 
+            }
+            case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_f));
                 break;
-            case MetaDataType::DOUBLE: 
+            }
+            case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
                 break;
+            }
             default:
                 break;
         }
