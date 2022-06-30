@@ -35,6 +35,13 @@ IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
     return newIRTempVar;
 }
 
+IRTempVariable* IRFunction::addTempVariable(IROperand *parentSymbolVariable) {
+    string newTempVariableName = string("t_") + to_string(tempCount++);
+    auto *newIRTempVar = new IRTempVariable(newTempVariableName, parentSymbolVariable->getMetaDataType(), parentSymbolVariable);
+    tempVariables.emplace(newTempVariableName, newIRTempVar);
+    return newIRTempVar;
+}
+
 IRSymbolVariable* IRFunction::addSymbolVariable(int block, AbstractSymbol *newSymbol, IRValue *initVal) {
     auto *newSymVar = new IRSymbolVariable(newSymbol, initVal, false);
     addLocalVariable(block,newSymVar);
@@ -78,10 +85,11 @@ int IRFunction::calFrameSize() {
             it.second->setMemOffset(frameSize + varSize);
             frameSize += varSize;
         }
-        else {
-            it.second->setMemOffset(it.second->getInitialValue()->getMemOffset());
+        else if (!it.second->getSymbolVariable()->getIsGlobalSymbolVar()){
+            it.second->setMemOffset(it.second->getSymbolVariable()->getMemOffset());
         }
     }
+    functionTable->setFrameSize(frameSize);
 }
 
 string IRFunction::getFunctionName() const {

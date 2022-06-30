@@ -1,0 +1,45 @@
+============ global var ================
+============ imm value ================
+ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+============ functions ================
+----------- funcDef -----------
+main() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+c := symbol type: 1; data type: 2; initValue: ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+b := symbol type: 1; data type: 2; initValue: ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+a := symbol type: 1; data type: 2; initValue: ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+----------- tempVars ------------
+t_1:= symbol type: TEMP VAR; data type: 2
+t_0:= symbol type: TEMP VAR; data type: 2
+----------- Codes ------------
+main:
+	a = ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	b = ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	c = ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	t_0 = a + b;
+	t_1 = t_0[0];
+	c[0] = t_1;
+	t_1 = t_0[1];
+	c[1] = t_1;
+	t_1 = t_0[2];
+	c[2] = t_1;
+	t_1 = t_0[3];
+	c[3] = t_1;
+	t_1 = t_0[4];
+	c[4] = t_1;
+	t_1 = t_0[5];
+	c[5] = t_1;
+	t_1 = t_0[6];
+	c[6] = t_1;
+	t_1 = t_0[7];
+	c[7] = t_1;
+	t_1 = t_0[8];
+	c[8] = t_1;
+	t_1 = t_0[9];
+	c[9] = t_1;
+	return 0;
+

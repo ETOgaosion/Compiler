@@ -43,6 +43,8 @@ public:
     virtual bool getIsArray() const { return false; };
     virtual int getArraySize() const { return 0; };
     virtual uint64_t getMemPosition() const { return 0; };
+    virtual bool getIsGlobalSymbolVar() const { return 0; };
+    virtual int getFrameSize() const { return 0; };
 
     virtual bool setAssigned() { return false; }
     virtual bool addHistorySymbol(IROperand *inSymbol) { return false; };
@@ -132,6 +134,7 @@ public:
     int getMemOffset() const override { return symbol->getOffset(); };
     IRValue *getInitialValue() const override { return initialValue; };
     bool getIsArray() const override { return symbol->getIsArray(); };
+    bool getIsGlobalSymbolVar() const override { return isGlobalSymbolVar; };
     int getArraySize() const override { return symbol->getSize(); };
     uint64_t getMemPosition() const override { return symbol->getMemPosition(); };
 
@@ -160,6 +163,7 @@ public:
     explicit IRSymbolFunction(SymbolTable *function);
     std::string getFunctionName() const override { return functionTable->getFuncName(); };
     SymbolTable *getFunctionSymbolTable() const override { return functionTable; };
+    int getFrameSize() const override { return functionTable->getFrameSize(); };
 
     bool setFunctionSymbolTable(SymbolTable *inFunctionTable) override { functionTable = inFunctionTable; return true; };
 
@@ -180,7 +184,7 @@ private:
 
 public:
     IRTempVariable(std::string newName, MetaDataType newMetaDataType);
-    IRTempVariable(std::string newName, MetaDataType newMetaDataType, IRSymbolVariable *parentVariable);
+    IRTempVariable(std::string newName, MetaDataType newMetaDataType, IROperand *parentVariable);
     IRTempVariable(std::string newName, MetaDataType newMetaDataType, IRValue *newValue);
 
     std::string getSymbolName() const override { return symbolName; };

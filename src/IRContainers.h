@@ -24,6 +24,7 @@ public:
     bool addParamVariable(IRSymbolVariable *newVariable);
     bool addLocalVariable(int block, IRSymbolVariable *newVariable);
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
+    IRTempVariable *addTempVariable(IROperand *parentSymbolVariable);
     IRSymbolVariable *addSymbolVariable(int block, AbstractSymbol *newSymbol, IRValue *initVal);
     IRLabel *addLabel();
     bool addCode(IRCode *newCode);

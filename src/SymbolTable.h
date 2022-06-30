@@ -200,6 +200,7 @@ public:
     virtual MetaDataType getReturnType() const { return MetaDataType::VOID; };
     virtual std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const { return {}; };
     virtual int getParamNum() const { return 0; };
+    virtual int getFrameSize() const { return 0; };
     
     virtual bool setSymbolTableType(TableType inSymbolTableType);
     virtual bool setParentSymbolTable(SymbolTable *parentSymbolTable);
@@ -207,6 +208,7 @@ public:
     virtual bool setReturnType(MetaDataType inReturnType) { return false;};
     virtual int setParamNum() { return false; };
     virtual bool setParamDataTypeList() { return false; };
+    virtual bool setFrameSize(int inSize) { return false; }
 
     virtual bool compareAbstractSymbolDataType(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) const;
     virtual bool compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) const { return false; };
@@ -233,6 +235,7 @@ private:
     int paramNum{};
     std::unordered_map<std::string, AbstractSymbol *> paramSymbolList;
     std::vector<std::tuple <MetaDataType, bool, std::size_t> > paramDataTypeList;
+    int frameSize;
 
 protected:
 
@@ -254,11 +257,13 @@ public:
     MetaDataType getReturnType() const override;
     int getParamNum() const override;
     std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const override;
+    int getFrameSize() const override;
 
     bool setFuncName(const std::string &inFuncName) override;
     bool setReturnType(MetaDataType inReturnType) override;
     int setParamNum() override;
     bool setParamDataTypeList() override;
+    bool setFrameSize(int inSize) override;
 
     bool compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) const override;
 

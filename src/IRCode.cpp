@@ -458,7 +458,7 @@ void IRGetParam::print() const {
 void IRCall::print() const {
     cout << "\t" << "call "
          << arg1->getVal()
-         << ", frame size: " << arg2->getVal() << "; " << endl;
+         << ", frame size: " << arg2->getFrameSize() << "; " << endl;
 
 }
 
@@ -485,13 +485,30 @@ void IRRead::print() const {
 
 void IRAddI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    t->addCodeAdd(resultReg, arg1Reg, arg2Reg, FloatPointType::NONE);
+    if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() != OperandType::VALUE) {
+        Register *arg2Reg = arg2->load(t);
+        t->addCodeAddi(resultReg, arg2Reg, stoi(arg1->getValue()), FloatPointType::NONE);
+        t->setRegisterFree(true, arg2Reg);
+    }
+    else if (arg1->getOperandType() != OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
+        Register *arg1Reg = arg1->load(t);
+        t->addCodeAddi(resultReg, arg1Reg, stoi(arg2->getValue()), FloatPointType::NONE);
+        t->setRegisterFree(true, arg1Reg);
+    }
+    else if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
+        Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
+        t->addCodeAddi(resultReg, zero, stoi(arg1->getValue()) + stoi(arg2->getValue()), FloatPointType::NONE);
+        t->setRegisterFree(true, zero);
+    }
+    else {
+        Register *arg1Reg = arg1->load(t);
+        Register *arg2Reg = arg2->load(t);
+        t->addCodeAdd(resultReg, arg1Reg, arg2Reg, FloatPointType::NONE);
+        t->setRegisterFree(true, arg1Reg);
+        t->setRegisterFree(true, arg2Reg);
+    }
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
     t->setRegisterFree(true, resultReg);
 }
 
@@ -1257,10 +1274,9 @@ void IRGetParamA::genTargetCode(TargetCodes *t) {
 void IRCall::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-    Register *freeReg = arg2->load(t);
-    t->addCodeSub(sp, sp, freeReg, FloatPointType::NONE);
+    t->addCodeAddi(sp, sp, -arg2->getFrameSize(), FloatPointType::NONE);
     t->addCodeCall(arg1->getFunctionName());
-    t->setRegisterFree(true, freeReg);
+    t->addCodeAddi(sp, sp, arg2->getFrameSize(), FloatPointType::NONE);
     t->setRegisterFree(true, sp);
 }
 

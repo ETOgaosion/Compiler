@@ -651,12 +651,6 @@ bool TargetCodes::addCodeLi(Register *rd, const string &targetLabel) {
     return true;
 }
 
-bool TargetCodes::addCodeLi(Register *rd, int imm) {
-    Code *newCode = new Code(ASMOperation::LI, FloatPointType::NONE, FloatPointType::NONE, rd, nullptr, nullptr, imm, {});
-    addCode(newCode);
-    return true;
-}
-
 bool TargetCodes::addCodeLb(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType) {
     Code *newCode = new Code(ASMOperation::LB, inFloatPointType, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
     addCode(newCode);
