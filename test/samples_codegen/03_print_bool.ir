@@ -1,0 +1,17 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+a := symbol type: 1; data type: 1; initValue: 1
+
+----------- tempVars ------------
+----------- Codes ------------
+main:
+	a = 1;
+	addparam a;
+	call print_bool, frame size: 16; 
+	return 0;
+

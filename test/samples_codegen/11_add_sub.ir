@@ -1,0 +1,118 @@
+============ global var ================
+============ imm value ================
+ImmValue_2: 3.4
+ImmValue_3: 2.1
+ImmValue_1: 2.3f
+ImmValue_0: 3.2f
+============ functions ================
+----------- funcDef -----------
+main() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+dd := symbol type: 1; data type: 4; initValue: 0
+
+dc := symbol type: 1; data type: 4; initValue: 0
+
+d := symbol type: 1; data type: 2; initValue: 0
+
+c := symbol type: 1; data type: 2; initValue: 0
+
+b := symbol type: 1; data type: 2; initValue: 0
+
+a := symbol type: 1; data type: 2; initValue: 0
+
+db := symbol type: 1; data type: 4; initValue: 0
+
+fb := symbol type: 1; data type: 3; initValue: 0
+
+fa := symbol type: 1; data type: 3; initValue: 0
+
+fd := symbol type: 1; data type: 3; initValue: 0
+
+fc := symbol type: 1; data type: 3; initValue: 0
+
+da := symbol type: 1; data type: 4; initValue: 0
+
+----------- tempVars ------------
+t_22:= symbol type: TEMP VAR; data type: 4
+t_6:= symbol type: TEMP VAR; data type: 2
+t_10:= symbol type: TEMP VAR; data type: 3
+t_4:= symbol type: TEMP VAR; data type: 2
+t_2:= symbol type: TEMP VAR; data type: 2
+t_8:= symbol type: TEMP VAR; data type: 3
+t_0:= symbol type: TEMP VAR; data type: 2
+t_12:= symbol type: TEMP VAR; data type: 3
+t_18:= symbol type: TEMP VAR; data type: 4
+t_14:= symbol type: TEMP VAR; data type: 3
+t_16:= symbol type: TEMP VAR; data type: 4
+t_20:= symbol type: TEMP VAR; data type: 4
+----------- Codes ------------
+main:
+	a = 0;
+	b = 0;
+	c = 0;
+	d = 0;
+	call get_int, frame size: 136; 
+	t_0 =  return ;
+	t_1 <= a;
+	t_1 = t_0;
+	t_2 = a - 3;
+	t_3 <= b;
+	t_3 = t_2;
+	call get_int, frame size: 136; 
+	t_4 =  return ;
+	t_5 <= c;
+	t_5 = t_4;
+	t_6 = c + 2;
+	t_7 <= d;
+	t_7 = t_6;
+	addparam b;
+	call print_int, frame size: 136; 
+	addparam d;
+	call print_int, frame size: 136; 
+	fa = 0;
+	fb = 0;
+	fc = 0;
+	fd = 0;
+	call get_float, frame size: 136; 
+	t_8 =  return ;
+	t_9 <= fa;
+	t_9 = t_8;
+	t_10 = fa - ImmValue_0: 3.2f;
+	t_11 <= fb;
+	t_11 = t_10;
+	call get_float, frame size: 136; 
+	t_12 =  return ;
+	t_13 <= fc;
+	t_13 = t_12;
+	t_14 = fc + ImmValue_1: 2.3f;
+	t_15 <= fd;
+	t_15 = t_14;
+	addparam fb;
+	call print_float, frame size: 136; 
+	addparam fd;
+	call print_float, frame size: 136; 
+	da = 0;
+	db = 0;
+	dc = 0;
+	dd = 0;
+	call get_double, frame size: 136; 
+	t_16 =  return ;
+	t_17 <= da;
+	t_17 = t_16;
+	t_18 = da - ImmValue_2: 3.4;
+	t_19 <= db;
+	t_19 = t_18;
+	call get_double, frame size: 136; 
+	t_20 =  return ;
+	t_21 <= dc;
+	t_21 = t_20;
+	t_22 = dc + ImmValue_3: 2.1;
+	t_23 <= dd;
+	t_23 = t_22;
+	addparam db;
+	call print_double, frame size: 136; 
+	addparam dd;
+	call print_double, frame size: 136; 
+	return 0;
+

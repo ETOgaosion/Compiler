@@ -1064,7 +1064,7 @@ void IRAssignF::genTargetCode(TargetCodes *t) {
     else {
         Register *arg1Reg = arg1->load(t);
         result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(true, arg1Reg);
+        t->setRegisterFree(false, arg1Reg);
     }
 }
 
@@ -1085,7 +1085,7 @@ void IRAssignD::genTargetCode(TargetCodes *t) {
     else {
         Register *arg1Reg = arg1->load(t);
         result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(true, arg1Reg);
+        t->setRegisterFree(false, arg1Reg);
     }
 }
 
@@ -1171,7 +1171,7 @@ void IRAssignArrayElemI::genTargetCode(TargetCodes *t) {
 
 void IRAssignArrayElemF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
+    Register *arg1Reg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     Register *arg2Reg = arg2->load(t);
     Register *srcReg = result->load(t);
     t->addCodeLla(arg1Reg, arg1->getSymbolName());
@@ -1179,22 +1179,22 @@ void IRAssignArrayElemF::genTargetCode(TargetCodes *t) {
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
     t->addCodeSw(arg1Reg, srcReg, 0, FloatPointType::NONE);
     t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
+    t->setRegisterFree(true, arg2Reg);
     t->setRegisterFree(false, srcReg);
 }
 
 void IRAssignArrayElemD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
+    Register *arg1Reg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     Register *arg2Reg = arg2->load(t);
     Register *srcReg = result->load(t);
     t->addCodeLla(arg1Reg, arg1->getSymbolName());
     t->addCodeSlli(arg2Reg, arg2Reg, 3);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
     t->addCodeSd(arg1Reg, srcReg, 0, FloatPointType::NONE);
-    t->setRegisterFree(true, arg1Reg);
+    t->setRegisterFree(false, arg1Reg);
     t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, srcReg);
+    t->setRegisterFree(false, srcReg);
 }
 
 void IRAddLabel::genTargetCode(TargetCodes *t) {

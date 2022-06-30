@@ -1,0 +1,18 @@
+============ global var ================
+============ imm value ================
+ImmValue_0: 2.3f
+============ functions ================
+----------- funcDef -----------
+main() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+a := symbol type: 1; data type: 3; initValue: ImmValue_0: 2.3f
+
+----------- tempVars ------------
+----------- Codes ------------
+main:
+	a = ImmValue_0: 2.3f;
+	addparam a;
+	call print_float, frame size: 16; 
+	return 0;
+

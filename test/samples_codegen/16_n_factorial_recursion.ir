@@ -1,0 +1,62 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+factorial(2) => 2:
+----------- paramVars -----------
+n := symbol type: 0; data type: 2
+----------- localVars -----------
+----------- tempVars ------------
+t_3:= symbol type: TEMP VAR; data type: 2
+t_2:= symbol type: TEMP VAR; data type: 2
+t_1:= symbol type: TEMP VAR; data type: 2
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+factorial:
+	n =  param 0;
+	t_0 = n == 1
+	beqz t_0 L_0_factorial
+	return ;
+L_0_factorial:
+	t_1 = n - 1;
+	addparam t_1;
+	call factorial, frame size: 32; 
+	t_2 =  return ;
+	t_3 = n * t_2;
+	return ;
+	return ;
+
+----------- funcDef -----------
+main() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+result := symbol type: 1; data type: 2; initValue: 0
+
+n := symbol type: 1; data type: 2; initValue: 0
+
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 2
+t_2:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 2
+----------- Codes ------------
+main:
+	n = 0;
+	result = 0;
+	call get_int, frame size: 32; 
+	t_0 =  return ;
+	t_1 <= n;
+	t_1 = t_0;
+	t_2 = n > 1
+	beqz t_2 L_0_main
+	addparam n;
+	call factorial, frame size: 32; 
+	t_3 =  return ;
+	t_4 <= result;
+	t_4 = t_3;
+L_0_main:
+	t_5 <= result;
+	t_5 = 1;
+	addparam result;
+	call print_int, frame size: 32; 
+	return 0;
+
