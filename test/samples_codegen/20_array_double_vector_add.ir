@@ -21,6 +21,13 @@ t_0:= symbol type: TEMP VAR; data type: 4
 ----------- Codes ------------
 double_array_vector_add:
 	double_array_c = ImmValue_2: {0, 0, 0, 0, 0, 0};
+	t_0 = 0;
+	while (t_0 < 6) {
+		t_1 = double_array_a[t_0];
+		t_2 = double_array_b[t_0];
+		t_3 = t_1 + t_2;
+		double_array_c[t_0] = t_3;
+	}
 	t_0 = double_array_a + double_array_b;
 	t_1 = t_0[0];
 	double_array_c[0] = t_1;
@@ -36,7 +43,7 @@ double_array_vector_add:
 	double_array_c[5] = t_1;
 	t_2 = double_array_c[5];
 	addparam t_2;
-	call print_double, frame size: 40; 
+	call print_double, frame size: 80; 
 	return ;
 
 ----------- funcDef -----------

@@ -90,7 +90,7 @@ public:
 
     bool addCodeAdd(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeSub(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeAddi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
+    bool addCodeAddi(Register *rd, Register *rs1, int offset);
     bool addCodeNeg(Register *rd, Register *rs1, FloatPointType inFloatPointType);
     bool addCodeMul(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
     bool addCodeDiv(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
@@ -116,14 +116,14 @@ public:
     bool addCodeLla(Register *rd, const std::string &targetLabel);
     bool addCodeLi(Register *rd, const std::string &targetLabel);
     bool addCodeLi(Register *rd, int imm);
-    bool addCodeLb(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
-    bool addCodeLw(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
-    bool addCodeLd(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType);
+    bool addCodeLb(Register *rd, Register *rs1, int offset);
+    bool addCodeLw(Register *rd, Register *rs1, int offset);
+    bool addCodeLd(Register *rd, Register *rs1, int offset);
     bool addCodeFlw(Register *rd, Register *rs1, int offset);
     bool addCodeFld(Register *rd, Register *rs1, int offset);
-    bool addCodeSb(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType);
-    bool addCodeSw(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType);
-    bool addCodeSd(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType);
+    bool addCodeSb(Register *rs1, Register *rs2, int offset);
+    bool addCodeSw(Register *rs1, Register *rs2, int offset);
+    bool addCodeSd(Register *rs1, Register *rs2, int offset);
     bool addCodeFsw(Register *rs1, Register *rs2, int offset);
     bool addCodeFsd(Register *rs1, Register *rs2, int offset);
     bool addCodeMv(Register *rd, Register *rs1, FloatPointType rdFloatPointType, FloatPointType rs1FloatPointType);
@@ -141,7 +141,7 @@ public:
     Register *tryGetCertainRegister(bool isGeneralPurposeRegister, const std::string &regName, bool &isFreeRegister);
 
     bool setRegisterFree(bool isGeneralPurposeRegister, const std::string &reg);
-    bool setRegisterFree(bool isGeneralPurposeRegister, Register *reg);
+    bool setRegisterFree(Register *reg);
 
     bool setRegistersFree(bool isGeneralPurposeRegister, const std::vector<std::string> &registers);
 };

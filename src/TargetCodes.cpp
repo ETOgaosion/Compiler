@@ -290,17 +290,9 @@ void Code::print() const {
             cout << "\tld\t" << rd->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::FLW:
-            if (rdFloatPointType != FloatPointType::SINGLE) {
-                cout << "ERROR: only int and float have LW instruction";
-                exit(-1);
-            }
             cout << "\tflw\t" << rd->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::FLD:
-            if (rdFloatPointType != FloatPointType::DOUBLE) {
-                cout << "ERROR: only double has LD instruction";
-                exit(-1);
-            }
             cout << "\tfld\t" << rd->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::SB:
@@ -313,17 +305,9 @@ void Code::print() const {
             cout << "\tsd\t" << rs2->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::FSW:
-            if (rdFloatPointType != FloatPointType::SINGLE) {
-                cout << "ERROR: only int and float have LW instruction";
-                exit(-1);
-            }
             cout << "\tfsw\t" << rs2->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::FSD:
-            if (rdFloatPointType != FloatPointType::DOUBLE) {
-                cout << "ERROR: only double has LD instruction";
-                exit(-1);
-            }
             cout << "\tfsd\t" << rs2->getAliasName() << ", " << to_string(offset) << "(" << rs1->getAliasName() << ")" << endl;
             break;
         case ASMOperation::MV:
@@ -458,8 +442,8 @@ bool TargetCodes::setRegisterFree(bool isGeneralPurposeRegister, const string &r
     }
 }
 
-bool TargetCodes::setRegisterFree(bool isGeneralPurposeRegister, Register *reg) {
-    if (isGeneralPurposeRegister) {
+bool TargetCodes::setRegisterFree(Register *reg) {
+    if (reg->getRegisterType() == RegisterType::GENERAL_PURPOSE) {
         return generalPurposeRegisters->setRegisterFree(reg->getAliasName());
     }
     else {
@@ -488,8 +472,8 @@ bool TargetCodes::addCodeSub(Register *rd, Register *rs1, Register *rs2, FloatPo
     return true;
 }
 
-bool TargetCodes::addCodeAddi(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType) {
-    Code *newCode = new Code(ASMOperation::ADDI, inFloatPointType, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
+bool TargetCodes::addCodeAddi(Register *rd, Register *rs1, int offset) {
+    Code *newCode = new Code(ASMOperation::ADDI, FloatPointType::NONE, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
     addCode(newCode);
     return true;
 }
@@ -651,20 +635,20 @@ bool TargetCodes::addCodeLi(Register *rd, const string &targetLabel) {
     return true;
 }
 
-bool TargetCodes::addCodeLb(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType) {
-    Code *newCode = new Code(ASMOperation::LB, inFloatPointType, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
+bool TargetCodes::addCodeLb(Register *rd, Register *rs1, int offset) {
+    Code *newCode = new Code(ASMOperation::LB, FloatPointType::NONE, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
     addCode(newCode);
     return true;
 }
 
-bool TargetCodes::addCodeLw(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType) {
-    Code *newCode = new Code(ASMOperation::LW, inFloatPointType, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
+bool TargetCodes::addCodeLw(Register *rd, Register *rs1, int offset) {
+    Code *newCode = new Code(ASMOperation::LW, FloatPointType::NONE, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
     addCode(newCode);
     return true;
 }
 
-bool TargetCodes::addCodeLd(Register *rd, Register *rs1, int offset, FloatPointType inFloatPointType) {
-    Code *newCode = new Code(ASMOperation::LD, inFloatPointType, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
+bool TargetCodes::addCodeLd(Register *rd, Register *rs1, int offset) {
+    Code *newCode = new Code(ASMOperation::LD, FloatPointType::NONE, FloatPointType::NONE, rd, rs1, nullptr, offset, {});
     addCode(newCode);
     return true;
 }
@@ -681,20 +665,20 @@ bool TargetCodes::addCodeFld(Register *rd, Register *rs1, int offset) {
     return true;
 }
 
-bool TargetCodes::addCodeSb(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType) {
-    Code *newCode = new Code(ASMOperation::SB, inFloatPointType, FloatPointType::NONE, nullptr, rs1, rs2, offset, {});
+bool TargetCodes::addCodeSb(Register *rs1, Register *rs2, int offset) {
+    Code *newCode = new Code(ASMOperation::SB, FloatPointType::NONE, FloatPointType::NONE, nullptr, rs1, rs2, offset, {});
     addCode(newCode);
     return true;
 }
 
-bool TargetCodes::addCodeSw(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType) {
-    Code *newCode = new Code(ASMOperation::SW, inFloatPointType, FloatPointType::NONE, nullptr, rs1, rs2, offset, {});
+bool TargetCodes::addCodeSw(Register *rs1, Register *rs2, int offset) {
+    Code *newCode = new Code(ASMOperation::SW, FloatPointType::NONE, FloatPointType::NONE, nullptr, rs1, rs2, offset, {});
     addCode(newCode);
     return true;
 }
 
-bool TargetCodes::addCodeSd(Register *rs1, Register *rs2, int offset, FloatPointType inFloatPointType) {
-    Code *newCode = new Code(ASMOperation::SD, inFloatPointType, FloatPointType::NONE, nullptr, rs1, rs2, offset, {});
+bool TargetCodes::addCodeSd(Register *rs1, Register *rs2, int offset) {
+    Code *newCode = new Code(ASMOperation::SD, FloatPointType::NONE, FloatPointType::NONE, nullptr, rs1, rs2, offset, {});
     addCode(newCode);
     return true;
 }

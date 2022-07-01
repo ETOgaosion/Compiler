@@ -58,8 +58,8 @@ public:
     virtual bool setLabel(const std::string& newLabel) { return false; };
     virtual bool setMetaDataType(MetaDataType newType) { return false; };
 
-    virtual Register *load(TargetCodes * t) { return nullptr; };
-    virtual Register *loadTo(TargetCodes * t, const std::string &regName) { return nullptr; };
+    virtual Register *load(TargetCodes * t, bool isGeneralPurposeRegister) { return nullptr; };
+    virtual Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) { return nullptr; };
     virtual Register *loadTo(TargetCodes * t, Register *inReg) { return nullptr; };
     virtual void storeFrom(TargetCodes * t, Register *reg) {};
 
@@ -107,8 +107,8 @@ public:
     bool setLabel(const std::string& newLabel) override { valueLabel = newLabel; };
     bool setMetaDataType(MetaDataType newType) override { metaDataType = newType; };
 
-    Register *load(TargetCodes * t) override;
-    Register *loadTo(TargetCodes * t, const std::string &regName) override;
+    Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
+    Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) override;
     Register *loadTo(TargetCodes * t, Register *inReg) override;
 
     void print() const override;
@@ -144,8 +144,8 @@ public:
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
     bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); };
 
-    Register *load(TargetCodes * t) override;
-    Register *loadTo(TargetCodes * t, const std::string &regName) override;
+    Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
+    Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) override;
     Register *loadTo(TargetCodes * t, Register *inReg) override;
     void storeFrom(TargetCodes * t, Register *reg) override;
 
@@ -201,8 +201,8 @@ public:
     void setMemOffset(int inOffset) override { offset = inOffset; };
     int getMemOffset() const override { return offset; };
 
-    Register *load(TargetCodes * t) override;
-    Register *loadTo(TargetCodes * t, const std::string &regName) override;
+    Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
+    Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) override;
     Register *loadTo(TargetCodes * t, Register *inReg) override;
     void storeFrom(TargetCodes * t, Register *reg) override;
 
