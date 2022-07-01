@@ -588,6 +588,17 @@ void SemanticAnalysis::exitBlockItem(CACTParser::BlockItemContext * ctx)
 void SemanticAnalysis::enterStmtAssignment(CACTParser::StmtAssignmentContext * ctx)
 {
     ctx->hasReturn = false;
+
+    if(ctx->lVal()->isArray){
+        IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
+        ctx->exp()->indexOperand = temp;
+        IRValue* zero = new IRValue(MetaDataType::INT, std::to_string(0), {}, false);
+        IRCode* code = new IRAssignI(temp, zero);
+        irGenerator->addCode(code);
+
+        IRLabel* beginArray = irGenerator->enterWhile();
+        ctx->beginArray = beginArray;
+    }
 }
 
 void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ctx)
@@ -613,32 +624,25 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
     }
 
     if(ctx->lVal()->isArray && ctx->exp()->isArray) {
-        IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
-        for(int i = 0; i < ctx->lVal()->size; i++){
-            IRValue* index = new IRValue(MetaDataType::INT, std::to_string(i), {}, false);
-            IRCode* fetchCode = nullptr;
-            IRCode* assignCode = nullptr;
-            switch (ctx->lVal()->lValMetaDataType) {
-                case MetaDataType::BOOL:
-                    fetchCode = new IRFetchArrayElemB(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemB(temp, ctx->lVal()->identOperand, index);
-                    break;
-                case MetaDataType::INT:
-                    fetchCode = new IRFetchArrayElemI(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemI(temp, ctx->lVal()->identOperand, index);
-                    break;
-                case MetaDataType::FLOAT:
-                    fetchCode = new IRFetchArrayElemF(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemF(temp, ctx->lVal()->identOperand, index);
-                    break;
-                case MetaDataType::DOUBLE:
-                    fetchCode = new IRFetchArrayElemD(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemD(temp, ctx->lVal()->identOperand, index);
-                    break;
-            }
-            irGenerator->addCode(fetchCode);
-            irGenerator->addCode(assignCode);
+        IRCode* assignCode = nullptr;
+        switch (ctx->lVal()->lValMetaDataType) {
+            case MetaDataType::BOOL:
+                assignCode = new IRAssignArrayElemB(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
+            case MetaDataType::INT:
+                assignCode = new IRAssignArrayElemI(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
+            case MetaDataType::FLOAT:
+                assignCode = new IRAssignArrayElemF(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
+            case MetaDataType::DOUBLE:
+                assignCode = new IRAssignArrayElemD(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
         }
+        irGenerator->addCode(assignCode);
+        IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->size), {}, false);
+        IRCode* code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
+        irGenerator->addCode(code);
     } else {
         if (ctx->lVal()->indexOperand) { // array[index] = value
             IRCode *assignCode = nullptr;
@@ -1085,6 +1089,8 @@ void SemanticAnalysis::enterExpAddExp(CACTParser::ExpAddExpContext * ctx)
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->addExp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitExpAddExp(CACTParser::ExpAddExpContext * ctx)
@@ -1176,6 +1182,8 @@ void SemanticAnalysis::enterPrimaryExpNestExp(CACTParser::PrimaryExpNestExpConte
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->exp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContext * ctx)
@@ -1200,7 +1208,27 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
     ctx->size = ctx->lVal()->size;
     ctx->metaDataType = ctx->lVal()->lValMetaDataType;
 
-    if (ctx->lVal()->indexOperand){ // array[index]
+    if (ctx->lVal()->isArray && ctx->indexOperand){
+        IROperand* tmp = irGenerator->addTempVariable(ctx->metaDataType);
+        IRCode* fetchCode = nullptr;
+        switch (ctx->lVal()->lValMetaDataType) {
+            case MetaDataType::BOOL:
+                fetchCode = new IRFetchArrayElemB(tmp, ctx->lVal()->identOperand, ctx->indexOperand);
+                break;
+            case MetaDataType::INT:
+                fetchCode = new IRFetchArrayElemI(tmp, ctx->lVal()->identOperand, ctx->indexOperand);
+                break;
+            case MetaDataType::FLOAT:
+                fetchCode = new IRFetchArrayElemF(tmp, ctx->lVal()->identOperand, ctx->indexOperand);
+                break;
+            case MetaDataType::DOUBLE:
+                fetchCode = new IRFetchArrayElemD(tmp, ctx->lVal()->identOperand, ctx->indexOperand);
+                break;
+        }
+        irGenerator->addCode(fetchCode);
+        ctx->operand = tmp;
+    }
+    else if (ctx->lVal()->indexOperand){ // array[index]
         IROperand *result = irGenerator->addTempVariable(ctx->metaDataType);
         IRCode* code = nullptr;
         switch (ctx->lVal()->lValMetaDataType) {
@@ -1219,7 +1247,6 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
         }
         irGenerator->addCode(code);
         ctx->operand = result;
-        // ????
     } else {
         ctx->operand = ctx->lVal()->identOperand;
     }
@@ -1256,6 +1283,8 @@ void SemanticAnalysis::enterUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpCon
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->primaryExp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpContext * ctx)
@@ -1335,6 +1364,8 @@ void SemanticAnalysis::enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryEx
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->unaryExp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
@@ -1429,6 +1460,9 @@ void SemanticAnalysis::enterMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->mulExp()->indexOperand = ctx->indexOperand;
+    ctx->unaryExp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
@@ -1523,6 +1557,8 @@ void SemanticAnalysis::enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * c
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->unaryExp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ctx)
@@ -1548,6 +1584,9 @@ void SemanticAnalysis::enterAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->addExp()->indexOperand = ctx->indexOperand;
+    ctx->mulExp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
@@ -1577,6 +1616,7 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
 
     IROperand* result = irGenerator->addTempVariable(ctx->metaDataType);
     IRCode* code = nullptr;
+   
     if (ctx->addOp()->getText() == "+"){
         switch (ctx->addExp()->metaDataType) {
             case MetaDataType::INT:
@@ -1605,6 +1645,7 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
     }
     else
         throw std::runtime_error("[ERROR] > addop illegal.\n");
+    
     irGenerator->addCode(code);
     ctx->operand = result;
 }
@@ -1614,6 +1655,8 @@ void SemanticAnalysis::enterAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
+
+    ctx->mulExp()->indexOperand = ctx->indexOperand;
 }
 
 void SemanticAnalysis::exitAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)

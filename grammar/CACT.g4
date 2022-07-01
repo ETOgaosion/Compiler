@@ -130,7 +130,8 @@ stmt
     locals [
         bool hasReturn,
         MetaDataType returnType,
-        std::vector<IRCode *> codes
+        std::vector<IRCode *> codes,
+        IRLabel* beginArray
     ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
@@ -178,7 +179,8 @@ exp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand
+        IROperand* operand,
+        IROperand* indexOperand
     ]
     : addExp        #expAddExp
     | BoolConst     #expBoolExp
@@ -208,7 +210,8 @@ primaryExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand
+        IROperand* operand,         #output
+        IROperand* indexOperand     #input
     ]
     : '(' exp ')'   #primaryExpNestExp
     | lVal          #primaryExplVal
@@ -220,7 +223,8 @@ unaryExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand
+        IROperand* operand,         #output
+        IROperand* indexOperand     #input
     ]
     : primaryExp                        #unaryExpPrimaryExp
     | Ident '(' (funcRParams)? ')'      #unaryExpFunc
@@ -248,7 +252,8 @@ mulExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand
+        IROperand* operand,         #output
+        IROperand* indexOperand     #input
     ]
     : unaryExp                              #mulExpUnaryExp
     | mulExp mulOp unaryExp                 #mulExpMulExp
@@ -262,7 +267,8 @@ addExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand
+        IROperand* operand,         #output
+        IROperand* indexOperand     #input
     ]
     : mulExp                        #addExpMulExp
     | addExp addOp mulExp           #addExpAddExp

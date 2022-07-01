@@ -39,7 +39,7 @@ public:
     IRValue* immAddSub(IROperand* op1, IROperand* op2, IROperation op);
     IRValue* immMul(IROperand* op1, IROperand* op2);
     IRValue* immDiv(IROperand* op1, IROperand* op2);
-
+    
 
     void constFolding();
     std::string getFunctionName() const;

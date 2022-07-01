@@ -269,6 +269,8 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
     return retVal;
 }
 
+void IRFunction::
+
 void IRFunction::constFolding() {
     int i = 0;
     for(; i < codes.size(); i++) { 
