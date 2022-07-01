@@ -589,7 +589,9 @@ void SemanticAnalysis::enterStmtAssignment(CACTParser::StmtAssignmentContext * c
 {
     ctx->hasReturn = false;
 
-    if(ctx->lVal()->isArray){
+    AbstractSymbol *searchLVal = curSymbolTable->lookUpAbstractSymbolGlobal(ctx->lVal()->getText());
+
+    if(searchLVal->getIsArray()){
         IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
         ctx->exp()->indexOperand = temp;
         IRValue* zero = new IRValue(MetaDataType::INT, std::to_string(0), {}, false);
@@ -826,6 +828,19 @@ void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentConte
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
+
+    AbstractSymbol *searchLVal = curSymbolTable->lookUpAbstractSymbolGlobal(ctx->lVal()->getText());
+
+    if(searchLVal->getIsArray()){
+        IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
+        ctx->exp()->indexOperand = temp;
+        IRValue* zero = new IRValue(MetaDataType::INT, std::to_string(0), {}, false);
+        IRCode* code = new IRAssignI(temp, zero);
+        irGenerator->addCode(code);
+
+        IRLabel* beginArray = irGenerator->enterWhile();
+        ctx->beginArray = beginArray;
+    }
 }
 
 void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
@@ -851,32 +866,25 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
     }
 
     if(ctx->lVal()->isArray && ctx->exp()->isArray) {
-        IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
-        for(int i = 0; i < ctx->lVal()->size; i++){
-            IRValue* index =new IRValue(MetaDataType::INT, std::to_string(i), {}, false);
-            IRCode* fetchCode = nullptr;
-            IRCode* assignCode = nullptr;
-            switch (ctx->lVal()->lValMetaDataType) {
-                case MetaDataType::BOOL:
-                    fetchCode = new IRFetchArrayElemB(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemB(temp, ctx->lVal()->identOperand, index);
-                    break;
-                case MetaDataType::INT:
-                    fetchCode = new IRFetchArrayElemI(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemI(temp, ctx->lVal()->identOperand, index);
-                    break;
-                case MetaDataType::FLOAT:
-                    fetchCode = new IRFetchArrayElemF(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemF(temp, ctx->lVal()->identOperand, index);
-                    break;
-                case MetaDataType::DOUBLE:
-                    fetchCode = new IRFetchArrayElemD(temp, ctx->exp()->operand, index);
-                    assignCode = new IRAssignArrayElemD(temp, ctx->lVal()->identOperand, index);
-                    break;
-            }
-            irGenerator->addCode(fetchCode);
-            irGenerator->addCode(assignCode);
+        IRCode* assignCode = nullptr;
+        switch (ctx->lVal()->lValMetaDataType) {
+            case MetaDataType::BOOL:
+                assignCode = new IRAssignArrayElemB(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
+            case MetaDataType::INT:
+                assignCode = new IRAssignArrayElemI(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
+            case MetaDataType::FLOAT:
+                assignCode = new IRAssignArrayElemF(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
+            case MetaDataType::DOUBLE:
+                assignCode = new IRAssignArrayElemD(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->exp()->indexOperand);
+                break;
         }
+        irGenerator->addCode(assignCode);
+        IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->size), {}, false);
+        IRCode* code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
+        irGenerator->addCode(code);
     } else {
         if(ctx->lVal()->indexOperand){ // array[index] = value
             IRCode* assignCode = nullptr;
