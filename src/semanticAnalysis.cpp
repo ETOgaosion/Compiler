@@ -642,8 +642,11 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
                 break;
         }
         irGenerator->addCode(assignCode);
+        IRValue* one = new IRValue(MetaDataType::INT, std::to_string(1), {}, false);
+        IRCode *code = new IRAddI(ctx->exp()->indexOperand, ctx->exp()->indexOperand, one);
+        irGenerator->addCode(code);
         IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
-        IRCode* code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
+        code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
         irGenerator->addCode(code);
     } else {
         if (ctx->lVal()->indexOperand) { // array[index] = value
@@ -882,8 +885,11 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
                 break;
         }
         irGenerator->addCode(assignCode);
+        IRValue* one = new IRValue(MetaDataType::INT, std::to_string(1), {}, false);
+        IRCode *code = new IRAddI(ctx->exp()->indexOperand, ctx->exp()->indexOperand, one);
+        irGenerator->addCode(code);
         IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
-        IRCode* code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
+        code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
         irGenerator->addCode(code);
     } else {
         if(ctx->lVal()->indexOperand){ // array[index] = value
