@@ -88,10 +88,10 @@ main:
    101b6:	0141                	addi	sp,sp,16
 	fsw	fa0, -16(sp)
    101b8:	fea12827          	fsw	fa0,-16(sp)
-	flw	ft0, -16(sp)
-   101bc:	ff012007          	flw	ft0,-16(sp)
-	fsw	ft0, -12(sp)
-   101c0:	fe012a27          	fsw	ft0,-12(sp)
+	lw	t0, -16(sp)
+   101bc:	ff012283          	lw	t0,-16(sp)
+	sw	t0, -12(sp)
+   101c0:	fe512a23          	sw	t0,-12(sp)
 	flw	fa0, -12(sp)
    101c4:	ff412507          	flw	fa0,-12(sp)
 	addi	sp, sp, -16

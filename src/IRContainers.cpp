@@ -275,7 +275,38 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
     return retVal;
 }
 
-void IRFunction::
+void IRFunction::basicBlockDivision() {
+    entrances.clear();
+    entrances.push_back(0);
+    for (int i = 0; i < codes.size(); i++) {
+        if (codes[i]->getOperation() == IROperation::ADD_LABEL) {
+            entrances.push_back(i);
+        }
+        if (codes[i]->getOperation() == IROperation::BEQZ) {
+            entrances.push_back(i + 1);
+        }
+    }
+    entrances.push_back(codes.size());
+    for (int i = 0; i < entrances.size() - 1; i++) {
+        basicBlocks.push_back(vector<IRCode *>(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]));
+    }
+    entrances.pop_back();
+    for (int i = 0; i < basicBlocks.size(); i++) {
+        controlFlow.push_back(vector<int>(i + 1));
+        for (int j = 0; j < basicBlocks[i].size(); j++) {
+            if (basicBlocks[i][j]->getOperation() == IROperation::BEQZ) {
+                for (int k = 0; k < entrances.size(); k++) {
+                    if (codes[entrances[k]]->getOperation() != IROperation::ADD_LABEL) {
+                        continue;
+                    }
+                    if (codes[entrances[k]]->getArg1()->getSymbolName() == basicBlocks[i][j]->getResult()->getSymbolName()) {
+                        controlFlow.back().push_back(k);
+                    }
+                }
+            }
+        }
+    }
+}
 
 void IRFunction::constFolding() {
     int i = 0;

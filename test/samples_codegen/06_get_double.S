@@ -12,8 +12,8 @@ main:
 	call	get_double
 	addi	sp, sp, 24
 	fsd	fa0, -24(sp)
-	fld	ft0, -24(sp)
-	fsd	ft0, -16(sp)
+	ld	t0, -24(sp)
+	sd	t0, -16(sp)
 	fld	fa0, -16(sp)
 	addi	sp, sp, -24
 	call	print_double

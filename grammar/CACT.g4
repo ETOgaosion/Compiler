@@ -211,8 +211,8 @@ primaryExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand,         #output
-        IROperand* indexOperand     #input
+        IROperand* operand,         
+        IROperand* indexOperand     
     ]
     : '(' exp ')'   #primaryExpNestExp
     | lVal          #primaryExplVal
@@ -224,8 +224,8 @@ unaryExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand,         #output
-        IROperand* indexOperand     #input
+        IROperand* operand,         
+        IROperand* indexOperand     
     ]
     : primaryExp                        #unaryExpPrimaryExp
     | Ident '(' (funcRParams)? ')'      #unaryExpFunc
@@ -253,8 +253,8 @@ mulExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand,         #output
-        IROperand* indexOperand     #input
+        IROperand* operand,         
+        IROperand* indexOperand     
     ]
     : unaryExp                              #mulExpUnaryExp
     | mulExp mulOp unaryExp                 #mulExpMulExp
@@ -268,8 +268,8 @@ addExp
         bool isArray,
         std::size_t size,
         MetaDataType metaDataType,
-        IROperand* operand,         #output
-        IROperand* indexOperand     #input
+        IROperand* operand,         
+        IROperand* indexOperand     
     ]
     : mulExp                        #addExpMulExp
     | addExp addOp mulExp           #addExpAddExp

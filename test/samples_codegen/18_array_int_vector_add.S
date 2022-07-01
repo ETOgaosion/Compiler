@@ -38,6 +38,73 @@ ImmValue_2:
 
 .text
 .align 1
+.globl	int_array_vector_add
+.type	int_array_vector_add, @function
+int_array_vector_add:
+	sd	ra, -8(sp)
+	lla	t0, ImmValue_2
+	addi	t1, sp, -32
+	sw	t0, 0(t1)
+	addi	t1, t1, 4
+	sw	t0, 0(t1)
+	addi	t1, t1, 4
+	sw	t0, 0(t1)
+	addi	t1, t1, 4
+	sw	t0, 0(t1)
+	addi	t1, t1, 4
+	sw	t0, 0(t1)
+	addi	t1, t1, 4
+	sw	t0, 0(t1)
+	addi	t1, t1, 4
+	mv	t0, zero
+	sw	t0, -44(sp)
+L_0_int_array_vector_add:
+	lla	t0, int_array_a
+	lw	t1, -44(sp)
+	slli	t1, t1, 2
+	addw	t0, t0, t1
+	lw	t0, 0(t0)
+	sw	t0, -48(sp)
+	lla	t0, int_array_b
+	lw	t1, -44(sp)
+	slli	t1, t1, 2
+	addw	t0, t0, t1
+	lw	t0, 0(t0)
+	sw	t0, -52(sp)
+	lw	t1, -48(sp)
+	lw	t2, -52(sp)
+	addw	t0, t1, t2
+	sw	t0, -56(sp)
+	addi	t0, sp, -32
+	lw	t1, -44(sp)
+	lw	t2, -56(sp)
+	slli	t1, t1, 2
+	addw	t0, t0, t1
+	sw	t2, 0(t0)
+	lw	t1, -44(sp)
+	addi	t0, t1, 1
+	sw	t0, -44(sp)
+	lw	t0, -44(sp)
+	addi	t1, zero, 6
+	slt	t2, t0, t1
+	seqz	t2, t2
+	sw	t2, -40(sp)
+	lw	t0, -40(sp)
+	beqz	t0, L_0_int_array_vector_add
+	addi	t0, sp, -32
+	addi	t1, zero, 5
+	slli	t1, t1, 2
+	addw	t0, t0, t1
+	lw	t0, 0(t0)
+	sw	t0, -36(sp)
+	lw	a0, -36(sp)
+	addi	sp, sp, -56
+	call	print_int
+	addi	sp, sp, 56
+	ld	ra, -8(sp)
+	ret
+.text
+.align 1
 .globl	main
 .type	main, @function
 main:

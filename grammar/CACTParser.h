@@ -353,6 +353,7 @@ public:
     bool hasReturn;
     MetaDataType returnType;
     std::vector<IRCode *> codes;
+    IRLabel* beginArray;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StmtContext() = default;
@@ -452,6 +453,7 @@ public:
     bool hasReturn;
     MetaDataType returnType;
     std::vector<IRCode *> codes;
+    IRLabel* beginArray;
     SubStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     SubStmtContext() = default;
@@ -519,6 +521,7 @@ public:
     std::size_t size;
     MetaDataType metaDataType;
     IROperand* operand;
+    IROperand* indexOperand;
     ExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     ExpContext() = default;
@@ -590,6 +593,7 @@ public:
     std::size_t size;
     MetaDataType metaDataType;
     IROperand* operand;
+    IROperand* indexOperand;
     PrimaryExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     PrimaryExpContext() = default;
@@ -636,6 +640,7 @@ public:
     std::size_t size;
     MetaDataType metaDataType;
     IROperand* operand;
+    IROperand* indexOperand;
     UnaryExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     UnaryExpContext() = default;
@@ -714,6 +719,7 @@ public:
     std::size_t size;
     MetaDataType metaDataType;
     IROperand* operand;
+    IROperand* indexOperand;
     MulExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     MulExpContext() = default;
@@ -765,6 +771,7 @@ public:
     std::size_t size;
     MetaDataType metaDataType;
     IROperand* operand;
+    IROperand* indexOperand;
     AddExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     AddExpContext() = default;

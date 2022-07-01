@@ -56,82 +56,41 @@ double_array_vector_add:
 	addi	t1, t1, 8
 	sd	t0, 0(t1)
 	addi	t1, t1, 8
+	mv	t0, zero
+	sd	t0, -76(sp)
+L_0_double_array_vector_add:
 	lla	t0, double_array_a
-	lla	t1, double_array_b
-	fadd.d	ft0, t0, t1
-	fsd	ft0, -80(sp)
-	ld	t0, -80(sp)
-	mv	t1, zero
+	ld	t1, -76(sp)
 	slli	t1, t1, 3
 	addw	t0, t0, t1
 	ld	t0, 0(t0)
-	sd	t0, -72(sp)
-	addi	t0, sp, -56
-	mv	t1, zero
-	ld	t2, -72(sp)
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	sd	t2, 0(t0)
-	ld	t0, -80(sp)
-	addi	t1, zero, 1
+	sd	t0, -84(sp)
+	lla	t0, double_array_b
+	ld	t1, -76(sp)
 	slli	t1, t1, 3
 	addw	t0, t0, t1
 	ld	t0, 0(t0)
-	sd	t0, -72(sp)
+	sd	t0, -92(sp)
+	fld	ft0, -84(sp)
+	fld	ft1, -92(sp)
+	fadd.d	ft2, ft0, ft1
+	fsd	ft2, -100(sp)
 	addi	t0, sp, -56
-	addi	t1, zero, 1
-	ld	t2, -72(sp)
+	ld	t1, -76(sp)
+	ld	t2, -100(sp)
 	slli	t1, t1, 3
 	addw	t0, t0, t1
 	sd	t2, 0(t0)
-	ld	t0, -80(sp)
-	addi	t1, zero, 2
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	ld	t0, 0(t0)
-	sd	t0, -72(sp)
-	addi	t0, sp, -56
-	addi	t1, zero, 2
-	ld	t2, -72(sp)
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	sd	t2, 0(t0)
-	ld	t0, -80(sp)
-	addi	t1, zero, 3
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	ld	t0, 0(t0)
-	sd	t0, -72(sp)
-	addi	t0, sp, -56
-	addi	t1, zero, 3
-	ld	t2, -72(sp)
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	sd	t2, 0(t0)
-	ld	t0, -80(sp)
-	addi	t1, zero, 4
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	ld	t0, 0(t0)
-	sd	t0, -72(sp)
-	addi	t0, sp, -56
-	addi	t1, zero, 4
-	ld	t2, -72(sp)
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	sd	t2, 0(t0)
-	ld	t0, -80(sp)
-	addi	t1, zero, 5
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	ld	t0, 0(t0)
-	sd	t0, -72(sp)
-	addi	t0, sp, -56
-	addi	t1, zero, 5
-	ld	t2, -72(sp)
-	slli	t1, t1, 3
-	addw	t0, t0, t1
-	sd	t2, 0(t0)
+	ld	t1, -76(sp)
+	addi	t0, t1, 1
+	sd	t0, -76(sp)
+	ld	t0, -76(sp)
+	addi	t1, zero, 6
+	slt	t2, t0, t1
+	seqz	t2, t2
+	sw	t2, -68(sp)
+	lw	t0, -68(sp)
+	beqz	t0, L_0_double_array_vector_add
 	addi	t0, sp, -56
 	addi	t1, zero, 5
 	slli	t1, t1, 3
@@ -139,9 +98,9 @@ double_array_vector_add:
 	ld	t0, 0(t0)
 	sd	t0, -64(sp)
 	fld	fa0, -64(sp)
-	addi	sp, sp, -80
+	addi	sp, sp, -104
 	call	print_double
-	addi	sp, sp, 80
+	addi	sp, sp, 104
 	ld	ra, -8(sp)
 	ret
 .text

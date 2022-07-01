@@ -592,7 +592,7 @@ void SemanticAnalysis::enterStmtAssignment(CACTParser::StmtAssignmentContext * c
     AbstractSymbol *searchLVal = curSymbolTable->lookUpAbstractSymbolGlobal(ctx->lVal()->getText());
 
     if(searchLVal->getIsArray()){
-        IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
+        IROperand* temp = irGenerator->addTempVariable(searchLVal->getMetaDataType());
         ctx->exp()->indexOperand = temp;
         IRValue* zero = new IRValue(MetaDataType::INT, std::to_string(0), {}, false);
         IRCode* code = new IRAssignI(temp, zero);
@@ -646,7 +646,10 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
         IRCode *code = new IRAddI(ctx->exp()->indexOperand, ctx->exp()->indexOperand, one);
         irGenerator->addCode(code);
         IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
-        code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
+        IRTempVariable *tmp = irGenerator->addTempVariable(MetaDataType::INT);
+        code = new IRSgeqI(tmp, ctx->exp()->indexOperand, sizeVal);
+        irGenerator->addCode(code);
+        code = new IRBeqz(tmp, ctx->beginArray);
         irGenerator->addCode(code);
     } else {
         if (ctx->lVal()->indexOperand) { // array[index] = value
@@ -835,7 +838,7 @@ void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentConte
     AbstractSymbol *searchLVal = curSymbolTable->lookUpAbstractSymbolGlobal(ctx->lVal()->getText());
 
     if(searchLVal->getIsArray()){
-        IROperand* temp = irGenerator->addTempVariable(ctx->lVal()->lValMetaDataType);
+        IROperand* temp = irGenerator->addTempVariable(searchLVal->getMetaDataType());
         ctx->exp()->indexOperand = temp;
         IRValue* zero = new IRValue(MetaDataType::INT, std::to_string(0), {}, false);
         IRCode* code = new IRAssignI(temp, zero);
@@ -889,7 +892,10 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
         IRCode *code = new IRAddI(ctx->exp()->indexOperand, ctx->exp()->indexOperand, one);
         irGenerator->addCode(code);
         IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
-        code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
+        IRTempVariable *tmp = irGenerator->addTempVariable(MetaDataType::INT);
+        code = new IRSgeqI(tmp, ctx->exp()->indexOperand, sizeVal);
+        irGenerator->addCode(code);
+        code = new IRBeqz(tmp, ctx->beginArray);
         irGenerator->addCode(code);
     } else {
         if(ctx->lVal()->indexOperand){ // array[index] = value

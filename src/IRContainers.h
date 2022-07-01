@@ -14,6 +14,10 @@ private:
     std::vector<IRCode *> codes;
     std::unordered_map<std::string, IRLabel *> labels;
 
+    std::vector<int> entrances;
+    std::vector<std::vector<IRCode *>> basicBlocks;
+    std::vector<std::vector<int>> controlFlow;
+
     int tempCount;
     int labelCount;
     int frameSize;
@@ -35,11 +39,11 @@ public:
     bool addCodes(const std::vector<IRCode *>& newCodes);
     int calFrameSize();
 
-
     IRValue* immAddSub(IROperand* op1, IROperand* op2, IROperation op);
     IRValue* immMul(IROperand* op1, IROperand* op2);
     IRValue* immDiv(IROperand* op1, IROperand* op2);
-    
+
+    void basicBlockDivision();    
 
     void constFolding();
     std::string getFunctionName() const;

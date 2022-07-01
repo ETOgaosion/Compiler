@@ -214,7 +214,7 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
             }
             else {
                 hasFreeRegister = true;
-                registerAllocBitmap["fa"] &= scanner;
+                registerAllocBitmap["fa"] |= scanner;
                 floatPointRegisterList["fa" + to_string(scanTimes)]->setAllocated();
                 if (inFloatPointType == FloatPointType::DOUBLE) {
                     floatPointRegisterList["fa" + to_string(scanTimes)]->setFloatPointType(FloatPointType::DOUBLE);
@@ -234,7 +234,7 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
                 }
                 else {
                     hasFreeRegister = true;
-                    registerAllocBitmap[reg] &= scanner;
+                    registerAllocBitmap[reg] |= scanner;
                     floatPointRegisterList[reg + to_string(scanTimes)]->setAllocated();
                     if (inFloatPointType == FloatPointType::DOUBLE) {
                         floatPointRegisterList["fa" + to_string(scanTimes)]->setFloatPointType(FloatPointType::DOUBLE);

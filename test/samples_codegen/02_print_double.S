@@ -9,8 +9,7 @@ iobuff:
 main:
 	sd	ra, -8(sp)
 	li	t0, ImmValue_0
-	fmv.d.x	ft0, t0
-	fsd	ft0, -16(sp)
+	sd	t0, -16(sp)
 	fld	fa0, -16(sp)
 	addi	sp, sp, -16
 	call	print_double

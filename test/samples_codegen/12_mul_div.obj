@@ -180,25 +180,25 @@ main:
    1026c:	08810113          	addi	sp,sp,136
 	fsw	fa0, -100(sp)
    10270:	f8a12e27          	fsw	fa0,-100(sp)
-	flw	ft0, -100(sp)
-   10274:	f9c12007          	flw	ft0,-100(sp)
-	fsw	ft0, -56(sp)
-   10278:	fc012427          	fsw	ft0,-56(sp)
+	lw	t0, -100(sp)
+   10274:	f9c12283          	lw	t0,-100(sp)
+	sw	t0, -56(sp)
+   10278:	fc512423          	sw	t0,-56(sp)
 	flw	ft0, -56(sp)
    1027c:	fc812007          	flw	ft0,-56(sp)
 	li	t0, ImmValue_0
    10280:	404cd2b7          	lui	t0,0x404cd
    10284:	ccd2829b          	addiw	t0,t0,-819
-	fmv.w.x	ft0, t0
-   10288:	f0028053          	fmv.w.x	ft0,t0
-	fmul.s	ft0, ft0, ft0
-   1028c:	10007053          	fmul.s	ft0,ft0,ft0
-	fsw	ft0, -88(sp)
-   10290:	fa012427          	fsw	ft0,-88(sp)
-	flw	ft0, -88(sp)
-   10294:	fa812007          	flw	ft0,-88(sp)
-	fsw	ft0, -52(sp)
-   10298:	fc012627          	fsw	ft0,-52(sp)
+	fmv.w.x	ft1, t0
+   10288:	f00280d3          	fmv.w.x	ft1,t0
+	fmul.s	ft2, ft0, ft1
+   1028c:	10107153          	fmul.s	ft2,ft0,ft1
+	fsw	ft2, -88(sp)
+   10290:	fa212427          	fsw	ft2,-88(sp)
+	lw	t0, -88(sp)
+   10294:	fa812283          	lw	t0,-88(sp)
+	sw	t0, -52(sp)
+   10298:	fc512623          	sw	t0,-52(sp)
 	addi	sp, sp, -136
    1029c:	f7810113          	addi	sp,sp,-136
 	call	get_float
@@ -207,25 +207,25 @@ main:
    102a4:	08810113          	addi	sp,sp,136
 	fsw	fa0, -108(sp)
    102a8:	f8a12a27          	fsw	fa0,-108(sp)
-	flw	ft0, -108(sp)
-   102ac:	f9412007          	flw	ft0,-108(sp)
-	fsw	ft0, -64(sp)
-   102b0:	fc012027          	fsw	ft0,-64(sp)
+	lw	t0, -108(sp)
+   102ac:	f9412283          	lw	t0,-108(sp)
+	sw	t0, -64(sp)
+   102b0:	fc512023          	sw	t0,-64(sp)
 	flw	ft0, -64(sp)
    102b4:	fc012007          	flw	ft0,-64(sp)
 	li	t0, ImmValue_1
    102b8:	3fccd2b7          	lui	t0,0x3fccd
    102bc:	ccd2829b          	addiw	t0,t0,-819
-	fmv.w.x	ft0, t0
-   102c0:	f0028053          	fmv.w.x	ft0,t0
-	fdiv.s	ft0, ft0, ft0
-   102c4:	18007053          	fdiv.s	ft0,ft0,ft0
-	fsw	ft0, -120(sp)
-   102c8:	f8012427          	fsw	ft0,-120(sp)
-	flw	ft0, -120(sp)
-   102cc:	f8812007          	flw	ft0,-120(sp)
-	fsw	ft0, -60(sp)
-   102d0:	fc012227          	fsw	ft0,-60(sp)
+	fmv.w.x	ft1, t0
+   102c0:	f00280d3          	fmv.w.x	ft1,t0
+	fdiv.s	ft2, ft0, ft1
+   102c4:	18107153          	fdiv.s	ft2,ft0,ft1
+	fsw	ft2, -120(sp)
+   102c8:	f8212427          	fsw	ft2,-120(sp)
+	lw	t0, -120(sp)
+   102cc:	f8812283          	lw	t0,-120(sp)
+	sw	t0, -60(sp)
+   102d0:	fc512223          	sw	t0,-60(sp)
 	flw	fa0, -52(sp)
    102d4:	fcc12507          	flw	fa0,-52(sp)
 	addi	sp, sp, -136
@@ -266,10 +266,10 @@ main:
    1031c:	08810113          	addi	sp,sp,136
 	fsd	fa0, -128(sp)
    10320:	f8a13027          	fsd	fa0,-128(sp)
-	fld	ft0, -128(sp)
-   10324:	f8013007          	fld	ft0,-128(sp)
-	fsd	ft0, -72(sp)
-   10328:	fa013c27          	fsd	ft0,-72(sp)
+	ld	t0, -128(sp)
+   10324:	f8013283          	ld	t0,-128(sp)
+	sd	t0, -72(sp)
+   10328:	fa513c23          	sd	t0,-72(sp)
 	fld	ft0, -72(sp)
    1032c:	fb813007          	fld	ft0,-72(sp)
 	li	t0, ImmValue_2
@@ -281,16 +281,16 @@ main:
    10340:	33328293          	addi	t0,t0,819
    10344:	02b2                	slli	t0,t0,0xc
    10346:	33328293          	addi	t0,t0,819
-	fmv.d.x	ft0, t0
-   1034a:	f2028053          	fmv.d.x	ft0,t0
-	fmul.d	ft0, ft0, ft0
-   1034e:	12007053          	fmul.d	ft0,ft0,ft0
-	fsd	ft0, -116(sp)
-   10352:	f8013627          	fsd	ft0,-116(sp)
-	fld	ft0, -116(sp)
-   10356:	f8c13007          	fld	ft0,-116(sp)
-	fsd	ft0, -48(sp)
-   1035a:	fc013827          	fsd	ft0,-48(sp)
+	fmv.d.x	ft1, t0
+   1034a:	f20280d3          	fmv.d.x	ft1,t0
+	fmul.d	ft2, ft0, ft1
+   1034e:	12107153          	fmul.d	ft2,ft0,ft1
+	fsd	ft2, -116(sp)
+   10352:	f8213627          	fsd	ft2,-116(sp)
+	ld	t0, -116(sp)
+   10356:	f8c13283          	ld	t0,-116(sp)
+	sd	t0, -48(sp)
+   1035a:	fc513823          	sd	t0,-48(sp)
 	addi	sp, sp, -136
    1035e:	f7810113          	addi	sp,sp,-136
 	call	get_double
@@ -299,26 +299,26 @@ main:
    10366:	08810113          	addi	sp,sp,136
 	fsd	fa0, -136(sp)
    1036a:	f6a13c27          	fsd	fa0,-136(sp)
-	fld	ft0, -136(sp)
-   1036e:	f7813007          	fld	ft0,-136(sp)
-	fsd	ft0, -24(sp)
-   10372:	fe013427          	fsd	ft0,-24(sp)
+	ld	t0, -136(sp)
+   1036e:	f7813283          	ld	t0,-136(sp)
+	sd	t0, -24(sp)
+   10372:	fe513423          	sd	t0,-24(sp)
 	fld	ft0, -24(sp)
    10376:	fe813007          	fld	ft0,-24(sp)
 	li	t0, ImmValue_3
    1037a:	6285                	lui	t0,0x1
    1037c:	2285                	addiw	t0,t0,1
    1037e:	12ca                	slli	t0,t0,0x32
-	fmv.d.x	ft0, t0
-   10380:	f2028053          	fmv.d.x	ft0,t0
-	fdiv.d	ft0, ft0, ft0
-   10384:	1a007053          	fdiv.d	ft0,ft0,ft0
-	fsd	ft0, -80(sp)
-   10388:	fa013827          	fsd	ft0,-80(sp)
-	fld	ft0, -80(sp)
-   1038c:	fb013007          	fld	ft0,-80(sp)
-	fsd	ft0, -16(sp)
-   10390:	fe013827          	fsd	ft0,-16(sp)
+	fmv.d.x	ft1, t0
+   10380:	f20280d3          	fmv.d.x	ft1,t0
+	fdiv.d	ft2, ft0, ft1
+   10384:	1a107153          	fdiv.d	ft2,ft0,ft1
+	fsd	ft2, -80(sp)
+   10388:	fa213827          	fsd	ft2,-80(sp)
+	ld	t0, -80(sp)
+   1038c:	fb013283          	ld	t0,-80(sp)
+	sd	t0, -16(sp)
+   10390:	fe513823          	sd	t0,-16(sp)
 	fld	fa0, -48(sp)
    10394:	fd013507          	fld	fa0,-48(sp)
 	addi	sp, sp, -136

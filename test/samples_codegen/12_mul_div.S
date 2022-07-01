@@ -66,28 +66,28 @@ main:
 	call	get_float
 	addi	sp, sp, 136
 	fsw	fa0, -100(sp)
-	flw	ft0, -100(sp)
-	fsw	ft0, -56(sp)
+	lw	t0, -100(sp)
+	sw	t0, -56(sp)
 	flw	ft0, -56(sp)
 	li	t0, ImmValue_0
-	fmv.w.x	ft0, t0
-	fmul.s	ft0, ft0, ft0
-	fsw	ft0, -88(sp)
-	flw	ft0, -88(sp)
-	fsw	ft0, -52(sp)
+	fmv.w.x	ft1, t0
+	fmul.s	ft2, ft0, ft1
+	fsw	ft2, -88(sp)
+	lw	t0, -88(sp)
+	sw	t0, -52(sp)
 	addi	sp, sp, -136
 	call	get_float
 	addi	sp, sp, 136
 	fsw	fa0, -108(sp)
-	flw	ft0, -108(sp)
-	fsw	ft0, -64(sp)
+	lw	t0, -108(sp)
+	sw	t0, -64(sp)
 	flw	ft0, -64(sp)
 	li	t0, ImmValue_1
-	fmv.w.x	ft0, t0
-	fdiv.s	ft0, ft0, ft0
-	fsw	ft0, -120(sp)
-	flw	ft0, -120(sp)
-	fsw	ft0, -60(sp)
+	fmv.w.x	ft1, t0
+	fdiv.s	ft2, ft0, ft1
+	fsw	ft2, -120(sp)
+	lw	t0, -120(sp)
+	sw	t0, -60(sp)
 	flw	fa0, -52(sp)
 	addi	sp, sp, -136
 	call	print_float
@@ -108,28 +108,28 @@ main:
 	call	get_double
 	addi	sp, sp, 136
 	fsd	fa0, -128(sp)
-	fld	ft0, -128(sp)
-	fsd	ft0, -72(sp)
+	ld	t0, -128(sp)
+	sd	t0, -72(sp)
 	fld	ft0, -72(sp)
 	li	t0, ImmValue_2
-	fmv.d.x	ft0, t0
-	fmul.d	ft0, ft0, ft0
-	fsd	ft0, -116(sp)
-	fld	ft0, -116(sp)
-	fsd	ft0, -48(sp)
+	fmv.d.x	ft1, t0
+	fmul.d	ft2, ft0, ft1
+	fsd	ft2, -116(sp)
+	ld	t0, -116(sp)
+	sd	t0, -48(sp)
 	addi	sp, sp, -136
 	call	get_double
 	addi	sp, sp, 136
 	fsd	fa0, -136(sp)
-	fld	ft0, -136(sp)
-	fsd	ft0, -24(sp)
+	ld	t0, -136(sp)
+	sd	t0, -24(sp)
 	fld	ft0, -24(sp)
 	li	t0, ImmValue_3
-	fmv.d.x	ft0, t0
-	fdiv.d	ft0, ft0, ft0
-	fsd	ft0, -80(sp)
-	fld	ft0, -80(sp)
-	fsd	ft0, -16(sp)
+	fmv.d.x	ft1, t0
+	fdiv.d	ft2, ft0, ft1
+	fsd	ft2, -80(sp)
+	ld	t0, -80(sp)
+	sd	t0, -16(sp)
 	fld	fa0, -48(sp)
 	addi	sp, sp, -136
 	call	print_double

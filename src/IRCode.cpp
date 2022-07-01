@@ -969,7 +969,7 @@ void IRSgeqI::genTargetCode(TargetCodes *t) {
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeSlt(resultReg, arg1Reg, arg2Reg);
     // neg
-    t->addCodeNot(resultReg, resultReg);
+    t->addCodeSeqz(resultReg, resultReg);
     result->storeFrom(t, resultReg);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
@@ -981,7 +981,8 @@ void IRSgeqF::genTargetCode(TargetCodes *t) {
     Register *arg1Reg = arg1->load(t, false);
     Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    t->addCodeFlt(resultReg, arg2Reg, arg1Reg, FloatPointType::SINGLE);
+    t->addCodeFlt(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
+    t->addCodeSeqz(resultReg, resultReg);
     result->storeFrom(t, resultReg);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
@@ -994,6 +995,7 @@ void IRSgeqD::genTargetCode(TargetCodes *t) {
     Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFlt(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
+    t->addCodeSeqz(resultReg, resultReg);
     result->storeFrom(t, resultReg);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);

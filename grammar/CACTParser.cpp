@@ -1211,6 +1211,7 @@ void CACTParser::StmtContext::copyFrom(StmtContext *ctx) {
   this->hasReturn = ctx->hasReturn;
   this->returnType = ctx->returnType;
   this->codes = ctx->codes;
+  this->beginArray = ctx->beginArray;
 }
 
 //----------------- StmtBlockContext ------------------------------------------------------------------
@@ -1654,6 +1655,7 @@ void CACTParser::SubStmtContext::copyFrom(SubStmtContext *ctx) {
   this->hasReturn = ctx->hasReturn;
   this->returnType = ctx->returnType;
   this->codes = ctx->codes;
+  this->beginArray = ctx->beginArray;
 }
 
 //----------------- SubStmtExpressionContext ------------------------------------------------------------------
@@ -1938,6 +1940,7 @@ void CACTParser::ExpContext::copyFrom(ExpContext *ctx) {
   this->size = ctx->size;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
+  this->indexOperand = ctx->indexOperand;
 }
 
 //----------------- ExpBoolExpContext ------------------------------------------------------------------
@@ -2158,6 +2161,7 @@ void CACTParser::PrimaryExpContext::copyFrom(PrimaryExpContext *ctx) {
   this->size = ctx->size;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
+  this->indexOperand = ctx->indexOperand;
 }
 
 //----------------- PrimaryExpNestExpContext ------------------------------------------------------------------
@@ -2286,6 +2290,7 @@ void CACTParser::UnaryExpContext::copyFrom(UnaryExpContext *ctx) {
   this->size = ctx->size;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
+  this->indexOperand = ctx->indexOperand;
 }
 
 //----------------- UnaryExpFuncContext ------------------------------------------------------------------
@@ -2560,6 +2565,7 @@ void CACTParser::MulExpContext::copyFrom(MulExpContext *ctx) {
   this->size = ctx->size;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
+  this->indexOperand = ctx->indexOperand;
 }
 
 //----------------- MulExpMulExpContext ------------------------------------------------------------------
@@ -2740,6 +2746,7 @@ void CACTParser::AddExpContext::copyFrom(AddExpContext *ctx) {
   this->size = ctx->size;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
+  this->indexOperand = ctx->indexOperand;
 }
 
 //----------------- AddExpAddExpContext ------------------------------------------------------------------

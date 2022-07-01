@@ -12,8 +12,8 @@ main:
 	call	get_float
 	addi	sp, sp, 16
 	fsw	fa0, -16(sp)
-	flw	ft0, -16(sp)
-	fsw	ft0, -12(sp)
+	lw	t0, -16(sp)
+	sw	t0, -12(sp)
 	flw	fa0, -12(sp)
 	addi	sp, sp, -16
 	call	print_float
