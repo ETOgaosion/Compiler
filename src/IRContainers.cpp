@@ -66,7 +66,6 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
                 }
             }
                 break;
-            }
             default:
                 break;
         }
@@ -97,7 +96,6 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
@@ -128,7 +126,6 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
                     retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
@@ -158,7 +155,6 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
@@ -180,7 +176,6 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
@@ -202,7 +197,6 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
@@ -232,7 +226,6 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
@@ -254,7 +247,6 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
@@ -276,7 +268,6 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
                 retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
             }
                 break;
-            }
             default:
                 break;
         }
