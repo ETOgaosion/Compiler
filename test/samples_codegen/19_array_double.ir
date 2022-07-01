@@ -36,7 +36,7 @@ L_1_double_array_add:
 	double_array_c[i] = t_3;
 	t_4 = double_array_c[i];
 	addparam t_4;
-	call print_double, frame size: 64; 
+	call print_double, frame size: 104; 
 	t_5 = i + 1;
 	t_6 <= i;
 	t_6 = t_5;

@@ -502,509 +502,509 @@ void IRAddI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() != OperandType::VALUE) {
-        Register *arg2Reg = arg2->load(t);
-        t->addCodeAddi(resultReg, arg2Reg, stoi(arg1->getValue()), FloatPointType::NONE);
-        t->setRegisterFree(true, arg2Reg);
+        Register *arg2Reg = arg2->load(t, true);
+        t->addCodeAddi(resultReg, arg2Reg, stoi(arg1->getValue()));
+        t->setRegisterFree(arg2Reg);
     }
     else if (arg1->getOperandType() != OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
-        Register *arg1Reg = arg1->load(t);
-        t->addCodeAddi(resultReg, arg1Reg, stoi(arg2->getValue()), FloatPointType::NONE);
-        t->setRegisterFree(true, arg1Reg);
+        Register *arg1Reg = arg1->load(t, true);
+        t->addCodeAddi(resultReg, arg1Reg, stoi(arg2->getValue()));
+        t->setRegisterFree(arg1Reg);
     }
     else if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
         Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
-        t->addCodeAddi(resultReg, zero, stoi(arg1->getValue()) + stoi(arg2->getValue()), FloatPointType::NONE);
-        t->setRegisterFree(true, zero);
+        t->addCodeAddi(resultReg, zero, stoi(arg1->getValue()) + stoi(arg2->getValue()));
+        t->setRegisterFree(zero);
     }
     else {
-        Register *arg1Reg = arg1->load(t);
-        Register *arg2Reg = arg2->load(t);
+        Register *arg1Reg = arg1->load(t, true);
+        Register *arg2Reg = arg2->load(t, true);
         t->addCodeAdd(resultReg, arg1Reg, arg2Reg, FloatPointType::NONE);
-        t->setRegisterFree(true, arg1Reg);
-        t->setRegisterFree(true, arg2Reg);
+        t->setRegisterFree(arg1Reg);
+        t->setRegisterFree(arg2Reg);
     }
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRAddF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeAdd(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRAddD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeAdd(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSubI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeSub(resultReg, arg1Reg, arg2Reg, FloatPointType::NONE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSubF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeSub(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSubD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeAdd(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRNegI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
+    Register *arg1Reg = arg1->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeNeg(resultReg, arg1Reg, FloatPointType::NONE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRNegF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
+    Register *arg1Reg = arg1->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeNeg(resultReg, arg1Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRNegD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
+    Register *arg1Reg = arg1->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeNeg(resultReg, arg1Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRMulI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeMul(resultReg, arg1Reg, arg2Reg, FloatPointType::NONE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRMulF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeMul(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRMulD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeMul(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRDivI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeDiv(resultReg, arg1Reg, arg2Reg, FloatPointType::NONE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRDivF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeDiv(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRDivD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeDiv(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRMod::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeRem(resultReg, arg1Reg, arg2Reg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRNot::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
+    Register *arg1Reg = arg1->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeNot(resultReg, arg1Reg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IROr::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeOr(resultReg, arg1Reg, arg2Reg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRAnd::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeAnd(resultReg, arg1Reg, arg2Reg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSeqB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *tmpResultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeXor(tmpResultReg, arg1Reg, arg2Reg);
     t->addCodeSeqz(resultReg, tmpResultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, tmpResultReg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(tmpResultReg);
+    t->setRegisterFree(resultReg);
 }
 
 
 void IRSeqI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *tmpResultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeXor(tmpResultReg, arg1Reg, arg2Reg);
     t->addCodeSeqz(resultReg, tmpResultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, tmpResultReg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(tmpResultReg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSeqF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFeq(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSeqD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFeq(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSneB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *tmpResultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeXor(tmpResultReg, arg1Reg, arg2Reg);
     t->addCodeSnez(resultReg, tmpResultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, tmpResultReg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(tmpResultReg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSneI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *tmpResultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeXor(tmpResultReg, arg1Reg, arg2Reg);
     t->addCodeSnez(resultReg, tmpResultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, tmpResultReg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(tmpResultReg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSneF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFeq(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     t->addCodeNot(resultReg, resultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSneD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFeq(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     t->addCodeNot(resultReg, resultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSltI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeSlt(resultReg, arg1Reg, arg2Reg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSltF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFlt(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSltD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFlt(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSgtI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     // reverse
     t->addCodeSlt(resultReg, arg2Reg, arg1Reg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSgtF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     // reverse
     t->addCodeFlt(resultReg, arg2Reg, arg1Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSgtD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     // reverse
     t->addCodeFlt(resultReg, arg2Reg, arg1Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSleqI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     // reverse
     t->addCodeSlt(resultReg, arg2Reg, arg1Reg);
     // neg
     t->addCodeNot(resultReg, resultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSleqF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     // reverse
     t->addCodeFlt(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(false, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSleqD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     // reverse
     t->addCodeFlt(resultReg, arg1Reg, arg2Reg, FloatPointType::DOUBLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSgeqI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeSlt(resultReg, arg1Reg, arg2Reg);
     // neg
     t->addCodeNot(resultReg, resultReg);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSgeqF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFlt(resultReg, arg2Reg, arg1Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRSgeqD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t);
-    Register *arg2Reg = arg2->load(t);
+    Register *arg1Reg = arg1->load(t, false);
+    Register *arg2Reg = arg2->load(t, false);
     Register *resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeFlt(resultReg, arg1Reg, arg2Reg, FloatPointType::SINGLE);
     result->storeFrom(t, resultReg);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(false, arg2Reg);
-    t->setRegisterFree(true, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRBeqz::genTargetCode(TargetCodes *t) {
-    Register *arg1Reg = arg1->load(t);
+    Register *arg1Reg = arg1->load(t, true);
     std::string label = arg2->getSymbolName();
     t->addCodeBeqz(arg1Reg, label);
-    t->setRegisterFree(true, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRGoto::genTargetCode(TargetCodes *t) {
@@ -1013,7 +1013,7 @@ void IRGoto::genTargetCode(TargetCodes *t) {
     Register *labelReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeLla(labelReg, label);
     t->addCodeJr(labelReg);
-    t->setRegisterFree(true, labelReg);
+    t->setRegisterFree(labelReg);
 }
 
 void IRReplace::genTargetCode(TargetCodes *t) {
@@ -1028,16 +1028,16 @@ void IRAssignB::genTargetCode(TargetCodes *t) {
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(arg1Reg, arg1->getSymbolName());
         for (int i = 0; i < result->getArraySize(); ++i) {
-            t->addCodeAddi(arg1Reg, arg1Reg, 4, FloatPointType::NONE);
-            t->addCodeSb(arg1Reg, tmpr, 0, FloatPointType::NONE);
+            t->addCodeAddi(arg1Reg, arg1Reg, 4);
+            t->addCodeSb(arg1Reg, tmpr, 0);
         }
-        t->setRegisterFree(true, arg1Reg);
-        t->setRegisterFree(true, tmpr);
+        t->setRegisterFree(arg1Reg);
+        t->setRegisterFree(tmpr);
     }
     else {
-        Register *arg1Reg = arg1->load(t);
+        Register *arg1Reg = arg1->load(t, true);
         result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(true, arg1Reg);
+        t->setRegisterFree(arg1Reg);
     }
 }
 
@@ -1047,18 +1047,20 @@ void IRAssignI::genTargetCode(TargetCodes *t) {
         Register *tmpr = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(tmpr, arg1->getValueLabel());
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-        t->addCodeLla(arg1Reg, arg1->getSymbolName());
+        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
+        t->addCodeAddi(arg1Reg, sp, -result->getMemOffset());
         for (int i = 0; i < result->getArraySize(); ++i) {
-            t->addCodeAddi(arg1Reg, arg1Reg, 4, FloatPointType::NONE);
-            t->addCodeSw(arg1Reg, tmpr, 0, FloatPointType::NONE);
+            t->addCodeSw(arg1Reg, tmpr, 0);
+            t->addCodeAddi(arg1Reg, arg1Reg, 4);
         }
-        t->setRegisterFree(true, arg1Reg);
-        t->setRegisterFree(true, tmpr);
+        t->setRegisterFree(arg1Reg);
+        t->setRegisterFree(tmpr);
+        t->setRegisterFree(sp);
     }
     else {
-        Register *arg1Reg = arg1->load(t);
+        Register *arg1Reg = arg1->load(t, true);
         result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(true, arg1Reg);
+        t->setRegisterFree(arg1Reg);
     }
 }
 
@@ -1068,18 +1070,20 @@ void IRAssignF::genTargetCode(TargetCodes *t) {
         Register *tmpr = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(tmpr, arg1->getValueLabel());
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-        t->addCodeLla(arg1Reg, arg1->getSymbolName());
+        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
+        t->addCodeAddi(arg1Reg, sp, -result->getMemOffset());
         for (int i = 0; i < result->getArraySize(); ++i) {
-            t->addCodeAddi(arg1Reg, arg1Reg, 4, FloatPointType::NONE);
-            t->addCodeSw(arg1Reg, tmpr, 0, FloatPointType::NONE);
+            t->addCodeSw(arg1Reg, tmpr, 0);
+            t->addCodeAddi(arg1Reg, arg1Reg, 4);
         }
-        t->setRegisterFree(true, arg1Reg);
-        t->setRegisterFree(true, tmpr);
+        t->setRegisterFree(arg1Reg);
+        t->setRegisterFree(tmpr);
+        t->setRegisterFree(sp);
     }
     else {
-        Register *arg1Reg = arg1->load(t);
+        Register *arg1Reg = arg1->load(t, true);
         result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(false, arg1Reg);
+        t->setRegisterFree(arg1Reg);
     }
 }
 
@@ -1089,127 +1093,121 @@ void IRAssignD::genTargetCode(TargetCodes *t) {
         Register *tmpr = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
         t->addCodeLla(tmpr, arg1->getValueLabel());
         Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-        t->addCodeLla(arg1Reg, arg1->getSymbolName());
+        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
+        t->addCodeAddi(arg1Reg, sp, -result->getMemOffset());
         for (int i = 0; i < result->getArraySize(); ++i) {
-            t->addCodeAddi(arg1Reg, arg1Reg, 4, FloatPointType::NONE);
-            t->addCodeSd(arg1Reg, tmpr, 0, FloatPointType::NONE);
+            t->addCodeSd(arg1Reg, tmpr, 0);
+            t->addCodeAddi(arg1Reg, arg1Reg, 8);
         }
-        t->setRegisterFree(true, arg1Reg);
-        t->setRegisterFree(true, tmpr);
+        t->setRegisterFree(arg1Reg);
+        t->setRegisterFree(tmpr);
+        t->setRegisterFree(sp);
     }
     else {
-        Register *arg1Reg = arg1->load(t);
+        Register *arg1Reg = arg1->load(t, true);
         result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(false, arg1Reg);
+        t->setRegisterFree(arg1Reg);
     }
 }
 
 void IRFetchArrayElemB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 2);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeLb(arg1Reg, arg1Reg, 0, FloatPointType::NONE);
+    t->addCodeLb(arg1Reg, arg1Reg, 0);
     result->storeFrom(t, arg1Reg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
 }
 
 void IRFetchArrayElemI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 2);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeLw(arg1Reg, arg1Reg, 0, FloatPointType::NONE);
+    t->addCodeLw(arg1Reg, arg1Reg, 0);
     result->storeFrom(t, arg1Reg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
 }
 
 void IRFetchArrayElemF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 2);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeLw(arg1Reg, arg1Reg, 0, FloatPointType::NONE);
+    t->addCodeLw(arg1Reg, arg1Reg, 0);
     result->storeFrom(t, arg1Reg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
 }
 
 void IRFetchArrayElemD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 3);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeLd(arg1Reg, arg1Reg, 0, FloatPointType::NONE);
+    t->addCodeLd(arg1Reg, arg1Reg, 0);
     result->storeFrom(t, arg1Reg);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
 }
 
 void IRAssignArrayElemB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    Register *srcReg = result->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
+    Register *srcReg = result->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 2);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeSb(arg1Reg, srcReg, 0, FloatPointType::NONE);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, srcReg);
+    t->addCodeSb(arg1Reg, srcReg, 0);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(srcReg);
 }
 
 void IRAssignArrayElemI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    Register *srcReg = result->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
+    Register *srcReg = result->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 2);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeSw(arg1Reg, srcReg, 0, FloatPointType::NONE);
-    t->setRegisterFree(true, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(true, srcReg);
+    t->addCodeSw(arg1Reg, srcReg, 0);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(srcReg);
 }
 
 void IRAssignArrayElemF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    Register *srcReg = result->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
+    Register *srcReg = result->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 2);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeSw(arg1Reg, srcReg, 0, FloatPointType::NONE);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(false, srcReg);
+    t->addCodeSw(arg1Reg, srcReg, 0);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(srcReg);
 }
 
 void IRAssignArrayElemD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
-    Register *arg2Reg = arg2->load(t);
-    Register *srcReg = result->load(t);
-    t->addCodeLla(arg1Reg, arg1->getSymbolName());
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
+    Register *srcReg = result->load(t, true);
     t->addCodeSlli(arg2Reg, arg2Reg, 3);
     t->addCodeAdd(arg1Reg, arg1Reg, arg2Reg, FloatPointType::NONE);
-    t->addCodeSd(arg1Reg, srcReg, 0, FloatPointType::NONE);
-    t->setRegisterFree(false, arg1Reg);
-    t->setRegisterFree(true, arg2Reg);
-    t->setRegisterFree(false, srcReg);
+    t->addCodeSd(arg1Reg, srcReg, 0);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(srcReg);
 }
 
 void IRAddLabel::genTargetCode(TargetCodes *t) {
@@ -1220,89 +1218,89 @@ void IRAddParamB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *arg1Reg = t->getNextFreeRegister(true, true, FloatPointType::NONE, hasFreeRegister);
     arg1->loadTo(t, arg1Reg);
-    t->setRegisterFree(true, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRAddParamI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *arg1Reg = t->getNextFreeRegister(true, true, FloatPointType::NONE, hasFreeRegister);
     arg1->loadTo(t, arg1Reg);
-    t->setRegisterFree(true, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRAddParamF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *arg1Reg = t->getNextFreeRegister(false, true, FloatPointType::SINGLE, hasFreeRegister);
     arg1->loadTo(t, arg1Reg);
-    t->setRegisterFree(false, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRAddParamD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *arg1Reg = t->getNextFreeRegister(false, true, FloatPointType::DOUBLE, hasFreeRegister);
     arg1->loadTo(t, arg1Reg);
-    t->setRegisterFree(false, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRAddParamA::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *arg1Reg = t->getNextFreeRegister(true, true, FloatPointType::NONE, hasFreeRegister);
     t->addCodeLla(arg1Reg, arg1->getSymbolName());
-    t->setRegisterFree(false, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRGetParamB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *resultArg = t->tryGetCertainRegister(true, "a" + arg1->getValue(), hasFreeRegister);
     result->storeFrom(t, resultArg);
-    t->setRegisterFree(true, resultArg);
+    t->setRegisterFree(resultArg);
 }
 
 void IRGetParamI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *resultArg = t->tryGetCertainRegister(true, "a" + arg1->getValue(), hasFreeRegister);
     result->storeFrom(t, resultArg);
-    t->setRegisterFree(true, resultArg);
+    t->setRegisterFree(resultArg);
 }
 
 void IRGetParamF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *resultArg = t->tryGetCertainRegister(false, "fa" + arg1->getValue(), hasFreeRegister);
     result->storeFrom(t, resultArg);
-    t->setRegisterFree(false, resultArg);
+    t->setRegisterFree(resultArg);
 }
 
 void IRGetParamD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *resultArg = t->tryGetCertainRegister(false, "fa" + arg1->getValue(), hasFreeRegister);
     result->storeFrom(t, resultArg);
-    t->setRegisterFree(false, resultArg);
+    t->setRegisterFree(resultArg);
 }
 
 void IRGetParamA::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *resultArg = t->tryGetCertainRegister(true, "a" + arg1->getValue(), hasFreeRegister);
     arg1->storeFrom(t, resultArg);
-    t->setRegisterFree(true, resultArg);
+    t->setRegisterFree(resultArg);
 }
 
 void IRCall::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-    t->addCodeAddi(sp, sp, -arg2->getFrameSize(), FloatPointType::NONE);
+    t->addCodeAddi(sp, sp, -arg2->getFrameSize());
     t->addCodeCall(arg1->getFunctionName());
-    t->addCodeAddi(sp, sp, arg2->getFrameSize(), FloatPointType::NONE);
-    t->setRegisterFree(true, sp);
+    t->addCodeAddi(sp, sp, arg2->getFrameSize());
+    t->setRegisterFree(sp);
 }
 
 void IRReturn::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
-    t->addCodeLd(ra, sp, -8, FloatPointType::NONE);
+    t->addCodeLd(ra, sp, -8);
     t->addCodeRet();
-    t->setRegisterFree(true, sp);
-    t->setRegisterFree(true, ra);
+    t->setRegisterFree(sp);
+    t->setRegisterFree(ra);
 }
 
 void IRReturnV::genTargetCode(TargetCodes *t) {
@@ -1314,7 +1312,7 @@ void IRReturnB::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
-    t->setRegisterFree(false, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRReturnI::genTargetCode(TargetCodes *t) {
@@ -1322,7 +1320,7 @@ void IRReturnI::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
-    t->setRegisterFree(true, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRReturnF::genTargetCode(TargetCodes *t) {
@@ -1330,7 +1328,7 @@ void IRReturnF::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
-    t->setRegisterFree(false, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRReturnD::genTargetCode(TargetCodes *t) {
@@ -1338,35 +1336,35 @@ void IRReturnD::genTargetCode(TargetCodes *t) {
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     arg1->loadTo(t, retReg);
     IRReturn::genTargetCode(t);
-    t->setRegisterFree(false, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRGetReturnB::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
     result->storeFrom(t, retReg);
-    t->setRegisterFree(false, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRGetReturnI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
     result->storeFrom(t, retReg);
-    t->setRegisterFree(true, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRGetReturnF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     result->storeFrom(t, retReg);
-    t->setRegisterFree(false, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRGetReturnD::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
     result->storeFrom(t, retReg);
-    t->setRegisterFree(false, retReg);
+    t->setRegisterFree(retReg);
 }
 
 void IRPrintB::genTargetCode(TargetCodes *t) {
