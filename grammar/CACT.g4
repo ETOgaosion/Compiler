@@ -162,7 +162,8 @@ subStmt
     locals [
         bool hasReturn,
         MetaDataType returnType,
-        std::vector<IRCode *> codes
+        std::vector<IRCode *> codes,
+        IRLabel* beginArray
     ]
     : lVal '=' exp ';'                              #subStmtAssignment
     | (exp)? ';'                                    #subStmtExpression
