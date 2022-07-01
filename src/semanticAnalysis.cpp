@@ -642,7 +642,7 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
                 break;
         }
         irGenerator->addCode(assignCode);
-        IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->size), {}, false);
+        IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
         IRCode* code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
         irGenerator->addCode(code);
     } else {
@@ -882,7 +882,7 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
                 break;
         }
         irGenerator->addCode(assignCode);
-        IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->size), {}, false);
+        IRValue* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
         IRCode* code = new IRSltI(ctx->beginArray, ctx->exp()->indexOperand, sizeVal);
         irGenerator->addCode(code);
     } else {
