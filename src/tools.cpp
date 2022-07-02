@@ -1,8 +1,27 @@
-#include <bitset>
-#include <climits>
 #include "tools.h"
 
+#include <bitset>
+#include <climits>
+#include <vector>
+#include <numeric>
+#include <unordered_map>
+#include <algorithm>
+
 using namespace std;
+
+template <typename T>
+vector<size_t> Tools::sort_indexes(const vector<T> &v) {
+    // initialize original index locations
+    vector<size_t> idx(v.size());
+    iota(idx.begin(), idx.end(), 0);
+    // sort indexes based on comparing values in v
+    // using std::stable_sort instead of std::sort
+    // to avoid unnecessary index re-orderings
+    // when v contains elements of equal values
+    stable_sort(idx.begin(), idx.end(),
+                [&v](size_t i1, size_t i2) {return v[i1] < v[i2];});
+    return idx;
+}
 
 vector<string> Tools::split (const string& s, const string& delimiter) {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();

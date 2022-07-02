@@ -17,6 +17,7 @@ private:
     std::vector<int> entrances;
     std::vector<std::vector<IRCode *>> basicBlocks;
     std::vector<std::vector<int>> controlFlow;
+    std::vector<int> cycleNum;
 
     int tempCount;
     int labelCount;
@@ -38,12 +39,19 @@ public:
     bool addCode(IRCode *newCode);
     bool addCodes(const std::vector<IRCode *>& newCodes);
     int calFrameSize();
+    int addFrameSize(int inFrameSize) { frameSize += inFrameSize;};
 
     IRValue* immAddSub(IROperand* op1, IROperand* op2, IROperation op);
     IRValue* immMul(IROperand* op1, IROperand* op2);
     IRValue* immDiv(IROperand* op1, IROperand* op2);
 
-    void basicBlockDivision();    
+    void basicBlockDivision();
+
+    void calVarActiveRegions();
+    static bool vectorOverlap(const std::vector<int>& a, const std::vector<int>& b);
+    std::unordered_map<IROperand *, std::vector<IROperand *>> calSymVarRelations();
+    std::unordered_map<IROperand *, int> calVarCosts();
+    void varBindRegisters(TargetCodes *t);
 
     void constFolding();
     std::string getFunctionName() const;

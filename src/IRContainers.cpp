@@ -1,8 +1,12 @@
 #include "IRContainers.h"
+#include "tools.h"
 
 #include <utility>
 #include <fstream>
-#include <stdio.h>
+#include <cstdio>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
 
 using namespace std;
 
@@ -282,28 +286,325 @@ void IRFunction::basicBlockDivision() {
         if (codes[i]->getOperation() == IROperation::ADD_LABEL) {
             entrances.push_back(i);
         }
-        if (codes[i]->getOperation() == IROperation::BEQZ) {
+        if (codes[i]->getOperation() == IROperation::BEQZ || codes[i]->getOperation() == IROperation::GOTO) {
             entrances.push_back(i + 1);
         }
     }
     entrances.push_back(codes.size());
     for (int i = 0; i < entrances.size() - 1; i++) {
-        basicBlocks.push_back(vector<IRCode *>(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]));
+        basicBlocks.emplace_back(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
     }
     entrances.pop_back();
     for (int i = 0; i < basicBlocks.size(); i++) {
-        controlFlow.push_back(vector<int>(i + 1));
-        for (int j = 0; j < basicBlocks[i].size(); j++) {
-            if (basicBlocks[i][j]->getOperation() == IROperation::BEQZ) {
+        controlFlow.emplace_back(i + 1);
+        for (auto & j : basicBlocks[i]) {
+            if (j->getOperation() == IROperation::BEQZ || j->getOperation() == IROperation::GOTO) {
                 for (int k = 0; k < entrances.size(); k++) {
                     if (codes[entrances[k]]->getOperation() != IROperation::ADD_LABEL) {
                         continue;
                     }
-                    if (codes[entrances[k]]->getArg1()->getSymbolName() == basicBlocks[i][j]->getResult()->getSymbolName()) {
+                    if (codes[entrances[k]]->getArg1()->getSymbolName() == j->getResult()->getSymbolName()) {
                         controlFlow.back().push_back(k);
                     }
                 }
             }
+        }
+    }
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++) {
+                    cycleNum[k]++;
+                }
+            }
+        }
+    }
+}
+
+void IRFunction::calVarActiveRegions() {
+    unordered_map<IROperand *, vector<int>> definitions;
+    unordered_map<IROperand *, vector<int>> uses;
+    for (int i = 0; i < basicBlocks.size(); i++) {
+        for (int j = 0; j < basicBlocks[i].size(); j++) {
+            if (!IRCode::isAssignmentOperation(basicBlocks[i][j]->getOperation())) {
+                continue;
+            }
+            IROperand *res = basicBlocks[i][j]->getResult();
+            IROperand *arg1 = basicBlocks[i][j]->getArg1();
+            IROperand *arg2 = basicBlocks[i][j]->getArg2();
+            if (res->getIsArray()) {
+                continue;
+            }
+            if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToSymbol()) {
+                 res = res->getSymbolVariable();
+            }
+            if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToSymbol()) {
+                arg1 = arg1->getSymbolVariable();
+            }
+            if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToSymbol()) {
+                arg2 = arg2->getSymbolVariable();
+            }
+            if (definitions.find(res) != definitions.end()) {
+                definitions[res].push_back(entrances[i] + j);
+            }
+            else {
+                definitions[res] = vector<int>(1, entrances[i] + j);
+            }
+            for (int k : controlFlow[i]) {
+                if (k <= i) {
+                    definitions[res].push_back(entrances[k]);
+                }
+            }
+            if (uses.find(arg1) != uses.end()) {
+                uses[arg1].push_back(entrances[i] + j);
+            }
+            else {
+                uses[arg1] = vector<int>(1, entrances[i] + j);
+            }
+            if (!arg2) {
+                continue;
+            }
+            if (uses.find(arg2) != uses.end()) {
+                uses[arg2].push_back(entrances[i] + j);
+            }
+            else {
+                uses[arg2] = vector<int>(1, entrances[i] + j);
+            }
+        }
+    }
+    vector<int> activeRegions;
+    for (const auto& it : uses) {
+        activeRegions.clear();
+        sort(definitions[it.first].begin(), definitions[it.first].end());
+        for (auto ui : it.second) {
+            int di = 0;
+            for (di = 0; di < definitions[it.first].size(); di++) {
+                if (definitions[it.first][di] > ui) {
+                    break;
+                }
+            }
+            if (di > 0) {
+                for (int i = definitions[it.first][di - 1]; i < ui; i++) {
+                    activeRegions.push_back(i);
+                }
+            }
+            else {
+                for (int i = 0; i < ui; i++) {
+                    activeRegions.push_back(i);
+                }
+            }
+        }
+        it.first->setActiveRegions(activeRegions);
+    }
+}
+
+bool IRFunction::vectorOverlap(const vector<int>& a, const vector<int>& b) {
+    for (auto a_it : a) {
+        for (auto b_it : b) {
+            if (a_it == b_it) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations() {
+    unordered_map<IROperand *, vector<IROperand *>> ret;
+    for (auto it = localVariables.begin(); it != prev(localVariables.end()); it++) {
+        if ((*it).second->getIsArray()) {
+            continue;
+        }
+        ret[(*it).second] = vector<IROperand *>();
+        for (auto in_it = next(it); in_it != localVariables.end(); in_it++) {
+            if ((*in_it).second->getIsArray()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
+                ret[(*it).second].push_back((*in_it).second);
+            }
+        }
+        for (auto & paramVariable : paramVariables) {
+            if (paramVariable.second->getIsArray()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
+                ret[(*it).second].push_back(paramVariable.second);
+            }
+        }
+        for (auto & tempVariable : tempVariables) {
+            if (tempVariable.second->getIsArray() || tempVariable.second->getAliasToSymbol()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
+                ret[(*it).second].push_back(tempVariable.second);
+            }
+        }
+    }
+    for (auto it = paramVariables.begin(); it != prev(paramVariables.end()); it++) {
+        if ((*it).second->getIsArray()) {
+            continue;
+        }
+        ret[(*it).second] = vector<IROperand *>();
+        for (auto in_it = next(it); in_it != paramVariables.end(); in_it++) {
+            if ((*in_it).second->getIsArray()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
+                ret[(*it).second].push_back((*in_it).second);
+            }
+        }
+        for (auto & localVariable : localVariables) {
+            if (localVariable.second->getIsArray()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
+                ret[(*it).second].push_back(localVariable.second);
+            }
+        }
+        for (auto & tempVariable : tempVariables) {
+            if (tempVariable.second->getAliasToSymbol() || tempVariable.second->getIsArray()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
+                ret[(*it).second].push_back(tempVariable.second);
+            }
+        }
+    }
+    for (auto it = tempVariables.begin(); it != prev(tempVariables.end()); it++) {
+        if ((*it).second->getIsArray() || (*it).second->getAliasToSymbol()) {
+            continue;
+        }
+        ret[(*it).second] = vector<IROperand *>();
+        for (auto in_it = next(it); in_it != tempVariables.end(); in_it++) {
+            if ((*in_it).second->getIsArray() || (*in_it).second->getAliasToSymbol()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
+                ret[(*it).second].push_back((*in_it).second);
+            }
+        }
+        for (auto & paramVariable : paramVariables) {
+            if (paramVariable.second->getIsArray()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
+                ret[(*it).second].push_back(paramVariable.second);
+            }
+        }
+        for (auto & localVariable : localVariables) {
+            if (localVariable.second->getIsArray()) {
+                continue;
+            }
+            if (!vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
+                ret[(*it).second].push_back(localVariable.second);
+            }
+        }
+    }
+}
+
+std::unordered_map<IROperand *, int> IRFunction::calVarCosts() {
+    std::unordered_map<IROperand *, int> ret;
+    for (int i = 0; i < basicBlocks.size(); i++) {
+        for (auto j : basicBlocks[i]) {
+            if (!IRCode::isAssignmentOperation(j->getOperation())) {
+                continue;
+            }
+            IROperand *res = j->getResult();
+            if (res->getIsArray()) {
+                continue;
+            }
+            IROperand *arg1 = j->getArg1();
+            IROperand *arg2 = j->getArg2();
+            if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToSymbol()) {
+                res = res->getSymbolVariable();
+            }
+            if (ret.find(res) == ret.end()) {
+                ret[res] = 1;
+            }
+            else {
+                ret[res] += cycleNum[i] * 10;
+            }
+            if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToSymbol()) {
+                arg1 = arg1->getSymbolVariable();
+            }
+            if (ret.find(arg1) == ret.end()) {
+                ret[arg1] = 1;
+            }
+            else {
+                ret[arg1] += cycleNum[i] * 10;
+            }
+            if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToSymbol()) {
+                arg2 = arg2->getSymbolVariable();
+            }
+            if (arg2) {
+                if (ret.find(arg2) == ret.end()) {
+                    ret[arg2] = 1;
+                }
+                else {
+                    ret[arg2] += cycleNum[i] * 10;
+                }
+            }
+        }
+    }
+}
+
+void IRFunction::varBindRegisters(TargetCodes *t) {
+    std::unordered_map<IROperand *, std::vector<IROperand *>> symVar = calSymVarRelations();
+    unordered_map<IROperand *, int> varCosts = calVarCosts();
+    vector<IROperand *> operands;
+    vector<IROperand *> sortedOperands;
+    vector<int> costs;
+    for (auto it : varCosts) {
+        operands.emplace_back(it.first);
+        costs.emplace_back(it.second);
+    }
+    for (auto i : Tools::sort_indexes(costs)) {
+        sortedOperands.push_back(operands[i]);
+    }
+    int numGenPurposeRegAlloc = 0;
+    int maxGenPurposeRegAlloc = 26;
+    int numFloatPointRegAlloc = 0;
+    int maxFloatPointRegAlloc = 30;
+    bool hasFreeRegister;
+    for (int i = 0; i < sortedOperands.size(); i++) {
+        if (sortedOperands[i]->getBindRegister()) {
+            continue;
+        }
+        if (sortedOperands[i]->getMetaDataType() == MetaDataType::BOOL || sortedOperands[i]->getMetaDataType() == MetaDataType::INT) {
+            if (numGenPurposeRegAlloc >= maxGenPurposeRegAlloc) {
+                if (numFloatPointRegAlloc < maxFloatPointRegAlloc) {
+                    continue;
+                }
+                else {
+                    break;
+                }
+            }
+            sortedOperands[i]->setBindRegister(true);
+            sortedOperands[i]->settargetBindRegister(t->getNextAvailableRegister(true, false, FloatPointType::NONE, hasFreeRegister));
+            for (auto it : symVar[sortedOperands[i]]) {
+                it->setBindRegister(true);
+                it->settargetBindRegister(sortedOperands[i]->gettargetBindRegister());
+            }
+            numGenPurposeRegAlloc++;
+        }
+        else {
+            if (numFloatPointRegAlloc >= maxFloatPointRegAlloc) {
+                if (numGenPurposeRegAlloc < maxGenPurposeRegAlloc) {
+                    continue;
+                }
+                else {
+                    break;
+                }
+            }
+            sortedOperands[i]->setBindRegister(true);
+            sortedOperands[i]->settargetBindRegister(t->getNextAvailableRegister(false, false, FloatPointType::NONE, hasFreeRegister));
+            for (auto it : symVar[sortedOperands[i]]) {
+                it->setBindRegister(true);
+                it->settargetBindRegister(sortedOperands[i]->gettargetBindRegister());
+            }
+            numFloatPointRegAlloc++;
         }
     }
 }

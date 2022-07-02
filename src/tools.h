@@ -7,6 +7,8 @@ private:
 protected:
 
 public:
+    template <typename T>
+    static std::vector<size_t> sort_indexes(const std::vector<T> &v);
     static std::vector<std::string> split(const std::string& s, const std::string& delimiter);
     static std::string bstohs(const std::string& hs);
     static std::string ftoIEEE754s(float value);

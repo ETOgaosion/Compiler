@@ -137,13 +137,17 @@ public:
     void codeWrite(std::string path) const;
 
     Register *getNextFreeRegister(bool isGeneralPurposeRegister, bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister);
+    Register *getNextAvailableRegister(bool isGeneralPurposeRegister, bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister);
 
     Register *tryGetCertainRegister(bool isGeneralPurposeRegister, const std::string &regName, bool &isFreeRegister);
 
     bool setRegisterFree(bool isGeneralPurposeRegister, const std::string &reg);
+    bool setRegisterAvailable(bool isGeneralPurposeRegister, const std::string &reg);
     bool setRegisterFree(Register *reg);
+    bool setRegisterAvailable(Register *reg);
 
     bool setRegistersFree(bool isGeneralPurposeRegister, const std::vector<std::string> &registers);
+    bool setRegistersAvailable(bool isGeneralPurposeRegister, const std::vector<std::string> &registers);
 };
 
 

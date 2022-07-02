@@ -65,6 +65,8 @@ public:
     virtual void print() const = 0;
 
     virtual void genTargetCode(TargetCodes *t) {};
+
+    static bool isAssignmentOperation(IROperation inOperation);
 };
 
 //!!!!!!!! consider immediate and metaDataType when generating target code !!!!!!!!!!
