@@ -339,7 +339,7 @@ void IRFunction::constFolding() {
                     }
                 }
             }
-            
+            delete code;
             codes.erase(codes.begin() + i);
             i--;
         }
@@ -359,6 +359,7 @@ void IRFunction::constFolding() {
                                 code->setArg1(new_value);
                             else
                                 code->setArg2(new_value);
+                            delete new_code;
                             codes.erase(codes.begin() + j);
                         }
                     } else if (op == IROperation::MUL) {
@@ -368,6 +369,7 @@ void IRFunction::constFolding() {
                                 code->setArg1(new_value);
                             else
                                 code->setArg2(new_value);
+                            delete new_code;
                             codes.erase(codes.begin() + j);
                         }
                     }
@@ -379,6 +381,7 @@ void IRFunction::constFolding() {
                                 code->setArg1(new_value);
                             else
                                 code->setArg2(new_value);
+                            delete new_code;
                             codes.erase(codes.begin() + j);
                         }
                     } else if (op == IROperation::MUL) {
@@ -388,6 +391,7 @@ void IRFunction::constFolding() {
                                 code->setArg1(new_value);
                             else
                                 code->setArg2(new_value);
+                            delete new_code;
                             codes.erase(codes.begin() + j);
                         }
                     }
