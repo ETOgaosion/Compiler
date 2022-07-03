@@ -288,6 +288,7 @@ void IRValue::genTargetValue(TargetCodes *t) const {
 IRSymbolVariable::IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue, bool newIsGlobalSymbolVar) : IROperand(OperandType::SYMBOLVAR) {
     symbol = newSymbol;
     assigned = false;
+    alive = false;
     historySymbols.clear();
     initialValue = newValue;
     isGlobalSymbolVar = newIsGlobalSymbolVar;
@@ -835,6 +836,7 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : I
     symbolName = std::move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
+    alive = false;
     aliasToSymbol = false;
     symbolVariable = nullptr;
     offset = 0;

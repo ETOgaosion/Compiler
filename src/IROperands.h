@@ -50,7 +50,7 @@ public:
     virtual bool getBindRegister() const { return false; };
     virtual Register *gettargetBindRegister() const { return nullptr; };
     virtual std::vector<int> getActiveRegions() const { return {}; };
-    virtual bool getIsAlive() const { return true; };
+    virtual bool getIsAlive() const { return false; };
 
     virtual void setAlive(bool set) {};
     virtual bool setAssigned() { return false; }
