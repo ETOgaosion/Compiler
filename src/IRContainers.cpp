@@ -975,6 +975,19 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     if (codes.back()->getOperation() != IROperation::RETURN) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
+        for (auto it : getBindRegisters()) {
+            if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
+                t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+            }
+            else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] == 'fs') {
+                if (it->getFloatPointType() == FloatPointType::SINGLE) {
+                    t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+                }
+                else {
+                    t->addCodeLd(it, sp, -it->getTmpStoreOffset());
+                }
+            }
+        }
         t->addCodeLd(ra, sp, -8);
         t->addCodeRet();
         t->setRegisterFree(sp);
