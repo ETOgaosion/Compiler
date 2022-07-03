@@ -56,10 +56,7 @@ public:
     void addOperandToVec(std::vector<IROperand*>& vars, IROperand* op);
     bool cmpTwoInVars(std::vector<IROperand*> & vec1, std::vector<IROperand*> & vec2);
 
-
-
-    void defVarsAnalysis();
-    void useVarsAnalysis();
+    void usedefVarsAnalysis();
     void liveVarAnalysis();
     void delDeadCode() ;
     void basicBlockDivision();

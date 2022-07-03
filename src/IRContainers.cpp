@@ -291,11 +291,14 @@ void IRFunction::addOperandToVec(std::vector<IROperand*>& vars, IROperand* op){
         vars.push_back(op);
 }
 
-void IRFunction::useVarsAnalysis() {
+void IRFunction::usedefVarsAnalysis() {
     for(int i = 0; i < basicBlocks.size(); i++) {
         auto block = basicBlocks[i];
         auto use = useVars[i];
-        // all operand init to be not alive
+        auto def = defVars[i];
+        use.clear();
+        def.clear();
+
         for(int j = block.size() - 1; j >= 0; j--){
             IRCode* code = block[j];
             IROperand* res = code->getResult();
@@ -306,65 +309,53 @@ void IRFunction::useVarsAnalysis() {
             if(op == IROperation::ADD_LABEL || op == IROperation::GOTO || op == IROperation::CALL)
                 continue;
             else if(op == IROperation::RETURN || op == IROperation::ADD_PARAM || op == IROperation::BEQZ){
-                arg1->setAlive(true);
-                addOperandToVec(use, arg1);
-                continue;
+                if(arg1){
+                    addOperandToVec(use, arg1);
+                    delOperandInVec(def, arg1);
+                }
             } else if (op == IROperation::GET_PARAM || op == IROperation::GET_RETURN) {
-                if(res){
-                    res->setAlive(false);
+                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)){
                     delOperandInVec(use, res);
-                    continue;
+                    addOperandToVec(def, res);
                 }
             } else if (op == IROperation::REPLACE) {
                 if(res){
-                    res->setAlive(false);
                     delOperandInVec(use, res);
+                    addOperandToVec(def, res);
                 }
                 if(arg1){
-                    arg1->setAlive(false);
                     delOperandInVec(use, arg1);
+                    addOperandToVec(def, arg1);
                 }
-                continue;
             } else if (op == IROperation::ASSIGN_ARRAY_ELEM) {
-                // if index is not immval, set it alive
                 if(arg2 && arg2->getOperandType() != OperandType::VALUE){
-                    arg2->setAlive(true);
                     addOperandToVec(use, arg2);
+                    delOperandInVec(def, arg2);
                 }
-                // if src if not immval, set it alive
-                if(res && res->getOperandType() != OperandType::VALUE){
-                    res->setAlive(true);
+                if(res && res->getOperandType() != OperandType::VALUE){ // src operand
+                    delOperandInVec(def, res);
                     addOperandToVec(use, res);
                 }
-                continue;
             } else if (op == IROperation::PHI) {
                 
             } else {
                 if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)){
-                    res->setAlive(false);
+                    addOperandToVec(def, res);
                     delOperandInVec(use, res);
                 }
                 if(arg1 && (arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR)){
-                    arg1->setAlive(true);
+                    delOperandInVec(def, arg1);
                     addOperandToVec(use, arg1);
                 }
                 if(arg2 && (arg2->getOperandType() == OperandType::SYMBOLVAR || arg2->getOperandType() == OperandType::TEMPVAR)){
-                    arg2->setAlive(true);
+                    delOperandInVec(def, arg2);
                     addOperandToVec(use, arg2);
                 }
             }
         }
-
-        // set use Vars to be not alive
-        for(auto & var : use)
-            var->setAlive(false);
     }
 }
 
-
-void IRFunction::defVarsAnalysis() {
-
-}
 
 // vec1 is old, vec 2 is new
 bool IRFunction::cmpTwoInVars(std::vector<IROperand*> & vec1, std::vector<IROperand*> & vec2){
@@ -381,59 +372,54 @@ bool IRFunction::cmpTwoInVars(std::vector<IROperand*> & vec1, std::vector<IROper
 } 
 
 void IRFunction::liveVarAnalysis() {
-    bool changed = false;
-
-    useVarsAnalysis();
-    defVarsAnalysis();
-
-    /* init last block's out vars */
-    auto outVar = outVars.back();
-    auto glbVars = ir->getGlobalVariables();
-    for(auto gblvar = glbVars.cbegin(); gblvar != glbVars.cend(); gblvar++) {
-        IRSymbolVariable* var = gblvar->second;
-        outVar.push_back(var);
-    }
+    bool changed;
+    usedefVarsAnalysis();
 
     do{
+        changed = false;
         for(int i = basicBlocks.size() - 1; i >= 0; i--){ // i for block number
-            auto block = basicBlocks[i];
+            bool ichanged = false;
             auto out = useVars[i];
-            // update out variables
-            // out.clear();
-            // std::vector<int> ctrlflow = controlFlow[i];
-            // for(int & back : ctrlflow){
-            //     for(auto & var :inVars[back])
-            //         addOperandToVec(out, var);
-            // }
-
             std::vector<IROperand*> newin;
+            // update out vars
             std::vector<int> ctrlflow = controlFlow[i];
             for(int & back : ctrlflow){
                 for(auto & var :inVars[back])
                     addOperandToVec(newin, var);
             }
+            // add global variables to the last block's out vars 
+            if(i == basicBlocks.size() - 1){
+                auto outVar = outVars.back();
+                auto glbVars = ir->getGlobalVariables();
+                for(auto gblvar = glbVars.cbegin(); gblvar != glbVars.cend(); gblvar++) {
+                    IRSymbolVariable* var = gblvar->second;
+                    outVar.push_back(var);
+                }           
+            }
+            // delete DEF variables
             for(auto & var : defVars[i])
                 delOperandInVec(newin, var);
+            // add USE variables
             for(auto & var : useVars[i])
                 addOperandToVec(newin, var);
             
-            changed = cmpTwoInVars(inVars[i], newin);
-            if(changed){
+            ichanged = cmpTwoInVars(inVars[i], newin);
+            if(ichanged){
                 // update inVar
                 inVars[i].clear();
                 for(auto & var : newin)
                     inVars[i].push_back(var);  
-            }          
+            }  
+            if(ichanged)
+                changed = true;        
         }
     } while (changed);
-
 }
 
 void IRFunction::delDeadCode() {
-    // scan basic blocks
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
         auto block = basicBlocks[i];
-        // set out vats to alive
+        // set out vars to alive
         for(auto & var : outVars[i])
             var->setAlive(true);
         // delete dead codes
@@ -450,11 +436,12 @@ void IRFunction::delDeadCode() {
                 arg1->setAlive(true);
                 continue;
             } else if (op == IROperation::GET_PARAM || op == IROperation::GET_RETURN) {
-                if(res && res->getIsAlive() == false) {
-                    delete code;
-                    block.erase(block.begin() + j);
-                    continue;
-                }
+                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR))
+                    if(res->getIsAlive() == false) {
+                        delete code;
+                        block.erase(block.begin() + j);
+                        continue;
+                    }
             } else if (op == IROperation::REPLACE) {
                 if(res && res->getIsAlive() == false) {
                     delete code;
