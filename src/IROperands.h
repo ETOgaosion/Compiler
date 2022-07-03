@@ -1,6 +1,8 @@
 #include "SymbolTable.h"
 #include "TargetCodes.h"
 
+#include <vector>
+
 #pragma once
 
 enum class OperandType {
@@ -45,6 +47,9 @@ public:
     virtual uint64_t getMemPosition() const { return 0; };
     virtual bool getIsGlobalSymbolVar() const { return 0; };
     virtual int getFrameSize() const { return 0; };
+    virtual bool getBindRegister() const { return false; };
+    virtual Register *gettargetBindRegister() const { return nullptr; };
+    virtual std::vector<int> getActiveRegions() const { return {}; };
     virtual bool getIsAlive() const { return true; };
 
     virtual void setAlive(bool set) {};
@@ -59,6 +64,9 @@ public:
     virtual void addValues(const std::vector<std::string>& newValues) {};
     virtual bool setLabel(const std::string& newLabel) { return false; };
     virtual bool setMetaDataType(MetaDataType newType) { return false; };
+    virtual bool setActiveRegions(std::vector<int> inActiveRegion) { return false; };
+    virtual bool setBindRegister(bool toBindRegister) { return false; };
+    virtual bool settargetBindRegister(Register *intargetBindRegister) { return false; };
 
     virtual Register *load(TargetCodes * t, bool isGeneralPurposeRegister) { return nullptr; };
     virtual Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) { return nullptr; };
@@ -125,8 +133,10 @@ private:
     std::vector<IROperand *> historySymbols;
     IRValue *initialValue;
     bool isGlobalSymbolVar;
+    std::vector<int> activeRegions;
+    bool bindRegister;
+    Register *targetBindRegister;
     bool alive;
-
 
 public:
     IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue, bool newIsGlobalSymbolVar);
@@ -141,15 +151,22 @@ public:
     bool getIsGlobalSymbolVar() const override { return isGlobalSymbolVar; };
     int getArraySize() const override { return symbol->getSize(); };
     uint64_t getMemPosition() const override { return symbol->getMemPosition(); };
-
-    bool getIsAlive() const override { return alive; };
-    void setAlive(bool set) override { alive = set; };
+    std::vector<int> getActiveRegions() const override { return activeRegions; };
+    bool getBindRegister() const override { return bindRegister; };
+    Register *gettargetBindRegister() const override { return targetBindRegister; };
 
     bool setAssigned() override { assigned = true; return true; };
     bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; };
 
+    bool getIsAlive() const override { return alive; };
+    void setAlive(bool set) override { alive = set; };
+
+
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
     bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); };
+    bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
+    bool settargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
+    bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
 
     Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
     Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) override;
@@ -188,8 +205,10 @@ private:
     IROperand *symbolVariable;
     int offset;
     IRValue *initialValue;
+    std::vector<int> activeRegions;
+    bool bindRegister;
+    Register *targetBindRegister;
     bool alive;
-
 
 public:
     IRTempVariable(std::string newName, MetaDataType newMetaDataType);
@@ -202,6 +221,9 @@ public:
     bool getAliasToSymbol() const override { return aliasToSymbol; };
     IROperand *getSymbolVariable() const override { return symbolVariable; };
     IRValue *getInitialValue() const override { return initialValue; };
+    std::vector<int> getActiveRegions() const override { return activeRegions; };
+    bool getBindRegister() const override { return bindRegister; };
+    Register *gettargetBindRegister() const override { return targetBindRegister; };
 
     bool getIsAlive() const override { return alive; };
     void setAlive(bool set) override { alive = set; };
@@ -209,6 +231,9 @@ public:
     bool setAssigned() override { assigned = true; return true; };
     bool setAliasToSymbol() override { aliasToSymbol = true; return true; };
     bool setSymbolVariable(IROperand *inSymbolVariable) override { aliasToSymbol = true; symbolVariable = inSymbolVariable; return true; };
+    bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
+    bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
+    bool settargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
 
     void setMemOffset(int inOffset) override { offset = inOffset; };
     int getMemOffset() const override { return offset; };

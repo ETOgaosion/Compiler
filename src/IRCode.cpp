@@ -26,6 +26,28 @@ bool IRCode::setResult(IROperand *op){
     return true;
 }
 
+bool IRCode::isAssignmentOperation(IROperation inOperation) {
+    switch(inOperation) {
+        case IROperation::BEQZ:
+        case IROperation::GOTO:
+        case IROperation::REPLACE:
+        case IROperation::FETCH_ARRAY_ELEM:
+        case IROperation::ASSIGN_ARRAY_ELEM:
+        case IROperation::ADD_LABEL:
+        case IROperation::ADD_PARAM:
+        case IROperation::GET_PARAM:
+        case IROperation::CALL:
+        case IROperation::RETURN:
+        case IROperation::GET_RETURN:
+        case IROperation::PRINT:
+        case IROperation::READ:
+            return false;
+            break;
+        default:
+            return true;
+    }
+}
+
 IRCode::IRCode(IROperation newOp, IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : operation(newOp), result(newResult), arg1(newArg1), arg2(newArg2) {}
 

@@ -424,6 +424,15 @@ Register *TargetCodes::getNextFreeRegister(bool isGeneralPurposeRegister, bool i
     }
 }
 
+Register *TargetCodes::getNextAvailableRegister(bool isGeneralPurposeRegister, bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->getNextAvailableRegister(isParam, inFloatPointType, hasFreeRegister);
+    }
+    else {
+        return floatPointRegisters->getNextAvailableRegister(isParam, inFloatPointType, hasFreeRegister);
+    }
+}
+
 Register *TargetCodes::tryGetCertainRegister(bool isGeneralPurposeRegister, const string &regName, bool &isFreeRegister) {
     if (isGeneralPurposeRegister) {
         return generalPurposeRegisters->tryGetCertainRegister(regName, isFreeRegister);
@@ -442,6 +451,15 @@ bool TargetCodes::setRegisterFree(bool isGeneralPurposeRegister, const string &r
     }
 }
 
+bool TargetCodes::setRegisterAvailable(bool isGeneralPurposeRegister, const string &reg) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->setRegisterAvailable(reg);
+    }
+    else {
+        return floatPointRegisters->setRegisterAvailable(reg);
+    }
+}
+
 bool TargetCodes::setRegisterFree(Register *reg) {
     if (reg->getRegisterType() == RegisterType::GENERAL_PURPOSE) {
         return generalPurposeRegisters->setRegisterFree(reg->getAliasName());
@@ -451,12 +469,30 @@ bool TargetCodes::setRegisterFree(Register *reg) {
     }
 }
 
+bool TargetCodes::setRegisterAvailable(Register *reg) {
+    if (reg->getRegisterType() == RegisterType::GENERAL_PURPOSE) {
+        return generalPurposeRegisters->setRegisterAvailable(reg->getAliasName());
+    }
+    else {
+        return floatPointRegisters->setRegisterAvailable(reg->getAliasName());
+    }
+}
+
 bool TargetCodes::setRegistersFree(bool isGeneralPurposeRegister, const vector<std::string> &registers) {
     if (isGeneralPurposeRegister) {
         return generalPurposeRegisters->setRegistersFree(registers);
     }
     else {
         return floatPointRegisters->setRegistersFree(registers);
+    }
+}
+
+bool TargetCodes::setRegistersAvailable(bool isGeneralPurposeRegister, const vector<std::string> &registers) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->setRegistersAvailable(registers);
+    }
+    else {
+        return floatPointRegisters->setRegistersAvailable(registers);
     }
 }
 
