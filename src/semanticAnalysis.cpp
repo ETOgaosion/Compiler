@@ -414,7 +414,6 @@ void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
     if (ctx->funcBlock()->funcBlockItem().back()->getText().find("return", 0) != 0) {
         irGenerator->exitFunction();
     }
-    irGenerator->currentIRFunc->calFrameSize();
 }
 
 void SemanticAnalysis::enterFuncType(CACTParser::FuncTypeContext * ctx)

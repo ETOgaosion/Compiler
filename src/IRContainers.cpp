@@ -810,10 +810,13 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
                 }
             }
             sortedOperands[i]->setBindRegister(true);
-            sortedOperands[i]->settargetBindRegister(t->getNextAvailableRegister(true, false, FloatPointType::NONE, hasFreeRegister));
+            Register *toBindReg = t->getNextAvailableRegister(true, false, FloatPointType::NONE, hasFreeRegister);
+            sortedOperands[i]->setTargetBindRegister(toBindReg);
+            toBindReg->setTmpStoreOffset(sortedOperands[i]->getMemOffset());
+            functionTable->insertBindRegisters(toBindReg);
             for (auto it : symVar[sortedOperands[i]]) {
                 it->setBindRegister(true);
-                it->settargetBindRegister(sortedOperands[i]->gettargetBindRegister());
+                it->setTargetBindRegister(toBindReg);
             }
             numGenPurposeRegAlloc++;
         }
@@ -827,10 +830,13 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
                 }
             }
             sortedOperands[i]->setBindRegister(true);
-            sortedOperands[i]->settargetBindRegister(t->getNextAvailableRegister(false, false, FloatPointType::NONE, hasFreeRegister));
+            Register *toBindReg = t->getNextAvailableRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+            sortedOperands[i]->setTargetBindRegister(toBindReg);
+            toBindReg->setTmpStoreOffset(sortedOperands[i]->getMemOffset());
+            functionTable->insertBindRegisters(toBindReg);
             for (auto it : symVar[sortedOperands[i]]) {
                 it->setBindRegister(true);
-                it->settargetBindRegister(sortedOperands[i]->gettargetBindRegister());
+                it->setTargetBindRegister(toBindReg);
             }
             numFloatPointRegAlloc++;
         }
@@ -1044,6 +1050,10 @@ int IRFunction::getFrameSize() const {
     return frameSize;
 }
 
+std::vector<Register *> IRFunction::getBindRegisters() const {
+    return functionTable->getBindRegisters();
+}
+
 void IRFunction::print(SymbolTable *globalSymbolTable) const {
     auto functionTable = globalSymbolTable->lookUpFuncSymbolTable(functionName);
     cout << "----------- funcDef -----------" << endl;
@@ -1095,6 +1105,19 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     t->addCodeSd(sp, ra, -8);
     t->setRegisterFree(ra);
+    for (auto it : getBindRegisters()) {
+        if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
+            t->addCodeSw(sp, it, -it->getTmpStoreOffset());
+        }
+        else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] == 'fs') {
+            if (it->getFloatPointType() == FloatPointType::SINGLE) {
+                t->addCodeSw(sp, it, -it->getTmpStoreOffset());
+            }
+            else {
+                t->addCodeSd(sp, it, -it->getTmpStoreOffset());
+            }
+        }
+    }
     t->setRegisterFree(sp);
     for (auto &code : codes) {
         code->genTargetCode(t);
@@ -1102,10 +1125,25 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     if (codes.back()->getOperation() != IROperation::RETURN) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
+        for (auto it : getBindRegisters()) {
+            if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
+                t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+            }
+            else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] == 'fs') {
+                if (it->getFloatPointType() == FloatPointType::SINGLE) {
+                    t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+                }
+                else {
+                    t->addCodeLd(it, sp, -it->getTmpStoreOffset());
+                }
+            }
+        }
         t->addCodeLd(ra, sp, -8);
         t->addCodeRet();
         t->setRegisterFree(sp);
     }
+    t->setAllRegistersFree();
+    t->setAllRegistersAvailable();
 }
 
 IRProgram::IRProgram() {}
@@ -1263,6 +1301,7 @@ void IRProgram::targetGen(TargetCodes *t) {
     }
     for (const auto& func : functions) {
         if ((func.second->getFunctionName().find("print_", 0) != 0) && (func.second->getFunctionName().find("get_", 0) != 0)) {
+            func.second->calFrameSize();
             func.second->targetCodeGen(t);
         }
     }

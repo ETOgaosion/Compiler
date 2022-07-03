@@ -14,7 +14,6 @@ Register::Register(RegisterType inRegisterType, FloatPointType inFloatPointType,
     value = 0;
     allocated = false;
     occupied = false;
-    isTmpStored = false;
     tmpStoreOffset = 0;
 }
 
@@ -72,7 +71,7 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
     int scanner = 0x1, scanTimes = 0;
     if (isParam) {
         while (scanTimes < registerClassNum["a"]) {
-            if (registerAllocBitmap["a"] & scanner || registerOccupiedBitmap["a"] & scanner) {
+            if (registerAllocBitmap["a"] & scanner) {
                 hasFreeRegister = false;
             }
             else {
@@ -89,7 +88,7 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
     else {
         for (const auto& reg : registerClass) {
             while (scanTimes < registerClassNum[reg]) {
-                if (registerAllocBitmap[reg] & scanner || registerAllocBitmap[reg] & scanner) {
+                if (registerAllocBitmap[reg] & scanner) {
                     hasFreeRegister = false;
                 }
                 else {
@@ -260,6 +259,34 @@ bool GeneralPurposeRegisters::setRegistersAvailable(const std::vector<std::strin
     return true;
 }
 
+bool GeneralPurposeRegisters::setRegistersFree(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterFree(reg->getAliasName());
+    }
+    return true;
+}
+
+bool GeneralPurposeRegisters::setRegistersAvailable(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterAvailable(reg->getAliasName());
+    }
+    return true;
+}
+
+bool GeneralPurposeRegisters::setAllRegistersFree() {
+    for (const auto& it : generalPurposeRegisterList) {
+        setRegisterFree(it.first);
+    }
+    return true;
+}
+
+bool GeneralPurposeRegisters::setAllRegistersAvailable() {
+    for (const auto& it : generalPurposeRegisterList) {
+        setRegisterAvailable(it.first);
+    }
+    return true;
+}
+
 FloatPointRegisters::FloatPointRegisters() : Registers(false) {
     registerClass = {"ft", "fa", "fs"};
     registerClassNum = {{"ft", 12}, {"fa", 8}, {"fs", 12}};
@@ -305,7 +332,7 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
     int scanner = 0x1, scanTimes = 0;
     if (isParam) {
         while (scanTimes < registerClassNum["fa"]) {
-            if (registerAllocBitmap["fa"] & scanner || registerOccupiedBitmap["fa"] & scanner) {
+            if (registerAllocBitmap["fa"] & scanner) {
                 hasFreeRegister = false;
             }
             else {
@@ -325,7 +352,7 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
     else {
         for (const auto& reg : registerClass) {
             while (scanTimes < registerClassNum[reg]) {
-                if (registerAllocBitmap[reg] & scanner || registerOccupiedBitmap[reg] & scanner) {
+                if (registerAllocBitmap[reg] & scanner) {
                     hasFreeRegister = false;
                 }
                 else {
@@ -481,4 +508,32 @@ Register *FloatPointRegisters::tryGetCertainRegister(const string &regName, bool
     isFreeRegister = true;
     floatPointRegisterList[regName]->setAllocated();
     return floatPointRegisterList[regName];
+}
+
+bool FloatPointRegisters::setRegistersFree(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterFree(reg->getAliasName());
+    }
+    return true;
+}
+
+bool FloatPointRegisters::setRegistersAvailable(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterAvailable(reg->getAliasName());
+    }
+    return true;
+}
+
+bool FloatPointRegisters::setAllRegistersFree() {
+    for (const auto& it : floatPointRegisterList) {
+        setRegisterFree(it.first);
+    }
+    return true;
+}
+
+bool FloatPointRegisters::setAllRegistersAvailable() {
+    for (const auto& it : floatPointRegisterList) {
+        setRegisterAvailable(it.first);
+    }
+    return true;
 }

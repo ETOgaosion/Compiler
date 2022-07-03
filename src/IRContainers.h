@@ -63,6 +63,7 @@ public:
     void liveVarAnalysis();
     void delDeadCode() ;
     void basicBlockDivision();
+
     void calVarActiveRegions();
     static bool vectorOverlap(const std::vector<int>& a, const std::vector<int>& b);
     std::unordered_map<IROperand *, std::vector<IROperand *>> calSymVarRelations();
@@ -70,7 +71,7 @@ public:
     void varBindRegisters(TargetCodes *t);
 
     void constFolding();
-    
+
     std::string getFunctionName() const;
     SymbolTable *getFuncSymbolTable() const { return functionTable; };
     IRSymbolVariable *getLocalVariable(int block, const std::string& varName);
@@ -80,6 +81,7 @@ public:
     std::vector<IRCode *> &getCodes();
     IRLabel *getLabel(const std::string& labelName);
     int getFrameSize() const;
+    std::vector<Register *> getBindRegisters() const;
 
     void print(SymbolTable *globalSymbolTable) const;
     void targetCodeGen(TargetCodes * t);

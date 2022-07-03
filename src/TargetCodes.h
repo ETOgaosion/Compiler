@@ -115,7 +115,6 @@ public:
     bool addCodeJr(Register *rs1);
     bool addCodeLla(Register *rd, const std::string &targetLabel);
     bool addCodeLi(Register *rd, const std::string &targetLabel);
-    bool addCodeLi(Register *rd, int imm);
     bool addCodeLb(Register *rd, Register *rs1, int offset);
     bool addCodeLw(Register *rd, Register *rs1, int offset);
     bool addCodeLd(Register *rd, Register *rs1, int offset);
@@ -147,7 +146,14 @@ public:
     bool setRegisterAvailable(Register *reg);
 
     bool setRegistersFree(bool isGeneralPurposeRegister, const std::vector<std::string> &registers);
+    bool setRegistersFree(bool isGeneralPurposeRegister, const std::vector<Register *> &registers);
     bool setRegistersAvailable(bool isGeneralPurposeRegister, const std::vector<std::string> &registers);
+    bool setRegistersAvailable(bool isGeneralPurposeRegister, const std::vector<Register *> &registers);
+
+    bool setAllRegistersFree(bool isGeneralPurposeRegister);
+    bool setAllRegistersAvailable(bool isGeneralPurposeRegister);
+    bool setAllRegistersFree();
+    bool setAllRegistersAvailable();
 };
 
 
