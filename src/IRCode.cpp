@@ -494,8 +494,7 @@ void IRGetParam::print() const {
 
 void IRCall::print() const {
     cout << "\t" << "call "
-         << arg1->getVal()
-         << ", frame size: " << arg2->getFrameSize() << "; " << endl;
+         << arg1->getVal() <<  "; " << endl;
 
 }
 
@@ -1311,9 +1310,35 @@ void IRGetParamA::genTargetCode(TargetCodes *t) {
 void IRCall::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
+    for (auto it : arg2->getBindRegisters()) {
+        if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] != 's') {
+            t->addCodeSw(sp, it, -it->getTmpStoreOffset());
+        }
+        else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] != 'fs') {
+            if (it->getFloatPointType() == FloatPointType::SINGLE) {
+                t->addCodeSw(sp, it, -it->getTmpStoreOffset());
+            }
+            else {
+                t->addCodeSd(sp, it, -it->getTmpStoreOffset());
+            }
+        }
+    }
     t->addCodeAddi(sp, sp, -arg2->getFrameSize());
     t->addCodeCall(arg1->getFunctionName());
     t->addCodeAddi(sp, sp, arg2->getFrameSize());
+    for (auto it : arg2->getBindRegisters()) {
+        if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] != 's') {
+            t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+        }
+        else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] != 'fs') {
+            if (it->getFloatPointType() == FloatPointType::SINGLE) {
+                t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+            }
+            else {
+                t->addCodeLd(it, sp, -it->getTmpStoreOffset());
+            }
+        }
+    }
     t->setRegisterFree(sp);
 }
 
@@ -1321,6 +1346,19 @@ void IRReturn::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
+    for (auto it : arg2->getBindRegisters()) {
+        if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
+            t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+        }
+        else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] == 'fs') {
+            if (it->getFloatPointType() == FloatPointType::SINGLE) {
+                t->addCodeLw(it, sp, -it->getTmpStoreOffset());
+            }
+            else {
+                t->addCodeLd(it, sp, -it->getTmpStoreOffset());
+            }
+        }
+    }
     t->addCodeLd(ra, sp, -8);
     t->addCodeRet();
     t->setRegisterFree(sp);

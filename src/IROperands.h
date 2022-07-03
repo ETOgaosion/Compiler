@@ -50,6 +50,7 @@ public:
     virtual bool getBindRegister() const { return false; };
     virtual Register *gettargetBindRegister() const { return nullptr; };
     virtual std::vector<int> getActiveRegions() const { return {}; };
+    virtual std::vector<Register *> getBindRegisters() const { return {}; };
 
     virtual bool setAssigned() { return false; }
     virtual bool addHistorySymbol(IROperand *inSymbol) { return false; };
@@ -64,7 +65,7 @@ public:
     virtual bool setMetaDataType(MetaDataType newType) { return false; };
     virtual bool setActiveRegions(std::vector<int> inActiveRegion) { return false; };
     virtual bool setBindRegister(bool toBindRegister) { return false; };
-    virtual bool settargetBindRegister(Register *intargetBindRegister) { return false; };
+    virtual bool setTargetBindRegister(Register *intargetBindRegister) { return false; };
 
     virtual Register *load(TargetCodes * t, bool isGeneralPurposeRegister) { return nullptr; };
     virtual Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) { return nullptr; };
@@ -158,7 +159,7 @@ public:
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
     bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
-    bool settargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
+    bool setTargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
 
     Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
@@ -181,6 +182,7 @@ public:
     std::string getFunctionName() const override { return functionTable->getFuncName(); };
     SymbolTable *getFunctionSymbolTable() const override { return functionTable; };
     int getFrameSize() const override { return functionTable->getFrameSize(); };
+    std::vector<Register *> getBindRegisters()  const override { return functionTable->getBindRegisters(); };
 
     bool setFunctionSymbolTable(SymbolTable *inFunctionTable) override { functionTable = inFunctionTable; return true; };
 
@@ -222,7 +224,7 @@ public:
     bool setSymbolVariable(IROperand *inSymbolVariable) override { aliasToSymbol = true; symbolVariable = inSymbolVariable; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
-    bool settargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
+    bool setTargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
 
     void setMemOffset(int inOffset) override { offset = inOffset; };
     int getMemOffset() const override { return offset; };

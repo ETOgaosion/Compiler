@@ -496,6 +496,52 @@ bool TargetCodes::setRegistersAvailable(bool isGeneralPurposeRegister, const vec
     }
 }
 
+bool TargetCodes::setRegistersFree(bool isGeneralPurposeRegister, const vector<Register *> &registers) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->setRegistersFree(registers);
+    }
+    else {
+        return floatPointRegisters->setRegistersFree(registers);
+    }
+}
+
+bool TargetCodes::setRegistersAvailable(bool isGeneralPurposeRegister, const vector<Register *> &registers) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->setRegistersAvailable(registers);
+    }
+    else {
+        return floatPointRegisters->setRegistersAvailable(registers);
+    }
+}
+
+bool TargetCodes::setAllRegistersFree(bool isGeneralPurposeRegister) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->setAllRegistersFree();
+    }
+    else {
+        return floatPointRegisters->setAllRegistersFree();
+    }
+}
+
+bool TargetCodes::setAllRegistersAvailable(bool isGeneralPurposeRegister) {
+    if (isGeneralPurposeRegister) {
+        return generalPurposeRegisters->setAllRegistersAvailable();
+    }
+    else {
+        return floatPointRegisters->setAllRegistersAvailable();
+    }
+}
+
+bool TargetCodes::setAllRegistersFree() {
+    generalPurposeRegisters->setAllRegistersFree();
+    return floatPointRegisters->setAllRegistersFree();
+}
+
+bool TargetCodes::setAllRegistersAvailable() {
+    generalPurposeRegisters->setAllRegistersAvailable();
+    return floatPointRegisters->setAllRegistersAvailable();
+}
+
 bool TargetCodes::addCodeAdd(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType) {
     Code *newCode = new Code(ASMOperation::ADD, inFloatPointType, FloatPointType::NONE, rd, rs1, rs2, 0, {});
     addCode(newCode);

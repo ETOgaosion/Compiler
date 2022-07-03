@@ -29,7 +29,6 @@ private:
     long long value;
     bool allocated;
     bool occupied;
-    bool isTmpStored;
     int tmpStoreOffset;
 
 public:
@@ -42,7 +41,6 @@ public:
     long long getValue() const { return value; };
     bool getAllocated() const { return allocated; };
     bool getOccupied() const { return occupied; };
-    bool getIsTmpStored() const { return isTmpStored; };
     int getTmpStoreOffset() const { return tmpStoreOffset; };
 
     void setFloatPointType(FloatPointType inFloatPointType) { floatPointType = inFloatPointType; };
@@ -51,7 +49,6 @@ public:
     void setOccupied() { occupied = true; }
     void setFree() { allocated = false; }
     void setAvailable() { occupied = false; }
-    void setIsTmpStored(bool inIsTmpStored) { isTmpStored = inIsTmpStored; };
     void setTmpStoreOffset(int inTmpStoreOffset) { tmpStoreOffset = inTmpStoreOffset; };
 };
 
@@ -73,7 +70,12 @@ public:
     virtual bool setRegisterOccupied (const std::string &) = 0;
 
     virtual bool setRegistersFree(const std::vector<std::string> &) = 0;
+    virtual bool setRegistersFree(const std::vector<Register *> &) = 0;
     virtual bool setRegistersAvailable(const std::vector<std::string> &) = 0;
+    virtual bool setRegistersAvailable(const std::vector<Register *> &) = 0;
+
+    virtual bool setAllRegistersFree() = 0;
+    virtual bool setAllRegistersAvailable() = 0;
 };
 
 class GeneralPurposeRegisters : public Registers {
@@ -98,7 +100,12 @@ public:
     bool setRegisterOccupied(const std::string &) override;
 
     bool setRegistersFree(const std::vector<std::string> &) override;
+    bool setRegistersFree(const std::vector<Register *> &) override;
     bool setRegistersAvailable(const std::vector<std::string> &) override;
+    bool setRegistersAvailable(const std::vector<Register *> &) override;
+
+    bool setAllRegistersFree() override;
+    bool setAllRegistersAvailable() override;
 };
 
 class FloatPointRegisters : public Registers {
@@ -123,7 +130,12 @@ public:
     bool setRegisterOccupied(const std::string &) override;
 
     bool setRegistersFree(const std::vector<std::string> &) override;
+    bool setRegistersFree(const std::vector<Register *> &) override;
     bool setRegistersAvailable(const std::vector<std::string> &) override;
+    bool setRegistersAvailable(const std::vector<Register *> &) override;
+
+    bool setAllRegistersFree() override;
+    bool setAllRegistersAvailable() override;
 };
 
 

@@ -1,3 +1,5 @@
+#include "Registers.h"
+
 #include <unordered_map>
 #include <vector>
 #include <utility>
@@ -186,6 +188,7 @@ public:
     virtual AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) { return nullptr;};
     virtual bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) { return false; };
     virtual bool insertParamType(AbstractSymbol *inParamSymbol) { return false; };
+    virtual bool insertBindRegisters(Register *inRegister) { return false; };
 
     virtual AbstractSymbol *lookUpAbstractSymbol(std::string inSymbolName) const;
     virtual AbstractSymbol *lookUpAbstractSymbolGlobal(std::string inSymbolName) const;
@@ -201,6 +204,7 @@ public:
     virtual std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const { return {}; };
     virtual int getParamNum() const { return 0; };
     virtual int getFrameSize() const { return 0; };
+    virtual std::vector<Register *> getBindRegisters() const { return {}; };
     
     virtual bool setSymbolTableType(TableType inSymbolTableType);
     virtual bool setParentSymbolTable(SymbolTable *parentSymbolTable);
@@ -237,6 +241,8 @@ private:
     std::vector<std::tuple <MetaDataType, bool, std::size_t> > paramDataTypeList;
     int frameSize;
 
+    std::vector<Register *> bindRegisters;
+
 protected:
 
 public:
@@ -249,6 +255,7 @@ public:
     AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) override;
     bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
     bool insertParamType(AbstractSymbol *inParamSymbol) override;
+    bool insertBindRegisters(Register *inRegister) override { bindRegisters.push_back(inRegister); return true;};
 
     AbstractSymbol *lookUpParamSymbol(const std::string &inSymbolName) const override;
     std::tuple <MetaDataType, bool, std::size_t> lookUpParamDataType(const std::string &inSymbolName) const override;
@@ -258,6 +265,7 @@ public:
     int getParamNum() const override;
     std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const override;
     int getFrameSize() const override;
+    std::vector<Register *> getBindRegisters() const override { return bindRegisters; };
 
     bool setFuncName(const std::string &inFuncName) override;
     bool setReturnType(MetaDataType inReturnType) override;

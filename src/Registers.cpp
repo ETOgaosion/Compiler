@@ -14,7 +14,6 @@ Register::Register(RegisterType inRegisterType, FloatPointType inFloatPointType,
     value = 0;
     allocated = false;
     occupied = false;
-    isTmpStored = false;
     tmpStoreOffset = 0;
 }
 
@@ -260,6 +259,34 @@ bool GeneralPurposeRegisters::setRegistersAvailable(const std::vector<std::strin
     return true;
 }
 
+bool GeneralPurposeRegisters::setRegistersFree(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterFree(reg->getAliasName());
+    }
+    return true;
+}
+
+bool GeneralPurposeRegisters::setRegistersAvailable(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterAvailable(reg->getAliasName());
+    }
+    return true;
+}
+
+bool GeneralPurposeRegisters::setAllRegistersFree() {
+    for (const auto& it : generalPurposeRegisterList) {
+        setRegisterFree(it.first);
+    }
+    return true;
+}
+
+bool GeneralPurposeRegisters::setAllRegistersAvailable() {
+    for (const auto& it : generalPurposeRegisterList) {
+        setRegisterAvailable(it.first);
+    }
+    return true;
+}
+
 FloatPointRegisters::FloatPointRegisters() : Registers(false) {
     registerClass = {"ft", "fa", "fs"};
     registerClassNum = {{"ft", 12}, {"fa", 8}, {"fs", 12}};
@@ -481,4 +508,32 @@ Register *FloatPointRegisters::tryGetCertainRegister(const string &regName, bool
     isFreeRegister = true;
     floatPointRegisterList[regName]->setAllocated();
     return floatPointRegisterList[regName];
+}
+
+bool FloatPointRegisters::setRegistersFree(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterFree(reg->getAliasName());
+    }
+    return true;
+}
+
+bool FloatPointRegisters::setRegistersAvailable(const vector<Register *> &registers) {
+    for (const auto &reg : registers) {
+        setRegisterAvailable(reg->getAliasName());
+    }
+    return true;
+}
+
+bool FloatPointRegisters::setAllRegistersFree() {
+    for (const auto& it : floatPointRegisterList) {
+        setRegisterFree(it.first);
+    }
+    return true;
+}
+
+bool FloatPointRegisters::setAllRegistersAvailable() {
+    for (const auto& it : floatPointRegisterList) {
+        setRegisterAvailable(it.first);
+    }
+    return true;
 }
