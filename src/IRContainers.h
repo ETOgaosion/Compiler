@@ -57,7 +57,10 @@ public:
 
     void constFolding();
 
+    void optimize(TargetCodes *t, int inOptimizeLevel);
+
     std::string getFunctionName() const;
+    bool getFunctionInLib() const;
     SymbolTable *getFuncSymbolTable() const { return functionTable; };
     IRSymbolVariable *getLocalVariable(int block, const std::string& varName);
     IRSymbolVariable *getParamVariable(const std::string& varName);
@@ -107,7 +110,8 @@ public:
 
     void print();
     void write(const std::string &path);
-    void targetGen(TargetCodes * t);
+    void optimize(TargetCodes *t, int inOptimizeLevel);
+    void targetGen(TargetCodes *t);
     void targetCodePrint(TargetCodes * t);
     void targetCodeWrite(TargetCodes * t, std::string path);
 };

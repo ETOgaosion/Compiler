@@ -21,6 +21,14 @@ int main(int argc, const char* argv[]) {
     tree::ParseTree *tree = parser.compUnit();
     SemanticAnalysis listener;
     listener.programName = std::string(argv[1]).substr(0, std::string(argv[1]).find_last_of("."));
+    if (argc > 2) {
+        if (argv[2][0] == '-' && argv[2][1] == 'O') {
+            listener.optimizationLevel = argv[2][2] - '0';
+        }
+    }
+    else {
+        listener.optimizationLevel = 0;
+    }
 
     if (errorNum = lexer.getNumberOfSyntaxErrors()) {
         std::cout << "[Error]> Lexer reported " << errorNum << " errors." << std::endl;

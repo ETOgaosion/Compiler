@@ -49,7 +49,7 @@ public:
     virtual bool getIsGlobalSymbolVar() const { return 0; };
     virtual int getFrameSize() const { return 0; };
     virtual bool getBindRegister() const { return false; };
-    virtual Register *gettargetBindRegister() const { return nullptr; };
+    virtual Register *getTargetBindRegister() const { return nullptr; };
     virtual std::vector<int> getActiveRegions() const { return {}; };
     virtual bool getIsAlive() const { return true; };
     virtual std::vector<Register *> getBindRegisters() const { return {}; };
@@ -155,7 +155,7 @@ public:
     uint64_t getMemPosition() const override { return symbol->getMemPosition(); };
     std::vector<int> getActiveRegions() const override { return activeRegions; };
     bool getBindRegister() const override { return bindRegister; };
-    Register *gettargetBindRegister() const override { return targetBindRegister; };
+    Register *getTargetBindRegister() const override { return targetBindRegister; };
 
     bool setAssigned() override { assigned = true; return true; };
     bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; };
@@ -227,7 +227,7 @@ public:
     IRValue *getInitialValue() const override { return initialValue; };
     std::vector<int> getActiveRegions() const override { return activeRegions; };
     bool getBindRegister() const override { return bindRegister; };
-    Register *gettargetBindRegister() const override { return targetBindRegister; };
+    Register *getTargetBindRegister() const override { return targetBindRegister; };
 
     bool getIsAlive() const override { return alive; };
     void setAlive(bool set) override { alive = set; };

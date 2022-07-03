@@ -289,6 +289,7 @@ IRSymbolVariable::IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue,
     symbol = newSymbol;
     assigned = false;
     historySymbols.clear();
+    historySymbols.push_back(this);
     initialValue = newValue;
     isGlobalSymbolVar = newIsGlobalSymbolVar;
 }
@@ -865,7 +866,6 @@ IRTempVariable::IRTempVariable(std::string newName, MetaDataType newMetaDataType
 Register *IRTempVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
     if (!aliasToSymbol) {
         bool hasFreeRegister;
-        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         Register *freeRegister = nullptr;
         if (bindRegister) {
             switch (metaDataType) {
@@ -894,6 +894,7 @@ Register *IRTempVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                     break;
             }
         }
+        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         switch(metaDataType) {
             case MetaDataType::BOOL:
                 freeRegister = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
@@ -1020,7 +1021,6 @@ Register *IRTempVariable::loadTo(TargetCodes *t, const std::string &regName, boo
 Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
     if (!aliasToSymbol) {
         bool hasFreeRegister;
-        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         if (bindRegister) {
             switch (metaDataType) {
                 case MetaDataType::BOOL:
@@ -1055,6 +1055,7 @@ Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
                     break;
             }
         }
+        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         switch (metaDataType) {
             case MetaDataType::BOOL:
             case MetaDataType::INT:
@@ -1076,7 +1077,6 @@ Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
 void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
     if (!aliasToSymbol) {
         bool hasFreeRegister;
-        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         if (bindRegister) {
             switch (metaDataType) {
                 case MetaDataType::BOOL:
@@ -1111,6 +1111,7 @@ void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
                     break;
             }
         }
+        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         switch(metaDataType) {
             case MetaDataType::BOOL:
                 t->addCodeSb(sp, reg, -offset);

@@ -675,7 +675,7 @@ public:
 
 class IRReturn : public IRCode {
 public:
-    explicit IRReturn(IROperand *newArg1);
+    explicit IRReturn(IROperand *newArg1, IROperand *newArg2);
 
     void print() const override;
 
@@ -684,35 +684,35 @@ public:
 
 class IRReturnV : public IRReturn {
 public:
-    IRReturnV();
+    IRReturnV(IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRReturnB : public IRReturn {
 public:
-    explicit IRReturnB(IROperand *newArg1);
+    explicit IRReturnB(IROperand *newArg1, IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRReturnI : public IRReturn {
 public:
-    explicit IRReturnI(IROperand *newArg1);
+    explicit IRReturnI(IROperand *newArg1, IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRReturnF : public IRReturn {
 public:
-    explicit IRReturnF(IROperand *newArg1);
+    explicit IRReturnF(IROperand *newArg1, IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRReturnD : public IRReturn {
 public:
-    explicit IRReturnD(IROperand *newArg1);
+    explicit IRReturnD(IROperand *newArg1, IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };

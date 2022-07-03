@@ -88,7 +88,7 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
     else {
         for (const auto& reg : registerClass) {
             while (scanTimes < registerClassNum[reg]) {
-                if (registerAllocBitmap[reg] & scanner) {
+                if (registerAllocBitmap[reg] & scanner || registerOccupiedBitmap[reg] & scanner) {
                     hasFreeRegister = false;
                 }
                 else {
@@ -100,6 +100,8 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
                 scanTimes++;
                 scanner = scanner << 1;
             }
+            scanTimes = 0;
+            scanner = 0x1;
         }
         return {};
     }
@@ -138,13 +140,15 @@ Register *GeneralPurposeRegisters::getNextAvailableRegister(bool isParam, FloatP
                 scanTimes++;
                 scanner = scanner << 1;
             }
+            scanTimes = 0;
+            scanner = 0x1;
         }
         return {};
     }
 }
 
 Register *GeneralPurposeRegisters::tryGetCertainRegister(const string &regName, bool &isFreeRegister) {
-    if (generalPurposeRegisterList[regName]->getAllocated() || generalPurposeRegisterList[regName]->getOccupied()) {
+    if (generalPurposeRegisterList[regName]->getAllocated()) {
         isFreeRegister = false;
         return nullptr;
     }
@@ -352,7 +356,7 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
     else {
         for (const auto& reg : registerClass) {
             while (scanTimes < registerClassNum[reg]) {
-                if (registerAllocBitmap[reg] & scanner) {
+                if (registerAllocBitmap[reg] & scanner || registerOccupiedBitmap[reg] & scanner) {
                     hasFreeRegister = false;
                 }
                 else {
@@ -367,6 +371,8 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
                 scanTimes++;
                 scanner = scanner << 1;
             }
+            scanTimes = 0;
+            scanner = 0x1;
         }
         return {};
     }
@@ -411,6 +417,8 @@ Register *FloatPointRegisters::getNextAvailableRegister(bool isParam, FloatPoint
                 scanTimes++;
                 scanner = scanner << 1;
             }
+            scanTimes = 0;
+            scanner = 0x1;
         }
         return {};
     }

@@ -76,7 +76,7 @@ bool IRGenerator::enterFunction(SymbolTable *function)
 
 bool IRGenerator::exitFunction()
 {
-    IRCode* retCode = new IRReturnV();
+    IRCode* retCode = new IRReturnV(new IRSymbolFunction(currentIRFunc->getFuncSymbolTable()));
     return currentIRFunc->addCode(retCode);
 }
 

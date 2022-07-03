@@ -14,6 +14,7 @@ private:
     std::vector<IRLabel*> whileBegin;
 public:
     std::string programName;
+    int optimizationLevel;
 
     SemanticAnalysis(/* args */){}
     ~SemanticAnalysis(){}

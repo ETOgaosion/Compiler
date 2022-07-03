@@ -9,8 +9,7 @@
 
 using namespace std;
 
-template <typename T>
-vector<size_t> Tools::sort_indexes(const vector<T> &v) {
+vector<size_t> Tools::sort_indexes(const vector<int> &v) {
     // initialize original index locations
     vector<size_t> idx(v.size());
     iota(idx.begin(), idx.end(), 0);

@@ -47,9 +47,9 @@ L_1_main:
 	t_6 = t_5;
 	goto L_1_main
 L_0_main:
-	addparam b;
-	call print_int, frame size: 32; 
+	addparam t_6;
+	call print_int; 
 	addparam 8;
-	call print_int, frame size: 32; 
+	call print_int; 
 	return ;
 
