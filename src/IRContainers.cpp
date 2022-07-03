@@ -275,6 +275,84 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
     return retVal;
 }
 
+void IRFunction::liveVarAnalysis() {
+    /* set global variables alive */
+    auto glbVars = ir->getGlobalVariables();
+    for(auto gblvar = glbVars.cbegin(); gblvar != glbVars.cend(); gblvar++) {
+        IRSymbolVariable* var = gblvar->second;
+        var->setAlive(true);
+    }
+
+    /* scan basic blocks */
+    for(int i = basicBlocks.size() - 1; i >= 0; i--){
+        auto block = basicBlocks[i];
+        for(int j = block.size() - 1; j >= 0; j--){
+            IRCode* code = block[j];
+            IROperand* res = code->getResult();
+            IROperand* arg1 = code->getArg1();
+            IROperand* arg2 = code->getArg2();
+            IROperation op = code->getOperation();
+
+            if(op == IROperation::ADD_LABEL || op == IROperation::GOTO || op == IROperation::CALL)
+                continue;
+            else if(op == IROperation::RETURN || op == IROperation::ADD_PARAM || op == IROperation::BEQZ){
+                arg1->setAlive(true);
+                continue;
+            } else if (op == IROperation::GET_PARAM || op == IROperation::GET_RETURN) {
+                if(res && res->getIsAlive() == false) {
+                    delete code;
+                    block.erase(block.begin() + j);
+                    continue;
+                }
+            } else if (op == IROperation::REPLACE) {
+                if(res && res->getIsAlive() == false) {
+                    delete code;
+                    block.erase(block.begin() + j);
+                    continue;
+                }
+
+                if(res)
+                    res->setAlive(false);
+                if(arg1)
+                    arg1->setAlive(false);
+            } else if (op == IROperation::ASSIGN_ARRAY_ELEM) {
+                if(arg1 && arg1->getIsAlive() == false){ // a[t_0] = b, but a is not alive
+                    delete code;
+                    block.erase(block.begin() + j);
+                    continue;
+                }
+
+                // if index is not immval, set it alive
+                if(arg2 && arg2->getOperandType() != OperandType::VALUE){
+                    arg2->setAlive(true);
+                }
+                // if src if not immval, set it alive
+                if(res && res->getOperandType() != OperandType::VALUE){
+                    res->setAlive(true);
+                }
+                continue;
+            } else if (op == IROperation::PHI) {
+                
+            } else {
+                if(res){
+                    if(!res->getIsAlive()){ // dead code
+                        delete code;
+                        block.erase(block.begin() + j);
+                        continue;
+                    }
+                }
+
+                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR))
+                    res->setAlive(false);
+                if(arg1 && (arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR))
+                    arg1->setAlive(true);
+                if(arg2 && (arg2->getOperandType() == OperandType::SYMBOLVAR || arg2->getOperandType() == OperandType::TEMPVAR))
+                    arg2->setAlive(true);
+            }
+        }
+    }
+}
+
 void IRFunction::basicBlockDivision() {
     entrances.clear();
     entrances.push_back(0);
@@ -401,6 +479,7 @@ void IRFunction::constFolding() {
         }
     }
 }
+
 
 IRTempVariable* IRFunction::addTempVariable(MetaDataType newMetaDataType) {
     string newTempVariableName = string("t_") + to_string(tempCount++);

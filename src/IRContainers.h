@@ -44,8 +44,9 @@ public:
     IRValue* immDiv(IROperand* op1, IROperand* op2);
 
     void basicBlockDivision();    
-
+    void liveVarAnalysis();
     void constFolding();
+    
     std::string getFunctionName() const;
     SymbolTable *getFuncSymbolTable() const { return functionTable; };
     IRSymbolVariable *getLocalVariable(int block, const std::string& varName);
@@ -85,6 +86,7 @@ public:
     IRValue *addMulSameImmValue(MetaDataType inMetaDataType, const std::string &inValue, int num);
     IRValue *addMulImmValue(MetaDataType inMetaDataType, std::vector<std::string> &inValues);
 
+    std::unordered_map<std::string, IRSymbolVariable *> getGlobalVariables() const {return globalVariables; };
     SymbolTable *getGlobalSymbolTable() const { return globalSymbolTable; };
     IRSymbolVariable *getGlobalVariable(const std::string& varName);
     IRFunction *getFunction(const std::string& functionName);

@@ -45,7 +45,9 @@ public:
     virtual uint64_t getMemPosition() const { return 0; };
     virtual bool getIsGlobalSymbolVar() const { return 0; };
     virtual int getFrameSize() const { return 0; };
+    virtual bool getIsAlive() const { return true; };
 
+    virtual void setAlive(bool set) {};
     virtual bool setAssigned() { return false; }
     virtual bool addHistorySymbol(IROperand *inSymbol) { return false; };
     virtual bool setAliasToSymbol() { return false; };
@@ -123,6 +125,8 @@ private:
     std::vector<IROperand *> historySymbols;
     IRValue *initialValue;
     bool isGlobalSymbolVar;
+    bool alive;
+
 
 public:
     IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue, bool newIsGlobalSymbolVar);
@@ -137,6 +141,9 @@ public:
     bool getIsGlobalSymbolVar() const override { return isGlobalSymbolVar; };
     int getArraySize() const override { return symbol->getSize(); };
     uint64_t getMemPosition() const override { return symbol->getMemPosition(); };
+
+    bool getIsAlive() const override { return alive; };
+    void setAlive(bool set) override { alive = set; };
 
     bool setAssigned() override { assigned = true; return true; };
     bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; };
@@ -181,6 +188,8 @@ private:
     IROperand *symbolVariable;
     int offset;
     IRValue *initialValue;
+    bool alive;
+
 
 public:
     IRTempVariable(std::string newName, MetaDataType newMetaDataType);
@@ -193,6 +202,9 @@ public:
     bool getAliasToSymbol() const override { return aliasToSymbol; };
     IROperand *getSymbolVariable() const override { return symbolVariable; };
     IRValue *getInitialValue() const override { return initialValue; };
+
+    bool getIsAlive() const override { return alive; };
+    void setAlive(bool set) override { alive = set; };
 
     bool setAssigned() override { assigned = true; return true; };
     bool setAliasToSymbol() override { aliasToSymbol = true; return true; };

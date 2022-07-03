@@ -788,6 +788,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
 
 void SemanticAnalysis::enterStmtReturn(CACTParser::StmtReturnContext * ctx)
 {
+    
 }
 
 void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
@@ -1228,7 +1229,7 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
     ctx->size = ctx->lVal()->size;
     ctx->metaDataType = ctx->lVal()->lValMetaDataType;
 
-    if (ctx->lVal()->isArray && ctx->indexOperand){
+    if (ctx->lVal()->isArray && ctx->indexOperand) {
         IROperand* tmp = irGenerator->addTempVariable(ctx->metaDataType);
         IRCode* fetchCode = nullptr;
         switch (ctx->lVal()->lValMetaDataType) {
@@ -1247,8 +1248,7 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
         }
         irGenerator->addCode(fetchCode);
         ctx->operand = tmp;
-    }
-    else if (ctx->lVal()->indexOperand){ // array[index]
+    } else if (ctx->lVal()->indexOperand) { // array[index]
         IROperand *result = irGenerator->addTempVariable(ctx->metaDataType);
         IRCode* code = nullptr;
         switch (ctx->lVal()->lValMetaDataType) {
@@ -1267,8 +1267,11 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
         }
         irGenerator->addCode(code);
         ctx->operand = result;
-    } else {
-        ctx->operand = ctx->lVal()->identOperand;
+    } else { // normal symbolVar
+        if ((ctx->lVal()->identOperand->getOperandType() == OperandType::SYMBOLVAR) && ctx->lVal()->identOperand->getAssigned())
+            ctx->operand = ctx->lVal()->identOperand->getLatestVersionSymbol();
+        else 
+            ctx->operand = ctx->lVal()->identOperand;
     }
 }
 
