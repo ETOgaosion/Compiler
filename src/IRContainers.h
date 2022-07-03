@@ -27,6 +27,12 @@ private:
 
 public:
     IRProgram * ir;
+    std::vector<std::vector<IROperand*>> useVars;
+    std::vector<std::vector<IROperand*>> inVars;
+    std::vector<std::vector<IROperand*>> outVars;
+    std::vector<std::vector<IROperand*>> defVars;
+
+
 
     explicit IRFunction(std::string newFunctionName, SymbolTable *newFunctionTable);
 
@@ -46,7 +52,13 @@ public:
     IRValue* immDiv(IROperand* op1, IROperand* op2);
 
 
+    void delOperandInVec(std::vector<IROperand*>& vars, IROperand* op);
+    void addOperandToVec(std::vector<IROperand*>& vars, IROperand* op);
+    bool cmpTwoInVars(std::vector<IROperand*> & vec1, std::vector<IROperand*> & vec2);
+
+    void usedefVarsAnalysis();
     void liveVarAnalysis();
+    void delDeadCode() ;
     void basicBlockDivision();
 
     void calVarActiveRegions();
