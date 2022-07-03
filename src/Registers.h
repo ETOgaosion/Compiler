@@ -29,6 +29,7 @@ private:
     long long value;
     bool allocated;
     bool occupied;
+    bool tmpStored;
     int tmpStoreOffset;
 
 public:
@@ -41,6 +42,7 @@ public:
     long long getValue() const { return value; };
     bool getAllocated() const { return allocated; };
     bool getOccupied() const { return occupied; };
+    bool getTmpStored() const { return tmpStored; };
     int getTmpStoreOffset() const { return tmpStoreOffset; };
 
     void setFloatPointType(FloatPointType inFloatPointType) { floatPointType = inFloatPointType; };
@@ -49,6 +51,7 @@ public:
     void setOccupied() { occupied = true; }
     void setFree() { allocated = false; }
     void setAvailable() { occupied = false; }
+    void setTmpStored(bool inTmpStored) { tmpStored = inTmpStored; };
     void setTmpStoreOffset(int inTmpStoreOffset) { tmpStoreOffset = inTmpStoreOffset; };
 };
 

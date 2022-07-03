@@ -39,6 +39,7 @@ public:
     virtual bool getAliasToSymbol() const { return false; };
     virtual IROperand *getSymbolVariable() const { return nullptr; }
     virtual std::string getFunctionName() const { return {}; };
+    virtual MetaDataType getReturnType() const { return {}; };
     virtual SymbolTable *getFunctionSymbolTable() const { return nullptr; };
     virtual int getMemOffset() const { return 0; };
     virtual IRValue *getInitialValue() const { return nullptr; };
@@ -187,6 +188,7 @@ private:
 public:
     explicit IRSymbolFunction(SymbolTable *function);
     std::string getFunctionName() const override { return functionTable->getFuncName(); };
+    MetaDataType getReturnType() const override { return functionTable->getReturnType(); };
     SymbolTable *getFunctionSymbolTable() const override { return functionTable; };
     int getFrameSize() const override { return functionTable->getFrameSize(); };
     std::vector<Register *> getBindRegisters()  const override { return functionTable->getBindRegisters(); };

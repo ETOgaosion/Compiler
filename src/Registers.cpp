@@ -71,7 +71,7 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
     int scanner = 0x1, scanTimes = 0;
     if (isParam) {
         while (scanTimes < registerClassNum["a"]) {
-            if (registerAllocBitmap["a"] & scanner || registerOccupiedBitmap["a"] & scanner) {
+            if (registerAllocBitmap["a"] & scanner) {
                 hasFreeRegister = false;
             }
             else {
@@ -88,7 +88,7 @@ Register *GeneralPurposeRegisters::getNextFreeRegister(bool isParam, FloatPointT
     else {
         for (const auto& reg : registerClass) {
             while (scanTimes < registerClassNum[reg]) {
-                if (registerAllocBitmap[reg] & scanner || registerAllocBitmap[reg] & scanner) {
+                if (registerAllocBitmap[reg] & scanner) {
                     hasFreeRegister = false;
                 }
                 else {
@@ -332,7 +332,7 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
     int scanner = 0x1, scanTimes = 0;
     if (isParam) {
         while (scanTimes < registerClassNum["fa"]) {
-            if (registerAllocBitmap["fa"] & scanner || registerOccupiedBitmap["fa"] & scanner) {
+            if (registerAllocBitmap["fa"] & scanner) {
                 hasFreeRegister = false;
             }
             else {
@@ -352,7 +352,7 @@ Register *FloatPointRegisters::getNextFreeRegister(bool isParam, FloatPointType 
     else {
         for (const auto& reg : registerClass) {
             while (scanTimes < registerClassNum[reg]) {
-                if (registerAllocBitmap[reg] & scanner || registerOccupiedBitmap[reg] & scanner) {
+                if (registerAllocBitmap[reg] & scanner) {
                     hasFreeRegister = false;
                 }
                 else {
