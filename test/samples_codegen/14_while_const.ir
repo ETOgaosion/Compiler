@@ -21,7 +21,7 @@ main:
 	n = 4;
 	i = 0;
 	b = 0;
-	call get_int, frame size: 40; 
+	call get_int; 
 	t_0 =  return ;
 	t_1 <= b;
 	t_1 = t_0;
@@ -31,11 +31,11 @@ L_1_main:
 	t_3 = i + 1;
 	t_4 <= i;
 	t_4 = t_3;
-	t_5 = b + 1;
+	t_5 = t_1 + 1;
 	t_6 <= b;
 	t_6 = t_5;
-	addparam b;
-	call print_int, frame size: 40; 
+	addparam t_6;
+	call print_int; 
 	goto L_1_main
 L_0_main:
 	return 0;

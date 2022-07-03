@@ -35,7 +35,7 @@ L_0_int_array_vector_add:
 	beqz t_4 L_0_int_array_vector_add
 	t_5 = int_array_c[5];
 	addparam t_5;
-	call print_int, frame size: 56; 
+	call print_int; 
 	return ;
 
 ----------- funcDef -----------
@@ -45,6 +45,6 @@ main() => 2:
 ----------- tempVars ------------
 ----------- Codes ------------
 main:
-	call int_array_vector_add, frame size: 8; 
+	call int_array_vector_add; 
 	return 0;
 

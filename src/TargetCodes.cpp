@@ -9,7 +9,7 @@
 
 using namespace std;
 
-Code::Code(ASMOperation newOp, FloatPointType newRdFloatPointType, FloatPointType newSrcFloatPointType, Register *newRd, Register *newRs1, Register *newRs2, int newOffset, std::string newLabel) {
+Code::Code(ASMOperation newOp, FloatPointType newRdFloatPointType, FloatPointType newSrcFloatPointType, Register *newRd, Register *newRs1, Register *newRs2, int newOffset, string newLabel) {
     op = newOp;
     rdFloatPointType = newRdFloatPointType;
     srcFloatPointType = newSrcFloatPointType;
@@ -17,11 +17,11 @@ Code::Code(ASMOperation newOp, FloatPointType newRdFloatPointType, FloatPointTyp
     rs1 = newRs1;
     rs2 = newRs2;
     offset = newOffset;
-    label = std::move(newLabel);
+    label = move(newLabel);
     directives = {};
 }
 
-Code::Code(ASMOperation newOp, std::string newDirectives) {
+Code::Code(ASMOperation newOp, string newDirectives) {
     op = newOp;
     rdFloatPointType = {};
     srcFloatPointType = {};
@@ -30,7 +30,7 @@ Code::Code(ASMOperation newOp, std::string newDirectives) {
     rs2 = nullptr;
     offset = 0;
     label = {};
-    directives = std::move(newDirectives);
+    directives = move(newDirectives);
 }
 
 void Code::print() const {
@@ -478,7 +478,7 @@ bool TargetCodes::setRegisterAvailable(Register *reg) {
     }
 }
 
-bool TargetCodes::setRegistersFree(bool isGeneralPurposeRegister, const vector<std::string> &registers) {
+bool TargetCodes::setRegistersFree(bool isGeneralPurposeRegister, const vector<string> &registers) {
     if (isGeneralPurposeRegister) {
         return generalPurposeRegisters->setRegistersFree(registers);
     }
@@ -487,7 +487,7 @@ bool TargetCodes::setRegistersFree(bool isGeneralPurposeRegister, const vector<s
     }
 }
 
-bool TargetCodes::setRegistersAvailable(bool isGeneralPurposeRegister, const vector<std::string> &registers) {
+bool TargetCodes::setRegistersAvailable(bool isGeneralPurposeRegister, const vector<string> &registers) {
     if (isGeneralPurposeRegister) {
         return generalPurposeRegisters->setRegistersAvailable(registers);
     }

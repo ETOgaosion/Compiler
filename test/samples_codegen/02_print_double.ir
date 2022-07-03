@@ -13,6 +13,6 @@ a := symbol type: 1; data type: 4; initValue: ImmValue_0: 3.4
 main:
 	a = ImmValue_0: 3.4;
 	addparam a;
-	call print_double, frame size: 16; 
+	call print_double; 
 	return 0;
 

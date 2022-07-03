@@ -12,11 +12,11 @@ t_0:= symbol type: TEMP VAR; data type: 3
 ----------- Codes ------------
 main:
 	a = 0;
-	call get_float, frame size: 16; 
+	call get_float; 
 	t_0 =  return ;
 	t_1 <= a;
 	t_1 = t_0;
-	addparam a;
-	call print_float, frame size: 16; 
+	addparam t_1;
+	call print_float; 
 	return 0;
 

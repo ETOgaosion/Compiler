@@ -35,7 +35,7 @@ L_0_double_array_vector_add:
 	beqz t_4 L_0_double_array_vector_add
 	t_5 = double_array_c[5];
 	addparam t_5;
-	call print_double, frame size: 104; 
+	call print_double; 
 	return ;
 
 ----------- funcDef -----------
@@ -45,6 +45,6 @@ main() => 2:
 ----------- tempVars ------------
 ----------- Codes ------------
 main:
-	call double_array_vector_add, frame size: 8; 
+	call double_array_vector_add; 
 	return 0;
 

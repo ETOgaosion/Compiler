@@ -37,7 +37,7 @@ bool IRGenerator::addCode(IRCode *newCode)
     return currentIRFunc->addCode(newCode);
 }
 
-bool IRGenerator::addCodes(std::vector<IRCode *> newCodes)
+bool IRGenerator::addCodes(vector<IRCode *> newCodes)
 {
     return currentIRFunc->addCodes(newCodes);
 }
@@ -81,6 +81,6 @@ bool IRGenerator::exitFunction()
 }
 
 
-IRSymbolFunction* IRGenerator::getSymbolFunction(std::string funcName){
+IRSymbolFunction* IRGenerator::getSymbolFunction(string funcName){
     return ir->getSymbolFunction(funcName);
 }

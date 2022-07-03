@@ -9,9 +9,9 @@ main() => 2:
 t_0:= symbol type: TEMP VAR; data type: 3
 ----------- Codes ------------
 main:
-	call get_float, frame size: 16; 
+	call get_float; 
 	t_0 =  return ;
 	addparam t_0;
-	call print_float, frame size: 16; 
+	call print_float; 
 	return 0;
 

@@ -14,7 +14,7 @@ vector<size_t> Tools::sort_indexes(const vector<int> &v) {
     vector<size_t> idx(v.size());
     iota(idx.begin(), idx.end(), 0);
     // sort indexes based on comparing values in v
-    // using std::stable_sort instead of std::sort
+    // using stable_sort instead of sort
     // to avoid unnecessary index re-orderings
     // when v contains elements of equal values
     stable_sort(idx.begin(), idx.end(),

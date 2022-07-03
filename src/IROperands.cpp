@@ -7,7 +7,7 @@
 using namespace std;
 
 IRLabel::IRLabel(string newName) : IROperand(OperandType::LABEL) {
-    labelName = std::move(newName);
+    labelName = move(newName);
 }
 
 void IRLabel::print() const {
@@ -25,7 +25,7 @@ IRValue::IRValue(MetaDataType newMetaDataType, const string &newLabel, bool newI
     isArray = newIsArray;
 }
 
-IRValue::IRValue(MetaDataType newMetaDataType, const std::string& newValue, const std::string &newLabel, bool newIsArray) : IROperand(OperandType::VALUE) {
+IRValue::IRValue(MetaDataType newMetaDataType, const string& newValue, const string &newLabel, bool newIsArray) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
     values.clear();
     values.push_back(newValue);
@@ -33,7 +33,7 @@ IRValue::IRValue(MetaDataType newMetaDataType, const std::string& newValue, cons
     isArray = newIsArray;
 }
 
-IRValue::IRValue(MetaDataType newMetaDataType, const std::vector<std::string>& newValues, const string &newLabel, bool newIsArray) : IROperand(OperandType::VALUE) {
+IRValue::IRValue(MetaDataType newMetaDataType, const vector<string>& newValues, const string &newLabel, bool newIsArray) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
     values.clear();
     for(const auto& newValue : newValues) {
@@ -47,7 +47,7 @@ void IRValue::addValue(const string& newValue) {
     values.push_back(newValue);
 }
 
-void IRValue::addValues(const std::vector<std::string>& newValues) {
+void IRValue::addValues(const vector<string>& newValues) {
     for(const auto& newValue : newValues) {
         values.push_back(newValue);
     }
@@ -123,7 +123,7 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
     }
 }
 
-Register *IRValue::loadTo(TargetCodes *t, const std::string &regName, bool isGeneralPurposeRegister) {
+Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralPurposeRegister) {
     MetaDataType dataType = metaDataType;
     bool hasFreeRegister;
     Register *freeRegister = nullptr;
@@ -217,7 +217,7 @@ void IRValue::print() const {
     }
     if (isArray) {
         cout << "{";
-        for (auto value : std::vector<string>(values.begin(), values.end() - 1)) {
+        for (auto value : vector<string>(values.begin(), values.end() - 1)) {
             cout << value << ", ";
         }
         cout << values.back();
@@ -236,7 +236,7 @@ string IRValue::getVal() const {
     }
     if (isArray) {
         retVal += "{";
-        for (auto value : std::vector<string>(values.begin(), values.end() - 1)) {
+        for (auto value : vector<string>(values.begin(), values.end() - 1)) {
             retVal += (value + ", ");
         }
         retVal += values.back();
@@ -254,7 +254,7 @@ void IRValue::genTargetValue(TargetCodes *t) const {
         stream << "\t.equ\t" << valueLabel << ", ";
         switch (metaDataType) {
             case MetaDataType::INT:
-                stream << "0x" << std::hex << stoi(values.front());
+                stream << "0x" << hex << stoi(values.front());
                 break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
@@ -270,7 +270,7 @@ void IRValue::genTargetValue(TargetCodes *t) const {
         for (const auto& value : values) {
             switch (metaDataType) {
                 case MetaDataType::INT:
-                    stream << "\t.word\t0x" << std::hex << stoi(value);
+                    stream << "\t.word\t0x" << hex << stoi(value);
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
@@ -414,7 +414,7 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
     return freeRegister;
 }
 
-Register *IRSymbolVariable::loadTo(TargetCodes *t, const std::string &regName, bool isGeneralPurposeRegister) {
+Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool isGeneralPurposeRegister) {
     MetaDataType dataType = symbol->getMetaDataType();
     bool hasFreeRegister;
     Register *targetRegister = nullptr;
@@ -735,7 +735,7 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
         stream << "\t.equ\t" << initialValue->getValueLabel() << ", ";
         switch (initialValue->getMetaDataType()) {
             case MetaDataType::INT:
-                stream << "0x" << std::hex << stoi(values.front());
+                stream << "0x" << hex << stoi(values.front());
                 break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
@@ -751,7 +751,7 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
         for (const auto& value : values) {
             switch (initialValue->getMetaDataType()) {
                 case MetaDataType::INT:
-                    stream << "\t.word\t0x" << std::hex << stoi(value);
+                    stream << "\t.word\t0x" << hex << stoi(value);
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
@@ -774,7 +774,7 @@ void IRSymbolVariable::genTargetGlobalValue(TargetCodes *t) const {
         stream << "\t.word\t";
         switch (initialValue->getMetaDataType()) {
             case MetaDataType::INT:
-                stream << "0x" << std::hex << stoi(values.front());
+                stream << "0x" << hex << stoi(values.front());
                 break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
@@ -790,7 +790,7 @@ void IRSymbolVariable::genTargetGlobalValue(TargetCodes *t) const {
         for (const auto& value : values) {
             switch (initialValue->getMetaDataType()) {
                 case MetaDataType::INT:
-                    stream << "\t.word\t0x" << std::hex << stoi(value);
+                    stream << "\t.word\t0x" << hex << stoi(value);
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
@@ -834,7 +834,7 @@ string IRSymbolFunction::getVal() const {
 
 
 IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : IROperand(OperandType::TEMPVAR) {
-    symbolName = std::move(newName);
+    symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
     alive = false;
@@ -844,8 +844,8 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : I
     initialValue = nullptr;
 }
 
-IRTempVariable::IRTempVariable(std::string newName, MetaDataType newMetaDataType, IROperand *parentVariable) : IROperand(OperandType::TEMPVAR) {
-    symbolName = std::move(newName);
+IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IROperand *parentVariable) : IROperand(OperandType::TEMPVAR) {
+    symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
     aliasToSymbol = true;
@@ -854,8 +854,8 @@ IRTempVariable::IRTempVariable(std::string newName, MetaDataType newMetaDataType
     initialValue = nullptr;
 }
 
-IRTempVariable::IRTempVariable(std::string newName, MetaDataType newMetaDataType, IRValue *newValue) : IROperand(OperandType::TEMPVAR) {
-    symbolName = std::move(newName);
+IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IRValue *newValue) : IROperand(OperandType::TEMPVAR) {
+    symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
     aliasToSymbol = false;
@@ -935,7 +935,7 @@ Register *IRTempVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
     }
 }
 
-Register *IRTempVariable::loadTo(TargetCodes *t, const std::string &regName, bool isGeneralPurposeRegister) {
+Register *IRTempVariable::loadTo(TargetCodes *t, const string &regName, bool isGeneralPurposeRegister) {
     if (!aliasToSymbol) {
         bool hasFreeRegister;
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);

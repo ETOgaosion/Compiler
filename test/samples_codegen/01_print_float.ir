@@ -13,6 +13,6 @@ a := symbol type: 1; data type: 3; initValue: ImmValue_0: 2.3f
 main:
 	a = ImmValue_0: 2.3f;
 	addparam a;
-	call print_float, frame size: 16; 
+	call print_float; 
 	return 0;
 

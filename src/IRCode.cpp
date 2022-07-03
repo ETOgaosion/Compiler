@@ -1259,14 +1259,14 @@ void IRSgeqD::genTargetCode(TargetCodes *t) {
 
 void IRBeqz::genTargetCode(TargetCodes *t) {
     Register *arg1Reg = arg1->load(t, true);
-    std::string label = arg2->getSymbolName();
+    string label = arg2->getSymbolName();
     t->addCodeBeqz(arg1Reg, label);
     t->setRegisterFree(arg1Reg);
 }
 
 void IRGoto::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    std::string label = arg1->getSymbolName();
+    string label = arg1->getSymbolName();
     Register *labelReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     t->addCodeLla(labelReg, label);
     t->addCodeJr(labelReg);

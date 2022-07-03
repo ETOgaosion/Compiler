@@ -12,6 +12,6 @@ a := symbol type: 1; data type: 1; initValue: 1
 main:
 	a = 1;
 	addparam a;
-	call print_bool, frame size: 16; 
+	call print_bool; 
 	return 0;
 

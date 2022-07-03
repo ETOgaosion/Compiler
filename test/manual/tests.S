@@ -36,51 +36,55 @@ main:
 	lla	t1, a
 	sw	t0, 0(t1)
 	mv	t0, zero
-	mv	t5, t0
+	mv	t6, t0
 L_1_main:
 	lla	t1, a
 	lw	t0, 0(t1)
 	addi	t1, zero, 6
 	slt	t3, t0, t1
 	mv	t0, zero
-	xor	t1, t5, t0
-	seqz	t4, t1
-	or	t2, t3, t4
+	xor	t1, t6, t0
+	seqz	t5, t1
+	or	t2, t3, t5
 	beqz	t2, L_0_main
 	lla	t1, a
 	lw	t0, 0(t1)
-	addi	t2, t0, 1
+	addi	t4, t0, 1
 	lla	t0, a
-	sw	t2, 0(t0)
-	addi	t3, t5, 1
-	mv	t5, t3
+	sw	t4, 0(t0)
+	addi	t3, t6, 1
+	mv	t6, t3
 	lla	t0, L_1_main
 	jr	t0
 L_0_main:
-	mv	a0, t5
+	mv	a0, t6
 	sw	t2, -28(sp)
 	sw	t3, -16(sp)
-	sw	t4, -24(sp)
-	sw	t5, -12(sp)
+	sw	t4, -32(sp)
+	sw	t5, -24(sp)
+	sw	t6, -12(sp)
 	addi	sp, sp, -32
 	call	print_int
 	addi	sp, sp, 32
 	lw	t2, -28(sp)
 	lw	t3, -16(sp)
-	lw	t4, -24(sp)
-	lw	t5, -12(sp)
+	lw	t4, -32(sp)
+	lw	t5, -24(sp)
+	lw	t6, -12(sp)
 	addi	a0, zero, 8
 	sw	t2, -28(sp)
 	sw	t3, -16(sp)
-	sw	t4, -24(sp)
-	sw	t5, -12(sp)
+	sw	t4, -32(sp)
+	sw	t5, -24(sp)
+	sw	t6, -12(sp)
 	addi	sp, sp, -32
 	call	print_int
 	addi	sp, sp, 32
 	lw	t2, -28(sp)
 	lw	t3, -16(sp)
-	lw	t4, -24(sp)
-	lw	t5, -12(sp)
-	mv	a0, t5
+	lw	t4, -32(sp)
+	lw	t5, -24(sp)
+	lw	t6, -12(sp)
+	mv	a0, t6
 	ld	ra, -8(sp)
 	ret

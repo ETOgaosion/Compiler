@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstdio>
 #include <vector>
+#include <deque>
 #include <unordered_map>
 #include <algorithm>
 
@@ -43,30 +44,30 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 if(op == IROperation::ADD) {
-                    retVal = new IRValue(MetaDataType::INT, std::to_string(val_a + val_b_i), {}, false);
+                    retVal = new IRValue(MetaDataType::INT, to_string(val_a + val_b_i), {}, false);
                 }
                 else if (op == IROperation::SUB) {
-                    retVal = new IRValue(MetaDataType::INT, std::to_string(val_a - val_b_i), {}, false);
+                    retVal = new IRValue(MetaDataType::INT, to_string(val_a - val_b_i), {}, false);
                 }
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 if(op == IROperation::ADD) {
-                    retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a + val_b_f));
+                    retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a + val_b_f));
                 }
                 else if (op == IROperation::SUB) {
-                    retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a - val_b_f));
+                    retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a - val_b_f));
                 }
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 if(op == IROperation::ADD) {
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_d));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_d));
                 }
                 else if (op == IROperation::SUB) {
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_d));
                 }
             }
                 break;
@@ -79,25 +80,25 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
            case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a + val_b_i));
+                    retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a + val_b_i));
                 else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a - val_b_i));
+                    retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a - val_b_i));
            }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a + val_b_f));
+                    retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a + val_b_f));
                 else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a - val_b_f));
+                    retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a - val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_d));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_d));
                 else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_d));
             }
                 break;
             default:
@@ -109,25 +110,25 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
                 if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_i));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_i));
                 else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_i));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_i));
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
                 if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_f));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_f));
                 else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_f));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
                 if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a + val_b_d));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_d));
                 else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a - val_b_d));
+                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_d));
             }
                 break;
             default:
@@ -146,17 +147,17 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
         switch(type2) {
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
-                retVal = new IRValue(MetaDataType::INT, std::to_string(val_a * val_b_i), {}, false);
+                retVal = new IRValue(MetaDataType::INT, to_string(val_a * val_b_i), {}, false);
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a * val_b_f));
+                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_d));
             }
                 break;
             default:
@@ -167,17 +168,17 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
         switch(type2) {
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a * val_b_i));
+                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b_i));
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a * val_b_f));
+                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_d));
             }
                 break;
             default:
@@ -188,17 +189,17 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
         switch(type2) {
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_i));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_i));
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_f));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a * val_b_d));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_d));
             }
                 break;
             default:
@@ -217,17 +218,17 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
         switch(type2) {
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
-                retVal = new IRValue(MetaDataType::INT, std::to_string(val_a / val_b_i), {}, false);
+                retVal = new IRValue(MetaDataType::INT, to_string(val_a / val_b_i), {}, false);
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a / val_b_f));
+                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_d));
             }
                 break;
             default:
@@ -238,17 +239,17 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
         switch(type2) {
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a / val_b_i));
+                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b_i));
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, std::to_string(val_a / val_b_f));
+                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_d));
             }
                 break;
             default:
@@ -259,17 +260,17 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
         switch(type2) {
             case MetaDataType::INT: {
                 int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_i));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_i));
             }
                 break;
             case MetaDataType::FLOAT: {
                 float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_f));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_f));
             }
                 break;
             case MetaDataType::DOUBLE: {
                 double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(val_a / val_b_d));
+                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_d));
             }
                 break;
             default:
@@ -279,13 +280,13 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
     return retVal;
 }
 
-void IRFunction::delOperandInVec(std::vector<IROperand*>& vars, IROperand* op){
+void IRFunction::delOperandInVec(vector<IROperand*>& vars, IROperand* op){
     auto it = find(vars.begin(), vars.end(), op);
     if(it != vars.end())
         vars.erase(it);
 }
 
-void IRFunction::addOperandToVec(std::vector<IROperand*>& vars, IROperand* op){
+void IRFunction::addOperandToVec(vector<IROperand*>& vars, IROperand* op){
     auto it = find(vars.begin(), vars.end(), op);
     if(it == vars.end())
         vars.push_back(op);
@@ -358,7 +359,7 @@ void IRFunction::usedefVarsAnalysis() {
 
 
 // vec1 is old, vec 2 is new
-bool IRFunction::cmpTwoInVars(std::vector<IROperand*> & vec1, std::vector<IROperand*> & vec2){
+bool IRFunction::cmpTwoInVars(vector<IROperand*> & vec1, vector<IROperand*> & vec2){
     for(IROperand* var : vec2){
         auto it = find(vec1.begin(), vec1.end(), var);
         if(it == vec1.end()){ // var is not in vec1
@@ -380,9 +381,9 @@ void IRFunction::liveVarAnalysis() {
         for(int i = basicBlocks.size() - 1; i >= 0; i--){ // i for block number
             bool ichanged = false;
             auto out = useVars[i];
-            std::vector<IROperand*> newin;
+            vector<IROperand*> newin;
             // update out vars
-            std::vector<int> ctrlflow = controlFlow[i];
+            vector<int> ctrlflow = controlFlow[i];
             for(int & back : ctrlflow){
                 for(auto & var :inVars[back])
                     addOperandToVec(newin, var);
@@ -697,7 +698,7 @@ bool IRFunction::vectorOverlap(const vector<int>& a, const vector<int>& b) {
     return false;
 }
 
-unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations() {
+unordered_map<IROperand *, vector<IROperand *>> IRFunction::calConflictVarRelations() {
     unordered_map<IROperand *, vector<IROperand *>> ret;
     if (localVariables.size() > 1) {
         for (auto it = localVariables.begin(); next(it) != localVariables.end(); it++) {
@@ -709,7 +710,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if ((*in_it).second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
                     ret[(*it).second].push_back((*in_it).second);
                 }
             }
@@ -717,7 +718,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (paramVariable.second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(paramVariable.second);
                 }
             }
@@ -725,7 +726,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (tempVariable.second->getIsArray() || tempVariable.second->getAliasToSymbol()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(tempVariable.second);
                 }
             }
@@ -737,7 +738,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
             if (paramVariable.second->getIsArray()) {
                 continue;
             }
-            if (!vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
+            if (vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
                 ret[(*it).second].push_back(paramVariable.second);
             }
         }
@@ -745,7 +746,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
             if (tempVariable.second->getIsArray() || tempVariable.second->getAliasToSymbol()) {
                 continue;
             }
-            if (!vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
+            if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
                 ret[(*it).second].push_back(tempVariable.second);
             }
         }
@@ -760,7 +761,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if ((*in_it).second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
                     ret[(*it).second].push_back((*in_it).second);
                 }
             }
@@ -768,7 +769,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (localVariable.second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(localVariable.second);
                 }
             }
@@ -776,7 +777,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (tempVariable.second->getAliasToSymbol() || tempVariable.second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(tempVariable.second);
                 }
             }
@@ -788,7 +789,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
             if (localVariable.second->getIsArray()) {
                 continue;
             }
-            if (!vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
+            if (vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
                 ret[(*it).second].push_back(localVariable.second);
             }
         }
@@ -796,7 +797,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
             if (tempVariable.second->getAliasToSymbol() || tempVariable.second->getIsArray()) {
                 continue;
             }
-            if (!vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
+            if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
                 ret[(*it).second].push_back(tempVariable.second);
             }
         }
@@ -811,7 +812,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if ((*in_it).second->getIsArray() || (*in_it).second->getAliasToSymbol()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
                     ret[(*it).second].push_back((*in_it).second);
                 }
             }
@@ -819,7 +820,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (paramVariable.second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(paramVariable.second);
                 }
             }
@@ -827,7 +828,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (localVariable.second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(localVariable.second);
                 }
             }
@@ -840,7 +841,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (paramVariable.second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), paramVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(paramVariable.second);
                 }
             }
@@ -848,7 +849,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
                 if (localVariable.second->getIsArray()) {
                     continue;
                 }
-                if (!vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
+                if (vectorOverlap((*it).second->getActiveRegions(), localVariable.second->getActiveRegions())) {
                     ret[(*it).second].push_back(localVariable.second);
                 }
             }
@@ -857,8 +858,39 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calSymVarRelations()
     return ret;
 }
 
-std::unordered_map<IROperand *, int> IRFunction::calVarCosts() {
-    std::unordered_map<IROperand *, int> ret;
+vector<vector<IROperand *>> IRFunction::calRegisterGraph(unordered_map<IROperand *, vector<IROperand *>> conflictVar) {
+    vector<vector<IROperand *>> ret;
+    vector<IROperand *> nodes;
+    vector<IROperand *> sortedNodes;
+    vector<int> degrees;
+    for (auto i : conflictVar) {
+        nodes.push_back(i.first);
+        degrees.push_back(i.second.size());
+    }
+    for (auto i : Tools::sort_indexes(degrees)) {
+        sortedNodes.push_back(nodes[i]);
+    }
+    for (int i = sortedNodes.size() - 1; i >= 0; i--) {
+        if (sortedNodes[i]->getWasColored()) {
+            continue;
+        }
+        sortedNodes[i]->setWasColored(true);
+        ret.push_back(vector<IROperand *>(1, sortedNodes[i]));
+        for (int j = i - 1; j >= 0; j--) {
+            if (find(conflictVar[sortedNodes[i]].begin(), conflictVar[sortedNodes[i]].end(), sortedNodes[j]) == conflictVar[sortedNodes[i]].end()) {
+                if (sortedNodes[j]->getWasColored()) {
+                    continue;
+                }
+                sortedNodes[j]->setWasColored(true);
+                ret.back().push_back(sortedNodes[j]);
+            }
+        }
+    }
+    return ret;
+}
+
+unordered_map<IROperand *, int> IRFunction::calVarCosts() {
+    unordered_map<IROperand *, int> ret;
     for (int i = 0; i < basicBlocks.size(); i++) {
         for (auto j : basicBlocks[i]) {
             if (!IRCode::isAssignmentOperation(j->getOperation())) {
@@ -910,7 +942,8 @@ std::unordered_map<IROperand *, int> IRFunction::calVarCosts() {
 
 void IRFunction::varBindRegisters(TargetCodes *t) {
     calVarActiveRegions();
-    std::unordered_map<IROperand *, std::vector<IROperand *>> symVar = calSymVarRelations();
+    unordered_map<IROperand *, vector<IROperand *>> conflictVar = calConflictVarRelations();
+    vector<vector<IROperand *>> registerGraph = calRegisterGraph(conflictVar);
     unordered_map<IROperand *, int> varCosts = calVarCosts();
     vector<IROperand *> operands;
     vector<IROperand *> sortedOperands;
@@ -947,12 +980,12 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
             functionTable->insertBindRegisters(toBindReg);
             vector<IROperand *> historySymbol;
             bool conflict = false;
-            for (auto it : symVar[sortedOperands[i]]) {
-                if (!it->getBindRegister()) {
-                    it->setBindRegister(true);
-                    it->setTargetBindRegister(toBindReg)
-                    ;
-                    break;
+            for (auto it : registerGraph) {
+                if (find(it.begin(), it.end(), sortedOperands[i]) != it.end()) {
+                    for (auto in_it : it) {
+                        in_it->setBindRegister(true);
+                        in_it->setTargetBindRegister(toBindReg);
+                    }
                 }
             }
             numGenPurposeRegAlloc++;
@@ -971,10 +1004,12 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
             sortedOperands[i]->setTargetBindRegister(toBindReg);
             toBindReg->setTmpStoreOffset(sortedOperands[i]->getMemOffset());
             functionTable->insertBindRegisters(toBindReg);
-            for (auto it : symVar[sortedOperands[i]]) {
-                if (!it->getBindRegister()) {
-                    it->setBindRegister(true);
-                    it->setTargetBindRegister(toBindReg);
+            for (auto it : registerGraph) {
+                if (find(it.begin(), it.end(), sortedOperands[i]) != it.end()) {
+                    for (auto in_it : it) {
+                        in_it->setBindRegister(true);
+                        in_it->setTargetBindRegister(toBindReg);
+                    }
                 }
             }
             numFloatPointRegAlloc++;
@@ -1000,7 +1035,7 @@ void IRFunction::constFolding() {
             } else if (op == IROperation::MOD) {
                 int val_a = stoi(code->getArg1()->getValue());
                 int val_b = stoi(code->getArg2()->getValue());
-                new_value = new IRValue(MetaDataType::INT, std::to_string(val_a % val_b), {}, false);
+                new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
             }
 
             if(new_value){
@@ -1221,7 +1256,7 @@ int IRFunction::getFrameSize() const {
     return frameSize;
 }
 
-std::vector<Register *> IRFunction::getBindRegisters() const {
+vector<Register *> IRFunction::getBindRegisters() const {
     return functionTable->getBindRegisters();
 }
 

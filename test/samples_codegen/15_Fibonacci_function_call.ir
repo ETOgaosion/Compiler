@@ -31,12 +31,12 @@ L_1_fibonacci:
 	t_1 = a + b;
 	t_2 <= c;
 	t_2 = t_1;
-	addparam c;
-	call print_int, frame size: 40; 
+	addparam t_2;
+	call print_int; 
 	t_3 <= a;
 	t_3 = b;
 	t_4 <= b;
-	t_4 = c;
+	t_4 = t_2;
 	t_5 = i + 1;
 	t_6 <= i;
 	t_6 = t_5;
@@ -56,12 +56,12 @@ t_0:= symbol type: TEMP VAR; data type: 2
 ----------- Codes ------------
 main:
 	n = 0;
-	call get_int, frame size: 24; 
+	call get_int; 
 	t_0 =  return ;
 	t_1 <= n;
 	t_1 = t_0;
-	addparam n;
-	call fibonacci, frame size: 24; 
+	addparam t_1;
+	call fibonacci; 
 	t_2 =  return ;
 	return 0;
 

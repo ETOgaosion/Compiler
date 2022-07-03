@@ -22,9 +22,10 @@ class IRTempVariable;
 class IROperand {
 private:
     OperandType operandType;
+    bool wasColored;
 
 public:
-    explicit IROperand(OperandType newOperandType) { operandType = newOperandType; }
+    explicit IROperand(OperandType newOperandType) { operandType = newOperandType; wasColored = false; };
 
     bool setOperandType(OperandType inOperandType) { operandType = inOperandType; return true; };
     OperandType getOperandType() const { return operandType; };
@@ -53,6 +54,7 @@ public:
     virtual std::vector<int> getActiveRegions() const { return {}; };
     virtual bool getIsAlive() const { return true; };
     virtual std::vector<Register *> getBindRegisters() const { return {}; };
+    virtual bool getWasColored() const { return wasColored; };
 
     virtual void setAlive(bool set) {};
     virtual bool setAssigned() { return false; }
@@ -69,6 +71,7 @@ public:
     virtual bool setActiveRegions(std::vector<int> inActiveRegion) { return false; };
     virtual bool setBindRegister(bool toBindRegister) { return false; };
     virtual bool setTargetBindRegister(Register *intargetBindRegister) { return false; };
+    virtual bool setWasColored(bool inWasColored) { wasColored = inWasColored; return true; };
 
     virtual Register *load(TargetCodes * t, bool isGeneralPurposeRegister) { return nullptr; };
     virtual Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) { return nullptr; };

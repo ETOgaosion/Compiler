@@ -63,7 +63,8 @@ public:
 
     void calVarActiveRegions();
     static bool vectorOverlap(const std::vector<int>& a, const std::vector<int>& b);
-    std::unordered_map<IROperand *, std::vector<IROperand *>> calSymVarRelations();
+    std::unordered_map<IROperand *, std::vector<IROperand *>> calConflictVarRelations();
+    std::vector<std::vector<IROperand *>> calRegisterGraph(std::unordered_map<IROperand *, std::vector<IROperand *>> conflictVar);
     std::unordered_map<IROperand *, int> calVarCosts();
     void varBindRegisters(TargetCodes *t);
 
