@@ -50,8 +50,10 @@ public:
     virtual bool getBindRegister() const { return false; };
     virtual Register *gettargetBindRegister() const { return nullptr; };
     virtual std::vector<int> getActiveRegions() const { return {}; };
+    virtual bool getIsAlive() const { return true; };
     virtual std::vector<Register *> getBindRegisters() const { return {}; };
 
+    virtual void setAlive(bool set) {};
     virtual bool setAssigned() { return false; }
     virtual bool addHistorySymbol(IROperand *inSymbol) { return false; };
     virtual bool setAliasToSymbol() { return false; };
@@ -135,6 +137,7 @@ private:
     std::vector<int> activeRegions;
     bool bindRegister;
     Register *targetBindRegister;
+    bool alive;
 
 public:
     IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue, bool newIsGlobalSymbolVar);
@@ -155,6 +158,10 @@ public:
 
     bool setAssigned() override { assigned = true; return true; };
     bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; };
+
+    bool getIsAlive() const override { return alive; };
+    void setAlive(bool set) override { alive = set; };
+
 
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
     bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); };
@@ -203,6 +210,7 @@ private:
     std::vector<int> activeRegions;
     bool bindRegister;
     Register *targetBindRegister;
+    bool alive;
 
 public:
     IRTempVariable(std::string newName, MetaDataType newMetaDataType);
@@ -218,6 +226,9 @@ public:
     std::vector<int> getActiveRegions() const override { return activeRegions; };
     bool getBindRegister() const override { return bindRegister; };
     Register *gettargetBindRegister() const override { return targetBindRegister; };
+
+    bool getIsAlive() const override { return alive; };
+    void setAlive(bool set) override { alive = set; };
 
     bool setAssigned() override { assigned = true; return true; };
     bool setAliasToSymbol() override { aliasToSymbol = true; return true; };

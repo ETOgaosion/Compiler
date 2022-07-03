@@ -37,6 +37,7 @@ private:
     std::size_t size;
     int offset;
     uint64_t memPosition{};
+
 protected:
 
 public:
