@@ -50,6 +50,7 @@ public:
     IRValue* immAddSub(IROperand* op1, IROperand* op2, IROperation op);
     IRValue* immMul(IROperand* op1, IROperand* op2);
     IRValue* immDiv(IROperand* op1, IROperand* op2);
+    IRValue* immCmp(IROperand* op1, IROperand* op2, IROperation op);
 
 
     void delOperandInVec(std::vector<IROperand*>& vars, IROperand* op);
