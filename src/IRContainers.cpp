@@ -8,6 +8,7 @@
 #include <deque>
 #include <unordered_map>
 #include <algorithm>
+#include <cstring>
 
 using namespace std;
 
@@ -144,67 +145,16 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
     IRValue* retVal = nullptr;
     if(type1 == MetaDataType::INT){
         int val_a = stoi(op1->getValue());
-        switch(type2) {
-            case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
-                retVal = new IRValue(MetaDataType::INT, to_string(val_a * val_b_i), {}, false);
-            }
-                break;
-            case MetaDataType::FLOAT: {
-                float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b_f));
-            }
-                break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_d));
-            }
-                break;
-            default:
-                break;
-        }
+        int val_b = stoi(op2->getValue());
+        retVal = new IRValue(MetaDataType::INT, to_string(val_a * val_b), {}, false);
     } else if (type1 == MetaDataType::FLOAT){
         float val_a = stof(op1->getValue());
-        switch(type2) {
-            case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b_i));
-            }
-                break;
-            case MetaDataType::FLOAT: {
-                float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b_f));
-            }
-                break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_d));
-            }
-                break;
-            default:
-                break;
-        }
+        float val_b = stof(op2->getValue());
+        retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b));
     } else if (type1 == MetaDataType::DOUBLE){
         double val_a = stod(op1->getValue());
-        switch(type2) {
-            case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_i));
-            }
-                break;
-            case MetaDataType::FLOAT: {
-                float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_f));
-            }
-                break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b_d));
-            }
-                break;
-            default:
-                break;
-        }
+        double val_b = stod(op2->getValue());
+        retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b));
     }
     return retVal;
 }
@@ -215,69 +165,299 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
     IRValue* retVal = nullptr;
     if(type1 == MetaDataType::INT){
         int val_a = stoi(op1->getValue());
-        switch(type2) {
-            case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
-                retVal = new IRValue(MetaDataType::INT, to_string(val_a / val_b_i), {}, false);
-            }
-                break;
-            case MetaDataType::FLOAT: {
-                float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b_f));
-            }
-                break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_d));
-            }
-                break;
-            default:
-                break;
-        }
+        int val_b = stoi(op2->getValue());
+        retVal = new IRValue(MetaDataType::INT, to_string(val_a / val_b), {}, false);
     } else if (type1 == MetaDataType::FLOAT){
         float val_a = stof(op1->getValue());
-        switch(type2) {
-            case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b_i));
-            }
+        float val_b = stof(op2->getValue());
+        retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b));
+    } else if (type1 == MetaDataType::DOUBLE){
+        double val_a = stod(op1->getValue());
+        double val_b = stod(op2->getValue());
+        retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b));
+    }
+    return retVal;
+}
+
+IRValue* IRFunction::immCmp(IROperand* op1, IROperand* op2, IROperation op){
+    MetaDataType type = op1->getMetaDataType();
+    IRValue* retVal = nullptr;
+    if (type == MetaDataType::INT) {
+        int val_a = stoi(op1->getValue());
+        int val_b = stoi(op2->getValue());
+        switch(op){
+            case IROperation::SLT:
+                if(val_a < val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
                 break;
-            case MetaDataType::FLOAT: {
-                float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b_f));
-            }
+            case IROperation::SGT:
+                if(val_a > val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
                 break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_d));
-            }
+            case IROperation::SLEQ:
+                if(val_a <= val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                break;
+            case IROperation::SGEQ:
+                if(val_a >= val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
                 break;
             default:
                 break;
         }
-    } else if (type1 == MetaDataType::DOUBLE){
+    } else if (type == MetaDataType::FLOAT) {
+        float val_a = stof(op1->getValue());
+        float val_b = stof(op2->getValue());
+        switch(op){
+            case IROperation::SLT:
+                if(val_a < val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                break;
+            case IROperation::SGT:
+                if(val_a > val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                break;
+            case IROperation::SLEQ:
+                if(val_a <= val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                break;
+            case IROperation::SGEQ:
+                if(val_a >= val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                break;
+            default:
+                break;
+        }
+    } else if (type == MetaDataType::DOUBLE) {
         double val_a = stod(op1->getValue());
-        switch(type2) {
-            case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_i));
-            }
+        double val_b = stod(op2->getValue());
+        switch(op){
+            case IROperation::SLT:
+                if(val_a < val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
                 break;
-            case MetaDataType::FLOAT: {
-                float val_b_f = stof(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_f));
-            }
+            case IROperation::SGT:
+                if(val_a > val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
                 break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b_d));
-            }
+            case IROperation::SLEQ:
+                if(val_a <= val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                break;
+            case IROperation::SGEQ:
+                if(val_a >= val_b)
+                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else
+                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
                 break;
             default:
                 break;
         }
     }
-    return retVal;
+}
+
+void IRFunction::constFolding() {
+    int i = 0;
+    for(; i < codes.size(); i++) { 
+        IRCode *code = codes[i];
+        IROperand* res = code->getResult();
+        IROperand* arg1 = code->getArg1();
+        IROperand* arg2 = code->getArg2();
+        IROperation op = code->getOperation();
+
+        if(!isAssignmentOperation(op) || op == IROperation::ASSIGN || op == IROperation::PHI)
+            continue;     
+        else if (op == IROperation::NOT) {
+            IRValue* new_value = nullptr;
+            if(arg1->getValue() == "1")
+                new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+            else if(arg1->getValue() == "0")
+                new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+
+            if(new_value){
+                for(int j = i + 1; j < codes.size(); j++){
+                    IRCode* new_code = codes[j];
+                    if(new_code->getArg1() == res){
+                        new_code->setArg1(new_value);
+                    } else if (new_code->getArg2() == res){
+                        new_code->setArg2(new_value);
+                    }
+                }
+            }
+            delete code;
+            codes.erase(codes.begin() + i);
+            i--;
+            continue;
+        } else if (op == IROperation::NEG) {
+            IRValue* new_value = nullptr;
+            switch(arg1->getMetaDataType()){
+                case MetaDataType::INT:{
+                    int val = stoi(arg1->getValue());
+                    new_value = IRValue(MetaDataType::INT, std::to_string(0 - val), {}, false);
+                    break;
+                }
+                case MetaDataType::FLOAT:{
+                    float val = stof(arg1->getValue());
+                    new_value = ir->addImmValue(MetaDataType::FLOAT, std::to_string(0 - val));
+                    break;
+                }
+                case MetaDataType::DOUBLE:{
+                    double val = stod(arg1->getValue());
+                    new_value = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(0 - val));
+                    break;
+                }
+            }
+
+            if(new_value){
+                for(int j = i + 1; j < codes.size(); j++){
+                    IRCode* new_code = codes[j];
+                    if(new_code->getArg1() == res){
+                        new_code->setArg1(new_value);
+                    } else if (new_code->getArg2() == res){
+                        new_code->setArg2(new_value);
+                    }
+                }
+            }
+            delete code;
+            codes.erase(codes.begin() + i);
+            i--;
+            continue;
+        }
+
+        // arg1 and arg2 both exists
+        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && code->arg2->getOperandType() == OperandType::VALUE){
+            // arg1 and arg2 are both immValues
+            IRValue* new_value = nullptr;
+            if(op == IROperation::ADD || op == IROperation::SUB){
+                new_value = immAddSub(arg1, arg2, op);
+            } else if (op == IROperation::MUL) {
+                new_value = immMul(arg1, arg2);
+            } else if (op == IROperation::DIV) {
+                new_value = immDiv(arg1, arg2);
+            } else if (op == IROperation::MOD) {
+                int val_a = stoi(arg1->getValue());
+                int val_b = stoi(arg2->getValue());
+                new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
+            } else if (op == IROperation::OR) {
+                if(arg1->getValue() == "1" || arg2->getValue() == "1")
+                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else 
+                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+            } else if (op == IROperation::AND) {
+                if(arg1->getValue() == "1" && arg2->getValue() == "1")
+                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else 
+                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+            } else if (op == IROperation::SEQ) {
+                if(strcmp(arg1->getValue(), arg2->getValue()) == 0)
+                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else   
+                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+            } else if (op == IROperation::SNE) {
+                if(strcmp(arg1->getValue(), arg2->getValue()) != 0)
+                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                else   
+                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+            } else {
+                new_value = immCmp(arg1, arg2, op);
+            }
+
+            if(new_value){
+                for(int j = i + 1; j < codes.size(); j++){
+                    IRCode* new_code = codes[j];
+                    if(new_code->getArg1() == res){
+                        new_code->setArg1(new_value);
+                    } else if (new_code->getArg2() == res){
+                        new_code->setArg2(new_value);
+                    }
+                }
+            }
+            delete code;
+            codes.erase(codes.begin() + i);
+            i--;
+
+        } else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
+            IROperand* imm_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg1() : code->getArg2();
+            IROperand* var_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg2() : code->getArg1();
+
+            for(int j = i + 1; j < codes.size(); j++){
+                IRCode *new_code = codes[j];
+                IROperation new_op = code->getOperation();
+                
+                if(new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE){
+                // new_code: arg1 is Var, arg2 is immVal
+                    if(op == IROperation::ADD){
+                        new_code->setOperation(op);
+                        IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
+                        new_code->setArg1(var_arg);
+                        new_code->setArg2(new_value);
+                    } else if (op == IROperation::SUB) {
+                        if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
+                            IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                            new_code->setOperation(op);
+                            new_code->setArg1(var_arg);
+                            new_code->setArg2(new_value);
+                        } else { // origin code: arg2 is var
+                            new_code->setOperation(op);
+                            IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
+                            new_code->setArg1(new_value);
+                            new_code->setArg2(var_arg);                            
+                        }
+                    } else if (op == IROperation::MUL) {
+                        if(new_op == IROperation::MUL) {
+                            IRValue* new_value = immMul(imm_arg, new_code->getArg2());
+                            new_code->setArg1(var_arg);
+                            new_code->setArg2(new_value);
+                        }
+                    }
+                } else if (new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == res) {
+                    // new_code: arg2 is Var, arg1 is immVal
+                    if (op == IROperation::ADD) {
+                        IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
+                        new_code->setArg1(new_value);
+                        new_code->setArg2(var_arg);
+                    } else if (op == IROperation::SUB) {
+                        if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
+                            new_code->setArg2(var_arg);
+                            IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                            new_code->setArg1(new_value);
+                        } else { // origin code: arg2 is var
+
+                        }
+                    } else if (op == IROperation::MUL) {
+                        if(new_op == IROperation::MUL) {
+                            IRValue* new_value = immMul(imm_arg, new_code->getArg1());
+                            new_code->setArg1(new_value);
+                            new_code->setArg2(var_arg);                            
+                        }
+                    }
+                }
+            }
+            break;
+        }
+    }
 }
 
 void IRFunction::delOperandInVec(vector<IROperand*>& vars, IROperand* op){
@@ -1017,112 +1197,7 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
     }
 }
 
-void IRFunction::constFolding() {
-    int i = 0;
-    for(; i < codes.size(); i++) { 
-        IRCode *code = codes[i];
-        IROperand* res = code->getResult();
-        IROperand* arg1 = code->getArg1();
-        IROperand* arg2 = code->getArg2();
-        IROperation op = code->getOperation();
 
-        if(!isAssignmentOperation(op) || op == IROperation::ASSIGN || op == IROperation::PHI)
-            continue;
-        
-        if(op == IROperation::NOT || op == IROperation::NEG){
-
-        }
-        // arg1 and arg2 exists
-        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && code->arg2->getOperandType() == OperandType::VALUE){
-            IRValue* new_value = nullptr;
-            if(op == IROperation::ADD || op == IROperation::SUB){
-                new_value = immAddSub(arg1, arg2, op);
-            } else if (op == IROperation::MUL) {
-                new_value = immMul(arg1, arg2);
-            } else if (op == IROperation::DIV) {
-                new_value = immDiv(arg1, arg2);
-            } else if (op == IROperation::MOD) {
-                int val_a = stoi(arg1->getValue());
-                int val_b = stoi(arg2->getValue());
-                new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
-            } else if (op == IROperation::OR) {
-                if(arg1->getValue() == "1" || arg2->getValue() == "1")
-                    new_value = new IRValue(MetaDataType::BOOL, "1", )
-
-            }
-
-            if(new_value){
-                for(int j = i + 1; j < codes.size(); j++){
-                    IRCode* new_code = codes[j];
-                    if(new_code->getArg1() == res){
-                        new_code->setArg1(new_value);
-                    } else if (new_code->getArg2() == res){
-                        new_code->setArg2(new_value);
-                    }
-                }
-            }
-            delete code;
-            codes.erase(codes.begin() + i);
-            i--;
-        }
-
-        else if(arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE){
-            IROperand* imm_arg = code->getArg1()->getOperandType() == OperandType::VALUE ? code->getArg1() : code->getArg2();
-
-            for(int j = i + 1; j < codes.size(); j++){
-                IRCode *new_code = codes[j];
-                IROperation new_op = code->getOperation();
-                
-                if(new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == res){
-                    if(op == IROperation::ADD || op == IROperation::SUB) {
-                        if(new_op == IROperation::ADD || new_op == IROperation::SUB){ 
-                            IRValue* new_value = immAddSub(imm_arg, new_code->getArg1(), new_op);
-                            if(arg1->getOperandType() == OperandType::VALUE)
-                                code->setArg1(new_value);
-                            else
-                                code->setArg2(new_value);
-                            delete new_code;
-                            codes.erase(codes.begin() + j);
-                        }
-                    } else if (op == IROperation::MUL) {
-                        if(new_op == IROperation::MUL) {
-                            IRValue* new_value = immMul(imm_arg, new_code->getArg1());
-                            if(arg1->getOperandType() == OperandType::VALUE)
-                                code->setArg1(new_value);
-                            else
-                                code->setArg2(new_value);
-                            delete new_code;
-                            codes.erase(codes.begin() + j);
-                        }
-                    }
-                } else if (new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE) {
-                    if(op == IROperation::ADD || op == IROperation::SUB) {
-                        if(new_op == IROperation::ADD || new_op == IROperation::SUB){ 
-                            IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
-                            if(code->getArg1()->getOperandType() == OperandType::VALUE)
-                                code->setArg1(new_value);
-                            else
-                                code->setArg2(new_value);
-                            delete new_code;
-                            codes.erase(codes.begin() + j);
-                        }
-                    } else if (op == IROperation::MUL) {
-                        if(new_op == IROperation::MUL) {
-                            IRValue* new_value = immMul(imm_arg, new_code->getArg2());
-                            if(arg1->getOperandType() == OperandType::VALUE)
-                                code->setArg1(new_value);
-                            else
-                                code->setArg2(new_value);
-                            delete new_code;
-                            codes.erase(codes.begin() + j);
-                        }
-                    }
-                }
-            }
-            break;
-        }
-    }
-}
 
 void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     switch (inOptimizeLevel) {

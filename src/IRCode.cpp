@@ -21,10 +21,16 @@ bool IRCode::setArg2(IROperand *arg){
     return true;
 }
 
-bool IRCode::setResult(IROperand *op){
-    result = op;
+bool IRCode::setResult(IROperand *res){
+    result = res;
     return true;
 }
+
+bool setOperation(IROperation op) {
+    operation = op;
+    return true;
+}
+
 
 bool IRCode::isAssignmentOperation(IROperation inOperation) {
     switch(inOperation) {

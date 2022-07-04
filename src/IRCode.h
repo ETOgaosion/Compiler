@@ -60,7 +60,9 @@ public:
 
     bool setArg2(IROperand *arg);
 
-    bool setResult(IROperand *op);
+    bool setResult(IROperand *res);
+
+    bool setOperation(IROperation op);
 
     virtual void print() const = 0;
 

@@ -1133,7 +1133,7 @@ void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->metaDataType = MetaDataType::BOOL;
-    ctx->operand = new IRValue(MetaDataType::BOOL, ctx->getText(), false);
+    ctx->operand = new IRValue(MetaDataType::BOOL, ctx->getText(), {}, false);
 }
 
 // Cond
@@ -1795,10 +1795,10 @@ void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * 
     ctx->metaDataType = MetaDataType::BOOL;
 
     if (ctx->BoolConst()->getText() == "true") {
-        ctx->operand = new IRValue(MetaDataType::BOOL, "1", false);
+        ctx->operand = new IRValue(MetaDataType::BOOL, "1", {}, false);
     }
     else {
-        ctx->operand = new IRValue(MetaDataType::BOOL, "0", false);
+        ctx->operand = new IRValue(MetaDataType::BOOL, "0", {}, false);
     }
 }
 
