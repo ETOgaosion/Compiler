@@ -26,7 +26,7 @@ bool IRCode::setResult(IROperand *res){
     return true;
 }
 
-bool setOperation(IROperation op) {
+bool IRCode::setOperation(IROperation op) {
     operation = op;
     return true;
 }

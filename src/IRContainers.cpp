@@ -347,7 +347,11 @@ void IRFunction::constFolding() {
         }
 
         // arg1 and arg2 both exists
+<<<<<<< HEAD
         if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE){
+=======
+        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && code->getArg2()->getOperandType() == OperandType::VALUE){
+>>>>>>> 7893c935284c3d7ce867e777001a93315b116de5
             // arg1 and arg2 are both immValues
             IRValue* new_value = nullptr;
             if(op == IROperation::ADD || op == IROperation::SUB){
@@ -376,7 +380,11 @@ void IRFunction::constFolding() {
                 else   
                     new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
             } else if (op == IROperation::SNE) {
+<<<<<<< HEAD
                 if(arg1->getValue() != arg2->getValue())
+=======
+                if(arg1->getValue() == arg2->getValue())
+>>>>>>> 7893c935284c3d7ce867e777001a93315b116de5
                     new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
                 else   
                     new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
