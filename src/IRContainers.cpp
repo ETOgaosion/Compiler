@@ -287,7 +287,7 @@ void IRFunction::constFolding() {
         IROperand* arg2 = code->getArg2();
         IROperation op = code->getOperation();
 
-        if(!isAssignmentOperation(op) || op == IROperation::ASSIGN || op == IROperation::PHI)
+        if(!IRCode::isAssignmentOperation(op) || op == IROperation::ASSIGN || op == IROperation::PHI)
             continue;     
         else if (op == IROperation::NOT) {
             IRValue* new_value = nullptr;
@@ -315,7 +315,7 @@ void IRFunction::constFolding() {
             switch(arg1->getMetaDataType()){
                 case MetaDataType::INT:{
                     int val = stoi(arg1->getValue());
-                    new_value = IRValue(MetaDataType::INT, std::to_string(0 - val), {}, false);
+                    new_value = new IRValue(MetaDataType::INT, std::to_string(0 - val), {}, false);
                     break;
                 }
                 case MetaDataType::FLOAT:{
@@ -347,7 +347,7 @@ void IRFunction::constFolding() {
         }
 
         // arg1 and arg2 both exists
-        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && code->arg2->getOperandType() == OperandType::VALUE){
+        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE){
             // arg1 and arg2 are both immValues
             IRValue* new_value = nullptr;
             if(op == IROperation::ADD || op == IROperation::SUB){
@@ -371,12 +371,12 @@ void IRFunction::constFolding() {
                 else 
                     new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
             } else if (op == IROperation::SEQ) {
-                if(strcmp(arg1->getValue(), arg2->getValue()) == 0)
+                if(arg1->getValue() == arg2->getValue())
                     new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
                 else   
                     new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
             } else if (op == IROperation::SNE) {
-                if(strcmp(arg1->getValue(), arg2->getValue()) != 0)
+                if(arg1->getValue() != arg2->getValue())
                     new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
                 else   
                     new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
@@ -444,7 +444,10 @@ void IRFunction::constFolding() {
                             IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
                             new_code->setArg1(new_value);
                         } else { // origin code: arg2 is var
-
+                            new_code->setOperation(new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                            new_code->setArg2(var_arg);
+                            IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
+                            new_code->setArg1(new_value);
                         }
                     } else if (op == IROperation::MUL) {
                         if(new_op == IROperation::MUL) {
