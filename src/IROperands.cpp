@@ -68,7 +68,12 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                 t->addCodeMv(freeRegister, zero,FloatPointType::NONE, FloatPointType::NONE);
             }
             else {
-                t->addCodeAddi(freeRegister, zero, stoi(values.front()));
+                if (stoi(values.front()) < 2048) {
+                    t->addCodeAddi(freeRegister, zero, stoi(values.front()));
+                }
+                else {
+                    t->addCodeLi(freeRegister, values.front());
+                }
             }
         }
         else {
