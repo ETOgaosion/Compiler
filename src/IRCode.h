@@ -69,6 +69,8 @@ public:
     virtual void genTargetCode(TargetCodes *t) {};
 
     static bool isAssignmentOperation(IROperation inOperation);
+
+    static bool isTwoArgAssignmentOperation(IROperation inOperation);
 };
 
 //!!!!!!!! consider immediate and metaDataType when generating target code !!!!!!!!!!

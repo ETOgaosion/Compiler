@@ -278,195 +278,278 @@ IRValue* IRFunction::immCmp(IROperand* op1, IROperand* op2, IROperation op){
     }
 }
 
-void IRFunction::constFolding() {
-    int i = 0;
-    for(; i < codes.size(); i++) { 
-        IRCode *code = codes[i];
-        IROperand* res = code->getResult();
-        IROperand* arg1 = code->getArg1();
-        IROperand* arg2 = code->getArg2();
-        IROperation op = code->getOperation();
+void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp_op, IROperation op){
+    IROperand* arg1 = code->getArg1();
+    IROperand* arg2 = code->getArg2();
 
-        if(!IRCode::isAssignmentOperation(op) || op == IROperation::ASSIGN || op == IROperation::PHI)
-            continue;     
-        else if (op == IROperation::NOT) {
-            IRValue* new_value = nullptr;
-            if(arg1->getValue() == "1")
-                new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
-            else if(arg1->getValue() == "0")
-                new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
-
-            if(new_value){
-                for(int j = i + 1; j < codes.size(); j++){
-                    IRCode* new_code = codes[j];
-                    if(new_code->getArg1() == res){
-                        new_code->setArg1(new_value);
-                    } else if (new_code->getArg2() == res){
-                        new_code->setArg2(new_value);
-                    }
-                }
-            }
-            delete code;
-            codes.erase(codes.begin() + i);
-            i--;
-            continue;
-        } else if (op == IROperation::NEG) {
-            IRValue* new_value = nullptr;
-            switch(arg1->getMetaDataType()){
-                case MetaDataType::INT:{
-                    int val = stoi(arg1->getValue());
-                    new_value = new IRValue(MetaDataType::INT, std::to_string(0 - val), {}, false);
-                    break;
-                }
-                case MetaDataType::FLOAT:{
-                    float val = stof(arg1->getValue());
-                    new_value = ir->addImmValue(MetaDataType::FLOAT, std::to_string(0 - val));
-                    break;
-                }
-                case MetaDataType::DOUBLE:{
-                    double val = stod(arg1->getValue());
-                    new_value = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(0 - val));
-                    break;
-                }
-            }
-
-            if(new_value){
-                for(int j = i + 1; j < codes.size(); j++){
-                    IRCode* new_code = codes[j];
-                    if(new_code->getArg1() == res){
-                        new_code->setArg1(new_value);
-                    } else if (new_code->getArg2() == res){
-                        new_code->setArg2(new_value);
-                    }
-                }
-            }
-            delete code;
-            codes.erase(codes.begin() + i);
-            i--;
-            continue;
+    if(IRCode::isTwoArgAssignmentOperation(op)){
+        if(arg1 == cmp_op){
+            code->setArg1(dst_op);
+        } else if (arg2 == cmp_op){
+            code->setArg2(dst_op);
         }
+    } else if (op == IROperation::BEQZ || op == IROperation::NEG || op == IROperation::NOT) {
+        if(arg1 == cmp_op)
+            code->setArg1(dst_op);
+    } else if (op == IROperation::) {
 
-        // arg1 and arg2 both exists
-<<<<<<< HEAD
-        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE){
-=======
-        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && code->getArg2()->getOperandType() == OperandType::VALUE){
->>>>>>> 7893c935284c3d7ce867e777001a93315b116de5
-            // arg1 and arg2 are both immValues
-            IRValue* new_value = nullptr;
-            if(op == IROperation::ADD || op == IROperation::SUB){
-                new_value = immAddSub(arg1, arg2, op);
-            } else if (op == IROperation::MUL) {
-                new_value = immMul(arg1, arg2);
-            } else if (op == IROperation::DIV) {
-                new_value = immDiv(arg1, arg2);
-            } else if (op == IROperation::MOD) {
-                int val_a = stoi(arg1->getValue());
-                int val_b = stoi(arg2->getValue());
-                new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
-            } else if (op == IROperation::OR) {
-                if(arg1->getValue() == "1" || arg2->getValue() == "1")
-                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else 
-                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
-            } else if (op == IROperation::AND) {
-                if(arg1->getValue() == "1" && arg2->getValue() == "1")
-                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else 
-                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
-            } else if (op == IROperation::SEQ) {
-                if(arg1->getValue() == arg2->getValue())
-                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else   
-                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
-            } else if (op == IROperation::SNE) {
-<<<<<<< HEAD
-                if(arg1->getValue() != arg2->getValue())
-=======
-                if(arg1->getValue() == arg2->getValue())
->>>>>>> 7893c935284c3d7ce867e777001a93315b116de5
-                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else   
-                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
-            } else {
-                new_value = immCmp(arg1, arg2, op);
-            }
+    }
+}
 
-            if(new_value){
+void IRFunction::constFolding() {
+    for(int bnum = 0; bnum < basicBlocks.size(); bnum++) {
+        auto block = basicBlocks[bnum]; 
+        for(int i = 0; i < block.size(); i++){
+            IRCode *code = block[i];
+            IROperand* res = code->getResult();
+            IROperand* arg1 = code->getArg1();
+            IROperand* arg2 = code->getArg2();
+            IROperation op = code->getOperation();
+
+            if(!IRCode::isAssignmentOperation(op) || op == IROperation::PHI)
+                continue;    
+            else if (op == IROperation::ASSIGN){
+                if(arg1->getOperandType() != OperandType::VALUE)
+                    continue;
+                // code->setResult(arg1);
+
                 for(int j = i + 1; j < codes.size(); j++){
-                    IRCode* new_code = codes[j];
-                    if(new_code->getArg1() == res){
-                        new_code->setArg1(new_value);
-                    } else if (new_code->getArg2() == res){
-                        new_code->setArg2(new_value);
+                        IRCode* new_code = codes[j];
+                        IROperation new_op = new_code->getOperation();
+                        // break at next def
+                        if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
+                            continue;
+                        if(new_code->getResult() == res){
+                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
+                                break;
+                        }
+                        // substitute res to arg1 (immValue)
+                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
+                            if(new_code->getArg1() == res){
+                                new_code->setArg1(arg1);
+                            } else if (new_code->getArg2() == res){
+                                new_code->setArg2(arg1);
+                            }
+                        }
+                }
+                block.erase(block.begin() + i);
+                codes.erase(codes.begin() + entrances[bnum] + i);
+                delete code;
+                i--;
+                continue;
+            } else if (op == IROperation::NOT) {
+                IRValue* new_value = nullptr;
+                if(arg1->getValue() == "1")
+                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                else if(arg1->getValue() == "0")
+                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+
+                if(new_value){
+                    for(int j = i + 1; j < codes.size(); j++){
+                        IRCode* new_code = codes[j];
+                        IROperation new_op = new_code->getOperation();
+                        // break at next def
+                        if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
+                            continue;
+                        if(new_code->getResult() == res){
+                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
+                                break;
+                        }
+                        // substitute res to new_value
+                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
+                            if(new_code->getArg1() == res){
+                                new_code->setArg1(new_value);
+                            } else if (new_code->getArg2() == res){
+                                new_code->setArg2(new_value);
+                            }
+                        }
                     }
                 }
+                block.erase(block.begin() + i);
+                codes.erase(codes.begin() + entrances[bnum] + i);
+                delete code;
+                i--;
+                continue;
+            } else if (op == IROperation::NEG) {
+                IRValue* new_value = nullptr;
+                switch(arg1->getMetaDataType()){
+                    case MetaDataType::INT:{
+                        int val = stoi(arg1->getValue());
+                        new_value = new IRValue(MetaDataType::INT, std::to_string(0 - val), {}, false);
+                        break;
+                    }
+                    case MetaDataType::FLOAT:{
+                        float val = stof(arg1->getValue());
+                        new_value = ir->addImmValue(MetaDataType::FLOAT, std::to_string(0 - val));
+                        break;
+                    }
+                    case MetaDataType::DOUBLE:{
+                        double val = stod(arg1->getValue());
+                        new_value = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(0 - val));
+                        break;
+                    }
+                }
+
+                if(new_value){
+                    for(int j = i + 1; j < codes.size(); j++){
+                        IRCode* new_code = codes[j];
+                        IROperation new_op = new_code->getOperation();
+                        // break at next def
+                        if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
+                            continue;
+                        if(new_code->getResult() == res){
+                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
+                                break;
+                        }
+                        // substitute res to new_value
+                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
+                            if(new_code->getArg1() == res){
+                                new_code->setArg1(new_value);
+                            } else if (new_code->getArg2() == res){
+                                new_code->setArg2(new_value);
+                            }
+                        }
+                    }
+                }
+                block.erase(block.begin() + i);
+                codes.erase(codes.begin() + entrances[bnum] + i);
+                delete code;
+                i--;
+                continue;
             }
-            delete code;
-            codes.erase(codes.begin() + i);
-            i--;
 
-        } else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
-            IROperand* imm_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg1() : code->getArg2();
-            IROperand* var_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg2() : code->getArg1();
+            // arg1 and arg2 both exists
+            if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE){
+                // arg1 and arg2 are both immValues
+                IRValue* new_value = nullptr;
+                if(op == IROperation::ADD || op == IROperation::SUB){
+                    new_value = immAddSub(arg1, arg2, op);
+                } else if (op == IROperation::MUL) {
+                    new_value = immMul(arg1, arg2);
+                } else if (op == IROperation::DIV) {
+                    new_value = immDiv(arg1, arg2);
+                } else if (op == IROperation::MOD) {
+                    int val_a = stoi(arg1->getValue());
+                    int val_b = stoi(arg2->getValue());
+                    new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
+                } else if (op == IROperation::OR) {
+                    if(arg1->getValue() == "1" || arg2->getValue() == "1")
+                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    else 
+                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                } else if (op == IROperation::AND) {
+                    if(arg1->getValue() == "1" && arg2->getValue() == "1")
+                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    else 
+                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                } else if (op == IROperation::SEQ) {
+                    if(arg1->getValue() == arg2->getValue())
+                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    else   
+                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                } else if (op == IROperation::SNE) {
+                    if(arg1->getValue() != arg2->getValue())
+                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    else   
+                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                } else {
+                    new_value = immCmp(arg1, arg2, op);
+                }
 
-            for(int j = i + 1; j < codes.size(); j++){
-                IRCode *new_code = codes[j];
-                IROperation new_op = code->getOperation();
-                
-                if(new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE){
-                // new_code: arg1 is Var, arg2 is immVal
-                    if(op == IROperation::ADD){
-                        new_code->setOperation(op);
-                        IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
-                        new_code->setArg1(var_arg);
-                        new_code->setArg2(new_value);
-                    } else if (op == IROperation::SUB) {
-                        if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
-                            IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
-                            new_code->setOperation(op);
-                            new_code->setArg1(var_arg);
-                            new_code->setArg2(new_value);
-                        } else { // origin code: arg2 is var
+                if(new_value){
+                    for(int j = i + 1; j < codes.size(); j++){
+                        IRCode* new_code = codes[j];
+                        IROperation new_op = new_code->getOperation();
+                        // break at next def
+                        if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
+                            continue;
+                        if(new_code->getResult() == res){
+                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
+                                break;
+                        }
+                        // substitute
+                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
+                            if(new_code->getArg1() == res){
+                                new_code->setArg1(new_value);
+                            } else if (new_code->getArg2() == res){
+                                new_code->setArg2(new_value);
+                            }
+                        } else if (new_op == IROperand::) {
+
+                        }
+                    }
+                }
+                block.erase(block.begin() + i);
+                codes.erase(codes.begin() + entrances[bnum] + i);
+                delete code;
+                i--;
+
+            } else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
+                IROperand* imm_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg1() : code->getArg2();
+                IROperand* var_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg2() : code->getArg1();
+
+                for(int j = i + 1; j < codes.size(); j++){
+                    IRCode *new_code = codes[j];
+                    IROperation new_op = code->getOperation();
+                    
+                    if(!IRCode::isAssignmentOperation(new_op) || new_op == IROperation::PHI)
+                        continue;
+                    if(new_op == IROperation::NEG || new_op == IROperation::NOT || new_op == IROperation::ASSIGN)
+                        continue;
+                    
+                    if(new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE){
+                    // new_code: arg1 is Var, arg2 is immVal
+                        if(op == IROperation::ADD){
                             new_code->setOperation(op);
                             IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
-                            new_code->setArg1(new_value);
-                            new_code->setArg2(var_arg);                            
-                        }
-                    } else if (op == IROperation::MUL) {
-                        if(new_op == IROperation::MUL) {
-                            IRValue* new_value = immMul(imm_arg, new_code->getArg2());
                             new_code->setArg1(var_arg);
                             new_code->setArg2(new_value);
+                        } else if (op == IROperation::SUB) {
+                            if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
+                                IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                                new_code->setOperation(op);
+                                new_code->setArg1(var_arg);
+                                new_code->setArg2(new_value);
+                            } else { // origin code: arg2 is var
+                                new_code->setOperation(op);
+                                IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
+                                new_code->setArg1(new_value);
+                                new_code->setArg2(var_arg);                            
+                            }
+                        } else if (op == IROperation::MUL) {
+                            if(new_op == IROperation::MUL) {
+                                IRValue* new_value = immMul(imm_arg, new_code->getArg2());
+                                new_code->setArg1(var_arg);
+                                new_code->setArg2(new_value);
+                            }
                         }
-                    }
-                } else if (new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == res) {
-                    // new_code: arg2 is Var, arg1 is immVal
-                    if (op == IROperation::ADD) {
-                        IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
-                        new_code->setArg1(new_value);
-                        new_code->setArg2(var_arg);
-                    } else if (op == IROperation::SUB) {
-                        if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
-                            new_code->setArg2(var_arg);
-                            IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
-                            new_code->setArg1(new_value);
-                        } else { // origin code: arg2 is var
-                            new_code->setOperation(new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
-                            new_code->setArg2(var_arg);
+                    } else if (new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == res) {
+                        // new_code: arg2 is Var, arg1 is immVal
+                        if (op == IROperation::ADD) {
                             IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
                             new_code->setArg1(new_value);
-                        }
-                    } else if (op == IROperation::MUL) {
-                        if(new_op == IROperation::MUL) {
-                            IRValue* new_value = immMul(imm_arg, new_code->getArg1());
-                            new_code->setArg1(new_value);
-                            new_code->setArg2(var_arg);                            
+                            new_code->setArg2(var_arg);
+                        } else if (op == IROperation::SUB) {
+                            if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
+                                new_code->setArg2(var_arg);
+                                IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                                new_code->setArg1(new_value);
+                            } else { // origin code: arg2 is var
+                                new_code->setOperation(new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                                new_code->setArg2(var_arg);
+                                IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
+                                new_code->setArg1(new_value);
+                            }
+                        } else if (op == IROperation::MUL) {
+                            if(new_op == IROperation::MUL) {
+                                IRValue* new_value = immMul(imm_arg, new_code->getArg1());
+                                new_code->setArg1(new_value);
+                                new_code->setArg2(var_arg);                            
+                            }
                         }
                     }
                 }
             }
-            break;
         }
     }
 }
@@ -1235,7 +1318,8 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
 void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     switch (inOptimizeLevel) {
         case 0:
-            // constFolding();
+            basicBlockDivision();
+            constFolding();
             break;
         case 1:
             basicBlockDivision();

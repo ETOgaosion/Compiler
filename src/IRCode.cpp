@@ -30,7 +30,27 @@ bool IRCode::setOperation(IROperation op) {
     operation = op;
     return true;
 }
-
+bool IRCode::isTwoArgAssignmentOperation(IROperation inOperation) {
+    switch(inOperation) {
+        case IROperation::ADD:
+        case IROperation::SUB:
+        case IROperation::MUL:
+        case IROperation::DIV:
+        case IROperation::MOD:
+        case IROperation::OR:
+        case IROperation::AND:
+        case IROperation::SEQ:
+        case IROperation::SNE:
+        case IROperation::SLT:
+        case IROperation::SGT:
+        case IROperation::SLEQ:
+        case IROperation::SGEQ:
+            return true;
+            break;
+        default:
+            return false;
+    }
+}
 
 bool IRCode::isAssignmentOperation(IROperation inOperation) {
     switch(inOperation) {
