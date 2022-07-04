@@ -61,6 +61,8 @@ public:
     void delDeadCode() ;
     void basicBlockDivision();
 
+    void substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp_op, IROperation op);
+
     void calVarActiveRegions();
     static bool vectorOverlap(const std::vector<int>& a, const std::vector<int>& b);
     std::unordered_map<IROperand *, std::vector<IROperand *>> calConflictVarRelations();

@@ -288,11 +288,12 @@ void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp
         } else if (arg2 == cmp_op){
             code->setArg2(dst_op);
         }
-    } else if (op == IROperation::BEQZ || op == IROperation::NEG || op == IROperation::NOT) {
+    } else if (op == IROperation::BEQZ || op == IROperation::NEG || op == IROperation::NOT || op == IROperation::ASSIGN || op == IROperation::ADD_PARAM || op == IROperation::RETURN) {
         if(arg1 == cmp_op)
             code->setArg1(dst_op);
-    } else if (op == IROperation::) {
-        
+    } else if (op == IROperation::FETCH_ARRAY_ELEM || op == IROperation::ASSIGN_ARRAY_ELEM) {
+        if(arg2 == cmp_op)
+            code->setArg2(dst_op);
     }
 }
 
@@ -319,18 +320,13 @@ void IRFunction::constFolding() {
                         // break at next def
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
                             continue;
+                        if(new_op == IROperation::REPLACE && res == new_code->getArg1())
+                            break;
                         if(new_code->getResult() == res){
-                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
-                                break;
+                            break;
                         }
                         // substitute res to arg1 (immValue)
-                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
-                            if(new_code->getArg1() == res){
-                                new_code->setArg1(arg1);
-                            } else if (new_code->getArg2() == res){
-                                new_code->setArg2(arg1);
-                            }
-                        }
+                        substituteUseOp(new_code, arg1, res, new_op);
                 }
                 block.erase(block.begin() + i);
                 codes.erase(codes.begin() + entrances[bnum] + i);
@@ -351,18 +347,13 @@ void IRFunction::constFolding() {
                         // break at next def
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
                             continue;
+                        if(new_op == IROperation::REPLACE && res == new_code->getArg1())
+                            break;
                         if(new_code->getResult() == res){
-                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
-                                break;
+                            break;
                         }
                         // substitute res to new_value
-                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
-                            if(new_code->getArg1() == res){
-                                new_code->setArg1(new_value);
-                            } else if (new_code->getArg2() == res){
-                                new_code->setArg2(new_value);
-                            }
-                        }
+                        substituteUseOp(new_code, new_value, res, new_op);
                     }
                 }
                 block.erase(block.begin() + i);
@@ -397,18 +388,13 @@ void IRFunction::constFolding() {
                         // break at next def
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
                             continue;
+                        if(new_op == IROperation::REPLACE && res == new_code->getArg1())
+                            break;
                         if(new_code->getResult() == res){
-                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
-                                break;
+                            break;
                         }
                         // substitute res to new_value
-                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
-                            if(new_code->getArg1() == res){
-                                new_code->setArg1(new_value);
-                            } else if (new_code->getArg2() == res){
-                                new_code->setArg2(new_value);
-                            }
-                        }
+                        substituteUseOp(new_code, new_value, res, new_op);
                     }
                 }
                 block.erase(block.begin() + i);
@@ -463,20 +449,13 @@ void IRFunction::constFolding() {
                         // break at next def
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
                             continue;
+                        if(new_op == IROperation::REPLACE && res == new_code->getArg1())
+                            break;
                         if(new_code->getResult() == res){
-                            if(IRCode::isAssignmentOperation(new_op) || new_op == IROperation::ASSIGN || new_op == IROperation::FETCH_ARRAY_ELEM || new_op == IROperation::GET_RETURN || new_op == IROperation::GET_PARAM)
-                                break;
+                            break;
                         }
                         // substitute
-                        if(IRCode::isTwoArgAssignmentOperation(new_op)){
-                            if(new_code->getArg1() == res){
-                                new_code->setArg1(new_value);
-                            } else if (new_code->getArg2() == res){
-                                new_code->setArg2(new_value);
-                            }
-                        } else if (new_op == IROperand::) {
-
-                        }
+                        substituteUseOp(new_code, new_value, res, new_op);
                     }
                 }
                 block.erase(block.begin() + i);
