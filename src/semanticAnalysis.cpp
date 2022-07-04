@@ -64,10 +64,9 @@ void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
     if(curSymbolTable->getSymbolTableType() != TableType::GLOBAL || !curSymbolTable->lookUpFuncSymbolTable("main")) {
         throw std::runtime_error("[ERROR] > There is no main function.\n");
     }
-    irGenerator->ir->optimize(irGenerator->targetCodes, optimizationLevel);
+    irGenerator->ir->targetGen(irGenerator->targetCodes, optimizationLevel);
     irGenerator->ir->print();
     irGenerator->ir->write(programName + ".ir");
-    irGenerator->ir->targetGen(irGenerator->targetCodes);
     irGenerator->ir->targetCodePrint(irGenerator->targetCodes);
     irGenerator->ir->targetCodeWrite(irGenerator->targetCodes, programName + ".S");
 }

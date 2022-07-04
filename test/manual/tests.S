@@ -32,59 +32,59 @@ fun:
 .type	main, @function
 main:
 	sd	ra, -8(sp)
-	addi	t0, zero, 5
-	lla	t1, a
-	sw	t0, 0(t1)
-	mv	t0, zero
-	mv	t6, t0
+	addi	t5, zero, 5
+	lla	t6, a
+	sw	t5, 0(t6)
+	mv	t5, zero
+	mv	t4, t5
 L_1_main:
-	lla	t1, a
-	lw	t0, 0(t1)
-	addi	t1, zero, 6
-	slt	t3, t0, t1
-	mv	t0, zero
-	xor	t1, t6, t0
-	seqz	t5, t1
-	or	t2, t3, t5
-	beqz	t2, L_0_main
-	lla	t1, a
-	lw	t0, 0(t1)
-	addi	t4, t0, 1
-	lla	t0, a
-	sw	t4, 0(t0)
-	addi	t3, t6, 1
-	mv	t6, t3
-	lla	t0, L_1_main
-	jr	t0
+	lla	t6, a
+	lw	t5, 0(t6)
+	addi	t6, zero, 6
+	slt	t1, t5, t6
+	mv	t5, zero
+	xor	t6, t4, t5
+	seqz	t3, t6
+	or	t0, t1, t3
+	beqz	t0, L_0_main
+	lla	t6, a
+	lw	t5, 0(t6)
+	addi	t2, t5, 1
+	lla	t5, a
+	sw	t2, 0(t5)
+	addi	t1, t4, 1
+	mv	t4, t1
+	lla	t5, L_1_main
+	jr	t5
 L_0_main:
-	mv	a0, t6
-	sw	t2, -28(sp)
-	sw	t3, -16(sp)
-	sw	t4, -32(sp)
-	sw	t5, -24(sp)
-	sw	t6, -12(sp)
+	mv	a0, t4
+	sw	t0, -28(sp)
+	sw	t1, -16(sp)
+	sw	t2, -32(sp)
+	sw	t3, -24(sp)
+	sw	t4, -12(sp)
 	addi	sp, sp, -32
 	call	print_int
 	addi	sp, sp, 32
-	lw	t2, -28(sp)
-	lw	t3, -16(sp)
-	lw	t4, -32(sp)
-	lw	t5, -24(sp)
-	lw	t6, -12(sp)
+	lw	t0, -28(sp)
+	lw	t1, -16(sp)
+	lw	t2, -32(sp)
+	lw	t3, -24(sp)
+	lw	t4, -12(sp)
 	addi	a0, zero, 8
-	sw	t2, -28(sp)
-	sw	t3, -16(sp)
-	sw	t4, -32(sp)
-	sw	t5, -24(sp)
-	sw	t6, -12(sp)
+	sw	t0, -28(sp)
+	sw	t1, -16(sp)
+	sw	t2, -32(sp)
+	sw	t3, -24(sp)
+	sw	t4, -12(sp)
 	addi	sp, sp, -32
 	call	print_int
 	addi	sp, sp, 32
-	lw	t2, -28(sp)
-	lw	t3, -16(sp)
-	lw	t4, -32(sp)
-	lw	t5, -24(sp)
-	lw	t6, -12(sp)
-	mv	a0, t6
+	lw	t0, -28(sp)
+	lw	t1, -16(sp)
+	lw	t2, -32(sp)
+	lw	t3, -24(sp)
+	lw	t4, -12(sp)
+	mv	a0, t4
 	ld	ra, -8(sp)
 	ret
