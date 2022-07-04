@@ -828,7 +828,7 @@ void IRNot::genTargetCode(TargetCodes *t) {
     else {
         resultReg = t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
     }
-    t->addCodeNot(resultReg, arg1Reg);
+    t->addCodeSeqz(resultReg, arg1Reg);
     result->storeFrom(t, resultReg);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(resultReg);
