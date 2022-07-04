@@ -17,6 +17,7 @@ factorial:
 	t_0 = n == 1
 	beqz t_0 L_0_factorial
 	return ;
+	goto L_1_factorial
 L_0_factorial:
 	t_1 = n - 1;
 	addparam t_1;
@@ -24,6 +25,7 @@ L_0_factorial:
 	t_2 =  return ;
 	t_3 = n * t_2;
 	return ;
+L_1_factorial:
 	return ;
 
 ----------- funcDef -----------
@@ -53,9 +55,11 @@ main:
 	t_3 =  return ;
 	t_4 <= result;
 	t_4 = t_3;
+	goto L_1_main
 L_0_main:
 	t_5 <= result;
 	t_5 = 1;
+L_1_main:
 	addparam t_5;
 	call print_int; 
 	return 0;

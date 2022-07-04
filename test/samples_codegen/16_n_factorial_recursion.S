@@ -17,6 +17,8 @@ factorial:
 	lw	a0, -12(sp)
 	ld	ra, -8(sp)
 	ret
+	lla	t0, L_1_factorial
+	jr	t0
 L_0_factorial:
 	lw	t0, -12(sp)
 	addi	t1, zero, 1
@@ -34,6 +36,7 @@ L_0_factorial:
 	lw	a0, -16(sp)
 	ld	ra, -8(sp)
 	ret
+L_1_factorial:
 	ld	ra, -8(sp)
 	ret
 .text
@@ -65,9 +68,12 @@ main:
 	sw	a0, -28(sp)
 	lw	t0, -28(sp)
 	sw	t0, -12(sp)
+	lla	t0, L_1_main
+	jr	t0
 L_0_main:
 	addi	t0, zero, 1
 	sw	t0, -12(sp)
+L_1_main:
 	lw	a0, -12(sp)
 	addi	sp, sp, -32
 	call	print_int

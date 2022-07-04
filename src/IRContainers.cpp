@@ -1296,15 +1296,15 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
 
 void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     switch (inOptimizeLevel) {
-        case 0:
+        case 1:
             basicBlockDivision();
             constFolding();
             break;
-        case 1:
+        case 2:
             basicBlockDivision();
             // liveVarAnalysis();
             break;
-        case 2:
+        case 3:
             basicBlockDivision();
             // liveVarAnalysis();
             varBindRegisters(t);

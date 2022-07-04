@@ -298,6 +298,8 @@ IRSymbolVariable::IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue,
     historySymbols.push_back(this);
     initialValue = newValue;
     isGlobalSymbolVar = newIsGlobalSymbolVar;
+    bindRegister = false;
+    targetBindRegister = nullptr;
 }
 
 Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
@@ -847,6 +849,8 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : I
     symbolVariable = nullptr;
     offset = 0;
     initialValue = nullptr;
+    bindRegister = false;
+    targetBindRegister = nullptr;
 }
 
 IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IROperand *parentVariable) : IROperand(OperandType::TEMPVAR) {
