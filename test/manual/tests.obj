@@ -95,121 +95,121 @@ fun:
 main:
 	sd	ra, -8(sp)
    101b6:	fe113c23          	sd	ra,-8(sp)
-	addi	t0, zero, 5
-   101ba:	4295                	li	t0,5
-	lla	t1, a
-   101bc:	00015317          	auipc	t1,0x15
-   101c0:	2dc30313          	addi	t1,t1,732 # 25498 <a>
-	sw	t0, 0(t1)
-   101c4:	00532023          	sw	t0,0(t1)
-	mv	t0, zero
-   101c8:	00000293          	li	t0,0
-	mv	t6, t0
-   101cc:	8f96                	mv	t6,t0
+	addi	t5, zero, 5
+   101ba:	4f15                	li	t5,5
+	lla	t6, a
+   101bc:	00015f97          	auipc	t6,0x15
+   101c0:	2dcf8f93          	addi	t6,t6,732 # 25498 <a>
+	sw	t5, 0(t6)
+   101c4:	01efa023          	sw	t5,0(t6)
+	mv	t5, zero
+   101c8:	00000f13          	li	t5,0
+	mv	t4, t5
+   101cc:	8efa                	mv	t4,t5
 
 00000000000101ce <L_1_main>:
 L_1_main:
-	lla	t1, a
-   101ce:	00015317          	auipc	t1,0x15
-   101d2:	2ca30313          	addi	t1,t1,714 # 25498 <a>
-	lw	t0, 0(t1)
-   101d6:	00032283          	lw	t0,0(t1)
-	addi	t1, zero, 6
-   101da:	4319                	li	t1,6
-	slt	t3, t0, t1
-   101dc:	0062ae33          	slt	t3,t0,t1
-	mv	t0, zero
-   101e0:	00000293          	li	t0,0
-	xor	t1, t6, t0
-   101e4:	005fc333          	xor	t1,t6,t0
-	seqz	t5, t1
-   101e8:	00133f13          	seqz	t5,t1
-	or	t2, t3, t5
-   101ec:	01ee63b3          	or	t2,t3,t5
-	beqz	t2, L_0_main
-   101f0:	02038863          	beqz	t2,10220 <L_0_main>
-	lla	t1, a
-   101f4:	00015317          	auipc	t1,0x15
-   101f8:	2a430313          	addi	t1,t1,676 # 25498 <a>
-	lw	t0, 0(t1)
-   101fc:	00032283          	lw	t0,0(t1)
-	addi	t4, t0, 1
-   10200:	00128e93          	addi	t4,t0,1
-	lla	t0, a
-   10204:	00015297          	auipc	t0,0x15
-   10208:	29428293          	addi	t0,t0,660 # 25498 <a>
-	sw	t4, 0(t0)
-   1020c:	01d2a023          	sw	t4,0(t0)
-	addi	t3, t6, 1
-   10210:	001f8e13          	addi	t3,t6,1
-	mv	t6, t3
-   10214:	8ff2                	mv	t6,t3
-	lla	t0, L_1_main
-   10216:	00000297          	auipc	t0,0x0
-   1021a:	fb828293          	addi	t0,t0,-72 # 101ce <L_1_main>
-	jr	t0
-   1021e:	8282                	jr	t0
+	lla	t6, a
+   101ce:	00015f97          	auipc	t6,0x15
+   101d2:	2caf8f93          	addi	t6,t6,714 # 25498 <a>
+	lw	t5, 0(t6)
+   101d6:	000faf03          	lw	t5,0(t6)
+	addi	t6, zero, 6
+   101da:	4f99                	li	t6,6
+	slt	t1, t5, t6
+   101dc:	01ff2333          	slt	t1,t5,t6
+	mv	t5, zero
+   101e0:	00000f13          	li	t5,0
+	xor	t6, t4, t5
+   101e4:	01eecfb3          	xor	t6,t4,t5
+	seqz	t3, t6
+   101e8:	001fbe13          	seqz	t3,t6
+	or	t0, t1, t3
+   101ec:	01c362b3          	or	t0,t1,t3
+	beqz	t0, L_0_main
+   101f0:	02028863          	beqz	t0,10220 <L_0_main>
+	lla	t6, a
+   101f4:	00015f97          	auipc	t6,0x15
+   101f8:	2a4f8f93          	addi	t6,t6,676 # 25498 <a>
+	lw	t5, 0(t6)
+   101fc:	000faf03          	lw	t5,0(t6)
+	addi	t2, t5, 1
+   10200:	001f0393          	addi	t2,t5,1
+	lla	t5, a
+   10204:	00015f17          	auipc	t5,0x15
+   10208:	294f0f13          	addi	t5,t5,660 # 25498 <a>
+	sw	t2, 0(t5)
+   1020c:	007f2023          	sw	t2,0(t5)
+	addi	t1, t4, 1
+   10210:	001e8313          	addi	t1,t4,1
+	mv	t4, t1
+   10214:	8e9a                	mv	t4,t1
+	lla	t5, L_1_main
+   10216:	00000f17          	auipc	t5,0x0
+   1021a:	fb8f0f13          	addi	t5,t5,-72 # 101ce <L_1_main>
+	jr	t5
+   1021e:	8f02                	jr	t5
 
 0000000000010220 <L_0_main>:
 L_0_main:
-	mv	a0, t6
-   10220:	857e                	mv	a0,t6
-	sw	t2, -28(sp)
-   10222:	fe712223          	sw	t2,-28(sp)
-	sw	t3, -16(sp)
-   10226:	ffc12823          	sw	t3,-16(sp)
-	sw	t4, -32(sp)
-   1022a:	ffd12023          	sw	t4,-32(sp)
-	sw	t5, -24(sp)
-   1022e:	ffe12423          	sw	t5,-24(sp)
-	sw	t6, -12(sp)
-   10232:	fff12a23          	sw	t6,-12(sp)
+	mv	a0, t4
+   10220:	8576                	mv	a0,t4
+	sw	t0, -28(sp)
+   10222:	fe512223          	sw	t0,-28(sp)
+	sw	t1, -16(sp)
+   10226:	fe612823          	sw	t1,-16(sp)
+	sw	t2, -32(sp)
+   1022a:	fe712023          	sw	t2,-32(sp)
+	sw	t3, -24(sp)
+   1022e:	ffc12423          	sw	t3,-24(sp)
+	sw	t4, -12(sp)
+   10232:	ffd12a23          	sw	t4,-12(sp)
 	addi	sp, sp, -32
    10236:	1101                	addi	sp,sp,-32
 	call	print_int
    10238:	054000ef          	jal	ra,1028c <print_int>
 	addi	sp, sp, 32
    1023c:	6105                	addi	sp,sp,32
-	lw	t2, -28(sp)
-   1023e:	fe412383          	lw	t2,-28(sp)
-	lw	t3, -16(sp)
-   10242:	ff012e03          	lw	t3,-16(sp)
-	lw	t4, -32(sp)
-   10246:	fe012e83          	lw	t4,-32(sp)
-	lw	t5, -24(sp)
-   1024a:	fe812f03          	lw	t5,-24(sp)
-	lw	t6, -12(sp)
-   1024e:	ff412f83          	lw	t6,-12(sp)
+	lw	t0, -28(sp)
+   1023e:	fe412283          	lw	t0,-28(sp)
+	lw	t1, -16(sp)
+   10242:	ff012303          	lw	t1,-16(sp)
+	lw	t2, -32(sp)
+   10246:	fe012383          	lw	t2,-32(sp)
+	lw	t3, -24(sp)
+   1024a:	fe812e03          	lw	t3,-24(sp)
+	lw	t4, -12(sp)
+   1024e:	ff412e83          	lw	t4,-12(sp)
 	addi	a0, zero, 8
    10252:	4521                	li	a0,8
-	sw	t2, -28(sp)
-   10254:	fe712223          	sw	t2,-28(sp)
-	sw	t3, -16(sp)
-   10258:	ffc12823          	sw	t3,-16(sp)
-	sw	t4, -32(sp)
-   1025c:	ffd12023          	sw	t4,-32(sp)
-	sw	t5, -24(sp)
-   10260:	ffe12423          	sw	t5,-24(sp)
-	sw	t6, -12(sp)
-   10264:	fff12a23          	sw	t6,-12(sp)
+	sw	t0, -28(sp)
+   10254:	fe512223          	sw	t0,-28(sp)
+	sw	t1, -16(sp)
+   10258:	fe612823          	sw	t1,-16(sp)
+	sw	t2, -32(sp)
+   1025c:	fe712023          	sw	t2,-32(sp)
+	sw	t3, -24(sp)
+   10260:	ffc12423          	sw	t3,-24(sp)
+	sw	t4, -12(sp)
+   10264:	ffd12a23          	sw	t4,-12(sp)
 	addi	sp, sp, -32
    10268:	1101                	addi	sp,sp,-32
 	call	print_int
    1026a:	022000ef          	jal	ra,1028c <print_int>
 	addi	sp, sp, 32
    1026e:	6105                	addi	sp,sp,32
-	lw	t2, -28(sp)
-   10270:	fe412383          	lw	t2,-28(sp)
-	lw	t3, -16(sp)
-   10274:	ff012e03          	lw	t3,-16(sp)
-	lw	t4, -32(sp)
-   10278:	fe012e83          	lw	t4,-32(sp)
-	lw	t5, -24(sp)
-   1027c:	fe812f03          	lw	t5,-24(sp)
-	lw	t6, -12(sp)
-   10280:	ff412f83          	lw	t6,-12(sp)
-	mv	a0, t6
-   10284:	857e                	mv	a0,t6
+	lw	t0, -28(sp)
+   10270:	fe412283          	lw	t0,-28(sp)
+	lw	t1, -16(sp)
+   10274:	ff012303          	lw	t1,-16(sp)
+	lw	t2, -32(sp)
+   10278:	fe012383          	lw	t2,-32(sp)
+	lw	t3, -24(sp)
+   1027c:	fe812e03          	lw	t3,-24(sp)
+	lw	t4, -12(sp)
+   10280:	ff412e83          	lw	t4,-12(sp)
+	mv	a0, t4
+   10284:	8576                	mv	a0,t4
 	ld	ra, -8(sp)
    10286:	ff813083          	ld	ra,-8(sp)
 	ret
@@ -490,7 +490,7 @@ L_0_main:
    1054e:	e4be                	sd	a5,72(sp)
    10550:	e8c2                	sd	a6,80(sp)
    10552:	ecc6                	sd	a7,88(sp)
-   10554:	01033583          	ld	a1,16(t1)
+   10554:	01033583          	ld	a1,16(t1) # 1015a <iobuff+0x6>
    10558:	1034                	addi	a3,sp,40
    1055a:	862a                	mv	a2,a0
    1055c:	851a                	mv	a0,t1

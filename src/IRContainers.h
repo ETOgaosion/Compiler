@@ -127,8 +127,7 @@ public:
 
     void print();
     void write(const std::string &path);
-    void optimize(TargetCodes *t, int inOptimizeLevel);
-    void targetGen(TargetCodes *t);
+    void targetGen(TargetCodes *t, int inOptimizeLevel);
     void targetCodePrint(TargetCodes * t);
     void targetCodeWrite(TargetCodes * t, std::string path);
 };

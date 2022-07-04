@@ -1469,8 +1469,6 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
         t->addCodeRet();
         t->setRegisterFree(sp);
     }
-    t->setAllRegistersFree();
-    t->setAllRegistersAvailable();
 }
 
 IRProgram::IRProgram() {}
@@ -1616,7 +1614,7 @@ void IRProgram::write(const string &path) {
     cout.rdbuf(coutbuf);
 }
 
-void IRProgram::targetGen(TargetCodes *t) {
+void IRProgram::targetGen(TargetCodes *t, int inOptimizeLevel) {
     for (auto &globalVar : globalVariables) {
         t->addCodeDirectives(".data");
         t->addCodeDirectives(".globl\t" + globalVar.first);
@@ -1628,16 +1626,11 @@ void IRProgram::targetGen(TargetCodes *t) {
     }
     for (const auto& func : functions) {
         if (!func.second->getFunctionInLib()) {
-            func.second->targetCodeGen(t);
-        }
-    }
-}
-
-void IRProgram::optimize(TargetCodes *t, int inOptimizeLevel) {
-    for (const auto& func : functions) {
-        if ((func.second->getFunctionName().find("print_", 0) != 0) && (func.second->getFunctionName().find("get_", 0) != 0)) {
             func.second->calFrameSize();
             func.second->optimize(t, inOptimizeLevel);
+            func.second->targetCodeGen(t);
+            t->setAllRegistersFree();
+            t->setAllRegistersAvailable();
         }
     }
 }
