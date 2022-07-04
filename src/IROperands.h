@@ -36,6 +36,7 @@ public:
     virtual std::vector<std::string> getValues() const { return {}; };
     virtual std::string getValueLabel() const { return {}; };
     virtual bool getAssigned() const { return false; };
+    virtual std::vector<IROperand *> getHistorySymbols() const { return {}; };
     virtual IROperand *getLatestVersionSymbol() const { return nullptr; };
     virtual bool getAliasToSymbol() const { return false; };
     virtual IROperand *getSymbolVariable() const { return nullptr; }
@@ -149,6 +150,7 @@ public:
     std::string getSymbolName() const override { return symbol->getSymbolName(); };
     MetaDataType getMetaDataType() const override { return symbol->getMetaDataType(); };
     bool getAssigned() const override { return assigned; };
+    std::vector<IROperand *> getHistorySymbols() const override { return historySymbols; };
     IROperand *getLatestVersionSymbol() const override { return historySymbols.back(); };
     int getMemOffset() const override { return symbol->getOffset(); };
     IRValue *getInitialValue() const override { return initialValue; };

@@ -1168,6 +1168,17 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
                     }
                 }
             }
+            if (sortedOperands[i]->getOperandType() == OperandType::SYMBOLVAR) {
+                for (auto it : sortedOperands[i]->getHistorySymbols()) {
+                    if (it == sortedOperands[i]) {
+                        continue;
+                    }
+                    else {
+                        it->setBindRegister(true);
+                        it->setTargetBindRegister(toBindReg);
+                    }
+                }
+            }
             numGenPurposeRegAlloc++;
         }
         else {
@@ -1189,6 +1200,17 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
                     for (auto in_it : it) {
                         in_it->setBindRegister(true);
                         in_it->setTargetBindRegister(toBindReg);
+                    }
+                }
+            }
+            if (sortedOperands[i]->getOperandType() == OperandType::SYMBOLVAR) {
+                for (auto it : sortedOperands[i]->getHistorySymbols()) {
+                    if (it == sortedOperands[i]) {
+                        continue;
+                    }
+                    else {
+                        it->setBindRegister(true);
+                        it->setTargetBindRegister(toBindReg);
                     }
                 }
             }
