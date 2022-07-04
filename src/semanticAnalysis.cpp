@@ -749,6 +749,11 @@ void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     if(ctx->getText().rfind("if", 0) == 0){
         IRCode *code = new IRAddLabel(falseLabel);
         codes.push_back(code);
+        if (ctx->stmt().size() > 1) {
+            IRLabel *exitLabel = irGenerator->addLabel();
+            codes.push_back(new IRGoto(exitLabel));
+            ctx->stmt(1)->codes = new IRAddLabel(exitLabel);
+        }
         ctx->stmt(0)->codes = codes;
     } else if (ctx->getText().rfind("while", 0) == 0){
         IRLabel* beginLabel = irGenerator->enterWhile();
@@ -997,6 +1002,11 @@ void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * c
         if(ctx->getText().rfind("if", 0) == 0){
             IRCode *code = new IRAddLabel(falseLabel);
             codes.push_back(code);
+            if (ctx->subStmt().size() > 1) {
+                IRLabel *exitLabel = irGenerator->addLabel();
+                codes.push_back(new IRGoto(exitLabel));
+                ctx->subStmt(1)->codes = new IRAddLabel(exitLabel);
+            }
             ctx->subStmt(0)->codes = codes;
         } else if (ctx->getText().rfind("while", 0) == 0){
             IRLabel* beginLabel = irGenerator->enterWhile();
