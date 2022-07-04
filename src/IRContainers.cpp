@@ -1021,29 +1021,42 @@ void IRFunction::constFolding() {
     int i = 0;
     for(; i < codes.size(); i++) { 
         IRCode *code = codes[i];
-        IROperand* tar_op = code->getResult();
+        IROperand* res = code->getResult();
+        IROperand* arg1 = code->getArg1();
+        IROperand* arg2 = code->getArg2();
         IROperation op = code->getOperation();
 
-        if(code->getArg1()->getOperandType() == OperandType::VALUE && code->getArg2()->getOperandType() == OperandType::VALUE){
+        if(!isAssignmentOperation(op) || op == IROperation::ASSIGN || op == IROperation::PHI)
+            continue;
+        
+        if(op == IROperation::NOT || op == IROperation::NEG){
+
+        }
+        // arg1 and arg2 exists
+        if(arg1 && arg2 && arg1->getOperandType() == OperandType::VALUE && code->arg2->getOperandType() == OperandType::VALUE){
             IRValue* new_value = nullptr;
             if(op == IROperation::ADD || op == IROperation::SUB){
-                new_value = immAddSub(code->getArg1(), code->getArg2(), op);
+                new_value = immAddSub(arg1, arg2, op);
             } else if (op == IROperation::MUL) {
-                new_value = immMul(code->getArg1(), code->getArg2());
+                new_value = immMul(arg1, arg2);
             } else if (op == IROperation::DIV) {
-                new_value = immDiv(code->getArg1(), code->getArg2());
+                new_value = immDiv(arg1, arg2);
             } else if (op == IROperation::MOD) {
-                int val_a = stoi(code->getArg1()->getValue());
-                int val_b = stoi(code->getArg2()->getValue());
+                int val_a = stoi(arg1->getValue());
+                int val_b = stoi(arg2->getValue());
                 new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
+            } else if (op == IROperation::OR) {
+                if(arg1->getValue() == "1" || arg2->getValue() == "1")
+                    new_value = new IRValue(MetaDataType::BOOL, "1", )
+
             }
 
             if(new_value){
                 for(int j = i + 1; j < codes.size(); j++){
                     IRCode* new_code = codes[j];
-                    if(new_code->getArg1() == tar_op){
+                    if(new_code->getArg1() == res){
                         new_code->setArg1(new_value);
-                    } else if (new_code->getArg2() == tar_op){
+                    } else if (new_code->getArg2() == res){
                         new_code->setArg2(new_value);
                     }
                 }
@@ -1053,18 +1066,18 @@ void IRFunction::constFolding() {
             i--;
         }
 
-        else if(code->getArg1()->getOperandType() == OperandType::VALUE || code->getArg2()->getOperandType() == OperandType::VALUE){
+        else if(arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE){
             IROperand* imm_arg = code->getArg1()->getOperandType() == OperandType::VALUE ? code->getArg1() : code->getArg2();
 
             for(int j = i + 1; j < codes.size(); j++){
                 IRCode *new_code = codes[j];
                 IROperation new_op = code->getOperation();
                 
-                if(new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == tar_op){
+                if(new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == res){
                     if(op == IROperation::ADD || op == IROperation::SUB) {
                         if(new_op == IROperation::ADD || new_op == IROperation::SUB){ 
                             IRValue* new_value = immAddSub(imm_arg, new_code->getArg1(), new_op);
-                            if(code->getArg1()->getOperandType() == OperandType::VALUE)
+                            if(arg1->getOperandType() == OperandType::VALUE)
                                 code->setArg1(new_value);
                             else
                                 code->setArg2(new_value);
@@ -1074,7 +1087,7 @@ void IRFunction::constFolding() {
                     } else if (op == IROperation::MUL) {
                         if(new_op == IROperation::MUL) {
                             IRValue* new_value = immMul(imm_arg, new_code->getArg1());
-                            if(code->getArg1()->getOperandType() == OperandType::VALUE)
+                            if(arg1->getOperandType() == OperandType::VALUE)
                                 code->setArg1(new_value);
                             else
                                 code->setArg2(new_value);
@@ -1082,7 +1095,7 @@ void IRFunction::constFolding() {
                             codes.erase(codes.begin() + j);
                         }
                     }
-                } else if (new_code->getArg1() == tar_op && new_code->getArg2()->getOperandType() == OperandType::VALUE) {
+                } else if (new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE) {
                     if(op == IROperation::ADD || op == IROperation::SUB) {
                         if(new_op == IROperation::ADD || new_op == IROperation::SUB){ 
                             IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
@@ -1096,7 +1109,7 @@ void IRFunction::constFolding() {
                     } else if (op == IROperation::MUL) {
                         if(new_op == IROperation::MUL) {
                             IRValue* new_value = immMul(imm_arg, new_code->getArg2());
-                            if(code->getArg1()->getOperandType() == OperandType::VALUE)
+                            if(arg1->getOperandType() == OperandType::VALUE)
                                 code->setArg1(new_value);
                             else
                                 code->setArg2(new_value);
