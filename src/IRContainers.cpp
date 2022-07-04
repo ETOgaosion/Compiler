@@ -292,7 +292,7 @@ void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp
         if(arg1 == cmp_op)
             code->setArg1(dst_op);
     } else if (op == IROperation::) {
-
+        
     }
 }
 
