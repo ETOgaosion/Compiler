@@ -527,7 +527,12 @@ void IRCall::print() const {
 void IRReturn::print() const {
     cout << "\t" << "return ";
     if (arg1) {
-        cout << arg1->getValue();
+        if (arg1->getOperandType() == OperandType::VALUE) {
+            cout << arg1->getValue();
+        }
+        else {
+            cout << arg1->getSymbolName();
+        }
     }
     cout << ";" << endl;
 }

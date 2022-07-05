@@ -1,8 +1,21 @@
-int a = 2;
-int main() {
-    int c = 2;
-    a = 1 - c;
-    int b;
-    b = 3 - a;
+// test user-defined function call
+
+int add(int n)
+{
+    if(n == 2)
+        return n * 2;
+    else
+        return n + 10;
+}
+
+int main()
+{
+    int n, result;
+    n = get_int();
+    if(n > 1)
+        result = add(n);
+    else
+        result = 1 + 2 * 8 + 100 - 9999 + 10000/5;
+    print_int(result);
     return 0;
 }

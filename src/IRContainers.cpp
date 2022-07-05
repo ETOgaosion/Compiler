@@ -314,24 +314,28 @@ void IRFunction::constFolding() {
                     continue;
                 // code->setResult(arg1);
 
-                for(int j = i + 1; j < codes.size(); j++){
-                        IRCode* new_code = codes[j];
+                for(int j = i + 1; j < block.size(); j++){
+                        IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
+                        if(new_op == IROperation::CALL)
+                            continue;
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
                             continue;
                         if(new_op == IROperation::REPLACE && res == new_code->getArg1())
                             break;
-                        if(new_code->getResult() == res){
+                        if(new_code->getResult()!=nullptr && new_code->getResult() == res){
                             break;
                         }
                         // substitute res to arg1 (immValue)
                         substituteUseOp(new_code, arg1, res, new_op);
                 }
-                block.erase(block.begin() + i);
-                codes.erase(codes.begin() + entrances[bnum] + i);
-                delete code;
-                i--;
+                // block.erase(block.begin() + i);
+                // codes.erase(codes.begin() + entrances[bnum] + i);
+                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                //     entrances[k]--;
+                // delete code;
+                // i--;
                 continue;
             } else if (op == IROperation::NOT) {
                 IRValue* new_value = nullptr;
@@ -341,8 +345,8 @@ void IRFunction::constFolding() {
                     new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
 
                 if(new_value){
-                    for(int j = i + 1; j < codes.size(); j++){
-                        IRCode* new_code = codes[j];
+                    for(int j = i + 1; j < block.size(); j++){
+                        IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
@@ -356,10 +360,12 @@ void IRFunction::constFolding() {
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
                 }
-                block.erase(block.begin() + i);
-                codes.erase(codes.begin() + entrances[bnum] + i);
-                delete code;
-                i--;
+                // block.erase(block.begin() + i);
+                // codes.erase(codes.begin() + entrances[bnum] + i);
+                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                //     entrances[k]--;
+                // delete code;
+                // i--;
                 continue;
             } else if (op == IROperation::NEG) {
                 IRValue* new_value = nullptr;
@@ -382,8 +388,8 @@ void IRFunction::constFolding() {
                 }
 
                 if(new_value){
-                    for(int j = i + 1; j < codes.size(); j++){
-                        IRCode* new_code = codes[j];
+                    for(int j = i + 1; j < block.size(); j++){
+                        IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
@@ -397,10 +403,12 @@ void IRFunction::constFolding() {
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
                 }
-                block.erase(block.begin() + i);
-                codes.erase(codes.begin() + entrances[bnum] + i);
-                delete code;
-                i--;
+                // block.erase(block.begin() + i);
+                // codes.erase(codes.begin() + entrances[bnum] + i);
+                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                //     entrances[k]--;
+                // delete code;
+                // i--;
                 continue;
             }
 
@@ -443,8 +451,8 @@ void IRFunction::constFolding() {
                 }
 
                 if(new_value){
-                    for(int j = i + 1; j < codes.size(); j++){
-                        IRCode* new_code = codes[j];
+                    for(int j = i + 1; j < block.size(); j++){
+                        IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
                         if(new_op == IROperation::ASSIGN_ARRAY_ELEM && res == new_code->getArg1())
@@ -458,18 +466,38 @@ void IRFunction::constFolding() {
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
                 }
-                block.erase(block.begin() + i);
-                codes.erase(codes.begin() + entrances[bnum] + i);
-                delete code;
-                i--;
+
+                switch(new_value->getMetaDataType()){
+                    case MetaDataType::BOOL:
+                        codes[entrances[bnum] + i] = new IRAssignB(res, new_value);
+                        break;
+                    case MetaDataType::INT:
+                        codes[entrances[bnum] + i] = new IRAssignI(res, new_value);
+                        break;
+                    case MetaDataType::FLOAT:
+                        codes[entrances[bnum] + i] = new IRAssignF(res, new_value);
+                        break;
+                    case MetaDataType::DOUBLE:
+                        codes[entrances[bnum] + i] = new IRAssignD(res, new_value);
+                        break;
+                }
+                // block.erase(block.begin() + i);
+                // codes.erase(codes.begin() + entrances[bnum] + i);
+                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                //     entrances[k]--;
+                // delete code;
+                // i--;
 
             } else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
+                if(op != IROperation::ADD && op != IROperation::SUB && op != IROperation::MUL)
+                    continue;
+
                 IROperand* imm_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg1() : code->getArg2();
                 IROperand* var_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg2() : code->getArg1();
-
-                for(int j = i + 1; j < codes.size(); j++){
-                    IRCode *new_code = codes[j];
-                    IROperation new_op = code->getOperation();
+                                
+                for(int j = i + 1; j < block.size(); j++){
+                    IRCode *new_code = block[j];
+                    IROperation new_op = new_code->getOperation();
                     
                     if(!IRCode::isAssignmentOperation(new_op) || new_op == IROperation::PHI)
                         continue;
@@ -479,21 +507,46 @@ void IRFunction::constFolding() {
                     if(new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE){
                     // new_code: arg1 is Var, arg2 is immVal
                         if(op == IROperation::ADD){
-                            new_code->setOperation(op);
                             IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
-                            new_code->setArg1(var_arg);
-                            new_code->setArg2(new_value);
+                            switch(var_arg->getMetaDataType()){
+                                case MetaDataType::INT:
+                                    codes[entrances[bnum] + j] = new IRAddI(new_code->getResult(), var_arg, new_value);
+                                    break;
+                                case MetaDataType::FLOAT:
+                                    codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), var_arg, new_value);
+                                    break;
+                                case MetaDataType::DOUBLE:
+                                    codes[entrances[bnum] + j] = new IRAddD(new_code->getResult(), var_arg, new_value);
+                                    break;
+                            }
+                            
                         } else if (op == IROperation::SUB) {
                             if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
                                 IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
-                                new_code->setOperation(op);
-                                new_code->setArg1(var_arg);
-                                new_code->setArg2(new_value);
+                                switch(var_arg->getMetaDataType()){
+                                case MetaDataType::INT:
+                                    codes[entrances[bnum] + j] = new IRSubI(new_code->getResult(), var_arg, new_value);
+                                    break;
+                                case MetaDataType::FLOAT:
+                                    codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), var_arg, new_value);
+                                    break;
+                                case MetaDataType::DOUBLE:
+                                    codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), var_arg, new_value);
+                                    break;
+                                }
                             } else { // origin code: arg2 is var
-                                new_code->setOperation(op);
                                 IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
-                                new_code->setArg1(new_value);
-                                new_code->setArg2(var_arg);                            
+                                switch(var_arg->getMetaDataType()){
+                                case MetaDataType::INT:
+                                    codes[entrances[bnum] + j] = new IRSubI(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                case MetaDataType::FLOAT:
+                                    codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                case MetaDataType::DOUBLE:
+                                    codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                }                          
                             }
                         } else if (op == IROperation::MUL) {
                             if(new_op == IROperation::MUL) {
@@ -514,10 +567,27 @@ void IRFunction::constFolding() {
                                 IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
                                 new_code->setArg1(new_value);
                             } else { // origin code: arg2 is var
-                                new_code->setOperation(new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
-                                new_code->setArg2(var_arg);
                                 IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
-                                new_code->setArg1(new_value);
+                                switch(var_arg->getMetaDataType()){
+                                case MetaDataType::INT:
+                                    if(new_op == IROperation::ADD)
+                                        codes[entrances[bnum] + j] = new IRSubI(new_code->getResult(), new_value, var_arg);
+                                    else
+                                        codes[entrances[bnum] + j] = new IRAddI(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                case MetaDataType::FLOAT:
+                                    if(new_op == IROperation::ADD)
+                                        block[j] = new IRSubF(new_code->getResult(), new_value, var_arg);
+                                    else
+                                        block[j] = new IRAddF(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                case MetaDataType::DOUBLE:
+                                    if(new_op == IROperation::ADD)
+                                        block[j] = new IRSubD(new_code->getResult(), new_value, var_arg);
+                                    else
+                                        block[j] = new IRAddD(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                } 
                             }
                         } else if (op == IROperation::MUL) {
                             if(new_op == IROperation::MUL) {
@@ -692,14 +762,20 @@ void IRFunction::delDeadCode() {
             } else if (op == IROperation::GET_PARAM || op == IROperation::GET_RETURN) {
                 if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR))
                     if(res->getIsAlive() == false) {
-                        delete code;
                         block.erase(block.begin() + j);
+                        codes.erase(codes.begin() + entrances[i] + j);
+                        for(int k = i + 1; k < basicBlocks.size(); k++)
+                            entrances[k]--;
+                        delete code;
                         continue;
                     }
             } else if (op == IROperation::REPLACE) {
                 if(res && res->getIsAlive() == false) {
-                    delete code;
                     block.erase(block.begin() + j);
+                    codes.erase(codes.begin() + entrances[i] + j);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    delete code;
                     continue;
                 }
 
@@ -709,8 +785,11 @@ void IRFunction::delDeadCode() {
                     arg1->setAlive(false);
             } else if (op == IROperation::ASSIGN_ARRAY_ELEM) {
                 if(arg1 && arg1->getIsAlive() == false){ // a[t_0] = b, but a is not alive
-                    delete code;
                     block.erase(block.begin() + j);
+                    codes.erase(codes.begin() + entrances[i] + j);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    delete code;
                     continue;
                 }
 
@@ -728,8 +807,11 @@ void IRFunction::delDeadCode() {
             } else {
                 if(res){
                     if(!res->getIsAlive()){ // dead code
-                        delete code;
                         block.erase(block.begin() + j);
+                        codes.erase(codes.begin() + entrances[i] + j);
+                        for(int k = i + 1; k < basicBlocks.size(); k++)
+                            entrances[k]--;
+                        delete code;
                         continue;
                     }
                 }
