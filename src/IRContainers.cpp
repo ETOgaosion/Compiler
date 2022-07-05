@@ -577,15 +577,15 @@ void IRFunction::constFolding() {
                                     break;
                                 case MetaDataType::FLOAT:
                                     if(new_op == IROperation::ADD)
-                                        block[j] = new IRSubF(new_code->getResult(), new_value, var_arg);
+                                        codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), new_value, var_arg);
                                     else
-                                        block[j] = new IRAddF(new_code->getResult(), new_value, var_arg);
+                                        codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), new_value, var_arg);
                                     break;
                                 case MetaDataType::DOUBLE:
                                     if(new_op == IROperation::ADD)
-                                        block[j] = new IRSubD(new_code->getResult(), new_value, var_arg);
+                                        codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), new_value, var_arg);
                                     else
-                                        block[j] = new IRAddD(new_code->getResult(), new_value, var_arg);
+                                        codes[entrances[bnum] + j] = new IRAddD(new_code->getResult(), new_value, var_arg);
                                     break;
                                 } 
                             }
@@ -618,8 +618,8 @@ void IRFunction::addOperandToVec(vector<IROperand*>& vars, IROperand* op){
 void IRFunction::usedefVarsAnalysis() {
     for(int i = 0; i < basicBlocks.size(); i++) {
         auto block = basicBlocks[i];
-        auto use = useVars[i];
-        auto def = defVars[i];
+        std::vector<IROperand*> use;
+        std::vector<IROperand*> def;
         use.clear();
         def.clear();
 
@@ -677,6 +677,8 @@ void IRFunction::usedefVarsAnalysis() {
                 }
             }
         }
+        useVars.emplace_back(use.begin(), use.end());
+        defVars.emplace_back(def.begin(), def.end());
     }
 }
 
@@ -1384,7 +1386,8 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
             break;
         case 2:
             basicBlockDivision();
-            // liveVarAnalysis();
+            constFolding();
+            liveVarAnalysis();
             break;
         case 3:
             basicBlockDivision();

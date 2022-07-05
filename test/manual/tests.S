@@ -46,39 +46,43 @@ main:
 	addi	sp, sp, -56
 	call	get_int
 	addi	sp, sp, 56
-	sw	a0, -44(sp)
-	lw	t0, -44(sp)
+	sw	a0, -48(sp)
+	lw	t0, -48(sp)
 	sw	t0, -16(sp)
 	lw	t0, -16(sp)
 	addi	t1, zero, 1
 	slt	t2, t1, t0
-	sb	t2, -28(sp)
-	lb	t0, -28(sp)
+	sb	t2, -32(sp)
+	lb	t0, -32(sp)
 	beqz	t0, L_0_main
 	lw	a0, -16(sp)
 	addi	sp, sp, -56
 	call	add
 	addi	sp, sp, 56
-	sw	a0, -20(sp)
-	lw	t0, -20(sp)
+	sw	a0, -24(sp)
+	lw	t0, -24(sp)
 	sw	t0, -12(sp)
 	lla	t0, L_1_main
 	jr	t0
 L_0_main:
 	addi	t0, zero, 16
-	sw	t0, -48(sp)
-	addi	t0, zero, 17
-	sw	t0, -36(sp)
-	addi	t0, zero, 117
-	sw	t0, -40(sp)
-	addi	t0, zero, -9882
-	sw	t0, -24(sp)
-	addi	t0, zero, 2000
 	sw	t0, -52(sp)
+	addi	t0, zero, 17
+	sw	t0, -40(sp)
+	addi	t0, zero, 117
+	sw	t0, -44(sp)
+	addi	t0, zero, -9882
+	sw	t0, -28(sp)
+	addi	t0, zero, 2000
+	sw	t0, -56(sp)
 	addi	t0, zero, -7882
-	sw	t0, -32(sp)
+	sw	t0, -36(sp)
 	addi	t0, zero, -7882
 	sw	t0, -12(sp)
+	addi	t0, zero, -6882
+	sw	t0, -20(sp)
+	addi	t0, zero, -6882
+	sw	t0, -16(sp)
 L_1_main:
 	lw	a0, -12(sp)
 	addi	sp, sp, -56

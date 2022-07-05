@@ -33,6 +33,7 @@ result := symbol type: 1; data type: 2; initValue: 0
 n := symbol type: 1; data type: 2; initValue: 0
 
 ----------- tempVars ------------
+t_12:= symbol type: TEMP VAR; data type: 2
 t_3:= symbol type: TEMP VAR; data type: 2
 t_8:= symbol type: TEMP VAR; data type: 2
 t_2:= symbol type: TEMP VAR; data type: 1
@@ -67,6 +68,9 @@ L_0_main:
 	t_10 = -7882;
 	t_11 <= result;
 	t_11 = -7882;
+	t_12 = -6882;
+	t_13 <= n;
+	t_13 = -6882;
 L_1_main:
 	addparam t_11;
 	call print_int; 

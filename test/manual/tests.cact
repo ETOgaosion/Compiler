@@ -14,8 +14,10 @@ int main()
     n = get_int();
     if(n > 1)
         result = add(n);
-    else
+    else {
         result = 1 + 2 * 8 + 100 - 9999 + 10000/5;
+        n = result + 1000;
+    }
     print_int(result);
     return 0;
 }

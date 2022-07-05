@@ -1,4 +1,4 @@
-# ./build.sh
+./build.sh
 # ./run_test.sh > res/code_gen_res.txt
 gdb build/compiler test/manual/tests.cact
 riscv64-unknown-elf-gcc -g test/manual/tests.S -L./ -lcact -o test/manual/tests
