@@ -899,18 +899,37 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     }
 
     for (auto it : lVal) {
-        irGenerator->addCode(new IRPhi(it.first, it.second));
+        IRTempVariable *newTemp = irGenerator->addTempVariable(it.first->getMetaDataType());
+        it.first->addHistorySymbol(newTemp);
+        newTemp->setAliasToSymbol();
+        newTemp->setSymbolVariable(it.first);
+        irGenerator->addCode(new IRReplace(it.first, newTemp));
+        irGenerator->addCode(new IRPhi(newTemp, it.second));
+
+        if (ctx->docLVal) {
+            if (ctx->lValDoc.find(it.first) != ctx->lValDoc.end()) {
+                ctx->lValDoc[it.first].push_back(newTemp);
+            }
+            else {
+                ctx->lValDoc[it.first] = std::vector<IROperand *>(1, newTemp);
+            }
+        }
     }
 
     if (ctx->subStmt()) {
         for (const auto& it: ctx->subStmt()->lValDoc) {
-            irGenerator->addCode(new IRPhi(it.first, it.second));
-            lVal[it.first] = std::vector<IROperand *>(1, it.first);
+            IRTempVariable *newTemp = irGenerator->addTempVariable(it.first->getMetaDataType());
+            it.first->addHistorySymbol(newTemp);
+            newTemp->setAliasToSymbol();
+            newTemp->setSymbolVariable(it.first);
+            irGenerator->addCode(new IRReplace(it.first, newTemp));
+            irGenerator->addCode(new IRPhi(newTemp, it.second));
+            lVal[it.first] = std::vector<IROperand *>(1, newTemp);
         }
-    }
 
-    if (ctx->docLVal) {
-        ctx->lValDoc = lVal;
+        if (ctx->docLVal) {
+            ctx->lValDoc = lVal;
+        }
     }
 }
 
@@ -1235,11 +1254,21 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ct
     }
 
     for (auto it : lVal) {
-        irGenerator->addCode(new IRPhi(it.first, it.second));
-    }
+        IRTempVariable *newTemp = irGenerator->addTempVariable(it.first->getMetaDataType());
+        it.first->addHistorySymbol(newTemp);
+        newTemp->setAliasToSymbol();
+        newTemp->setSymbolVariable(it.first);
+        irGenerator->addCode(new IRReplace(it.first, newTemp));
+        irGenerator->addCode(new IRPhi(newTemp, it.second));
 
-    if (ctx->docLVal) {
-        ctx->lValDoc = lVal;
+        if (ctx->docLVal) {
+            if (ctx->lValDoc.find(it.first) != ctx->lValDoc.end()) {
+                ctx->lValDoc[it.first].push_back(newTemp);
+            }
+            else {
+                ctx->lValDoc[it.first] = std::vector<IROperand *>(1, newTemp);
+            }
+        }
     }
 }
 

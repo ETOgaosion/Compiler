@@ -431,59 +431,60 @@ void IRNot::print() const {
 
 void IROr::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " || " << arg2->getVal() << endl;
+         << arg1->getVal() << " || " << arg2->getVal() << ";" << endl;
 }
 
 void IRAnd::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " && " << arg2->getVal() << endl;
+         << arg1->getVal() << " && " << arg2->getVal() << ";" << endl;
 }
 
 void IRSeq::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " == " << arg2->getVal() << endl;
+         << arg1->getVal() << " == " << arg2->getVal() << ";" << endl;
 }
 
 void IRSne::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " != " << arg2->getVal() << endl;
+         << arg1->getVal() << " != " << arg2->getVal() << ";" << endl;
 }
 
 void IRSlt::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " < " << arg2->getVal() << endl;
+         << arg1->getVal() << " < " << arg2->getVal() << ";" << endl;
 }
 
 void IRSgt::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " > " << arg2->getVal() << endl;
+         << arg1->getVal() << " > " << arg2->getVal() << ";" << endl;
 }
 
 void IRSleq::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " <= " << arg2->getVal() << endl;
+         << arg1->getVal() << " <= " << arg2->getVal() << ";" << endl;
 }
 
 void IRSgeq::print() const {
     cout << "\t" << result->getVal() << " = "
-         << arg1->getVal() << " >= " << arg2->getVal() << endl;
+         << arg1->getVal() << " >= " << arg2->getVal() << ";" << endl;
 }
 
 void IRBeqz::print() const {
     cout << "\t" << "beqz "
          << arg1->getVal() << " "
-         << arg2->getVal() << endl;
+         << arg2->getVal() << ";" << endl;
 }
 
 void IRGoto::print() const {
-    cout << "\t" << "goto " << arg1->getVal() << endl;
+    cout << "\t" << "goto " << arg1->getVal() << ";" << endl;
 }
 
 void IRPhi::print() const {
     cout << "\t" << result->getVal() << " = phi ";
-    for (auto i : args) {
-        cout << i->getVal() <<  ",";
+    for (auto i : vector<IROperand *>(args.begin(), prev(args.end()))) {
+        cout << i->getVal() <<  ", ";
     }
+    cout << args.back()->getVal() << ";";
     cout << endl;
 }
 

@@ -72,9 +72,11 @@ L_0_main:
 	t_13 <= n;
 	t_13 = t_12;
 L_1_main:
-	n = phi t_13,n,
-	result = phi t_4,result,t_11,
-	addparam t_11;
+	n <= t_14;
+	t_14 = phi t_13,n
+	result <= t_15;
+	t_15 = phi t_4,result,t_11
+	addparam t_15;
 	call print_int; 
 	return 0;
 
