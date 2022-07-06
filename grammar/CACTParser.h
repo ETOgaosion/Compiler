@@ -2,6 +2,8 @@
     #include "../src/SymbolTable.h"
     #include "../src/IROperands.h"
     #include "../src/IRCode.h"
+    #include <vector>
+    #include <unordered_map>
 
 
 // Generated from grammar/CACT.g4 by ANTLR 4.8
@@ -320,6 +322,8 @@ public:
   public:
     bool hasReturn;
     MetaDataType returnType;
+    bool docLVal;
+    std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     FuncBlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<FuncBlockItemContext *> funcBlockItem();
@@ -336,6 +340,8 @@ public:
   public:
     bool hasReturn;
     MetaDataType returnType;
+    bool docLVal;
+    std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     FuncBlockItemContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     DeclContext *decl();
@@ -354,6 +360,8 @@ public:
     MetaDataType returnType;
     std::vector<IRCode *> codes;
     IRLabel* beginArray;
+    bool docLVal;
+    std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StmtContext() = default;
@@ -420,6 +428,8 @@ public:
   public:
     bool hasReturn;
     MetaDataType returnType;
+    bool docLVal;
+    std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     BlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<BlockItemContext *> blockItem();
@@ -436,6 +446,8 @@ public:
   public:
     bool hasReturn;
     MetaDataType returnType;
+    bool docLVal;
+    std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     BlockItemContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     DeclContext *decl();
@@ -454,6 +466,8 @@ public:
     MetaDataType returnType;
     std::vector<IRCode *> codes;
     IRLabel* beginArray;
+    bool docLVal;
+    std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     SubStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     SubStmtContext() = default;

@@ -234,8 +234,10 @@ IRBeqz::IRBeqz(IROperand *newArg1, IROperand *newLabel)
 IRGoto::IRGoto(IROperand *newLabel)
         : IRCode(IROperation::GOTO, nullptr, newLabel, nullptr) {}
 
-IRPhi::IRPhi(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
-        : IRCode(IROperation::PHI, newResult, newArg1, newArg2) {}
+IRPhi::IRPhi(IROperand *newResult, std::vector<IROperand *>newArg1)
+        : IRCode(IROperation::PHI, newResult, nullptr, nullptr) {
+    args = newArg1;
+}
 
 IRReplace::IRReplace(IROperand *newResult, IROperand *newArg1)
         : IRCode(IROperation::REPLACE, newResult, newArg1, nullptr) {}
@@ -478,9 +480,10 @@ void IRGoto::print() const {
 }
 
 void IRPhi::print() const {
-    cout << "\t" << result->getVal() << " = phi("
-         << arg1->getVal() << ","
-         << arg2->getVal() << ")";
+    cout << "\t" << result->getVal() << " = phi ";
+    for (auto i : args) {
+        cout << i->getVal() <<  ",";
+    }
 }
 
 void IRReplace::print() const {

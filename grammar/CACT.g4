@@ -9,6 +9,8 @@ options {
     #include "../src/SymbolTable.h"
     #include "../src/IROperands.h"
     #include "../src/IRCode.h"
+    #include <vector>
+    #include <unordered_map>
 }
 
 /********** Parser **********/
@@ -112,7 +114,9 @@ brackets
 funcBlock
     locals [
         bool hasReturn,
-        MetaDataType returnType
+        MetaDataType returnType,
+        bool docLVal,
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]
     : '{' (funcBlockItem)* '}'
     ;
@@ -120,7 +124,9 @@ funcBlock
 funcBlockItem
     locals [
         bool hasReturn,
-        MetaDataType returnType
+        MetaDataType returnType,
+        bool docLVal,
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]
     : decl 
     | stmt
@@ -131,7 +137,9 @@ stmt
         bool hasReturn,
         MetaDataType returnType,
         std::vector<IRCode *> codes,
-        IRLabel* beginArray
+        IRLabel* beginArray,
+        bool docLVal,
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
@@ -145,6 +153,8 @@ block
     locals [
         bool hasReturn,
         MetaDataType returnType,
+        bool docLVal,
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]
     : '{' (blockItem)* '}'
     ;
@@ -153,6 +163,8 @@ blockItem
     locals [
         bool hasReturn,
         MetaDataType returnType,
+        bool docLVal,
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]
     : decl 
     | subStmt
@@ -163,7 +175,9 @@ subStmt
         bool hasReturn,
         MetaDataType returnType,
         std::vector<IRCode *> codes,
-        IRLabel* beginArray
+        IRLabel* beginArray,
+        bool docLVal,
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]
     : lVal '=' exp ';'                              #subStmtAssignment
     | (exp)? ';'                                    #subStmtExpression
