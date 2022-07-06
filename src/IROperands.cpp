@@ -68,7 +68,7 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                 t->addCodeMv(freeRegister, zero,FloatPointType::NONE, FloatPointType::NONE);
             }
             else {
-                if (stoi(values.front()) < 2048) {
+                if (stoi(values.front()) > -2048 && stoi(values.front()) < 2048) {
                     t->addCodeAddi(freeRegister, zero, stoi(values.front()));
                 }
                 else {
@@ -141,7 +141,12 @@ Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralP
             t->addCodeMv(targetRegister, zero,FloatPointType::NONE, FloatPointType::NONE);
         }
         else {
-            t->addCodeAddi(targetRegister, zero, stoi(values.front()));
+            if (stoi(values.front()) > -2048 && stoi(values.front()) < 2048) {
+                t->addCodeAddi(targetRegister, zero, stoi(values.front()));
+            }
+            else {
+                t->addCodeLi(targetRegister, values.front());
+            }
         }
         t->setRegisterFree(zero);
         return targetRegister;
@@ -191,7 +196,12 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
             t->addCodeMv(inReg, zero, FloatPointType::NONE, FloatPointType::NONE);
         }
         else {
-            t->addCodeAddi(inReg, zero, stoi(values.front()));
+            if (stoi(values.front()) > -2048 && stoi(values.front()) < 2048) {
+                t->addCodeAddi(inReg, zero, stoi(values.front()));
+            }
+            else {
+                t->addCodeLi(inReg, values.front());
+            }
         }
         t->setRegisterFree(zero);
         return inReg;

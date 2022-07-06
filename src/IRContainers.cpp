@@ -604,12 +604,16 @@ void IRFunction::constFolding() {
 }
 
 void IRFunction::delOperandInVec(vector<IROperand*>& vars, IROperand* op){
+    if(!op)
+        return;
     auto it = find(vars.begin(), vars.end(), op);
     if(it != vars.end())
         vars.erase(it);
 }
 
 void IRFunction::addOperandToVec(vector<IROperand*>& vars, IROperand* op){
+    if(!op)
+        return;
     auto it = find(vars.begin(), vars.end(), op);
     if(it == vars.end())
         vars.push_back(op);
@@ -700,13 +704,15 @@ bool IRFunction::cmpTwoInVars(vector<IROperand*> & vec1, vector<IROperand*> & ve
 void IRFunction::liveVarAnalysis() {
     bool changed;
     usedefVarsAnalysis();
+    inVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
+    outVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
 
     do{
         changed = false;
         for(int i = basicBlocks.size() - 1; i >= 0; i--){ // i for block number
             bool ichanged = false;
             auto out = useVars[i];
-            vector<IROperand*> newin;
+            std::vector<IROperand*> newin;
             // update out vars
             vector<int> ctrlflow = controlFlow[i];
             for(int & back : ctrlflow){
@@ -720,7 +726,7 @@ void IRFunction::liveVarAnalysis() {
                 for(auto gblvar = glbVars.cbegin(); gblvar != glbVars.cend(); gblvar++) {
                     IRSymbolVariable* var = gblvar->second;
                     outVar.push_back(var);
-                }           
+                }
             }
             // delete DEF variables
             for(auto & var : defVars[i])
@@ -1388,10 +1394,12 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
             basicBlockDivision();
             constFolding();
             liveVarAnalysis();
+            delDeadCode();
             break;
         case 3:
             basicBlockDivision();
             // liveVarAnalysis();
+            // delDeadCode();
             varBindRegisters(t);
             break;
     }

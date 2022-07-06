@@ -190,77 +190,88 @@ main:
    1025e:	fe512a23          	sw	t0,-12(sp)
 	lla	t0, L_1_main
    10262:	00000297          	auipc	t0,0x0
-   10266:	06828293          	addi	t0,t0,104 # 102ca <L_1_main>
+   10266:	07c28293          	addi	t0,t0,124 # 102de <L_1_main>
 	jr	t0
    1026a:	8282                	jr	t0
 
 000000000001026c <L_0_main>:
 L_0_main:
-	addi	t0, zero, 16
+	addi	t0, zero, 2
    1026c:	4289                	li	t0,2
-	sw	t0, -52(sp)
+	addi	t1, zero, 8
    1026e:	4321                	li	t1,8
-	addi	t0, zero, 17
+	mulw	t2, t0, t1
    10270:	026283bb          	mulw	t2,t0,t1
-	sw	t0, -40(sp)
+	sw	t2, -52(sp)
    10274:	fc712623          	sw	t2,-52(sp)
-	addi	t0, zero, 117
+	lw	t1, -52(sp)
    10278:	fcc12303          	lw	t1,-52(sp)
-	sw	t0, -44(sp)
+	addi	t0, t1, 1
    1027c:	00130293          	addi	t0,t1,1
-	addi	t0, zero, -9882
+	sw	t0, -40(sp)
    10280:	fc512c23          	sw	t0,-40(sp)
-	sw	t0, -28(sp)
+	lw	t1, -40(sp)
    10284:	fd812303          	lw	t1,-40(sp)
-	addi	t0, zero, 2000
+	addi	t0, t1, 100
    10288:	06430293          	addi	t0,t1,100
-	sw	t0, -56(sp)
+	sw	t0, -44(sp)
    1028c:	fc512a23          	sw	t0,-44(sp)
-	addi	t0, zero, -7882
+	lw	t0, -44(sp)
    10290:	fd412283          	lw	t0,-44(sp)
-	sw	t0, -36(sp)
+	li	t1, 9999
    10294:	6309                	lui	t1,0x2
    10296:	70f3031b          	addiw	t1,t1,1807
-	addi	t0, zero, -7882
+	subw	t2, t0, t1
    1029a:	406283bb          	subw	t2,t0,t1
-	sw	t0, -12(sp)
+	sw	t2, -28(sp)
    1029e:	fe712223          	sw	t2,-28(sp)
-	addi	t0, zero, -6882
+	li	t0, 10000
    102a2:	6289                	lui	t0,0x2
    102a4:	7102829b          	addiw	t0,t0,1808
-	sw	t0, -20(sp)
+	addi	t1, zero, 5
    102a8:	4315                	li	t1,5
-	addi	t0, zero, -6882
+	divw	t2, t0, t1
    102aa:	0262c3bb          	divw	t2,t0,t1
-	sw	t0, -16(sp)
+	sw	t2, -56(sp)
    102ae:	fc712423          	sw	t2,-56(sp)
-L_1_main:
+	lw	t1, -28(sp)
    102b2:	fe412303          	lw	t1,-28(sp)
-	lw	a0, -12(sp)
+	lw	t2, -56(sp)
    102b6:	fc812383          	lw	t2,-56(sp)
-	addi	sp, sp, -56
+	addw	t0, t1, t2
    102ba:	007302bb          	addw	t0,t1,t2
-	call	print_int
+	sw	t0, -36(sp)
    102be:	fc512e23          	sw	t0,-36(sp)
-	addi	sp, sp, 56
+	lw	t0, -36(sp)
    102c2:	fdc12283          	lw	t0,-36(sp)
-	mv	a0, zero
+	sw	t0, -12(sp)
    102c6:	fe512a23          	sw	t0,-12(sp)
-
-00000000000102ca <L_1_main>:
-	ld	ra, -8(sp)
-	ret
+	lw	t1, -12(sp)
    102ca:	ff412303          	lw	t1,-12(sp)
+	addi	t0, t1, 1000
    102ce:	3e830293          	addi	t0,t1,1000 # 23e8 <register_fini-0xdcc8>
+	sw	t0, -20(sp)
    102d2:	fe512623          	sw	t0,-20(sp)
+	lw	t0, -20(sp)
    102d6:	fec12283          	lw	t0,-20(sp)
+	sw	t0, -16(sp)
    102da:	fe512823          	sw	t0,-16(sp)
+
+00000000000102de <L_1_main>:
+L_1_main:
+	lw	a0, -12(sp)
    102de:	ff412503          	lw	a0,-12(sp)
+	addi	sp, sp, -56
    102e2:	fc810113          	addi	sp,sp,-56
+	call	print_int
    102e6:	012000ef          	jal	ra,102f8 <print_int>
+	addi	sp, sp, 56
    102ea:	03810113          	addi	sp,sp,56
+	mv	a0, zero
    102ee:	00000513          	li	a0,0
+	ld	ra, -8(sp)
    102f2:	ff813083          	ld	ra,-8(sp)
+	ret
    102f6:	8082                	ret
 
 00000000000102f8 <print_int>:

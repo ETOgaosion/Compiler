@@ -115,6 +115,7 @@ public:
     bool addCodeJr(Register *rs1);
     bool addCodeLla(Register *rd, const std::string &targetLabel);
     bool addCodeLi(Register *rd, const std::string &targetLabel);
+    bool addCodeLi(Register *rd, int imm);
     bool addCodeLb(Register *rd, Register *rs1, int offset);
     bool addCodeLw(Register *rd, Register *rs1, int offset);
     bool addCodeLd(Register *rd, Register *rs1, int offset);

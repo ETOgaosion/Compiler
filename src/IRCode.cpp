@@ -484,6 +484,7 @@ void IRPhi::print() const {
     for (auto i : args) {
         cout << i->getVal() <<  ",";
     }
+    cout << endl;
 }
 
 void IRReplace::print() const {
@@ -564,17 +565,34 @@ void IRAddI::genTargetCode(TargetCodes *t) {
     }
     if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() != OperandType::VALUE) {
         Register *arg2Reg = arg2->load(t, true);
-        t->addCodeAddi(resultReg, arg2Reg, stoi(arg1->getValue()));
+        if (stoi(arg1->getValue()) > 2048 || stoi(arg1->getValue()) < -2048) {
+            t->addCodeLi(resultReg, stoi(arg1->getValue()));
+        }
+        else {
+            t->addCodeAddi(resultReg, arg2Reg, stoi(arg1->getValue()));
+        }
         t->setRegisterFree(arg2Reg);
     }
     else if (arg1->getOperandType() != OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
         Register *arg1Reg = arg1->load(t, true);
-        t->addCodeAddi(resultReg, arg1Reg, stoi(arg2->getValue()));
+        int val = stoi(arg2->getValue());
+        if (val > 2048 || val < -2048) {
+            t->addCodeLi(resultReg, val);
+        }
+        else {
+            t->addCodeAddi(resultReg, arg1Reg, val);
+        }
         t->setRegisterFree(arg1Reg);
     }
     else if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
         Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
-        t->addCodeAddi(resultReg, zero, stoi(arg1->getValue()) + stoi(arg2->getValue()));
+        int val = stoi(arg2->getValue()) + stoi(arg2->getValue());
+        if (val > 2048 || val < -2048) {
+            t->addCodeLi(resultReg, stoi(arg1->getValue()));
+        }
+        else {
+            t->addCodeAddi(resultReg, zero, val);
+        }
         t->setRegisterFree(zero);
     }
     else {

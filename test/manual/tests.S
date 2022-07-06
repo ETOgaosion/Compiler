@@ -65,23 +65,34 @@ main:
 	lla	t0, L_1_main
 	jr	t0
 L_0_main:
-	addi	t0, zero, 16
-	sw	t0, -52(sp)
-	addi	t0, zero, 17
+	addi	t0, zero, 2
+	addi	t1, zero, 8
+	mulw	t2, t0, t1
+	sw	t2, -52(sp)
+	lw	t1, -52(sp)
+	addi	t0, t1, 1
 	sw	t0, -40(sp)
-	addi	t0, zero, 117
+	lw	t1, -40(sp)
+	addi	t0, t1, 100
 	sw	t0, -44(sp)
-	addi	t0, zero, -9882
-	sw	t0, -28(sp)
-	addi	t0, zero, 2000
-	sw	t0, -56(sp)
-	addi	t0, zero, -7882
+	lw	t0, -44(sp)
+	li	t1, 9999
+	subw	t2, t0, t1
+	sw	t2, -28(sp)
+	li	t0, 10000
+	addi	t1, zero, 5
+	divw	t2, t0, t1
+	sw	t2, -56(sp)
+	lw	t1, -28(sp)
+	lw	t2, -56(sp)
+	addw	t0, t1, t2
 	sw	t0, -36(sp)
-	addi	t0, zero, -7882
+	lw	t0, -36(sp)
 	sw	t0, -12(sp)
-	addi	t0, zero, -6882
+	lw	t1, -12(sp)
+	addi	t0, t1, 1000
 	sw	t0, -20(sp)
-	addi	t0, zero, -6882
+	lw	t0, -20(sp)
 	sw	t0, -16(sp)
 L_1_main:
 	lw	a0, -12(sp)

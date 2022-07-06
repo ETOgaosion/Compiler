@@ -540,13 +540,14 @@ void SemanticAnalysis::exitFuncBlock(CACTParser::FuncBlockContext * ctx)
                 }
             }
         }
+        ctx->lValDoc = toJoinVarDoc;
     }
 }
 
 void SemanticAnalysis::enterFuncBlockItem(CACTParser::FuncBlockItemContext * ctx) 
 {
     ctx->hasReturn = false;
-    if (ctx->docLVal) {
+    if (ctx->stmt() && ctx->docLVal) {
         ctx->stmt()->docLVal = true;
         ctx->stmt()->lValDoc.clear();
     }
@@ -558,7 +559,7 @@ void SemanticAnalysis::exitFuncBlockItem(CACTParser::FuncBlockItemContext * ctx)
         ctx->hasReturn = true;
         ctx->returnType = ctx->stmt()->returnType;
     }
-    if (ctx->docLVal) {
+    if (ctx->stmt() && ctx->docLVal) {
         ctx->lValDoc = ctx->stmt()->lValDoc;
     }
 }
@@ -612,6 +613,7 @@ void SemanticAnalysis::exitBlock(CACTParser::BlockContext * ctx)
                 }
             }
         }
+        ctx->lValDoc = toJoinVarDoc;
     }
 }
 
@@ -619,7 +621,7 @@ void SemanticAnalysis::enterBlockItem(CACTParser::BlockItemContext * ctx)
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
-    if (ctx->docLVal) {
+    if (ctx->subStmt() && ctx->docLVal) {
         ctx->subStmt()->docLVal = true;
         ctx->subStmt()->lValDoc.clear();
     }
@@ -632,7 +634,7 @@ void SemanticAnalysis::exitBlockItem(CACTParser::BlockItemContext * ctx)
         ctx->hasReturn = true;
         ctx->returnType = ctx->subStmt()->returnType;
     }
-    if (ctx->docLVal) {
+    if (ctx->subStmt() && ctx->docLVal) {
         ctx->lValDoc = ctx->subStmt()->lValDoc;
     }
 }
@@ -736,9 +738,13 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
                 if (ctx->docLVal) {
                     if (ctx->lValDoc.find(ctx->lVal()->identOperand) != ctx->lValDoc.end()) {
                         ctx->lValDoc[ctx->lVal()->identOperand].push_back(temp);
+                        if (std::find(ctx->lValDoc[ctx->lVal()->identOperand].begin(), ctx->lValDoc[ctx->lVal()->identOperand].end(), ctx->lVal()->identOperand) != ctx->lValDoc[ctx->lVal()->identOperand].end()) {
+                            ctx->lValDoc[ctx->lVal()->identOperand].push_back(ctx->lVal()->identOperand);
+                        }
                     }
                     else {
                         ctx->lValDoc[ctx->lVal()->identOperand] = std::vector<IROperand *>(1, temp);
+                        ctx->lValDoc[ctx->lVal()->identOperand].push_back(ctx->lVal()->identOperand);
                     }
                 }
             } else {
@@ -876,11 +882,24 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
         irGenerator->addCodes(ctx->codes);
 
     std::unordered_map<IROperand *, std::vector<IROperand *>> lVal;
+    lVal.clear();
     for (auto stmt : ctx->stmt()) {
         for (const auto& it: stmt->lValDoc) {
-            irGenerator->addCode(new IRPhi(it.first, it.second));
-            lVal[it.first] = std::vector<IROperand *>(1, it.first);
+            if (lVal.find(it.first) != lVal.end()) {
+                for (auto in_it : it.second) {
+                    if (std::find(lVal[it.first].begin(), lVal[it.first].end(), in_it) == lVal[it.first].end()) {
+                        lVal[it.first].push_back(in_it);
+                    }
+                }
+            }
+            else {
+                lVal[it.first] = std::vector<IROperand *>(it.second.begin(), it.second.end());
+            }
         }
+    }
+
+    for (auto it : lVal) {
+        irGenerator->addCode(new IRPhi(it.first, it.second));
     }
 
     if (ctx->subStmt()) {
@@ -1036,9 +1055,13 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
                 if (ctx->docLVal) {
                     if (ctx->lValDoc.find(ctx->lVal()->identOperand) != ctx->lValDoc.end()) {
                         ctx->lValDoc[ctx->lVal()->identOperand].push_back(temp);
+                        if (std::find(ctx->lValDoc[ctx->lVal()->identOperand].begin(), ctx->lValDoc[ctx->lVal()->identOperand].end(), ctx->lVal()->identOperand) != ctx->lValDoc[ctx->lVal()->identOperand].end()) {
+                            ctx->lValDoc[ctx->lVal()->identOperand].push_back(ctx->lVal()->identOperand);
+                        }
                     }
                     else {
                         ctx->lValDoc[ctx->lVal()->identOperand] = std::vector<IROperand *>(1, temp);
+                        ctx->lValDoc[ctx->lVal()->identOperand].push_back(ctx->lVal()->identOperand);
                     }
                 }
             } else {
@@ -1195,11 +1218,24 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ct
         irGenerator->addCodes(ctx->codes);
 
     std::unordered_map<IROperand *, std::vector<IROperand *>> lVal;
+    lVal.clear();
     for (auto stmt : ctx->subStmt()) {
         for (const auto& it: stmt->lValDoc) {
-            irGenerator->addCode(new IRPhi(it.first, it.second));
-            lVal[it.first] = std::vector<IROperand *>(1, it.first);
+            if (lVal.find(it.first) != lVal.end()) {
+                for (auto in_it : it.second) {
+                    if (std::find(lVal[it.first].begin(), lVal[it.first].end(), in_it) == lVal[it.first].end()) {
+                        lVal[it.first].push_back(in_it);
+                    }
+                }
+            }
+            else {
+                lVal[it.first] = std::vector<IROperand *>(it.second.begin(), it.second.end());
+            }
         }
+    }
+
+    for (auto it : lVal) {
+        irGenerator->addCode(new IRPhi(it.first, it.second));
     }
 
     if (ctx->docLVal) {
