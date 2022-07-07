@@ -409,11 +409,179 @@ void IRAddI::genTargetCode(TargetCodes *t) {
 
 ##### 常量折叠
 
+- 双操作数赋值语句中，arg1和arg2中只有一个为常量的情况
 
+```c++
+else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
+    if(op != IROperation::ADD && op != IROperation::SUB && op != IROperation::MUL)
+        continue;
+
+    IROperand* imm_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg1() : code->getArg2();
+    IROperand* var_arg = arg1->getOperandType() == OperandType::VALUE ? code->getArg2() : code->getArg1();
+
+    for(int j = i + 1; j < block.size(); j++){
+        IRCode *new_code = block[j];
+        IROperation new_op = new_code->getOperation();
+        
+    if(new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE){
+        // new_code: arg1 is Var, arg2 is immVal
+        if(op == IROperation::ADD){
+            IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
+            switch(var_arg->getMetaDataType()){
+                case MetaDataType::INT:
+                    codes[entrances[bnum] + j] = new IRAddI(new_code->getResult(), var_arg, new_value);
+                    break;
+                case MetaDataType::FLOAT:
+                    codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), var_arg, new_value);
+                    break;
+                case MetaDataType::DOUBLE:
+                    codes[entrances[bnum] + j] = new IRAddD(new_code->getResult(), var_arg, new_value);
+                    break;
+            }
+
+        } else if (op == IROperation::SUB) {
+            if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
+                IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                switch(var_arg->getMetaDataType()){
+                    case MetaDataType::INT:
+                        codes[entrances[bnum] + j] = new IRSubI(new_code->getResult(), var_arg, new_value);
+                        break;
+                    case MetaDataType::FLOAT:
+                        codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), var_arg, new_value);
+                        break;
+                    case MetaDataType::DOUBLE:
+                        codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), var_arg, new_value);
+                        break;
+                }
+            } else { // origin code: arg2 is var
+                IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
+                switch(var_arg->getMetaDataType()){
+                    case MetaDataType::INT:
+                        codes[entrances[bnum] + j] = new IRSubI(new_code->getResult(), new_value, var_arg);
+                        break;
+                    case MetaDataType::FLOAT:
+                        codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), new_value, var_arg);
+                        break;
+                    case MetaDataType::DOUBLE:
+                        codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), new_value, var_arg);
+                        break;
+                }                          
+            }
+        } else if (op == IROperation::MUL) {
+            if(new_op == IROperation::MUL) {
+                IRValue* new_value = immMul(imm_arg, new_code->getArg2());
+                new_code->setArg1(var_arg);
+                new_code->setArg2(new_value);
+            }
+        }
+    }  else if (new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == res) {
+        // new_code: arg2 is Var, arg1 is immVal
+        if (op == IROperation::ADD) {
+            IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
+            new_code->setArg1(new_value);
+            new_code->setArg2(var_arg);
+        } else if (op == IROperation::SUB) {
+            if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
+                new_code->setArg2(var_arg);
+                IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
+                new_code->setArg1(new_value);
+            } else { // origin code: arg2 is var
+                IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
+                switch(var_arg->getMetaDataType()){
+                    case MetaDataType::INT:
+                        if(new_op == IROperation::ADD)
+                            codes[entrances[bnum] + j] = new IRSubI(new_code->getResult(), new_value, var_arg);
+                        else
+                            codes[entrances[bnum] + j] = new IRAddI(new_code->getResult(), new_value, var_arg);
+                        break;
+                    case MetaDataType::FLOAT:
+                        if(new_op == IROperation::ADD)
+                            codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), new_value, var_arg);
+                        else
+                            codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), new_value, var_arg);
+                        break;
+                    case MetaDataType::DOUBLE:
+                        if(new_op == IROperation::ADD)
+                            codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), new_value, var_arg);
+                        else
+                            codes[entrances[bnum] + j] = new IRAddD(new_code->getResult(), new_value, var_arg);
+                        break;
+                } 
+            }
+        } else if (op == IROperation::MUL) {
+            if(new_op == IROperation::MUL) {
+                IRValue* new_value = immMul(imm_arg, new_code->getArg1());
+                new_code->setArg1(new_value);
+                new_code->setArg2(var_arg);                            
+            }
+        }
+    }
+}
+```
+
+- 这个情况较为复杂，需要分析`code`和`new_code`的操作，++/+-/-+/--都可能对应不同的情况，同时，在这四种不同的大情况下，还需要考虑操作数的顺序，例如究竟是`var - const`，还是`const - var`，这都可能产生不同情况折叠的code
+
+  例如：原始code为`a = 1 - b;` 扫描得到的新code为`c = a - 2;` 那么新code要替换为`c = -1 - b;`
+
+  ​			如果新code为`c = 2 - a;`那么新code要被替换为`c = 1 + b;` 情况繁琐，需将各种情况考虑全面及正确
 
 ##### 死代码删除
 
+- ##### 活跃变量分析
 
+  ```c++
+  void IRFunction::liveVarAnalysis() {
+      bool changed;
+      // use & def vars 分析
+      usedefVarsAnalysis();
+      inVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
+      outVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
+  
+      do{
+          changed = false;
+          for(int i = basicBlocks.size() - 1; i >= 0; i--){ // i for block number
+              auto out = useVars[i];
+              std::vector<IROperand*> newin;
+              std::vector<IROperand*> newOut;
+              // update out vars
+              vector<int> ctrlflow = controlFlow[i];
+              for(int back : ctrlflow){
+                  if (back >= inVars.size()) {
+                      continue;
+                  }
+                  for(auto var : inVars[back])
+                      addOperandToVec(newOut, var);
+              }
+              
+              // IN = use U (out - def)
+              // add OUT variables
+              for(auto & var : newOut)
+                  addOperandToVec(newin, var);
+              // delete DEF variables
+              for(auto & var : defVars[i])
+                  delOperandInVec(newin, var);
+              // add USE variables
+              for(auto & var : useVars[i])
+                  addOperandToVec(newin, var);
+              
+              if(!cmpTwoInVars(inVars[i], newin)){
+                  // update inVar
+                  changed = true;       
+                  inVars[i].clear();
+                  for(auto & var : newin)
+                      inVars[i].push_back(var);
+              }
+              if(!cmpTwoInVars(outVars[i], newOut)){
+                  // update inVar
+                  changed = true;
+                  outVars[i].clear();
+                  for(auto & var : newOut)
+                      outVars[i].push_back(var);
+              }
+          }
+      } while (changed);
+  }
+  ```
 
 ##### 寄存器指派
 
@@ -464,7 +632,7 @@ void IRAddI::genTargetCode(TargetCodes *t) {
 
 - 官奕琳
 
-<!-- TODO -->
+通过本学期的学习，我了解了编译的各个阶段如何组织运行，发现了编译的许多值得探究和品味之处——例如中间代码设计需要在统一和详细之间做权衡，如果设计统一，那么可以更简化优化的算法；但设计详细可以使得目标代码生成时拥有更多信息；优化时不仅需要用演绎的思维去探索算法应该如何推演，还要根据实际情况和诸多细节进行完善，相比起前两部分来说，编译优化更有挑战性，也更有趣味。
 
 
 
