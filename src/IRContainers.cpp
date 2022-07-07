@@ -308,7 +308,7 @@ void IRFunction::constFolding() {
             IROperand* arg2 = code->getArg2();
             IROperation op = code->getOperation();
 
-            if(!IRCode::isAssignmentOperation(op) || op == IROperation::PHI)
+            if(op != IROperation::BEQZ && (!IRCode::isAssignmentOperation(op) || op == IROperation::PHI))
                 continue;    
             else if (op == IROperation::ASSIGN){
                 if(arg1->getOperandType() != OperandType::VALUE)
@@ -338,6 +338,8 @@ void IRFunction::constFolding() {
                 // i--;
                 continue;
             } else if (op == IROperation::NOT) {
+                if(arg1->getOperandType() != OperandType::VALUE)
+                    continue;
                 IRValue* new_value = nullptr;
                 if(arg1->getValue() == "1")
                     new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
@@ -368,6 +370,8 @@ void IRFunction::constFolding() {
                 // i--;
                 continue;
             } else if (op == IROperation::NEG) {
+                if(arg1->getOperandType() != OperandType::VALUE)
+                    continue;
                 IRValue* new_value = nullptr;
                 switch(arg1->getMetaDataType()){
                     case MetaDataType::INT:{
@@ -410,6 +414,23 @@ void IRFunction::constFolding() {
                 // delete code;
                 // i--;
                 continue;
+            } else if (op == IROperation::BEQZ) {
+                if(arg1->getOperandType() != OperandType::VALUE)
+                    continue;
+                int beqzArg = stoi(arg1->getValue());
+                if (beqzArg == 0) {
+                    code = new IRGoto(arg2);
+                    block[i] = code;
+                    basicBlocks[bnum][i] = code;
+                    codes[entrances[bnum] + i] = code;
+                }
+                else {
+                    block.erase(block.begin() + i);
+                    codes.erase(codes.begin() + entrances[bnum] + i);
+                    for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    delete code;
+                }
             }
 
             // arg1 and arg2 both exists
@@ -656,6 +677,10 @@ void IRFunction::usedefVarsAnalysis() {
                     addOperandToVec(def, arg1);
                 }
             } else if (op == IROperation::ASSIGN_ARRAY_ELEM) {
+                if(res && res->getOperandType() != OperandType::VALUE && !res->getIsGlobalSymbolVar()){ // src operand
+                    delOperandInVec(def, res);
+                    addOperandToVec(use, res);
+                }
                 if(arg1 && arg1->getOperandType() != OperandType::VALUE){
                     addOperandToVec(use, arg2);
                     delOperandInVec(def, arg2);
@@ -664,21 +689,17 @@ void IRFunction::usedefVarsAnalysis() {
                     addOperandToVec(use, arg2);
                     delOperandInVec(def, arg2);
                 }
-                if(res && res->getOperandType() != OperandType::VALUE && !res->getIsGlobalSymbolVar()){ // src operand
+            } else if (op == IROperation::PHI) {
+                if (res && res->getOperandType() != OperandType::VALUE && !res->getIsGlobalSymbolVar()) {
                     delOperandInVec(def, res);
                     addOperandToVec(use, res);
                 }
-            } else if (op == IROperation::PHI) {
                 vector<IROperand *> args = code->getArgs();
                 for (auto arg : args) {
                     if (arg->getOperandType() != OperandType::VALUE) {
                         addOperandToVec(use, arg);
                         delOperandInVec(def, arg);
                     }
-                }
-                if (res && res->getOperandType() != OperandType::VALUE && !res->getIsGlobalSymbolVar()) {
-                    delOperandInVec(def, res);
-                    addOperandToVec(use, res);
                 }
             } else {
                 if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR) && !res->getIsGlobalSymbolVar()){
@@ -770,6 +791,14 @@ void IRFunction::liveVarAnalysis() {
 // algorithm only works in Basic Block
 void IRFunction::delDeadCode() {
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
+        for (int i = 0; i < basicBlocks.size(); i++) {
+            if (basicBlocks[i].empty()) {
+                basicBlocks.erase(basicBlocks.begin() + i);
+                controlFlow.erase(controlFlow.begin() + i);
+                entrances.erase(entrances.begin() + i);
+                cycleNum.erase(cycleNum.begin() + i);
+            }
+        }
         auto block = basicBlocks[i];
         // set out vars to alive
         if (i == basicBlocks.size() - 1 || cycleNum[i] != 0) {
@@ -785,18 +814,163 @@ void IRFunction::delDeadCode() {
             IROperand* arg2 = code->getArg2();
             IROperation op = code->getOperation();
 
-            if(op == IROperation::ADD_LABEL || op == IROperation::GOTO || op == IROperation::CALL) {
+            if(op == IROperation::ADD_LABEL) {
                 // can optimize
-                if (block.size() == 1 && block[i + 1])
+                if (block.size() == 1 && i < basicBlocks.size() - 1 && basicBlocks[i + 1][0]->getOperation() == IROperation::ADD_LABEL) {
+                    for (auto it : basicBlocks) {
+                        for (auto in_it : it) {
+                            if (in_it->getOperation() == IROperation::GOTO) {
+                                in_it->setArg1(basicBlocks[i + 1][0]->getArg1());
+                            }
+                            else if (in_it->getOperation() == IROperation::BEQZ) {
+                                in_it->setArg2(basicBlocks[i + 1][0]->getArg1());
+                            }
+                        }
+                    }
+                    block.erase(block.begin() + j);
+                    basicBlocks[i].erase(basicBlocks[i].begin() + j);
+                    codes.erase(codes.begin() + entrances[i] + j);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    delete code;
+                    continue;
+                }
                 continue;
-            } else if(op == IROperation::RETURN || op == IROperation::ADD_PARAM || op == IROperation::BEQZ){
+            } else if (op == IROperation::GOTO) {
+                if (j == block.size() - 1) {
+                    if (basicBlocks[i + 1][0]->getOperation() == IROperation::ADD_LABEL) {
+                        if (basicBlocks[i + 1][0]->getArg1() == arg1) {
+                            block.erase(block.begin() + j);
+                            basicBlocks[i].erase(basicBlocks[i].begin() + j);
+                            codes.erase(codes.begin() + entrances[i] + j);
+                            for(int k = i + 1; k < basicBlocks.size(); k++)
+                                entrances[k]--;
+                            delete code;
+                            bool hasReference = false;
+                            for (auto it : basicBlocks) {
+                                for (auto in_it : it) {
+                                    if (in_it->getOperation() == IROperation::GOTO) {
+                                        if (in_it->getArg1() == arg1) {
+                                            hasReference = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (in_it->getOperation() == IROperation::BEQZ) {
+                                        if (in_it->getArg2() == arg1) {
+                                            hasReference = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!hasReference) {
+                                basicBlocks[i + 1].erase(basicBlocks[i + 1].begin());
+                                codes.erase(codes.begin() + entrances[i + 1]);
+                                for(int k = i + 2; k < basicBlocks.size(); k++)
+                                    entrances[k]--;
+                                continue;
+                            }
+                        }
+                    }
+                    else if (basicBlocks[i + 1][0]->getOperation() == IROperation::GOTO) {
+                        block.erase(block.begin() + j);
+                        basicBlocks[i].erase(basicBlocks[i].begin() + j);
+                        codes.erase(codes.begin() + entrances[i] + j);
+                        for(int k = i + 1; k < basicBlocks.size(); k++)
+                            entrances[k]--;
+                        delete code;
+                        bool hasReference = false;
+                        bool findDef = false;
+                        int block_i = 0, in_i = 0;
+                        int block_i_def = 0, in_i_def = 0;
+                        for (; block_i < basicBlocks.size(); block_i++) {
+                            for (; in_i < basicBlocks[block_i].size(); in_i++) {
+                                auto in_it = basicBlocks[block_i][in_i];
+                                if (in_it->getOperation() == IROperation::GOTO) {
+                                    if (in_it->getArg1() == arg1) {
+                                        hasReference = true;
+                                        if (findDef) {
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if (in_it->getOperation() == IROperation::BEQZ) {
+                                    if (in_it->getArg2() == arg1) {
+                                        hasReference = true;
+                                        if (findDef) {
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if (in_it->getOperation() == IROperation::ADD_LABEL) {
+                                    if (in_it->getArg1() == arg1) {
+                                        findDef = true;
+                                        block_i_def = block_i;
+                                        in_i_def = in_i;
+                                        if (hasReference) {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (!hasReference) {
+                            basicBlocks[block_i_def].erase(basicBlocks[block_i_def].begin() + in_i_def);
+                            codes.erase(codes.begin() + entrances[block_i_def] + in_i_def);
+                            for(int k = block_i_def + 1; k < basicBlocks.size(); k++)
+                                entrances[k]--;
+                            continue;
+                        }
+                    }
+                }
+            } else if (op == IROperation::CALL) {
+                continue;
+            } else if (op == IROperation::RETURN || op == IROperation::ADD_PARAM){
                 if (arg1 && arg1->getOperandType() != OperandType::VALUE) {
                     arg1->setAlive(true);
+                }
+            } else if (op == IROperation::BEQZ) {
+                if (block.size() == 1 && i < basicBlocks.size() - 1) {
+                    if (basicBlocks[i + 1][0]->getOperation() == IROperation::ADD_LABEL) {
+                        if (basicBlocks[i + 1][0]->getArg1() == arg2) {
+                            block.erase(block.begin() + j);
+                            basicBlocks[i].erase(basicBlocks[i].begin() + j);
+                            codes.erase(codes.begin() + entrances[i] + j);
+                            for(int k = i + 1; k < basicBlocks.size(); k++)
+                                entrances[k]--;
+                            delete code;
+                            bool hasReference = false;
+                            for (auto it : basicBlocks) {
+                                for (auto in_it : it) {
+                                    if (in_it->getOperation() == IROperation::GOTO) {
+                                        if (in_it->getArg1() == arg2) {
+                                            hasReference = true;
+                                            break;
+                                        }
+                                    }
+                                    else if (in_it->getOperation() == IROperation::BEQZ) {
+                                        if (in_it->getArg2() == arg2) {
+                                            hasReference = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!hasReference) {
+                                basicBlocks[i + 1].erase(basicBlocks[i + 1].begin());
+                                codes.erase(codes.begin() + entrances[i + 1]);
+                                for(int k = i + 2; k < basicBlocks.size(); k++)
+                                    entrances[k]--;
+                                continue;
+                            }
+                        }
+                    }
                 }
             } else if (op == IROperation::GET_PARAM || op == IROperation::GET_RETURN) {
                 if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR))
                     if(res->getIsAlive() == false) {
                         block.erase(block.begin() + j);
+                        basicBlocks[i].erase(basicBlocks[i].begin() + j);
                         codes.erase(codes.begin() + entrances[i] + j);
                         for(int k = i + 1; k < basicBlocks.size(); k++)
                             entrances[k]--;
@@ -806,6 +980,7 @@ void IRFunction::delDeadCode() {
             } else if (op == IROperation::REPLACE) {
                 if(res && res->getIsAlive() == false) {
                     block.erase(block.begin() + j);
+                    basicBlocks[i].erase(basicBlocks[i].begin() + j);
                     codes.erase(codes.begin() + entrances[i] + j);
                     for(int k = i + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -819,6 +994,7 @@ void IRFunction::delDeadCode() {
             } else if (op == IROperation::PHI) {
                 if(res && res->getIsAlive() == false) {
                     block.erase(block.begin() + j);
+                    basicBlocks[i].erase(basicBlocks[i].begin() + j);
                     codes.erase(codes.begin() + entrances[i] + j);
                     for(int k = i + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -834,6 +1010,7 @@ void IRFunction::delDeadCode() {
             } else if (op == IROperation::ASSIGN_ARRAY_ELEM) {
                 if(arg1 && arg1->getIsAlive() == false){ // a[t_0] = b, but a is not alive
                     block.erase(block.begin() + j);
+                    basicBlocks[i].erase(basicBlocks[i].begin() + j);
                     codes.erase(codes.begin() + entrances[i] + j);
                     for(int k = i + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -859,6 +1036,7 @@ void IRFunction::delDeadCode() {
                 if(res){
                     if(!res->getIsAlive()){ // dead code
                         block.erase(block.begin() + j);
+                        basicBlocks[i].erase(basicBlocks[i].begin() + j);
                         codes.erase(codes.begin() + entrances[i] + j);
                         for(int k = i + 1; k < basicBlocks.size(); k++)
                             entrances[k]--;
