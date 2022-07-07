@@ -6,12 +6,6 @@ iobuff:
 .type	add, @function
 add:
 	sd	ra, -8(sp)
-	sw	a0, -12(sp)
-	lw	t0, -12(sp)
-	addi	t1, zero, 2
-	xor	t2, t0, t1
-	seqz	t3, t2
-	sb	t3, -24(sp)
 	lb	t0, -24(sp)
 	beqz	t0, L_0_add
 	lw	t0, -12(sp)
@@ -39,12 +33,6 @@ L_1_add:
 .type	main, @function
 main:
 	sd	ra, -8(sp)
-	mv	t0, zero
-	beqz	t0, L_0_main
-	lla	t0, L_1_main
-	jr	t0
-L_0_main:
-L_1_main:
 	mv	a0, zero
 	ld	ra, -8(sp)
 	ret
