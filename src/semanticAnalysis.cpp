@@ -5,8 +5,6 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     block = 0;
     curSymbolTable = SymbolTable::getGlobalSymbolTable();
     irGenerator = IRGenerator::getIRGenerator(IRProgram::getIRProgram(programName, curSymbolTable));
-    irGenerator->targetCodes->addCodeLabel("iobuff");
-    irGenerator->targetCodes->addCodeDirectives("\t.zero 80");
     SymbolTable *funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_int", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, 0);
     funcSymbolTable->setParamDataTypeList();

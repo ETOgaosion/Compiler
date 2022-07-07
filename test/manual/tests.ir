@@ -2,26 +2,6 @@
 ============ imm value ================
 ============ functions ================
 ----------- funcDef -----------
-add(2) => 2:
------------ paramVars -----------
-n := symbol type: 0; data type: 2
------------ localVars -----------
------------ tempVars ------------
-t_2:= symbol type: TEMP VAR; data type: 2
-t_1:= symbol type: TEMP VAR; data type: 2
-t_0:= symbol type: TEMP VAR; data type: 1
------------ Codes ------------
-add:
-	beqz t_0 L_0_add;
-	t_1 = n * 2;
-	return t_1;
-	goto L_1_add;
-L_0_add:
-	t_2 = n + 10;
-	return t_2;
-L_1_add:
-
------------ funcDef -----------
 main() => 2:
 ----------- paramVars -----------
 ----------- localVars -----------

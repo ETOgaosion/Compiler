@@ -1662,7 +1662,7 @@ void IRCall::genTargetCode(TargetCodes *t) {
 void IRReturn::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-    Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
+    // Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
     for (auto it : arg2->getBindRegisters()) {
         if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
             t->addCodeLw(it, sp, -it->getTmpStoreOffset());
@@ -1676,10 +1676,10 @@ void IRReturn::genTargetCode(TargetCodes *t) {
             }
         }
     }
-    t->addCodeLd(ra, sp, -8);
+    // t->addCodeLd(ra, sp, -8);
     t->addCodeRet();
     t->setRegisterFree(sp);
-    t->setRegisterFree(ra);
+    // t->setRegisterFree(ra);
 }
 
 void IRReturnV::genTargetCode(TargetCodes *t) {

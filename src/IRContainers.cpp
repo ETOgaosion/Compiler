@@ -1807,10 +1807,10 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     t->addCodeDirectives(".type\t" + functionName + ", @function");
     t->addCodeLabel(functionName);
     bool hasFreeRegister;
-    Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
+    // Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-    t->addCodeSd(sp, ra, -8);
-    t->setRegisterFree(ra);
+    // t->addCodeSd(sp, ra, -8);
+    // t->setRegisterFree(ra);
     for (auto it : getBindRegisters()) {
         if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
             t->addCodeSw(sp, it, -it->getTmpStoreOffset());
@@ -1830,7 +1830,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     }
     if (codes.back()->getOperation() != IROperation::RETURN) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-        Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
+        // Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
         for (auto it : getBindRegisters()) {
             if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
                 t->addCodeLw(it, sp, -it->getTmpStoreOffset());
@@ -1844,9 +1844,10 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
                 }
             }
         }
-        t->addCodeLd(ra, sp, -8);
+        // t->addCodeLd(ra, sp, -8);
         t->addCodeRet();
         t->setRegisterFree(sp);
+        // t->setRegisterFree(ra);
     }
 }
 
