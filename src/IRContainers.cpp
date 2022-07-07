@@ -768,19 +768,13 @@ void IRFunction::liveVarAnalysis() {
     } while (changed);
 }
 
+// algorithm only works in Basic Block
 void IRFunction::delDeadCode() {
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
         auto block = basicBlocks[i];
         // set out vars to alive
         for(auto & var : outVars[i]) {
-            if (i == basicBlocks.size() - 1) {
-                var->setAlive(true);
-            }
-            else {
-                if (var->getIsAlive()) {
-                    var->setAlive(true);
-                }
-            }
+            var->setAlive(true);
         }
         // delete dead codes
         for(int j = block.size() - 1; j >= 0; j--){
@@ -792,6 +786,7 @@ void IRFunction::delDeadCode() {
 
             if(op == IROperation::ADD_LABEL || op == IROperation::GOTO || op == IROperation::CALL)
                 // can optimize
+                if (block.size() == 1 && block[i + 1])
                 continue;
             else if(op == IROperation::RETURN || op == IROperation::ADD_PARAM || op == IROperation::BEQZ){
                 if (arg1 && arg1->getOperandType() != OperandType::VALUE) {
