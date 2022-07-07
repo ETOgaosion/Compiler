@@ -54,6 +54,8 @@ public:
 
     IROperand *getArg2() const { return arg2; };
 
+    virtual std::vector<IROperand *> getArgs() const { return {}; };
+
     IROperand *getResult() const { return result; };
 
     bool setArg1(IROperand *arg);
@@ -455,9 +457,11 @@ public:
 
 class IRPhi : public IRCode {
 private:
-    std::vector<IROperand *>args;
+    std::vector<IROperand *> args;
 public:
     IRPhi(IROperand *newResult, std::vector<IROperand *>newArg1);
+
+    std::vector<IROperand *> getArgs() const override { return args; };
 
     void print() const override;
 };
