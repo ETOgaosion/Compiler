@@ -773,8 +773,10 @@ void IRFunction::delDeadCode() {
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
         auto block = basicBlocks[i];
         // set out vars to alive
-        for(auto & var : outVars[i]) {
-            var->setAlive(true);
+        if (i == basicBlocks.size() - 1 || cycleNum[i] != 0) {
+            for(auto & var : outVars[i]) {
+                var->setAlive(true);
+            }
         }
         // delete dead codes
         for(int j = block.size() - 1; j >= 0; j--){
@@ -784,11 +786,11 @@ void IRFunction::delDeadCode() {
             IROperand* arg2 = code->getArg2();
             IROperation op = code->getOperation();
 
-            if(op == IROperation::ADD_LABEL || op == IROperation::GOTO || op == IROperation::CALL)
+            if(op == IROperation::ADD_LABEL || op == IROperation::GOTO || op == IROperation::CALL) {
                 // can optimize
                 if (block.size() == 1 && block[i + 1])
                 continue;
-            else if(op == IROperation::RETURN || op == IROperation::ADD_PARAM || op == IROperation::BEQZ){
+            } else if(op == IROperation::RETURN || op == IROperation::ADD_PARAM || op == IROperation::BEQZ){
                 if (arg1 && arg1->getOperandType() != OperandType::VALUE) {
                     arg1->setAlive(true);
                 }

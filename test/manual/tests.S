@@ -40,38 +40,10 @@ L_1_add:
 main:
 	sd	ra, -8(sp)
 	mv	t0, zero
-	sw	t0, -16(sp)
-	mv	t0, zero
-	sw	t0, -12(sp)
-	mv	t0, zero
-	sb	t0, -48(sp)
-	mv	t0, zero
 	beqz	t0, L_0_main
-	li	t0, 1998000
-	sw	t0, -28(sp)
-	li	t0, 1998000
-	sw	t0, -12(sp)
 	lla	t0, L_1_main
 	jr	t0
 L_0_main:
-	addi	t0, zero, 16
-	sw	t0, -20(sp)
-	addi	t0, zero, 17
-	sw	t0, -32(sp)
-	addi	t0, zero, 117
-	sw	t0, -52(sp)
-	li	t0, -9882
-	sw	t0, -40(sp)
-	addi	t0, zero, 2000
-	sw	t0, -44(sp)
-	li	t0, -7882
-	sw	t0, -24(sp)
-	li	t0, -7882
-	sw	t0, -12(sp)
-	li	t0, -6882
-	sw	t0, -36(sp)
-	li	t0, -6882
-	sw	t0, -16(sp)
 L_1_main:
 	mv	a0, zero
 	ld	ra, -8(sp)
