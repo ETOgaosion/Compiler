@@ -410,7 +410,7 @@ void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
     if (!ctx->funcBlock()->hasReturn && (curSymbolTable->getReturnType() != MetaDataType::VOID)) {
         throw std::runtime_error("[ERROR] > Non void function has no return.\n");
     }
-    if (ctx->funcBlock()->funcBlockItem().back()->getText().find("return", 0) != 0) {
+    if (ctx->funcType()->funcMetaDataType == MetaDataType::VOID && ctx->funcBlock()->funcBlockItem().back()->getText().find("return", 0) != std::string::npos) {
         irGenerator->exitFunction();
     }
 }

@@ -642,7 +642,7 @@ void IRFunction::usedefVarsAnalysis() {
                     delOperandInVec(def, arg1);
                 }
             } else if (op == IROperation::GET_PARAM || op == IROperation::GET_RETURN) {
-                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)){
+                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR) && !res->getIsGlobalSymbolVar()){
                     delOperandInVec(use, res);
                     addOperandToVec(def, res);
                 }
@@ -651,23 +651,37 @@ void IRFunction::usedefVarsAnalysis() {
                     delOperandInVec(use, res);
                     addOperandToVec(def, res);
                 }
-                if(arg1){
+                if(arg1 && !arg1->getIsGlobalSymbolVar()){
                     delOperandInVec(use, arg1);
                     addOperandToVec(def, arg1);
                 }
             } else if (op == IROperation::ASSIGN_ARRAY_ELEM) {
+                if(arg1 && arg1->getOperandType() != OperandType::VALUE){
+                    addOperandToVec(use, arg2);
+                    delOperandInVec(def, arg2);
+                }
                 if(arg2 && arg2->getOperandType() != OperandType::VALUE){
                     addOperandToVec(use, arg2);
                     delOperandInVec(def, arg2);
                 }
-                if(res && res->getOperandType() != OperandType::VALUE){ // src operand
+                if(res && res->getOperandType() != OperandType::VALUE && !res->getIsGlobalSymbolVar()){ // src operand
                     delOperandInVec(def, res);
                     addOperandToVec(use, res);
                 }
             } else if (op == IROperation::PHI) {
-                
+                vector<IROperand *> args = code->getArgs();
+                for (auto arg : args) {
+                    if (arg->getOperandType() != OperandType::VALUE) {
+                        addOperandToVec(use, arg);
+                        delOperandInVec(def, arg);
+                    }
+                }
+                if (res && res->getOperandType() != OperandType::VALUE && !res->getIsGlobalSymbolVar()) {
+                    delOperandInVec(def, res);
+                    addOperandToVec(use, res);
+                }
             } else {
-                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)){
+                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR) && !res->getIsGlobalSymbolVar()){
                     addOperandToVec(def, res);
                     delOperandInVec(use, res);
                 }
@@ -689,16 +703,17 @@ void IRFunction::usedefVarsAnalysis() {
 
 // vec1 is old, vec 2 is new
 bool IRFunction::cmpTwoInVars(vector<IROperand*> & vec1, vector<IROperand*> & vec2){
+    if (vec1.size() != vec2.size()) {
+        return false;
+    }
     for(IROperand* var : vec2){
         auto it = find(vec1.begin(), vec1.end(), var);
         if(it == vec1.end()){ // var is not in vec1
-            return true;
+            return false;
         }
-        vec1.erase(it);
+        // vec1.erase(it);
     }
-    if(vec1.empty())
-        return false;
-    else return true;
+    return true;
 } 
 
 void IRFunction::liveVarAnalysis() {
@@ -710,24 +725,23 @@ void IRFunction::liveVarAnalysis() {
     do{
         changed = false;
         for(int i = basicBlocks.size() - 1; i >= 0; i--){ // i for block number
-            bool ichanged = false;
             auto out = useVars[i];
             std::vector<IROperand*> newin;
+            std::vector<IROperand*> newOut;
             // update out vars
             vector<int> ctrlflow = controlFlow[i];
-            for(int & back : ctrlflow){
-                for(auto & var :inVars[back])
-                    addOperandToVec(newin, var);
-            }
-            // add global variables to the last block's out vars 
-            if(i == basicBlocks.size() - 1){
-                auto outVar = outVars.back();
-                auto glbVars = ir->getGlobalVariables();
-                for(auto gblvar = glbVars.cbegin(); gblvar != glbVars.cend(); gblvar++) {
-                    IRSymbolVariable* var = gblvar->second;
-                    outVar.push_back(var);
+            for(int back : ctrlflow){
+                if (back >= inVars.size()) {
+                    continue;
                 }
+                for(auto var : inVars[back])
+                    addOperandToVec(newOut, var);
             }
+            
+            // IN = use U (out - def)
+            // add OUT variables
+            for(auto & var : newOut)
+                addOperandToVec(newin, var);
             // delete DEF variables
             for(auto & var : defVars[i])
                 delOperandInVec(newin, var);
@@ -735,15 +749,20 @@ void IRFunction::liveVarAnalysis() {
             for(auto & var : useVars[i])
                 addOperandToVec(newin, var);
             
-            ichanged = cmpTwoInVars(inVars[i], newin);
-            if(ichanged){
+            if(!cmpTwoInVars(inVars[i], newin)){
                 // update inVar
+                changed = true;       
                 inVars[i].clear();
                 for(auto & var : newin)
-                    inVars[i].push_back(var);  
-            }  
-            if(ichanged)
-                changed = true;        
+                    inVars[i].push_back(var);
+            }
+            if(!cmpTwoInVars(outVars[i], newOut)){
+                // update inVar
+                changed = true;
+                outVars[i].clear();
+                for(auto & var : newOut)
+                    outVars[i].push_back(var);
+            }
         }
     } while (changed);
 }
@@ -842,6 +861,9 @@ void IRFunction::basicBlockDivision() {
     entrances.clear();
     entrances.push_back(0);
     for (int i = 0; i < codes.size(); i++) {
+        if (find(entrances.begin(), entrances.end(), i) != entrances.end()) {
+            continue;
+        }
         if (codes[i]->getOperation() == IROperation::ADD_LABEL) {
             entrances.push_back(i);
         }
@@ -1782,6 +1804,7 @@ void IRProgram::targetGen(TargetCodes *t, int inOptimizeLevel) {
     }
     for (const auto& func : functions) {
         if (!func.second->getFunctionInLib()) {
+            func.second->ir = this;
             func.second->calFrameSize();
             func.second->optimize(t, inOptimizeLevel);
             func.second->targetCodeGen(t);
