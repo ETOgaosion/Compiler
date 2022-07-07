@@ -312,7 +312,6 @@ void IRFunction::constFolding() {
             else if (op == IROperation::ASSIGN){
                 if(arg1->getOperandType() != OperandType::VALUE)
                     continue;
-                // code->setResult(arg1);
 
                 for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];

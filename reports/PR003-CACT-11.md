@@ -190,7 +190,36 @@ private:
 
 ##### 常量折叠
 
-<!-- TODO -->
+函数主要位于IRContainers:`void IRFunction::constFolding()`
+
+此处设计的常量折叠主要涉及以下几种情况：
+
+- **单操作数赋值语句**：如`ASSIGN`, `NEG`, `NOT`
+
+  - 如果`arg1`为常量，例如`res = const`，那么直到下一次`res`被定值之前，将所有`res`的引用替换为`const`
+  - 不仅可以实现指令降级和替换，还可能使得代码能进一步被常量折叠，例如原本后续存在代码`a = 1 + res;`当`res`被替换为常量后，则该代码也可以进行常量折叠
+
+- **双操作数赋值语句**：
+
+  - `arg1`, `arg2`**均为常量**：如`ADD`, `SUB`, `SEQ`, `SNE`, etc
+    - 例如`a = const1 + const2;`
+    - 计算出`const1 + const2`，将计算出的结果设置为一个新的`IRValue`，不妨名为`new_value`
+    - 将该code修改为`a = new_value;`
+    - 扫描后续代码，直到下一次`a`被定值前，将所有`a`的引用替换为`new_value`
+  - `arg1`, `arg2`**只有一个为常量**：此处仅考虑了`ADD`, `SUB`, `MUL`操作
+    - 传统意义上的常量折叠操作
+    - 记该代码为`code`
+      - 如果`code`为`ADD`/`SUB`操作：假设`res = a + const1;`
+        - 扫描后续代码`new_code`，直到下一次`res`被定值前——如果`new_code`也为`ADD`/`SUB`操作，且`new_code`的一个操作数为`res`，即`new_code`形如：`new_res = res - const2;`
+        - 替换`new_code`为`new_res = a + new_value;` 其中`new_value`的值等于`const1 - const2`
+        - 相当于对用`code`对`res`进行了替换，常量折叠
+      - 如果`code`为`MUL`操作：假设`res = a * const1;`
+        - 扫描后续代码`new_code`，直到下一次`res`被定值前——如果`new_code`也为`MUL`操作，且`new_code`的一个操作数为`res`，即`new_code`形如：`new_res = res * const2;`
+        - 替换`new_code`为`new_res = a * new_value;` 其中`new_value`的值等于`const1 * const2`
+
+  值得一提的是，这一部分常量折叠仅仅是对基本块内的代码进行折叠，而且常量折叠部分并不会进行**代码删除**的操作，因为此处还没有进行**活跃变量分析**，删除代码可能导致错误；
+
+  比如`a = 1 + 2;` `constFolding()`方法会将代码变成`a = 3;`，且会将在本基本块内，所有`a`在下一次定值之前的引用改为3，但由于不知道基本块出口活跃变量，a可能是本基本块出口的活跃变量，但其余基本块对a的引用并没有被改变为3，所以如果删除代码可能会导致错误。
 
 ##### 基本块和控制流图
 
@@ -251,7 +280,42 @@ class IRFunction {
 
 ##### 死代码删除
 
-<!-- TODO -->
+主要函数集中在IRContainers中
+
+> `void IRFunction::delDeadCode();` -- 进行死代码删除
+>
+> `void IRFunction::liveVarAnalysis();` -- 对每个基本块进行活跃变量分析
+>
+> `void IRFunction::usedefVarsAnalysis();` -- 对每个基本块的`use`变量和`def`变量进行分析
+
+- ##### 活跃变量分析
+
+  - 对每个基本块的`use`和`def`变量进行分析
+
+    - 对每个基本块从后往前扫描，对每一个`IRCode`
+      - 将该code中定值的量从`use`中删除，加入`def`
+      - 将该code中引用的量从`def`中删除，加入`use`
+      - 注意对同一个code而言，操作顺序为**先处理定值变量，再处理引用变量**，例如`x = x + 1;` 应该先将x从`use`中删除，加入`def`，再从`def`中删除，加入`use`
+
+  - 分析`outVars`和`inVars`：
+
+    - 每一个block的`outVars`为该block的所有后继blocks的`inVars`的并集
+    - 根据`inVars = useVars + (outVars - defVars)`确定每一个block新的`inVars`
+
+    - 比较新的`inVars`和之前的`inVars`，直到每一个block的两次`inVars`都保持不变才能结束循环
+
+- ##### 死代码删除
+
+  - ##### 基本块内优化
+
+    - 将该block的所有`outVars`设置为`alive`
+    - 扫描基本块中的每一个`IRCode`，记为`code`
+    - 对于每一个`code`
+      - 如果定值变量为不活跃，则删除`code`
+      - 否则，将定值变量设置为`not alive`，再将引用变量设置为`alive`，注意顺序不应该颠倒
+      - 不同的`IRCode`的定值变量和引用变量情况不同，需要一一判别，例如`GETRETURN res`相当于对`res`的定值，而`AddParam arg1, arg2`，相当于对`arg1`的引用
+
+  - 值得一提的是，上述活跃变量分析算法只是保守估计了每一个基本块的`outVars`，可能存在的一种情况是，如果基本块间无循环，block A有且仅有一个后继block B，在block B中存在`t1 = t2 + 1;`这样的代码，而`t1`不活跃，该代码被删除，且block B中不存在对`t2`的其余引用，实际上`t2`可以被设置为`not alive`；但活跃变量分析算法会将`t2`当作`use vars`存储，所以`t2`会在B的`inVars`中，进而存在于A的`outVars`中，导致代码冗余。所以，如果我们发现基本块之间不存在循环，可以对代码的所有基本块从后向前扫描，由算法+控制流决定每一个基本块的`outVars`（这种情况下`t2`不会存在于A的`outVars`中），使得代码更加优化
 
 ##### 寄存器管理
 
@@ -345,11 +409,11 @@ void IRAddI::genTargetCode(TargetCodes *t) {
 
 ##### 常量折叠
 
-<!-- TODO -->
+
 
 ##### 死代码删除
 
-<!-- TODO -->
+
 
 ##### 寄存器指派
 
