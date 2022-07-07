@@ -39,37 +39,12 @@ L_1_add:
 .type	main, @function
 main:
 	sd	ra, -8(sp)
-	addi	sp, sp, -56
-	call	get_int
-	addi	sp, sp, 56
-	sw	a0, -48(sp)
-	lw	t0, -48(sp)
-	sw	t0, -16(sp)
-	lw	t0, -16(sp)
-	addi	t1, zero, 1
-	slt	t2, t1, t0
-	sb	t2, -32(sp)
-	lb	t0, -32(sp)
+	mv	t0, zero
 	beqz	t0, L_0_main
-	lw	a0, -16(sp)
-	addi	sp, sp, -56
-	call	add
-	addi	sp, sp, 56
-	sw	a0, -24(sp)
-	lw	t0, -24(sp)
-	sw	t0, -12(sp)
 	lla	t0, L_1_main
 	jr	t0
 L_0_main:
-	li	t0, -7882
-	sw	t0, -12(sp)
-	li	t0, -6882
-	sw	t0, -16(sp)
 L_1_main:
-	lw	a0, -12(sp)
-	addi	sp, sp, -56
-	call	print_int
-	addi	sp, sp, 56
 	mv	a0, zero
 	ld	ra, -8(sp)
 	ret

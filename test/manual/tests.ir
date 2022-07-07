@@ -32,35 +32,20 @@ result := symbol type: 1; data type: 2; initValue: 0
 n := symbol type: 1; data type: 2; initValue: 0
 
 ----------- tempVars ------------
-t_12:= symbol type: TEMP VAR; data type: 2
 t_3:= symbol type: TEMP VAR; data type: 2
 t_8:= symbol type: TEMP VAR; data type: 2
-t_2:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 2
+t_4:= symbol type: TEMP VAR; data type: 2
 t_10:= symbol type: TEMP VAR; data type: 2
 t_6:= symbol type: TEMP VAR; data type: 2
 t_7:= symbol type: TEMP VAR; data type: 2
-t_0:= symbol type: TEMP VAR; data type: 2
+t_0:= symbol type: TEMP VAR; data type: 1
 t_5:= symbol type: TEMP VAR; data type: 2
-t_9:= symbol type: TEMP VAR; data type: 2
 ----------- Codes ------------
 main:
-	call get_int; 
-	t_0 =  return ;
-	t_1 = t_0;
-	t_2 = t_1 > 1;
-	beqz t_2 L_0_main;
-	addparam t_1;
-	call add; 
-	t_3 =  return ;
-	t_4 = t_3;
+	beqz 0 L_0_main;
 	goto L_1_main;
 L_0_main:
-	t_11 = -7882;
-	t_13 = -6882;
 L_1_main:
-	t_14 = phi t_13, n;
-	t_15 = phi t_4, result, t_11;
-	addparam t_15;
-	call print_int; 
 	return 0;
 

@@ -276,6 +276,7 @@ IRValue* IRFunction::immCmp(IROperand* op1, IROperand* op2, IROperation op){
                 break;
         }
     }
+    return retVal;
 }
 
 void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp_op, IROperation op){
@@ -465,28 +466,28 @@ void IRFunction::constFolding() {
                         // substitute
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
-                }
 
-                switch(new_value->getMetaDataType()){
-                    case MetaDataType::BOOL:
-                        codes[entrances[bnum] + i] = new IRAssignB(res, new_value);
-                        break;
-                    case MetaDataType::INT:
-                        codes[entrances[bnum] + i] = new IRAssignI(res, new_value);
-                        break;
-                    case MetaDataType::FLOAT:
-                        codes[entrances[bnum] + i] = new IRAssignF(res, new_value);
-                        break;
-                    case MetaDataType::DOUBLE:
-                        codes[entrances[bnum] + i] = new IRAssignD(res, new_value);
-                        break;
+                    switch(new_value->getMetaDataType()){
+                        case MetaDataType::BOOL:
+                            codes[entrances[bnum] + i] = new IRAssignB(res, new_value);
+                            break;
+                        case MetaDataType::INT:
+                            codes[entrances[bnum] + i] = new IRAssignI(res, new_value);
+                            break;
+                        case MetaDataType::FLOAT:
+                            codes[entrances[bnum] + i] = new IRAssignF(res, new_value);
+                            break;
+                        case MetaDataType::DOUBLE:
+                            codes[entrances[bnum] + i] = new IRAssignD(res, new_value);
+                            break;
+                    }
+                    // block.erase(block.begin() + i);
+                    // codes.erase(codes.begin() + entrances[bnum] + i);
+                    // for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                    //     entrances[k]--;
+                    // delete code;
+                    // i--;
                 }
-                // block.erase(block.begin() + i);
-                // codes.erase(codes.begin() + entrances[bnum] + i);
-                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                //     entrances[k]--;
-                // delete code;
-                // i--;
 
             } else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
                 if(op != IROperation::ADD && op != IROperation::SUB && op != IROperation::MUL)
@@ -771,8 +772,16 @@ void IRFunction::delDeadCode() {
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
         auto block = basicBlocks[i];
         // set out vars to alive
-        for(auto & var : outVars[i])
-            var->setAlive(true);
+        for(auto & var : outVars[i]) {
+            if (i == basicBlocks.size() - 1) {
+                var->setAlive(true);
+            }
+            else {
+                if (var->getIsAlive()) {
+                    var->setAlive(true);
+                }
+            }
+        }
         // delete dead codes
         for(int j = block.size() - 1; j >= 0; j--){
             IRCode* code = block[j];
@@ -782,10 +791,12 @@ void IRFunction::delDeadCode() {
             IROperation op = code->getOperation();
 
             if(op == IROperation::ADD_LABEL || op == IROperation::GOTO || op == IROperation::CALL)
+                // can optimize
                 continue;
             else if(op == IROperation::RETURN || op == IROperation::ADD_PARAM || op == IROperation::BEQZ){
-                arg1->setAlive(true);
-                continue;
+                if (arg1 && arg1->getOperandType() != OperandType::VALUE) {
+                    arg1->setAlive(true);
+                }
             } else if (op == IROperation::GET_PARAM || op == IROperation::GET_RETURN) {
                 if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR))
                     if(res->getIsAlive() == false) {
@@ -802,35 +813,52 @@ void IRFunction::delDeadCode() {
                     codes.erase(codes.begin() + entrances[i] + j);
                     for(int k = i + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
+                    if(arg1)
+                        arg1->setAlive(false);
                     delete code;
                     continue;
                 }
-
-                if(res)
-                    res->setAlive(false);
                 if(arg1)
-                    arg1->setAlive(false);
+                    arg1->setAlive(true);
+            } else if (op == IROperation::PHI) {
+                if(res && res->getIsAlive() == false) {
+                    block.erase(block.begin() + j);
+                    codes.erase(codes.begin() + entrances[i] + j);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    for (auto it : code->getArgs()) {
+                        it->setAlive(false);
+                    }
+                    delete code;
+                    continue;
+                }
+                for (auto it : code->getArgs()) {
+                    it->setAlive(true);
+                }
             } else if (op == IROperation::ASSIGN_ARRAY_ELEM) {
                 if(arg1 && arg1->getIsAlive() == false){ // a[t_0] = b, but a is not alive
                     block.erase(block.begin() + j);
                     codes.erase(codes.begin() + entrances[i] + j);
                     for(int k = i + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
+                    if(arg1 && arg1->getOperandType() != OperandType::VALUE){
+                        arg1->setAlive(false);
+                    }
+                    if(arg2 && arg2->getOperandType() != OperandType::VALUE){
+                        arg2->setAlive(false);
+                    }
                     delete code;
                     continue;
                 }
 
                 // if index is not immval, set it alive
+                if(arg1 && arg1->getOperandType() != OperandType::VALUE){
+                    arg1->setAlive(true);
+                }
                 if(arg2 && arg2->getOperandType() != OperandType::VALUE){
                     arg2->setAlive(true);
                 }
-                // if src if not immval, set it alive
-                if(res && res->getOperandType() != OperandType::VALUE){
-                    res->setAlive(true);
-                }
                 continue;
-            } else if (op == IROperation::PHI) {
-                
             } else {
                 if(res){
                     if(!res->getIsAlive()){ // dead code
@@ -838,22 +866,20 @@ void IRFunction::delDeadCode() {
                         codes.erase(codes.begin() + entrances[i] + j);
                         for(int k = i + 1; k < basicBlocks.size(); k++)
                             entrances[k]--;
+                        if(arg1 && (arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR))
+                            arg1->setAlive(false);
+                        if(arg2 && (arg2->getOperandType() == OperandType::SYMBOLVAR || arg2->getOperandType() == OperandType::TEMPVAR))
+                            arg2->setAlive(false);
                         delete code;
                         continue;
                     }
                 }
-
-                if(res && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR))
-                    res->setAlive(false);
                 if(arg1 && (arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR))
                     arg1->setAlive(true);
                 if(arg2 && (arg2->getOperandType() == OperandType::SYMBOLVAR || arg2->getOperandType() == OperandType::TEMPVAR))
                     arg2->setAlive(true);
             }
         }
-        // set inVars to be not alive
-        for(auto & var : inVars[i])
-            var->setAlive(false);
     }
 }
 
