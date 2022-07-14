@@ -15,7 +15,7 @@ endif()
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     set (CMAKE_CXX_COMPILER "/usr/bin/g++-5")
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    set (CMAKE_CXX_COMPILER "g++-5")
+    set (CMAKE_CXX_COMPILER "g++-11")
 endif()
 
 set(CMAKE_BUILD_TYPE "Debug")

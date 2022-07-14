@@ -1,8 +1,0 @@
-// OUTPUT: 0
-
-int main()
-{
-    int a;
-	print_int(a);
-    return 0;
-}
