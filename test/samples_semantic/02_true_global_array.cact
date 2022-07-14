@@ -1,6 +1,0 @@
-int a[6] = {1, 2, 3, 4};
-const int b = 4;
-int main()
-{
-	return b;
-}
