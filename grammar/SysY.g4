@@ -221,7 +221,7 @@ lVal
         IRSymbolVariable* identOperand,
         IROperand* indexOperand
     ]
-    : Ident ('[' exp ']')?
+    : Ident ('[' exp ']')*
     ;
 
 primaryExp
