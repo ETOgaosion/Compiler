@@ -157,7 +157,7 @@ public:
     std::string symbolName;
     MetaDataType type;
     bool withType;
-    std::vector<std::size_t> size;
+    std::vector<std::size_t> shape;
     bool isArray;
     IRValue* value;
     ConstDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -177,7 +177,7 @@ public:
   class  ConstInitValContext : public antlr4::ParserRuleContext {
   public:
     MetaDataType type;
-    std::vector<std::size_t> size;
+    std::vector<std::size_t> shape;
     bool isArray;
     IRValue* value;
     ConstInitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -232,7 +232,7 @@ public:
     std::string symbolName;
     MetaDataType type;
     bool withType;
-    std::vector<std::size_t> size;
+    std::vector<std::size_t> shape;
     bool isArray;
     IRValue* value;
     VarDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -252,7 +252,7 @@ public:
   class  InitValContext : public antlr4::ParserRuleContext {
   public:
     MetaDataType type;
-    std::vector<std::size_t> size;
+    std::vector<std::size_t> shape;
     bool isArray;
     IRValue* value;
     InitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -557,7 +557,7 @@ public:
   class  ExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    std::size_t size;
+    std::vector<std::size_t> shape;
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
@@ -589,7 +589,7 @@ public:
   class  LValContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    std::size_t size;
+    std::vector<std::size_t> shape;
     SymbolType symbolType;
     MetaDataType lValMetaDataType;
     IRSymbolVariable* identOperand;
@@ -610,7 +610,7 @@ public:
   class  PrimaryExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    std::size_t size;
+    std::vector<std::size_t> shape;
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
@@ -657,7 +657,7 @@ public:
   class  UnaryExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    std::size_t size;
+    std::vector<std::size_t> shape;
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
@@ -718,7 +718,7 @@ public:
   class  FuncRParamsContext : public antlr4::ParserRuleContext {
   public:
     std::vector<bool> isArrayList;
-    std::vector<std::size_t> sizeList;
+    std::vector<std::vector<std::size_t>> shapeList;
     std::vector<MetaDataType> metaDataTypeList;
     std::vector<IROperand*> operandsList;
     FuncRParamsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -736,7 +736,7 @@ public:
   class  MulExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    std::size_t size;
+    std::vector<std::size_t> shape;
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
@@ -788,7 +788,7 @@ public:
   class  AddExpContext : public antlr4::ParserRuleContext {
   public:
     bool isArray;
-    std::size_t size;
+    std::vector<std::size_t> shape;
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
