@@ -21,5 +21,30 @@ t_0:= symbol type: TEMP VAR; data type: 1
 t_5:= symbol type: TEMP VAR; data type: 2
 ----------- Codes ------------
 main:
+	n = 0;
+	result = 0;
+	t_0 = n > 1;
+	beqz t_0 L_0_main;
+	t_1 = 999 * 2000;
+	t_2 <= result;
+	t_2 = t_1;
+	goto L_1_main;
+L_0_main:
+	t_3 = 2 * 8;
+	t_4 = 1 + t_3;
+	t_5 = t_4 + 100;
+	t_6 = t_5 - 9999;
+	t_7 = 10000 / 5;
+	t_8 = t_6 + t_7;
+	t_9 <= result;
+	t_9 = t_8;
+	t_10 = t_9 + 1000;
+	t_11 <= n;
+	t_11 = t_10;
+L_1_main:
+	n <= t_12;
+	t_12 = phi t_11, n;
+	result <= t_13;
+	t_13 = phi t_2, result, t_9;
 	return 0;
 
