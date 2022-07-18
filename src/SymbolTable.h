@@ -22,10 +22,8 @@ enum class TableType {
 
 enum class MetaDataType {
     VOID,
-    BOOL,
     INT,
-    FLOAT,
-    DOUBLE
+    FLOAT
 };
 
 class AbstractSymbol {
