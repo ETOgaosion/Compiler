@@ -6,3 +6,5 @@ res
 .vscode
 .idea
 .idea/*
+*.in
+*.out
