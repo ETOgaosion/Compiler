@@ -6,13 +6,13 @@
 
 ## 任务说明
 
-本次实验为CACT编译器设计的第一个实验，主要完成的任务如下：
+本次实验为SysY编译器设计的第一个实验，主要完成的任务如下：
 
 - 实验环境的配置，包括：
     - 熟悉ANTLR4工具的安装和使用
     - 服务器和本地编译环境的搭建
-- 完成CACT相关词法的设计
-    - 根据`CACT_specification.pdf`完善`CACT.g4`，实现对语法产生式规则的描述
+- 完成SysY相关词法的设计
+    - 根据`SysY_specification.pdf`完善`SysY.g4`，实现对语法产生式规则的描述
 - 能够捕获词法分析阶段和语法分析阶段的错误并进行相应的输出处理
     - 若无错误返回0，存在错误返回非0值
 - 进行编译测试，正确实现所有语法的识别
@@ -26,7 +26,7 @@
 
 ### 设计思路
 
-#### CACT语法规则
+#### SysY语法规则
 
 ##### 终结符
 
@@ -46,7 +46,7 @@
 
 - 单/双精度浮点常量：
 
-  CACT中，浮点型字面值分为double与float类型，若字面值后面跟'F'或'f'后缀，则为float型，否则默认为double型。所以先考虑构造double类型的正则表达式。
+  SysY中，浮点型字面值分为double与float类型，若字面值后面跟'F'或'f'后缀，则为float型，否则默认为double型。所以先考虑构造double类型的正则表达式。
 
   有符号浮点型常数有如下几个类型：
 
@@ -90,13 +90,13 @@
     $DoubleConst \rarr FractionalConst \ \  ExponentPart?
         \ | \ DigitSequence\ \  ExponentPart$
 
-  - 在CACT中，float类型即为double类型字面值后加"f" 或"F"，所以产生式为
+  - 在SysY中，float类型即为double类型字面值后加"f" 或"F"，所以产生式为
 
     $FloatConst \rarr DoubleConst \ ('f'|'F')$
 
 ##### 非终结符
 
-相比于CACT_specification中所给出的文法，我们在本次实验中集中修改了**表达式**部分的文法，主要是因为该部分文法中含有左递归。即使ANTLR允许直接的左递归，在仍未了解底层实现的情况下，默认还需要进行操作以消除左递归，为了让表达式更加直观明了，并且减小编译器工作量，对一些产生式中的左递归进行消除。
+相比于SysY_specification中所给出的文法，我们在本次实验中集中修改了**表达式**部分的文法，主要是因为该部分文法中含有左递归。即使ANTLR允许直接的左递归，在仍未了解底层实现的情况下，默认还需要进行操作以消除左递归，为了让表达式更加直观明了，并且减小编译器工作量，对一些产生式中的左递归进行消除。
 
 - 左递归消除的形式化过程如下：
 
@@ -106,7 +106,7 @@
 
   $$A\rightarrow \beta_{1}A' \mid \cdots \mid \beta_{n} A'$$$$A'\rightarrow \alpha_{1}A' \mid \cdots \mid \alpha_{m}A'\mid \epsilon $$
 
-- 值得注意的是，CACT的各个表达式的产生文法还隐含了不同运算的**优先级**。每一个产生式的**右部只可包含自己，或比自己优先级更高的非终结符**。具体来说，优先级为：
+- 值得注意的是，SysY的各个表达式的产生文法还隐含了不同运算的**优先级**。每一个产生式的**右部只可包含自己，或比自己优先级更高的非终结符**。具体来说，优先级为：
 
   一元运算 > 乘除模运算 > 加减运算 > 关系运算 > 相等性运算 > 逻辑与运算 > 逻辑或运算
   
@@ -127,7 +127,7 @@
 
 关于`getNumberOfSyntaxErrors`更详细的信息：
 
-根据查找结果，在`CACTLexer`的父类`Lexer`中和`CACTParser`的父类`Parser`中分别找到了对应函数的实现：
+根据查找结果，在`SysYLexer`的父类`Lexer`中和`SysYParser`的父类`Parser`中分别找到了对应函数的实现：
 
 ```cpp
 // size_t Parser::getNumberOfSyntaxErrors()
@@ -215,7 +215,7 @@ ExponentPart
 
 - 编译单元：
 
-  CACT_specification中所给出的文法为：`CompUnit → [ CompUnit ] ( Decl | FuncDef )`
+  SysY_specification中所给出的文法为：`CompUnit → [ CompUnit ] ( Decl | FuncDef )`
 
   上述文法等价于`CompUnit → CompUnit  ( Decl | FuncDef ) | Decl | FuncDef `
 
@@ -233,7 +233,7 @@ ExponentPart
 
 - 乘除模表达式 MulExp：
 
-  CACT_specification中所给出的文法为：`MulExp → UnaryExp | MulExp ('*' | '/' | '%') UnaryExp`
+  SysY_specification中所给出的文法为：`MulExp → UnaryExp | MulExp ('*' | '/' | '%') UnaryExp`
 
   消除左递归：
 
@@ -260,7 +260,7 @@ ExponentPart
 
 - 加减表达式 AddExp：
 
-  CACT_specification中所给出的文法为：`AddExp → MulExp | AddExp ('+' | '−') MulExp`
+  SysY_specification中所给出的文法为：`AddExp → MulExp | AddExp ('+' | '−') MulExp`
 
   消除左递归：
 
@@ -287,7 +287,7 @@ ExponentPart
 
 - 关系表达式 RelExp ：
 
-  CACT_specification中所给出的文法为：`RelExp → AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp | BoolConst`
+  SysY_specification中所给出的文法为：`RelExp → AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp | BoolConst`
 
   消除左递归后的antlr代码为：
 
@@ -300,7 +300,7 @@ ExponentPart
 
 - 相等性表达式 EqExp：
 
-  CACT_specification中所给出的文法为：`EqExp → RelExp | EqExp ('==' | '!=') RelExp`
+  SysY_specification中所给出的文法为：`EqExp → RelExp | EqExp ('==' | '!=') RelExp`
 
   消除左递归后的antlr代码为：
 
@@ -312,7 +312,7 @@ ExponentPart
 
 - 逻辑与表达式 LAndExp:
 
-  CACT_specification中所给出的文法为：`LAndExp → EqExp | LAndExp '&&' EqExp`
+  SysY_specification中所给出的文法为：`LAndExp → EqExp | LAndExp '&&' EqExp`
 
   消除左递归后的antlr代码为：
 
@@ -324,7 +324,7 @@ ExponentPart
 
 - 逻辑或表达式 LOrExp:
 
-  CACT_specification中所给出的文法为：`LOrExp → LAndExp | LOrExp '||' LAndExp`
+  SysY_specification中所给出的文法为：`LOrExp → LAndExp | LOrExp '||' LAndExp`
 
   消除左递归后的antlr代码为：
 
@@ -341,11 +341,11 @@ ExponentPart
 在`main.cpp`中，需要确定获取lexer和parser错误最早的准确位置，有以下可能的位置：
 
 ```cpp
-CACTLexer lexer(&input);
+SysYLexer lexer(&input);
 // get lex error pos 1
 CommonTokenStream tokens(&lexer);
 // get lex error pos 2
-CACTParser parser(&tokens);
+SysYParser parser(&tokens);
 // get lex error pos 3
 // get parser error pos 1
 tree::ParseTree *tree = parser.compUnit();
@@ -356,13 +356,13 @@ tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
 // get parser error pos 3
 ```
 
-但是很快就能够排除前三条语句，能够获取错误的时机一定是词法分析与语法分析进行完成，而对前三条语句，只需要查看派生类和父类的构造函数便可知初始化阶段只设置实例化类的相关参数，并不进行分析动作。以Lexer为例，派生类CACTLexer以及父类Lexer构造函数如下：
+但是很快就能够排除前三条语句，能够获取错误的时机一定是词法分析与语法分析进行完成，而对前三条语句，只需要查看派生类和父类的构造函数便可知初始化阶段只设置实例化类的相关参数，并不进行分析动作。以Lexer为例，派生类SysYLexer以及父类Lexer构造函数如下：
 
 ```cpp
 // class relation
-class  CACTLexer : public antlr4::Lexer
-// CACTLexer constructor:
-CACTLexer::CACTLexer(CharStream *input) : Lexer(input) {
+class  SysYLexer : public antlr4::Lexer
+// SysYLexer constructor:
+SysYLexer::SysYLexer(CharStream *input) : Lexer(input) {
   _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
 }
 // LexerATNSimulator constructor:
@@ -403,7 +403,7 @@ void Lexer::InitializeInstanceFields() {
 但为了深入ANTLR，对`compUnit`进行进一步了解，我们直接指出核心点：
 
 ```cpp
-CACTParser::CompUnitContext* CACTParser::compUnit() {
+SysYParser::CompUnitContext* SysYParser::compUnit() {
     _la = _input->LA(1);
 }
 ```
@@ -486,9 +486,9 @@ class ANTLR4CPP_PUBLIC Lexer : public Recognizer, public TokenSource
 // main.cpp
 int main(int argc, const char* argv[]) {
     // ...
-    CACTLexer lexer(&input);
+    SysYLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
-    CACTParser parser(&tokens);
+    SysYParser parser(&tokens);
     tree::ParseTree *tree = parser.compUnit();
     SemanticAnalysis listener;
     if (errorNum = lexer.getNumberOfSyntaxErrors()) {
@@ -551,7 +551,7 @@ antlr-runtime相关文件包括预编译需要的头文件，运行时动态链�
 
 #### 官奕琳
 
-完成了CACT语法规则的录入，完善`CACT.g4`并撰写相应部分实验报告。通过对语言进行准确的语法定义，更深入的了解了值得玩味的语法规范。而debug过程根据位置报错对连锁的产生式都需要进行修改，考验耐心细致程度，为以后更复杂的情况做铺垫。
+完成了SysY语法规则的录入，完善`SysY.g4`并撰写相应部分实验报告。通过对语言进行准确的语法定义，更深入的了解了值得玩味的语法规范。而debug过程根据位置报错对连锁的产生式都需要进行修改，考验耐心细致程度，为以后更复杂的情况做铺垫。
 
 #### 高梓源
 

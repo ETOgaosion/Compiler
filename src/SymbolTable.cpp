@@ -1,11 +1,10 @@
 #include "SymbolTable.h"
 #include "errorMsg.h"
-#include <fstream>
 #include <utility>
 
 using namespace std;
 
-template <class T> bool findDuplicateName(unordered_map<string,T*> list, string className, string name) {
+template <class T> bool findDuplicateName(unordered_map<string,T*> list, const string& className, string name) {
     auto searchSymbol = list.find(name);
     if (searchSymbol != list.end()) {
         ERROR_INSERT_DUPLICATED(className, name);
@@ -21,16 +20,16 @@ AbstractSymbol::AbstractSymbol() {
     symbolType = SymbolType::PARAM;
     metaDataType = MetaDataType::VOID;
     isArray = false;
-    size = 0;
+    shape.clear();
     offset = 0;
 }
 
-AbstractSymbol::AbstractSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
+AbstractSymbol::AbstractSymbol(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape){
     symbolName = move(inSymbolName);
     symbolType = inSymbolType;
     metaDataType = inMetaDataType;
     isArray = inIsArray;
-    size = inSize;
+    shape = move(inShape);
     offset = 0;
 }
 
@@ -50,8 +49,8 @@ bool AbstractSymbol::getIsArray() const {
     return isArray;
 }
 
-size_t AbstractSymbol::getSize() const {
-    return size;
+vector<size_t> AbstractSymbol::getShape() const {
+    return shape;
 }
 
 int AbstractSymbol::getOffset() const {
@@ -62,12 +61,12 @@ uint64_t AbstractSymbol::getMemPosition() const {
     return memPosition;
 }
 
-bool AbstractSymbol::setAttributes(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
+bool AbstractSymbol::setAttributes(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) {
     symbolName = move(inSymbolName);
     symbolType = inSymbolType;
     metaDataType = inMetaDataType;
     isArray = inIsArray;
-    size = inSize;
+    shape = move(inShape);
 }
 
 bool AbstractSymbol::setOffset(int inOffset) {
@@ -87,54 +86,54 @@ int AbstractSymbol::getOffsetFromDataType(MetaDataType inDataType) {
 // --------
 
 ParamSymbol::ParamSymbol(const string& inSymbolName, MetaDataType inMetaDataType) {
-    AbstractSymbol::setAttributes(inSymbolName, SymbolType::PARAM, inMetaDataType, false, 0);
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::PARAM, inMetaDataType, false, {});
 }
 
 // --------
 
 VarSymbol::VarSymbol(const string& inSymbolName, MetaDataType inMetaDataType) {
-    AbstractSymbol::setAttributes(inSymbolName, SymbolType::VAR, inMetaDataType, false, 0);
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::VAR, inMetaDataType, false, {});
 }
 
 // --------
 
 ConstSymbol::ConstSymbol(const string& inSymbolName, MetaDataType inMetaDataType) {
-    AbstractSymbol::setAttributes(inSymbolName, SymbolType::CONST, inMetaDataType, false, 0);
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::CONST, inMetaDataType, false, {});
 }
 
 // --------
 
-ParamArraySymbol::ParamArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, size_t inSize) {
-    AbstractSymbol::setAttributes(inSymbolName, SymbolType::PARAM, inMetaDataType, true, inSize);
+ParamArraySymbol::ParamArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, vector<size_t> inShape) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::PARAM, inMetaDataType, true, move(inShape));
 }
 
 // --------
 
-VarArraySymbol::VarArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, size_t inSize) {
-    AbstractSymbol::setAttributes(inSymbolName, SymbolType::VAR, inMetaDataType, true, inSize);
+VarArraySymbol::VarArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, vector<size_t> inShape) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::VAR, inMetaDataType, true, move(inShape));
 }
 
 // --------
 
-ConstArraySymbol::ConstArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, size_t inSize) {
-    AbstractSymbol::setAttributes(inSymbolName, SymbolType::CONST, inMetaDataType, true, inSize);
+ConstArraySymbol::ConstArraySymbol(const string& inSymbolName, MetaDataType inMetaDataType, vector<size_t> inShape) {
+    AbstractSymbol::setAttributes(inSymbolName, SymbolType::CONST, inMetaDataType, true, move(inShape));
 }
 
-AbstractSymbol *SymbolFactory::createSymbol(const string& inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize){
+AbstractSymbol *SymbolFactory::createSymbol(const string& inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape){
     switch(inSymbolType){
         case SymbolType::PARAM:
             if (inIsArray){
-                return new ParamArraySymbol(inSymbolName, inMetaDataType, inSize);
+                return new ParamArraySymbol(inSymbolName, inMetaDataType, move(inShape));
             }
             return new ParamSymbol(inSymbolName, inMetaDataType);
         case SymbolType::VAR:
             if (inIsArray) {
-                return new VarArraySymbol(inSymbolName, inMetaDataType, inSize);
+                return new VarArraySymbol(inSymbolName, inMetaDataType, move(inShape));
             }
             return new VarSymbol(inSymbolName, inMetaDataType);
         case SymbolType::CONST:
             if (inIsArray) {
-                return new ConstArraySymbol(inSymbolName, inMetaDataType, inSize);
+                return new ConstArraySymbol(inSymbolName, inMetaDataType, move(inShape));
             }
             return new ConstSymbol(inSymbolName, inMetaDataType);
         default:
@@ -243,12 +242,12 @@ SymbolTable::SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable
     }
 }
 
-AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
+AbstractSymbol *SymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) {
     if (lookUpAbstractSymbol(inSymbolName)){
         return nullptr;
     }
     SymbolFactory symbolFactory;
-    AbstractSymbol *insertAbstractSymbol = symbolFactory.createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+    AbstractSymbol *insertAbstractSymbol = symbolFactory.createSymbol(inSymbolName, inSymbolType, inMetaDataType, inIsArray, move(inShape));
     abstractSymbolList.emplace(inSymbolName, insertAbstractSymbol);
     return insertAbstractSymbol;
 }
@@ -319,7 +318,7 @@ bool SymbolTable::setParentSymbolTable(SymbolTable *inParentSymbolTable) {
     return true;
 }
 
-bool SymbolTable::compareAbstractSymbolDataType(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) const {
+bool SymbolTable::compareAbstractSymbolDataType(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) const {
     AbstractSymbol *curSymbol = lookUpAbstractSymbol(inSymbolName);
     if (!curSymbol) {
         ERROR_COMPARE_NO_SYMBOL("SymbolTable", inSymbolName);
@@ -328,7 +327,7 @@ bool SymbolTable::compareAbstractSymbolDataType(string inSymbolName, SymbolType 
     return  curSymbol->getSymbolType() == inSymbolType &&
             curSymbol->getMetaDataType() == inMetaDataType &&
             curSymbol->getIsArray() == inIsArray &&
-            (!inIsArray || curSymbol->getSize() == inSize);
+            (!inIsArray || curSymbol->getShape() == inShape);
 
 }
 
@@ -357,12 +356,12 @@ FuncSymbolTable::FuncSymbolTable(string inFuncName, MetaDataType inReturnType, S
     SymbolTable::setParentSymbolTable(inParentSymbolTable);
 }
 
-AbstractSymbol *FuncSymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
+AbstractSymbol *FuncSymbolTable::insertAbstractSymbolSafely(string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) {
     if (lookUpParamSymbol(inSymbolName)) {
         return nullptr;
     }
     else {
-        return SymbolTable::insertAbstractSymbolSafely(inSymbolName, inSymbolType, inMetaDataType, inIsArray, inSize);
+        return SymbolTable::insertAbstractSymbolSafely(inSymbolName, inSymbolType, inMetaDataType, inIsArray, move(inShape));
     }
 }
 
@@ -375,12 +374,12 @@ AbstractSymbol *FuncSymbolTable::insertAbstractSymbolSafely(AbstractSymbol *inAb
     }
 }
 
-AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(const string &inSymbolName, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
+AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(const string &inSymbolName, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) {
     if (findDuplicateName<AbstractSymbol>(paramSymbolList, "FuncSymbolTable", inSymbolName) || lookUpFuncSymbolTable(inSymbolName)) {
         return nullptr;
     }
     SymbolFactory symbolFactory;
-    AbstractSymbol *insertParamSymbol = symbolFactory.createSymbol(inSymbolName, SymbolType::PARAM, inMetaDataType, inIsArray, inSize);
+    AbstractSymbol *insertParamSymbol = symbolFactory.createSymbol(inSymbolName, SymbolType::PARAM, inMetaDataType, inIsArray, move(inShape));
     paramSymbolList.emplace(inSymbolName, insertParamSymbol);
     return insertParamSymbol;
 }
@@ -393,13 +392,13 @@ AbstractSymbol *FuncSymbolTable::insertParamSymbolSafely(AbstractSymbol *inParam
     return inParamSymbol;
 }
 
-bool FuncSymbolTable::insertParamType(MetaDataType inMetaDataType, bool inIsArray, size_t inSize) {
-    paramDataTypeList.emplace_back(inMetaDataType, inIsArray, inSize);
+bool FuncSymbolTable::insertParamType(MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) {
+    paramDataTypeList.emplace_back(inMetaDataType, inIsArray, move(inShape));
     return true;
 }
 
 bool FuncSymbolTable::insertParamType(AbstractSymbol *inParamSymbol) {
-    return insertParamType(inParamSymbol->getMetaDataType(), inParamSymbol->getIsArray(), inParamSymbol->getSize());
+    return insertParamType(inParamSymbol->getMetaDataType(), inParamSymbol->getIsArray(), inParamSymbol->getShape());
 }
 
 AbstractSymbol *FuncSymbolTable::lookUpParamSymbol(const string &inSymbolName) const {
@@ -412,13 +411,13 @@ AbstractSymbol *FuncSymbolTable::lookUpParamSymbol(const string &inSymbolName) c
     }
 }
 
-tuple <MetaDataType, bool, size_t> FuncSymbolTable::lookUpParamDataType(const string &inSymbolName) const {
+tuple <MetaDataType, bool, vector<size_t>> FuncSymbolTable::lookUpParamDataType(const string &inSymbolName) const {
     AbstractSymbol *searchSymbol = lookUpParamSymbol(inSymbolName);
     if (searchSymbol) {
-        return make_tuple(searchSymbol->getMetaDataType(), searchSymbol->getIsArray(), searchSymbol->getSize());
+        return make_tuple(searchSymbol->getMetaDataType(), searchSymbol->getIsArray(), searchSymbol->getShape());
     }
     else {
-        return tuple <MetaDataType, bool, size_t> ();
+        return {};
     }
 }
 
@@ -434,7 +433,7 @@ int FuncSymbolTable::getParamNum() const {
     return paramNum; 
 }
 
-vector<tuple<MetaDataType, bool, size_t> > FuncSymbolTable::getParamDataTypeList() const {
+vector<tuple<MetaDataType, bool, vector<size_t>> > FuncSymbolTable::getParamDataTypeList() const {
     return paramDataTypeList;
 }
 
@@ -459,7 +458,7 @@ int FuncSymbolTable::setParamNum() {
 
 bool FuncSymbolTable::setParamDataTypeList() {
     for (auto i = paramSymbolList.begin(); i != paramSymbolList.end(); ++i) {
-        paramDataTypeList.emplace_back(i->second->getMetaDataType(), i->second->getIsArray(), i->second->getSize());
+        paramDataTypeList.emplace_back(i->second->getMetaDataType(), i->second->getIsArray(), i->second->getShape());
     }
     return true;
 }
@@ -468,14 +467,14 @@ bool FuncSymbolTable::setFrameSize(int inSize) {
     frameSize = inSize;
 }
 
-bool FuncSymbolTable::compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, size_t inSize) const {
+bool FuncSymbolTable::compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) const {
     if (index < 0 || index >= paramNum) {
         ERROR_COMPARE_SIZE_UNMATCH("FuncSymbolTable", index, paramNum);
         return false;
     }
     return  get<0>(paramDataTypeList[index]) == inMetaDataType &&
             get<1>(paramDataTypeList[index]) == inIsArray &&
-            (!inIsArray || get<2>(paramDataTypeList[index]) == inSize);
+            (!inIsArray || get<2>(paramDataTypeList[index]) == move(inShape));
 }
 BlockSymbolTable::BlockSymbolTable() {
     SymbolTable::setSymbolTableType(TableType::BLOCK);

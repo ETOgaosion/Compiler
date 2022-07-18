@@ -43,7 +43,7 @@ constDef
         std::string symbolName,
         MetaDataType type,
         bool withType,
-        std::vector<std::size_t> size,
+        std::vector<std::size_t> shape,
         bool isArray,
         IRValue* value
     ]
@@ -53,7 +53,7 @@ constDef
 constInitVal
     locals [
         MetaDataType type,
-        std::vector<std::size_t> size,
+        std::vector<std::size_t> shape,
         bool isArray,
         IRValue* value
     ]
@@ -70,7 +70,7 @@ varDef
         std::string symbolName,
         MetaDataType type,
         bool withType,
-        std::vector<std::size_t> size,
+        std::vector<std::size_t> shape,
         bool isArray,
         IRValue* value
     ]
@@ -80,7 +80,7 @@ varDef
 initVal
     locals [
         MetaDataType type,
-        std::vector<std::size_t> size,
+        std::vector<std::size_t> shape,
         bool isArray,
         IRValue* value
     ]
@@ -199,7 +199,7 @@ subStmt
 exp
     locals [
         bool isArray,
-        std::size_t size,
+        std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,
         IROperand* indexOperand
@@ -217,7 +217,7 @@ cond
 lVal
     locals [
         bool isArray,
-        std::size_t size,
+        std::vector<std::size_t> shape,
         SymbolType symbolType,
         MetaDataType lValMetaDataType,
         IRSymbolVariable* identOperand,
@@ -229,7 +229,7 @@ lVal
 primaryExp
     locals [
         bool isArray,
-        std::size_t size,
+        std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,         
         IROperand* indexOperand     
@@ -242,7 +242,7 @@ primaryExp
 unaryExp
     locals [
         bool isArray,
-        std::size_t size,
+        std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,         
         IROperand* indexOperand     
@@ -261,7 +261,7 @@ unaryOp
 funcRParams
     locals [
         std::vector<bool> isArrayList,
-        std::vector<std::size_t> sizeList,
+        std::vector<std::vector<std::size_t>> shapeList,
         std::vector<MetaDataType> metaDataTypeList,
         std::vector<IROperand*> operandsList
     ]
@@ -271,7 +271,7 @@ funcRParams
 mulExp
     locals [
         bool isArray,
-        std::size_t size,
+        std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,         
         IROperand* indexOperand     
@@ -286,7 +286,7 @@ mulOp
 addExp
     locals [
         bool isArray,
-        std::size_t size,
+        std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,         
         IROperand* indexOperand     

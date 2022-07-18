@@ -1,9 +1,9 @@
 #include <iostream>
 
 #include "antlr4-runtime.h"
-#include "../grammar/CACTLexer.h"
-#include "../grammar/CACTParser.h"
-#include "../grammar/CACTBaseListener.h"
+#include "../grammar/SysYLexer.h"
+#include "../grammar/SysYParser.h"
+#include "../grammar/SysYBaseListener.h"
 
 #include "semanticAnalysis.h"
 #include <string>
@@ -15,9 +15,9 @@ int main(int argc, const char* argv[]) {
     int errorNum = 0;
     stream.open(argv[1]);
     ANTLRInputStream input(stream);
-    CACTLexer lexer(&input);
+    SysYLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
-    CACTParser parser(&tokens);
+    SysYParser parser(&tokens);
     tree::ParseTree *tree = parser.compUnit();
     SemanticAnalysis listener;
     listener.programName = std::string(argv[1]).substr(0, std::string(argv[1]).find_last_of("."));

@@ -6,9 +6,9 @@
 
 ## 任务说明
 
-本次实验首先需要完成CACT语言符号表的设计和操作处理。
+本次实验首先需要完成SysY语言符号表的设计和操作处理。
 
-利用符号表在PR001的基础上实现对CACT语言进行语义分析和类型检查，对于语义错误能进行相应的处理，即对于符合语义规范的.cact文件，编译器返回0，对于有语义错误的.cact文件，编译器返回非0值。
+利用符号表在PR001的基础上实现对SysY语言进行语义分析和类型检查，对于语义错误能进行相应的处理，即对于符合语义规范的.cact文件，编译器返回0，对于有语义错误的.cact文件，编译器返回非0值。
 
 ## 成员组成
 
@@ -35,7 +35,7 @@
 - 相关信息
 - 属性
 
-上述描述只是有了初步的概念，我们结合CACT的应用实例思考符号表如何组织。
+上述描述只是有了初步的概念，我们结合SysY的应用实例思考符号表如何组织。
 
 - 首先站在顶层，需要有一个**全局符号表`globalSymbolTable`**，存储**全局变量**和**函数符号表列表**
 - 而后函数符号表中面向函数内部符号信息，需要存储**参数符号、指代符号、块符号表列表**
@@ -54,8 +54,8 @@
 
 - 指代符号：使用Ident进行匹配的，用以指代值的抽象符号
 - 块结构：函数内部语句中使用成对大括号括起的若干条语句，对应词法中block
-- 声明：只声明类型，不定义实现，CACT中只适用于函数声明
-- 定义：定义指代符号的值，定义函数的实现。CACT specification中指出“*未显式初始化的整型和浮点型变量/常量/数组被默认初始化为0*”，因此所有变量的声明都可以直接视为定义其值为0。
+- 声明：只声明类型，不定义实现，SysY中只适用于函数声明
+- 定义：定义指代符号的值，定义函数的实现。SysY specification中指出“*未显式初始化的整型和浮点型变量/常量/数组被默认初始化为0*”，因此所有变量的声明都可以直接视为定义其值为0。
 
 接下来根据UML类图详细叙述设计：
 
@@ -65,9 +65,9 @@
 
 首先从最基本的元素开始，作为指代值的抽象符号，根据指代内容可以划分为6种：参数符号、变量符号、常量符号、参数数组、变量数组、常量数组。
 
-此处我们的设计是提取其共性组成父类`AbstractSymbol`，共性为符号名称、符号类型、元数据类型、是否是数组、大小，符号类型和是否是数组决定了上述6种指代符号中采用哪种进行实例化，为实例化的方便，我们采用简单工厂模式（兼顾了面向对象特性和时间复杂度），定义`AbstractSymbolFactory`及其静态方法`createSymbol`。此外，确定一个指代符号还依赖的信息是元数据类型和大小，前者为`int, bool`等CACT基本数据类型，后者保存数组大小。
+此处我们的设计是提取其共性组成父类`AbstractSymbol`，共性为符号名称、符号类型、元数据类型、是否是数组、大小，符号类型和是否是数组决定了上述6种指代符号中采用哪种进行实例化，为实例化的方便，我们采用简单工厂模式（兼顾了面向对象特性和时间复杂度），定义`AbstractSymbolFactory`及其静态方法`createSymbol`。此外，确定一个指代符号还依赖的信息是元数据类型和大小，前者为`int, bool`等SysY基本数据类型，后者保存数组大小。
 
-采用一个复杂的例子：`int array[10];`，该语句定义了一个整形数组变量，大小为10，要想唯一确定这个符号必须存储：`数组名`、`变量`、`整型`、`数组`、`大小为10`这五条信息，虽然按照CACT语言规范，查找时只需要数组名这一条信息，但其他信息在进行类型判断时尤为重要。
+采用一个复杂的例子：`int array[10];`，该语句定义了一个整形数组变量，大小为10，要想唯一确定这个符号必须存储：`数组名`、`变量`、`整型`、`数组`、`大小为10`这五条信息，虽然按照SysY语言规范，查找时只需要数组名这一条信息，但其他信息在进行类型判断时尤为重要。
 
 (C++)面向对象的另一个核心要素在于访问控制，我们这里默认所有符号在定义的时候就已经确定类型，之后在相同作用域内不可以二次定义。因此设置`AbstractSymbol`或其子类信息的唯一手段是通过构造函数，此处只提供`const`类型（若对类成员有修改在编译阶段会报错）的`get`方法。
 
@@ -87,9 +87,9 @@
 
 函数接口主要提供五种：`insert, lookUp, get, set, compare`，父类中皆为虚函数(`virtual`)，但有些进行实现。面向对象中值得利用的一个特性为代码重用，就体现在此处，若无修改必要，直接使用父类模版。但是，若有些函数接口是某个子类特有的，在父类中进行直接返回式实现，在子类中`override`，函数所需要的成员变量只需要定义在子类中，若某个函数需要每个子类不同实现，则直接在最后加`const = 0`，每个子类`override`，否则子类未能实现则编译器报错（但本次试验没有这类情况）。
 
-#### CACT词法描述更新
+#### SysY词法描述更新
 
-在上次实验，我们将一部分存在左递归的文法进行左递归消除，本意是辅助CACT更快速的进行分析。但这次实验中，语法分析阶段更常见的情形是二元关系运算，为更快速方便的进行语义分析，将左递归还原成二元关系，按照递归方式逐级判断，虽然本质上和扫描判断相近，但是简化为二元关系并恰当运用继承属性、综合属性能够有更多的实现，更加符合编译中三地址、二地址转换的一般方法。
+在上次实验，我们将一部分存在左递归的文法进行左递归消除，本意是辅助SysY更快速的进行分析。但这次实验中，语法分析阶段更常见的情形是二元关系运算，为更快速方便的进行语义分析，将左递归还原成二元关系，按照递归方式逐级判断，虽然本质上和扫描判断相近，但是简化为二元关系并恰当运用继承属性、综合属性能够有更多的实现，更加符合编译中三地址、二地址转换的一般方法。
 
 此外，为全面的语法分析，对于分支产生式都单独添加子标签，便于寻访。对于需要用到符号表相关量作为继承、综合属性的产生式也增加`locals`变量定义。
 
@@ -215,9 +215,9 @@ SymbolTable *FuncSymbolTableList::insertFuncSymbolTableSafely(string inFuncName,
 2. 若当前为函数符号表，查找`ParamSymbolList`
 3. 向上(`paramSymbolTable`)查找
 
-根据CACT specification，变量在不同作用域中可以覆盖，变量可以和函数同名，插入操作只需要搜索当前作用域有无重名变量。
+根据SysY specification，变量在不同作用域中可以覆盖，变量可以和函数同名，插入操作只需要搜索当前作用域有无重名变量。
 
-### CACT语义分析
+### SysY语义分析
 
 #### CompUnit
 
@@ -372,7 +372,7 @@ constInitVal
 ```
 
 ```c++
-void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
+void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
 {
     if(!ctx->constExp().empty()){
         ctx->type = ctx->constExp(0)->metaDataType;
@@ -418,10 +418,10 @@ void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayCo
 #### FuncDef
 
 - 进入结点时
-  - 判断当前符号表是否为全局符号表。由于CACT不支持函数嵌套声明，若当前不为全局符号表，则出错
+  - 判断当前符号表是否为全局符号表。由于SysY不支持函数嵌套声明，若当前不为全局符号表，则出错
   - 根据`funcType()->getText()`设置函数返回值类型属性
   - 如果该函数为`main`函数，则判断返回值类型是否为`int`，参数列表是否为空，如果有一个不是则报错
-  - 将函数符号表插入当前符号表中，由于CACT不支持函数重载，所以如果插入时发现重载则报错
+  - 将函数符号表插入当前符号表中，由于SysY不支持函数重载，所以如果插入时发现重载则报错
 
 #### FuncFParam
 
@@ -438,7 +438,7 @@ void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayCo
 - 退出结点时，判断
   - 如果产生式使用的是`stmt->lVal '=' exp ';' `
     - 左值`lVal`为常数，相当于给常数赋值，报错
-    - `lVal`与`exp`的数据类型不同，由于CACT不支持强制类型转换，所以报错
+    - `lVal`与`exp`的数据类型不同，由于SysY不支持强制类型转换，所以报错
     - `lVal`是数组，而`exp`不是数组，报错
     - `lVal`不是数组，而`exp`是数组，报错
   - 如果产生式使用的是`stmt->block`
@@ -483,7 +483,7 @@ subStmt节点必然是在循环内部，只有最外层while下的subStmt运行�
   - 在符号表中递归检查是否存在`lVal`的定义，如果不存在则报错
   
   ```c++
-  void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
+  void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
   {
       if (ctx->exp()) {
           if (ctx->exp()->isArray || ctx->exp()->metaDataType != MetaDataType::INT) {
@@ -513,7 +513,7 @@ subStmt节点必然是在循环内部，只有最外层while下的subStmt运行�
   - 如果存在，则判断调用的函数参数数量，类型，是否与定义一致，如果不一致则报错
   
   ```c++
-  void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
+  void SemanticAnalysis::exitUnaryExpFunc(SysYParser::UnaryExpFuncContext * ctx)
   {
       SymbolTable *funcSymbolTable = curSymbolTable->lookUpFuncSymbolTable(ctx->Ident()->getText());
       if (!funcSymbolTable) {
@@ -543,7 +543,7 @@ subStmt节点必然是在循环内部，只有最外层while下的subStmt运行�
   - 如果`unaryOp`为`+/-`，而`unaryExp`是布尔类型值，则报错
   
   ```c++
-  void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
+  void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExpContext * ctx)
   {
       ctx->isArray = ctx->unaryExp()->isArray;
       ctx->metaDataType = ctx->unaryExp()->metaDataType;
@@ -578,7 +578,7 @@ subStmt节点必然是在循环内部，只有最外层while下的subStmt运行�
   - 两方是否数据类型不一致，如果不一致，则报错
 
 ```c++
-void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
+void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
 {
     if (ctx->addExp()->isArray) {
         throw std::runtime_error("[ERROR] > rel: array cannot be operands of logic operators.\n");
@@ -593,7 +593,7 @@ void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
     ctx->metaDataType = MetaDataType::BOOL;
 }
 
-void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
+void SemanticAnalysis::exitRelExpAddExp(SysYParser::RelExpAddExpContext * ctx)
 {
     if (ctx->addExp()->isArray) {
         throw std::runtime_error("[ERROR] > rel add: array cannot be operands of logic operators. " + curSymbolTable->getFuncName());
@@ -606,7 +606,7 @@ void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
 - 进行等或不等关系运算时，需要判断如果运算两方数据类型不一致，则报错
 
 ```c++
-void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
+void SemanticAnalysis::exitEqExpEqExp(SysYParser::EqExpEqExpContext * ctx)
 {
     if (ctx->eqExp()->metaDataType != ctx->relExp()->metaDataType) {
         throw std::runtime_error("[ERROR] > eq operator with different data type.\n");
@@ -621,7 +621,7 @@ void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
   
 ```c++
 // LOrExp
-void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
+void SemanticAnalysis::exitLOrExpLOrExp(SysYParser::LOrExpLOrExpContext * ctx)
 {
     ctx->metaDataType = ctx->lAndExp()->metaDataType;
     if (ctx->metaDataType != MetaDataType::BOOL || ctx->lAndExp()->metaDataType != MetaDataType::BOOL) {
@@ -630,7 +630,7 @@ void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
 }
 
 // LAndExp
-void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ctx)
+void SemanticAnalysis::exitLAndExpLAndExp(SysYParser::LAndExpLAndExpContext * ctx)
 {
     ctx->metaDataType = ctx->lAndExp()->metaDataType;
     if (ctx->metaDataType != MetaDataType::BOOL || ctx->eqExp()->metaDataType != MetaDataType::BOOL) {
@@ -649,19 +649,19 @@ void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ct
     - 若当前产生式中该名称子节点最多有一个，使用子节点名的函数调用是无需传入参数，若存在则返回其指针，若不存在返回nullptr
     - 若可能有多个同名子节点，则函数调用后返回vector向量，内容为其指针
 - ANTLR进行自顶向下语法分析，在上层节点enter后未经过下层节点，无法使用下层节点综合属性、继承属性，只能获取文本字面量，只有在需要新建并切换符号表时才在enter中实现
-- CACT specification中未给出的信息：
+- SysY specification中未给出的信息：
     - 单目运算符`!`只能用于`bool`类型的变量或表达式
     - 单目运算符`+, -`能用于`int, float, double`类型的变量，表达式，数组
-    - `continue/break`只能用在循环内部，CACT只有`while`循环
+    - `continue/break`只能用在循环内部，SysY只有`while`循环
 
 ## 总结
 
 ### 实验结果总结
 
-经过本次实验，我们能够对CACT语言符号表进行搭建，对其进行语义分析和静态类型检查，本组成功通过了27+48个测试样例（存在语义错误则设置为false），但可能还有遗漏的语义错误未能查出。由于运用了大量面向对象的实现，牺牲了一部分语义分析性能和效率，这部分确实还有提升空间。另外这里只做到了静态类型检查，符号表完全可以增加更多记录信息，能够支持更多的错误检测，比如数组下标溢出等等。
+经过本次实验，我们能够对SysY语言符号表进行搭建，对其进行语义分析和静态类型检查，本组成功通过了27+48个测试样例（存在语义错误则设置为false），但可能还有遗漏的语义错误未能查出。由于运用了大量面向对象的实现，牺牲了一部分语义分析性能和效率，这部分确实还有提升空间。另外这里只做到了静态类型检查，符号表完全可以增加更多记录信息，能够支持更多的错误检测，比如数组下标溢出等等。
 
 ### 分成员总结
 
 高梓源：本次实验中主要负责符号表设计，参与补全语义分析的错误检测。此次理论上是编译实验，但大量结合了面向对象的设计和思想，这主要是由于C++使用的便捷性造成。由于此前上过相关课程，掌握java面向对象的编程规范，对于这部分上手较为容易，此前也有了解过C++ STL的相关数据结构，因此掌握一些加速方法。通过本次实验对于C++面向对象的编程方式有了较深的感悟和理解，同时对于自顶向下语法制导翻译的理论和实践有了更紧密的结合，加深对编译这部分知识的理解。同时也为语义分析错误的琐碎程度耸然。
 
-官奕琳：在本次实验中负责语义分析和错误检测，运用符号表接口实现了CACT自顶向下翻译过程的符号表构建，并且能够在运行过程中准确定位错误。而这依赖对CACT specification的相关描述的熟稔掌握。为以后的编译过程打下良好基础。此外，因为此前接触面向对象编程较少，这也是一次很好的锻炼机会，能够阅读并运用C++接口实现需求。
+官奕琳：在本次实验中负责语义分析和错误检测，运用符号表接口实现了SysY自顶向下翻译过程的符号表构建，并且能够在运行过程中准确定位错误。而这依赖对SysY specification的相关描述的熟稔掌握。为以后的编译过程打下良好基础。此外，因为此前接触面向对象编程较少，这也是一次很好的锻炼机会，能够阅读并运用C++接口实现需求。

@@ -2,52 +2,52 @@
     #include "../src/SymbolTable.h"
 
 
-// Generated from /Volumes/study/code/C++/vscode/compiler/compiler/grammar/CACT.g4 by ANTLR 4.8
+// Generated from /Volumes/study/code/C++/vscode/compiler/compiler/grammar/SysY.g4 by ANTLR 4.8
 
 
-#include "CACTLexer.h"
+#include "SysYLexer.h"
 
 
 using namespace antlr4;
 
 
-CACTLexer::CACTLexer(CharStream *input) : Lexer(input) {
+SysYLexer::SysYLexer(CharStream *input) : Lexer(input) {
   _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
 }
 
-CACTLexer::~CACTLexer() {
+SysYLexer::~SysYLexer() {
   delete _interpreter;
 }
 
-std::string CACTLexer::getGrammarFileName() const {
-  return "CACT.g4";
+std::string SysYLexer::getGrammarFileName() const {
+  return "SysY.g4";
 }
 
-const std::vector<std::string>& CACTLexer::getRuleNames() const {
+const std::vector<std::string>& SysYLexer::getRuleNames() const {
   return _ruleNames;
 }
 
-const std::vector<std::string>& CACTLexer::getChannelNames() const {
+const std::vector<std::string>& SysYLexer::getChannelNames() const {
   return _channelNames;
 }
 
-const std::vector<std::string>& CACTLexer::getModeNames() const {
+const std::vector<std::string>& SysYLexer::getModeNames() const {
   return _modeNames;
 }
 
-const std::vector<std::string>& CACTLexer::getTokenNames() const {
+const std::vector<std::string>& SysYLexer::getTokenNames() const {
   return _tokenNames;
 }
 
-dfa::Vocabulary& CACTLexer::getVocabulary() const {
+dfa::Vocabulary& SysYLexer::getVocabulary() const {
   return _vocabulary;
 }
 
-const std::vector<uint16_t> CACTLexer::getSerializedATN() const {
+const std::vector<uint16_t> SysYLexer::getSerializedATN() const {
   return _serializedATN;
 }
 
-const atn::ATN& CACTLexer::getATN() const {
+const atn::ATN& SysYLexer::getATN() const {
   return _atn;
 }
 
@@ -55,14 +55,14 @@ const atn::ATN& CACTLexer::getATN() const {
 
 
 // Static vars and initialization.
-std::vector<dfa::DFA> CACTLexer::_decisionToDFA;
-atn::PredictionContextCache CACTLexer::_sharedContextCache;
+std::vector<dfa::DFA> SysYLexer::_decisionToDFA;
+atn::PredictionContextCache SysYLexer::_sharedContextCache;
 
 // We own the ATN which in turn owns the ATN states.
-atn::ATN CACTLexer::_atn;
-std::vector<uint16_t> CACTLexer::_serializedATN;
+atn::ATN SysYLexer::_atn;
+std::vector<uint16_t> SysYLexer::_serializedATN;
 
-std::vector<std::string> CACTLexer::_ruleNames = {
+std::vector<std::string> SysYLexer::_ruleNames = {
   u8"T__0", u8"T__1", u8"T__2", u8"T__3", u8"T__4", u8"T__5", u8"T__6", 
   u8"T__7", u8"T__8", u8"T__9", u8"T__10", u8"T__11", u8"T__12", u8"T__13", 
   u8"T__14", u8"T__15", u8"T__16", u8"T__17", u8"T__18", u8"T__19", u8"T__20", 
@@ -75,15 +75,15 @@ std::vector<std::string> CACTLexer::_ruleNames = {
   u8"NewLine", u8"WhiteSpace", u8"BlockComment", u8"LineComment"
 };
 
-std::vector<std::string> CACTLexer::_channelNames = {
+std::vector<std::string> SysYLexer::_channelNames = {
   "DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 };
 
-std::vector<std::string> CACTLexer::_modeNames = {
+std::vector<std::string> SysYLexer::_modeNames = {
   u8"DEFAULT_MODE"
 };
 
-std::vector<std::string> CACTLexer::_literalNames = {
+std::vector<std::string> SysYLexer::_literalNames = {
   "", u8"'const'", u8"','", u8"';'", u8"'int'", u8"'bool'", u8"'double'", 
   u8"'float'", u8"'['", u8"']'", u8"'='", u8"'{'", u8"'}'", u8"'('", u8"')'", 
   u8"'void'", u8"'if'", u8"'else'", u8"'while'", u8"'return'", u8"'break'", 
@@ -91,18 +91,18 @@ std::vector<std::string> CACTLexer::_literalNames = {
   u8"'<'", u8"'>'", u8"'<='", u8"'>='", u8"'=='", u8"'!='", u8"'&&'", u8"'||'"
 };
 
-std::vector<std::string> CACTLexer::_symbolicNames = {
+std::vector<std::string> SysYLexer::_symbolicNames = {
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
   u8"BoolConst", u8"Ident", u8"IntConst", u8"DigitSequence", u8"FloatConst", 
   u8"DoubleConst", u8"NewLine", u8"WhiteSpace", u8"BlockComment", u8"LineComment"
 };
 
-dfa::Vocabulary CACTLexer::_vocabulary(_literalNames, _symbolicNames);
+dfa::Vocabulary SysYLexer::_vocabulary(_literalNames, _symbolicNames);
 
-std::vector<std::string> CACTLexer::_tokenNames;
+std::vector<std::string> SysYLexer::_tokenNames;
 
-CACTLexer::Initializer::Initializer() {
+SysYLexer::Initializer::Initializer() {
   // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there.
 	for (size_t i = 0; i < _symbolicNames.size(); ++i) {
 		std::string name = _vocabulary.getLiteralName(i);
@@ -384,4 +384,4 @@ CACTLexer::Initializer::Initializer() {
   }
 }
 
-CACTLexer::Initializer CACTLexer::_init;
+SysYLexer::Initializer SysYLexer::_init;
