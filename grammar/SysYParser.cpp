@@ -434,7 +434,7 @@ size_t SysYParser::ConstInitValContext::getRuleIndex() const {
 void SysYParser::ConstInitValContext::copyFrom(ConstInitValContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->type = ctx->type;
-  this->size = ctx->size;
+  this->shape = ctx->shape;
   this->isArray = ctx->isArray;
   this->value = ctx->value;
 }
@@ -2223,7 +2223,7 @@ size_t SysYParser::PrimaryExpContext::getRuleIndex() const {
 void SysYParser::PrimaryExpContext::copyFrom(PrimaryExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
-  this->size = ctx->size;
+  this->shape = ctx->shape;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
@@ -2351,7 +2351,7 @@ size_t SysYParser::UnaryExpContext::getRuleIndex() const {
 void SysYParser::UnaryExpContext::copyFrom(UnaryExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
-  this->size = ctx->size;
+  this->shape = ctx->shape;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
@@ -2624,7 +2624,7 @@ size_t SysYParser::MulExpContext::getRuleIndex() const {
 void SysYParser::MulExpContext::copyFrom(MulExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
-  this->size = ctx->size;
+  this->shape = ctx->shape;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
@@ -2805,7 +2805,7 @@ size_t SysYParser::AddExpContext::getRuleIndex() const {
 void SysYParser::AddExpContext::copyFrom(AddExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
-  this->size = ctx->size;
+  this->shape = ctx->shape;
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
