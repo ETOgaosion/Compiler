@@ -286,7 +286,7 @@ class IRFunction {
 >
 > `void IRFunction::liveVarAnalysis();` -- 对每个基本块进行活跃变量分析
 >
-> `void IRFunction::usedefVarsAnalysis();` -- 对每个基本块的`use`变量和`def`变量进行分析
+> `void IRFunction::useDefVarsAnalysis();` -- 对每个基本块的`use`变量和`def`变量进行分析
 
 - ##### 活跃变量分析
 
@@ -533,7 +533,7 @@ else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() 
   void IRFunction::liveVarAnalysis() {
       bool changed;
       // use & def vars 分析
-      usedefVarsAnalysis();
+      useDefVarsAnalysis();
       inVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
       outVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
   

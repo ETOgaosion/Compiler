@@ -81,16 +81,7 @@ bool AbstractSymbol::setMemPosition(uint64_t inMemPosition) {
 }
 
 int AbstractSymbol::getOffsetFromDataType(MetaDataType inDataType) {
-    switch(inDataType){
-        case MetaDataType::INT:
-        case MetaDataType::BOOL:
-        case MetaDataType::FLOAT:
-            return 4;
-        case MetaDataType::DOUBLE:
-            return 8;
-        default:
-            return 0;
-    }
+    return 4;
 }
 
 // --------

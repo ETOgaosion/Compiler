@@ -35,8 +35,6 @@ bType
         MetaDataType bMetaDataType
     ]
     : 'int'
-    | 'bool'
-    | 'double'
     | 'float'
     ;
 
@@ -45,7 +43,7 @@ constDef
         std::string symbolName,
         MetaDataType type,
         bool withType,
-        std::size_t size,
+        std::vector<std::size_t> size,
         bool isArray,
         IRValue* value
     ]
@@ -55,7 +53,7 @@ constDef
 constInitVal
     locals [
         MetaDataType type,
-        std::size_t size,
+        std::vector<std::size_t> size,
         bool isArray,
         IRValue* value
     ]
@@ -72,7 +70,7 @@ varDef
         std::string symbolName,
         MetaDataType type,
         bool withType,
-        std::size_t size,
+        std::vector<std::size_t> size,
         bool isArray,
         IRValue* value
     ]
@@ -81,9 +79,14 @@ varDef
 
 initVal
     locals [
+        MetaDataType type,
+        std::vector<std::size_t> size,
+        bool isArray,
+        IRValue* value
     ]
     : exp
     | '{' (initVal (',' initVal)*)? '}'
+    ;
 
 funcDef
     : funcType Ident '(' (funcFParams)? ')' funcBlock
@@ -201,8 +204,7 @@ exp
         IROperand* operand,
         IROperand* indexOperand
     ]
-    : addExp        #expAddExp
-    | BoolConst     #expBoolExp
+    : addExp
     ;
 
 cond

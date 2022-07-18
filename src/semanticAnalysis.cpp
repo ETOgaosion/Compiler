@@ -5,7 +5,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     block = 0;
     curSymbolTable = SymbolTable::getGlobalSymbolTable();
     irGenerator = IRGenerator::getIRGenerator(IRProgram::getIRProgram(programName, curSymbolTable));
-    SymbolTable *funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_int", MetaDataType::VOID, curSymbolTable);
+    SymbolTable *funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putint", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
@@ -13,7 +13,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
     
-    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_float", MetaDataType::VOID, curSymbolTable);
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putfloat", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
@@ -21,34 +21,41 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
-    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_double", MetaDataType::VOID, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::DOUBLE, false, 0);
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putarray", MetaDataType::VOID, curSymbolTable);
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
-    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("print_bool", MetaDataType::VOID, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::BOOL, false, 0);
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putfarray", MetaDataType::VOID, curSymbolTable);
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, 0);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
-    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_int", MetaDataType::INT, curSymbolTable);
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getint", MetaDataType::INT, curSymbolTable);
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
-    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_float", MetaDataType::FLOAT, curSymbolTable);
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getfloat", MetaDataType::FLOAT, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
 
-    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("get_double", MetaDataType::DOUBLE, curSymbolTable);
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getarray", MetaDataType::INT, curSymbolTable);
+    funcSymbolTable->setParamDataTypeList();
+    funcSymbolTable->setParamNum();
+    irGenerator->enterFunction(funcSymbolTable);
+    irGenerator->exitFunction();
+    irGenerator->currentIRFunc->calFrameSize();
+
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getfarray", MetaDataType::FLOAT, curSymbolTable);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
