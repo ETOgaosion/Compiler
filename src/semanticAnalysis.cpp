@@ -1,12 +1,12 @@
 #include "semanticAnalysis.h"
 
-void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
+void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
 {
     block = 0;
     curSymbolTable = SymbolTable::getGlobalSymbolTable();
     irGenerator = IRGenerator::getIRGenerator(IRProgram::getIRProgram(programName, curSymbolTable));
     SymbolTable *funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putint", MetaDataType::VOID, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, 0);
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, {});
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
@@ -14,7 +14,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->currentIRFunc->calFrameSize();
     
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putfloat", MetaDataType::VOID, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, 0);
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, {});
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
@@ -22,7 +22,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putarray", MetaDataType::VOID, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, 0);
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, true, {});
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
@@ -30,7 +30,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putfarray", MetaDataType::VOID, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, 0);
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, true, {});
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
@@ -43,7 +43,6 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getfloat", MetaDataType::FLOAT, curSymbolTable);
-    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::VOID, false, 0);
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
@@ -63,7 +62,7 @@ void SemanticAnalysis::enterCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->currentIRFunc->calFrameSize();
 }
 
-void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
+void SemanticAnalysis::exitCompUnit(SysYParser::CompUnitContext * ctx)
 {
     if(curSymbolTable->getSymbolTableType() != TableType::GLOBAL || !curSymbolTable->lookUpFuncSymbolTable("main")) {
         throw std::runtime_error("[ERROR] > There is no main function.\n");
@@ -71,37 +70,32 @@ void SemanticAnalysis::exitCompUnit(CACTParser::CompUnitContext * ctx)
     irGenerator->ir->targetGen(irGenerator->targetCodes, optimizationLevel);
     irGenerator->ir->print();
     irGenerator->ir->write(programName + ".ir");
-    irGenerator->ir->targetCodePrint(irGenerator->targetCodes);
-    irGenerator->ir->targetCodeWrite(irGenerator->targetCodes, programName + ".S");
+    IRProgram::targetCodePrint(irGenerator->targetCodes);
+    IRProgram::targetCodeWrite(irGenerator->targetCodes, programName + ".S");
 }
 
-void SemanticAnalysis::enterDecl(CACTParser::DeclContext * ctx)
+void SemanticAnalysis::enterDecl(SysYParser::DeclContext * ctx)
 {
 }
 
-void SemanticAnalysis::exitDecl(CACTParser::DeclContext * ctx)
+void SemanticAnalysis::exitDecl(SysYParser::DeclContext * ctx)
 {
 }
 
-void SemanticAnalysis::enterConstDecl(CACTParser::ConstDeclContext * ctx)
+void SemanticAnalysis::enterConstDecl(SysYParser::ConstDeclContext * ctx)
 {   
 }
 
-void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
+void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
 {
     MetaDataType type = ctx->bType()->bMetaDataType;
     SymbolFactory symbolFactory;
 
     for(const auto & const_def : ctx->constDef())
     {
+        // TODO: type conversion
         if (const_def->withType && const_def->type != type && const_def->type != MetaDataType::VOID) {
-            if (const_def->withType && const_def->type == MetaDataType::DOUBLE && type == MetaDataType::FLOAT) {
-                const_def->type = MetaDataType::FLOAT;
-                const_def->value->setMetaDataType(MetaDataType::FLOAT);
-            }
-            else {
-                throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
-            }
+            throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
         }
         AbstractSymbol *symbol = SymbolFactory::createSymbol(const_def->symbolName, SymbolType::CONST, type, const_def->isArray, const_def->size);
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
@@ -116,17 +110,11 @@ void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
                 IRCode* code = nullptr;
                 const_def->value->setMetaDataType(type);
                 switch (type) {
-                    case MetaDataType::BOOL:
-                        code = new IRAssignB(newConst, const_def->value);
-                        break;
                     case MetaDataType::INT:
                         code = new IRAssignI(newConst, const_def->value);
                         break;
                     case MetaDataType::FLOAT:
                         code = new IRAssignF(newConst, const_def->value);
-                        break;
-                    case MetaDataType::DOUBLE:
-                        code = new IRAssignD(newConst, const_def->value);
                         break;
                 }
                 irGenerator->addCode(code);
@@ -135,25 +123,19 @@ void SemanticAnalysis::exitConstDecl(CACTParser::ConstDeclContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterBType(CACTParser::BTypeContext * ctx)
+void SemanticAnalysis::enterBType(SysYParser::BTypeContext * ctx)
 {
     ctx->bMetaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitBType(CACTParser::BTypeContext * ctx)
+void SemanticAnalysis::exitBType(SysYParser::BTypeContext * ctx)
 {
     std::string dataTypeText = ctx->getText();
-    if (dataTypeText == "bool") {
-        ctx->bMetaDataType = MetaDataType::BOOL;
-    }
-    else if (dataTypeText == "int") {
+    if (dataTypeText == "int") {
         ctx->bMetaDataType = MetaDataType::INT;
     }
     else if (dataTypeText == "float") {
         ctx->bMetaDataType = MetaDataType::FLOAT;
-    }
-    else if (dataTypeText == "double") {
-        ctx->bMetaDataType = MetaDataType::DOUBLE;
     }
     else{
         throw std::runtime_error("[ERROR] > Data Type not supported.\n");
@@ -161,7 +143,7 @@ void SemanticAnalysis::exitBType(CACTParser::BTypeContext * ctx)
 }
 
 // ConstDef
-void SemanticAnalysis::enterConstDef(CACTParser::ConstDefContext * ctx)
+void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
 {
     ctx->symbolName = "";
     ctx->type = MetaDataType::VOID;
@@ -170,7 +152,7 @@ void SemanticAnalysis::enterConstDef(CACTParser::ConstDefContext * ctx)
     ctx->isArray = false;
 }
 
-void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
+void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
     if(!ctx->IntConst()){
@@ -207,7 +189,7 @@ void SemanticAnalysis::exitConstDef(CACTParser::ConstDefContext * ctx)
 }
 
 // ConstInitVal
-void SemanticAnalysis::enterConstInitValOfVar(CACTParser::ConstInitValOfVarContext * ctx)
+void SemanticAnalysis::enterConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
 {
     ctx->type = MetaDataType::VOID;
     ctx->size = 0;
@@ -215,7 +197,7 @@ void SemanticAnalysis::enterConstInitValOfVar(CACTParser::ConstInitValOfVarConte
     ctx->value = nullptr;
 }
 
-void SemanticAnalysis::exitConstInitValOfVar(CACTParser::ConstInitValOfVarContext * ctx)
+void SemanticAnalysis::exitConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
 {
     ctx->type = ctx->constExp()->metaDataType;
     ctx->size = 1;
@@ -233,7 +215,7 @@ void SemanticAnalysis::exitConstInitValOfVar(CACTParser::ConstInitValOfVarContex
     }
 }
 
-void SemanticAnalysis::enterConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
+void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
 {
     ctx->type = MetaDataType::VOID;
     ctx->size = 0;
@@ -241,7 +223,7 @@ void SemanticAnalysis::enterConstInitValOfArray(CACTParser::ConstInitValOfArrayC
     ctx->value = nullptr;
 }
 
-void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * ctx)
+void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
 {
     if(!ctx->constExp().empty()){
         ctx->type = ctx->constExp(0)->metaDataType;
@@ -270,10 +252,10 @@ void SemanticAnalysis::exitConstInitValOfArray(CACTParser::ConstInitValOfArrayCo
 }
 
 // VarDecl
-void SemanticAnalysis::enterVarDecl(CACTParser::VarDeclContext * ctx)
+void SemanticAnalysis::enterVarDecl(SysYParser::VarDeclContext * ctx)
 {
 }
-void SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
+void SemanticAnalysis::exitVarDecl(SysYParser::VarDeclContext * ctx)
 {
     MetaDataType type = ctx->bType()->bMetaDataType;
     SymbolFactory symbolFactory;
@@ -322,7 +304,7 @@ void SemanticAnalysis::exitVarDecl(CACTParser::VarDeclContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterVarDef(CACTParser::VarDefContext * ctx)
+void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
 {
     ctx->symbolName = "";
     ctx->type = MetaDataType::VOID;
@@ -331,7 +313,7 @@ void SemanticAnalysis::enterVarDef(CACTParser::VarDefContext * ctx)
     ctx->isArray = false;
 }
 
-void SemanticAnalysis::exitVarDef(CACTParser::VarDefContext * ctx)
+void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
     if(!ctx->IntConst()){
@@ -367,7 +349,7 @@ void SemanticAnalysis::exitVarDef(CACTParser::VarDefContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterFuncDef(CACTParser::FuncDefContext * ctx)
+void SemanticAnalysis::enterFuncDef(SysYParser::FuncDefContext * ctx)
 {
     if (curSymbolTable->getSymbolTableType() != TableType::GLOBAL) {
         throw std::runtime_error("[ERROR] > cannot define function in non-global area.\n");
@@ -410,7 +392,7 @@ void SemanticAnalysis::enterFuncDef(CACTParser::FuncDefContext * ctx)
     irGenerator->enterFunction(funcSymbolTable);
 }
 
-void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
+void SemanticAnalysis::exitFuncDef(SysYParser::FuncDefContext * ctx)
 {
     if (!ctx->funcBlock()->hasReturn && (curSymbolTable->getReturnType() != MetaDataType::VOID)) {
         throw std::runtime_error("[ERROR] > Non void function has no return.\n");
@@ -420,19 +402,19 @@ void SemanticAnalysis::exitFuncDef(CACTParser::FuncDefContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterFuncType(CACTParser::FuncTypeContext * ctx)
+void SemanticAnalysis::enterFuncType(SysYParser::FuncTypeContext * ctx)
 {
 }
 
-void SemanticAnalysis::exitFuncType(CACTParser::FuncTypeContext * ctx)
+void SemanticAnalysis::exitFuncType(SysYParser::FuncTypeContext * ctx)
 {   
 }
 
-void SemanticAnalysis::enterFuncFParams(CACTParser::FuncFParamsContext * ctx)
+void SemanticAnalysis::enterFuncFParams(SysYParser::FuncFParamsContext * ctx)
 {
 }
 
-void SemanticAnalysis::exitFuncFParams(CACTParser::FuncFParamsContext * ctx)
+void SemanticAnalysis::exitFuncFParams(SysYParser::FuncFParamsContext * ctx)
 {
     curSymbolTable->setParamNum();
     curSymbolTable->setParamDataTypeList();
@@ -478,10 +460,10 @@ void SemanticAnalysis::exitFuncFParams(CACTParser::FuncFParamsContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterFuncFParam(CACTParser::FuncFParamContext * ctx)
+void SemanticAnalysis::enterFuncFParam(SysYParser::FuncFParamContext * ctx)
 {
 }
-void SemanticAnalysis::exitFuncFParam(CACTParser::FuncFParamContext * ctx)
+void SemanticAnalysis::exitFuncFParam(SysYParser::FuncFParamContext * ctx)
 {
     SymbolFactory symbolFactory;
     AbstractSymbol *funcParamSymbol = SymbolFactory::createSymbol(ctx->Ident()->getText(), SymbolType::PARAM, ctx->bType()->bMetaDataType, ctx->brackets(), 0);
@@ -496,11 +478,11 @@ void SemanticAnalysis::exitFuncFParam(CACTParser::FuncFParamContext * ctx)
     ctx->paramType = ctx->bType()->bMetaDataType;
 }
 
-void SemanticAnalysis::enterBrackets(CACTParser::BracketsContext * ctx) {}
+void SemanticAnalysis::enterBrackets(SysYParser::BracketsContext * ctx) {}
 
-void SemanticAnalysis::exitBrackets(CACTParser::BracketsContext * ctx) {}
+void SemanticAnalysis::exitBrackets(SysYParser::BracketsContext * ctx) {}
 
-void SemanticAnalysis::enterFuncBlock(CACTParser::FuncBlockContext * ctx) 
+void SemanticAnalysis::enterFuncBlock(SysYParser::FuncBlockContext * ctx)
 {
     ctx->hasReturn = false;
     if (curSymbolTable->getSymbolTableType() != TableType::FUNC) {
@@ -515,7 +497,7 @@ void SemanticAnalysis::enterFuncBlock(CACTParser::FuncBlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::exitFuncBlock(CACTParser::FuncBlockContext * ctx) 
+void SemanticAnalysis::exitFuncBlock(SysYParser::FuncBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     for (auto & it : ctx->funcBlockItem()) {
@@ -549,7 +531,7 @@ void SemanticAnalysis::exitFuncBlock(CACTParser::FuncBlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterFuncBlockItem(CACTParser::FuncBlockItemContext * ctx) 
+void SemanticAnalysis::enterFuncBlockItem(SysYParser::FuncBlockItemContext * ctx)
 {
     ctx->hasReturn = false;
     if (ctx->stmt() && ctx->docLVal) {
@@ -558,7 +540,7 @@ void SemanticAnalysis::enterFuncBlockItem(CACTParser::FuncBlockItemContext * ctx
     }
 }
 
-void SemanticAnalysis::exitFuncBlockItem(CACTParser::FuncBlockItemContext * ctx) 
+void SemanticAnalysis::exitFuncBlockItem(SysYParser::FuncBlockItemContext * ctx)
 {
     if (ctx->stmt() && ctx->stmt()->hasReturn) {
         ctx->hasReturn = true;
@@ -569,7 +551,7 @@ void SemanticAnalysis::exitFuncBlockItem(CACTParser::FuncBlockItemContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterBlock(CACTParser::BlockContext * ctx)
+void SemanticAnalysis::enterBlock(SysYParser::BlockContext * ctx)
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
@@ -585,7 +567,7 @@ void SemanticAnalysis::enterBlock(CACTParser::BlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::exitBlock(CACTParser::BlockContext * ctx)
+void SemanticAnalysis::exitBlock(SysYParser::BlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     for (auto & it : ctx->blockItem()) {
@@ -622,7 +604,7 @@ void SemanticAnalysis::exitBlock(CACTParser::BlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterBlockItem(CACTParser::BlockItemContext * ctx)
+void SemanticAnalysis::enterBlockItem(SysYParser::BlockItemContext * ctx)
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
@@ -632,7 +614,7 @@ void SemanticAnalysis::enterBlockItem(CACTParser::BlockItemContext * ctx)
     }
 }
 
-void SemanticAnalysis::exitBlockItem(CACTParser::BlockItemContext * ctx)
+void SemanticAnalysis::exitBlockItem(SysYParser::BlockItemContext * ctx)
 {
     if (ctx->subStmt() && ctx->subStmt()->hasReturn) {
         throw std::runtime_error("[NO ERROR] Block item return");
@@ -644,7 +626,7 @@ void SemanticAnalysis::exitBlockItem(CACTParser::BlockItemContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterStmtAssignment(CACTParser::StmtAssignmentContext * ctx)
+void SemanticAnalysis::enterStmtAssignment(SysYParser::StmtAssignmentContext * ctx)
 {
     ctx->hasReturn = false;
 
@@ -662,7 +644,7 @@ void SemanticAnalysis::enterStmtAssignment(CACTParser::StmtAssignmentContext * c
     }
 }
 
-void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ctx)
+void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ctx)
 {
     if (ctx->lVal()->symbolType == SymbolType::CONST) {
         throw std::runtime_error("[ERROR] > cannot assign to a CONST statement.\n");
@@ -787,18 +769,18 @@ void SemanticAnalysis::exitStmtAssignment(CACTParser::StmtAssignmentContext * ct
         irGenerator->addCodes(ctx->codes);
 }
 
-void SemanticAnalysis::enterStmtExpression(CACTParser::StmtExpressionContext * ctx)
+void SemanticAnalysis::enterStmtExpression(SysYParser::StmtExpressionContext * ctx)
 {
     ctx->hasReturn = false;
 }
 
-void SemanticAnalysis::exitStmtExpression(CACTParser::StmtExpressionContext * ctx)
+void SemanticAnalysis::exitStmtExpression(SysYParser::StmtExpressionContext * ctx)
 {
     if(!ctx->codes.empty())
         irGenerator->addCodes(ctx->codes);
 }
 
-void SemanticAnalysis::enterStmtBlock(CACTParser::StmtBlockContext * ctx)
+void SemanticAnalysis::enterStmtBlock(SysYParser::StmtBlockContext * ctx)
 {
     ctx->hasReturn = false;
     SymbolTable *blkSymbolTable = new BlockSymbolTable(curSymbolTable);
@@ -810,7 +792,7 @@ void SemanticAnalysis::enterStmtBlock(CACTParser::StmtBlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
+void SemanticAnalysis::exitStmtBlock(SysYParser::StmtBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     if (ctx->funcBlock() && ctx->funcBlock()->hasReturn) {
@@ -826,7 +808,7 @@ void SemanticAnalysis::exitStmtBlock(CACTParser::StmtBlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
+void SemanticAnalysis::enterStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
 {
     ctx->hasReturn = false;
 
@@ -866,7 +848,7 @@ void SemanticAnalysis::enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     }
 }
 
-void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
+void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
 {
     for (auto & s : ctx->stmt()) {
         if (s->hasReturn) {
@@ -938,12 +920,12 @@ void SemanticAnalysis::exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterStmtReturn(CACTParser::StmtReturnContext * ctx)
+void SemanticAnalysis::enterStmtReturn(SysYParser::StmtReturnContext * ctx)
 {
     
 }
 
-void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
+void SemanticAnalysis::exitStmtReturn(SysYParser::StmtReturnContext * ctx)
 {
     if (ctx->exp() && ctx->exp()->isArray) {
         throw std::runtime_error("[ERROR] > never return an array.\n");
@@ -983,7 +965,7 @@ void SemanticAnalysis::exitStmtReturn(CACTParser::StmtReturnContext * ctx)
         irGenerator->addCodes(ctx->codes);
 }
 
-void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
+void SemanticAnalysis::enterSubStmtAssignment(SysYParser::SubStmtAssignmentContext * ctx)
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
@@ -1002,7 +984,7 @@ void SemanticAnalysis::enterSubStmtAssignment(CACTParser::SubStmtAssignmentConte
     }
 }
 
-void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext * ctx)
+void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContext * ctx)
 {
     if (ctx->lVal()->symbolType == SymbolType::CONST) {
         throw std::runtime_error("[ERROR] > cannot assign to a CONST statement.\n");
@@ -1123,19 +1105,19 @@ void SemanticAnalysis::exitSubStmtAssignment(CACTParser::SubStmtAssignmentContex
         irGenerator->addCodes(ctx->codes);
 }
 
-void SemanticAnalysis::enterSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
+void SemanticAnalysis::enterSubStmtExpression(SysYParser::SubStmtExpressionContext * ctx)
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitSubStmtExpression(CACTParser::SubStmtExpressionContext * ctx)
+void SemanticAnalysis::exitSubStmtExpression(SysYParser::SubStmtExpressionContext * ctx)
 {
     if(!ctx->codes.empty())
         irGenerator->addCodes(ctx->codes);
 }
 
-void SemanticAnalysis::enterSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
+void SemanticAnalysis::enterSubStmtBlock(SysYParser::SubStmtBlockContext * ctx)
 {
     SymbolTable *blkSymbolTable = new BlockSymbolTable(curSymbolTable);
     curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
@@ -1148,7 +1130,7 @@ void SemanticAnalysis::enterSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::exitSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
+void SemanticAnalysis::exitSubStmtBlock(SysYParser::SubStmtBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     ctx->hasReturn = ctx->block()->hasReturn;
@@ -1166,7 +1148,7 @@ void SemanticAnalysis::exitSubStmtBlock(CACTParser::SubStmtBlockContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ctx)
+void SemanticAnalysis::enterSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ctx)
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
@@ -1202,7 +1184,7 @@ void SemanticAnalysis::enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * c
     }
 }
 
-void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ctx)
+void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ctx)
 {
     for (auto & s : ctx->subStmt()) {
         if (s->hasReturn) {
@@ -1277,11 +1259,11 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * ct
     }
 }
 
-void SemanticAnalysis::enterSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
+void SemanticAnalysis::enterSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
 {
 }
 
-void SemanticAnalysis::exitSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
+void SemanticAnalysis::exitSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
 {
     if (ctx->exp() && ctx->exp()->isArray) {
         throw std::runtime_error("[ERROR] > never return an array.\n");
@@ -1330,7 +1312,7 @@ void SemanticAnalysis::exitSubStmtReturn(CACTParser::SubStmtReturnContext * ctx)
 
 
 // Exp
-void SemanticAnalysis::enterExpAddExp(CACTParser::ExpAddExpContext * ctx)
+void SemanticAnalysis::enterExpAddExp(SysYParser::ExpAddExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1339,7 +1321,7 @@ void SemanticAnalysis::enterExpAddExp(CACTParser::ExpAddExpContext * ctx)
     ctx->addExp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitExpAddExp(CACTParser::ExpAddExpContext * ctx)
+void SemanticAnalysis::exitExpAddExp(SysYParser::ExpAddExpContext * ctx)
 {
     ctx->isArray = ctx->addExp()->isArray;
     ctx->size = ctx->addExp()->size;
@@ -1347,14 +1329,14 @@ void SemanticAnalysis::exitExpAddExp(CACTParser::ExpAddExpContext * ctx)
     ctx->operand = ctx->addExp()->operand;
 }
 
-void SemanticAnalysis::enterExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
+void SemanticAnalysis::enterExpBoolExp(SysYParser::ExpBoolExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
+void SemanticAnalysis::exitExpBoolExp(SysYParser::ExpBoolExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->metaDataType = MetaDataType::BOOL;
@@ -1362,12 +1344,12 @@ void SemanticAnalysis::exitExpBoolExp(CACTParser::ExpBoolExpContext * ctx)
 }
 
 // Cond
-void SemanticAnalysis::enterCond(CACTParser::CondContext * ctx)
+void SemanticAnalysis::enterCond(SysYParser::CondContext * ctx)
 {
     
 }
 
-void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
+void SemanticAnalysis::exitCond(SysYParser::CondContext * ctx)
 {
     if(ctx->lOrExp()->metaDataType != MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > condition must be bool");
@@ -1376,7 +1358,7 @@ void SemanticAnalysis::exitCond(CACTParser::CondContext * ctx)
     irGenerator->addCode(code);
 }
 
-void SemanticAnalysis::enterLVal(CACTParser::LValContext * ctx)
+void SemanticAnalysis::enterLVal(SysYParser::LValContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1385,7 +1367,7 @@ void SemanticAnalysis::enterLVal(CACTParser::LValContext * ctx)
     ctx->indexOperand = nullptr;
 }
 
-void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
+void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
 {
     if (ctx->exp()) {
         if (ctx->exp()->isArray || ctx->exp()->metaDataType != MetaDataType::INT) {
@@ -1423,7 +1405,7 @@ void SemanticAnalysis::exitLVal(CACTParser::LValContext * ctx)
 }
 
 
-void SemanticAnalysis::enterPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContext * ctx)
+void SemanticAnalysis::enterPrimaryExpNestExp(SysYParser::PrimaryExpNestExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1432,7 +1414,7 @@ void SemanticAnalysis::enterPrimaryExpNestExp(CACTParser::PrimaryExpNestExpConte
     ctx->exp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContext * ctx)
+void SemanticAnalysis::exitPrimaryExpNestExp(SysYParser::PrimaryExpNestExpContext * ctx)
 {
     ctx->isArray = ctx->exp()->isArray;
     ctx->size = ctx->exp()->size;
@@ -1441,14 +1423,14 @@ void SemanticAnalysis::exitPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContex
     ctx->operand = ctx->exp()->operand;
 }
 
-void SemanticAnalysis::enterPrimaryExplVal(CACTParser::PrimaryExplValContext * ctx)
+void SemanticAnalysis::enterPrimaryExplVal(SysYParser::PrimaryExplValContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ctx)
+void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ctx)
 {
     ctx->isArray = ctx->lVal()->isArray;
     ctx->size = ctx->lVal()->size;
@@ -1500,14 +1482,14 @@ void SemanticAnalysis::exitPrimaryExplVal(CACTParser::PrimaryExplValContext * ct
     }
 }
 
-void SemanticAnalysis::enterPrimaryExpNumber(CACTParser::PrimaryExpNumberContext * ctx)
+void SemanticAnalysis::enterPrimaryExpNumber(SysYParser::PrimaryExpNumberContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext * ctx)
+void SemanticAnalysis::exitPrimaryExpNumber(SysYParser::PrimaryExpNumberContext * ctx)
 {
     ctx->isArray = false;
     ctx->metaDataType = ctx->number()->metaDataType;
@@ -1526,7 +1508,7 @@ void SemanticAnalysis::exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext 
 
 
 // Unary
-void SemanticAnalysis::enterUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpContext * ctx)
+void SemanticAnalysis::enterUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1535,7 +1517,7 @@ void SemanticAnalysis::enterUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpCon
     ctx->primaryExp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpContext * ctx)
+void SemanticAnalysis::exitUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpContext * ctx)
 {
     ctx->isArray = ctx->primaryExp()->isArray;
     ctx->size = ctx->primaryExp()->size;
@@ -1543,7 +1525,7 @@ void SemanticAnalysis::exitUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpCont
     ctx->operand = ctx->primaryExp()->operand;
 }
 
-void SemanticAnalysis::enterUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
+void SemanticAnalysis::enterUnaryExpFunc(SysYParser::UnaryExpFuncContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1551,7 +1533,7 @@ void SemanticAnalysis::enterUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
 
 }
 
-void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
+void SemanticAnalysis::exitUnaryExpFunc(SysYParser::UnaryExpFuncContext * ctx)
 {
     SymbolTable *funcSymbolTable = curSymbolTable->lookUpFuncSymbolTable(ctx->Ident()->getText());
     if (!funcSymbolTable) {
@@ -1607,7 +1589,7 @@ void SemanticAnalysis::exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
+void SemanticAnalysis::enterUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1616,7 +1598,7 @@ void SemanticAnalysis::enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryEx
     ctx->unaryExp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * ctx)
+void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExpContext * ctx)
 {
     ctx->isArray = ctx->unaryExp()->isArray;
     ctx->metaDataType = ctx->unaryExp()->metaDataType;
@@ -1655,23 +1637,23 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExp
     ctx->operand = result;
 }
 
-void SemanticAnalysis::enterUnaryOp(CACTParser::UnaryOpContext * ctx)
+void SemanticAnalysis::enterUnaryOp(SysYParser::UnaryOpContext * ctx)
 {
 }
 
-void SemanticAnalysis::exitUnaryOp(CACTParser::UnaryOpContext * ctx)
+void SemanticAnalysis::exitUnaryOp(SysYParser::UnaryOpContext * ctx)
 {
 }
 
 // funcRParams
-void SemanticAnalysis::enterFuncRParams(CACTParser::FuncRParamsContext * ctx)
+void SemanticAnalysis::enterFuncRParams(SysYParser::FuncRParamsContext * ctx)
 {
     ctx->isArrayList.clear();
     ctx->sizeList.clear();
     ctx->metaDataTypeList.clear();
 }
 
-void SemanticAnalysis::exitFuncRParams(CACTParser::FuncRParamsContext * ctx)
+void SemanticAnalysis::exitFuncRParams(SysYParser::FuncRParamsContext * ctx)
 {
     for (auto & it : ctx->exp()) {
         ctx->isArrayList.emplace_back(it->isArray);
@@ -1703,7 +1685,7 @@ void SemanticAnalysis::exitFuncRParams(CACTParser::FuncRParamsContext * ctx)
 }
 
 // MulExp
-void SemanticAnalysis::enterMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
+void SemanticAnalysis::enterMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1713,7 +1695,7 @@ void SemanticAnalysis::enterMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
     ctx->unaryExp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
+void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
 {
     ctx->isArray = ctx->mulExp()->isArray;
     ctx->metaDataType = ctx->mulExp()->metaDataType;
@@ -1800,7 +1782,7 @@ void SemanticAnalysis::exitMulExpMulExp(CACTParser::MulExpMulExpContext * ctx)
     ctx->operand = result;
 }
 
-void SemanticAnalysis::enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ctx)
+void SemanticAnalysis::enterMulExpUnaryExp(SysYParser::MulExpUnaryExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1809,7 +1791,7 @@ void SemanticAnalysis::enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * c
     ctx->unaryExp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ctx)
+void SemanticAnalysis::exitMulExpUnaryExp(SysYParser::MulExpUnaryExpContext * ctx)
 {
     ctx->isArray = ctx->unaryExp()->isArray;
     ctx->metaDataType = ctx->unaryExp()->metaDataType;
@@ -1818,16 +1800,16 @@ void SemanticAnalysis::exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * ct
     ctx->operand = ctx->unaryExp()->operand;
 }
 
-void SemanticAnalysis::enterMulOp(CACTParser::MulOpContext * ctx) 
+void SemanticAnalysis::enterMulOp(SysYParser::MulOpContext * ctx)
 {
 }
 
-void SemanticAnalysis::exitMulOp(CACTParser::MulOpContext * ctx)
+void SemanticAnalysis::exitMulOp(SysYParser::MulOpContext * ctx)
 {
 }
 
 // AddExp
-void SemanticAnalysis::enterAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
+void SemanticAnalysis::enterAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1837,7 +1819,7 @@ void SemanticAnalysis::enterAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
     ctx->mulExp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
+void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 {
     ctx->isArray = ctx->addExp()->isArray;
     ctx->metaDataType = ctx->addExp()->metaDataType;
@@ -1898,7 +1880,7 @@ void SemanticAnalysis::exitAddExpAddExp(CACTParser::AddExpAddExpContext * ctx)
     ctx->operand = result;
 }
 
-void SemanticAnalysis::enterAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
+void SemanticAnalysis::enterAddExpMulExp(SysYParser::AddExpMulExpContext * ctx)
 {
     ctx->isArray = false;
     ctx->size = 0;
@@ -1907,7 +1889,7 @@ void SemanticAnalysis::enterAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
     ctx->mulExp()->indexOperand = ctx->indexOperand;
 }
 
-void SemanticAnalysis::exitAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
+void SemanticAnalysis::exitAddExpMulExp(SysYParser::AddExpMulExpContext * ctx)
 {
     ctx->isArray = ctx->mulExp()->isArray;
     ctx->metaDataType = ctx->mulExp()->metaDataType;
@@ -1917,12 +1899,12 @@ void SemanticAnalysis::exitAddExpMulExp(CACTParser::AddExpMulExpContext * ctx)
 }
 
 // RelExp
-void SemanticAnalysis::enterRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
+void SemanticAnalysis::enterRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
+void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
 {
     if (ctx->addExp()->isArray) {
         throw std::runtime_error("[ERROR] > rel: array cannot be operands of logic operators.\n");
@@ -1996,12 +1978,12 @@ void SemanticAnalysis::exitRelExpRelExp(CACTParser::RelExpRelExpContext * ctx)
     ctx->operand = result;
 }
 
-void SemanticAnalysis::enterRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
+void SemanticAnalysis::enterRelExpAddExp(SysYParser::RelExpAddExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
+void SemanticAnalysis::exitRelExpAddExp(SysYParser::RelExpAddExpContext * ctx)
 {
     if (ctx->addExp()->isArray) {
         throw std::runtime_error("[ERROR] > rel add: array cannot be operands of logic operators. " + curSymbolTable->getFuncName());
@@ -2010,12 +1992,12 @@ void SemanticAnalysis::exitRelExpAddExp(CACTParser::RelExpAddExpContext * ctx)
     ctx->operand = ctx->addExp()->operand;
 }
 
-void SemanticAnalysis::enterRelExpBoolConst(CACTParser::RelExpBoolConstContext * ctx)
+void SemanticAnalysis::enterRelExpBoolConst(SysYParser::RelExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * ctx)
+void SemanticAnalysis::exitRelExpBoolConst(SysYParser::RelExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::BOOL;
 
@@ -2028,23 +2010,23 @@ void SemanticAnalysis::exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * 
 }
 
 //EqExp
-void SemanticAnalysis::enterEqExpRelExp(CACTParser::EqExpRelExpContext * ctx)
+void SemanticAnalysis::enterEqExpRelExp(SysYParser::EqExpRelExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 
 }
-void SemanticAnalysis::exitEqExpRelExp(CACTParser::EqExpRelExpContext * ctx)
+void SemanticAnalysis::exitEqExpRelExp(SysYParser::EqExpRelExpContext * ctx)
 {
     ctx->metaDataType = ctx->relExp()->metaDataType;
     ctx->operand = ctx->relExp()->operand;
 }
 
-void SemanticAnalysis::enterEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
+void SemanticAnalysis::enterEqExpEqExp(SysYParser::EqExpEqExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
+void SemanticAnalysis::exitEqExpEqExp(SysYParser::EqExpEqExpContext * ctx)
 {
     if (ctx->eqExp()->metaDataType != ctx->relExp()->metaDataType) {
         throw std::runtime_error("[ERROR] > eq operator with different data type.\n");
@@ -2089,12 +2071,12 @@ void SemanticAnalysis::exitEqExpEqExp(CACTParser::EqExpEqExpContext * ctx)
 }
 
 //LAndExp
-void SemanticAnalysis::enterLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ctx)
+void SemanticAnalysis::enterLAndExpLAndExp(SysYParser::LAndExpLAndExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ctx)
+void SemanticAnalysis::exitLAndExpLAndExp(SysYParser::LAndExpLAndExpContext * ctx)
 {
     ctx->metaDataType = ctx->lAndExp()->metaDataType;
     if (ctx->metaDataType != MetaDataType::BOOL || ctx->eqExp()->metaDataType != MetaDataType::BOOL) {
@@ -2106,35 +2088,35 @@ void SemanticAnalysis::exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * ct
     ctx->operand = result;
 }
 
-void SemanticAnalysis::enterLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
+void SemanticAnalysis::enterLAndExpEqExp(SysYParser::LAndExpEqExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitLAndExpEqExp(CACTParser::LAndExpEqExpContext * ctx)
+void SemanticAnalysis::exitLAndExpEqExp(SysYParser::LAndExpEqExpContext * ctx)
 {
     ctx->metaDataType = ctx->eqExp()->metaDataType;
     ctx->operand = ctx->eqExp()->operand;
 }
 
 //LOrExp
-void SemanticAnalysis::enterLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx)
+void SemanticAnalysis::enterLOrExpLAndExp(SysYParser::LOrExpLAndExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * ctx)
+void SemanticAnalysis::exitLOrExpLAndExp(SysYParser::LOrExpLAndExpContext * ctx)
 {
     ctx->metaDataType = ctx->lAndExp()->metaDataType;
 
     ctx->operand = ctx->lAndExp()->operand;
 }
-void SemanticAnalysis::enterLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
+void SemanticAnalysis::enterLOrExpLOrExp(SysYParser::LOrExpLOrExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 }
 
-void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
+void SemanticAnalysis::exitLOrExpLOrExp(SysYParser::LOrExpLOrExpContext * ctx)
 {
     ctx->metaDataType = ctx->lAndExp()->metaDataType;
     if (ctx->metaDataType != MetaDataType::BOOL || ctx->lAndExp()->metaDataType != MetaDataType::BOOL) {
@@ -2150,22 +2132,22 @@ void SemanticAnalysis::exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * ctx)
 
 
 // ConstExp
-void SemanticAnalysis::enterConstExpNumber(CACTParser::ConstExpNumberContext * ctx)
+void SemanticAnalysis::enterConstExpNumber(SysYParser::ConstExpNumberContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
 
 }
-void SemanticAnalysis::exitConstExpNumber(CACTParser::ConstExpNumberContext * ctx)
+void SemanticAnalysis::exitConstExpNumber(SysYParser::ConstExpNumberContext * ctx)
 {
     ctx->metaDataType = ctx->number()->metaDataType;
     ctx->val = ctx->getText();
 }
 
-void SemanticAnalysis::enterConstExpBoolConst(CACTParser::ConstExpBoolConstContext * ctx)
+void SemanticAnalysis::enterConstExpBoolConst(SysYParser::ConstExpBoolConstContext * ctx)
 {
 }
 
-void SemanticAnalysis::exitConstExpBoolConst(CACTParser::ConstExpBoolConstContext * ctx)
+void SemanticAnalysis::exitConstExpBoolConst(SysYParser::ConstExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::BOOL;
     if(ctx->getText() == "true"){
@@ -2176,28 +2158,28 @@ void SemanticAnalysis::exitConstExpBoolConst(CACTParser::ConstExpBoolConstContex
 }
 
 // Number
-void SemanticAnalysis::enterNumberIntConst(CACTParser::NumberIntConstContext * ctx)
+void SemanticAnalysis::enterNumberIntConst(SysYParser::NumberIntConstContext * ctx)
 {
 
 }
-void SemanticAnalysis::exitNumberIntConst(CACTParser::NumberIntConstContext * ctx)
+void SemanticAnalysis::exitNumberIntConst(SysYParser::NumberIntConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::INT;
 }
 
-void SemanticAnalysis::enterNumberDoubleConst(CACTParser::NumberDoubleConstContext * ctx)
+void SemanticAnalysis::enterNumberDoubleConst(SysYParser::NumberDoubleConstContext * ctx)
 {
 
 }
-void SemanticAnalysis::exitNumberDoubleConst(CACTParser::NumberDoubleConstContext * ctx)
+void SemanticAnalysis::exitNumberDoubleConst(SysYParser::NumberDoubleConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::DOUBLE;
 }
-void SemanticAnalysis::enterNumberFloatConst(CACTParser::NumberFloatConstContext * ctx)
+void SemanticAnalysis::enterNumberFloatConst(SysYParser::NumberFloatConstContext * ctx)
 {
 
 }
-void SemanticAnalysis::exitNumberFloatConst(CACTParser::NumberFloatConstContext * ctx)
+void SemanticAnalysis::exitNumberFloatConst(SysYParser::NumberFloatConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::FLOAT;
 }

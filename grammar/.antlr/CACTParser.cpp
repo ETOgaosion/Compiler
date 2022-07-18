@@ -2,72 +2,72 @@
     #include "../src/SymbolTable.h"
 
 
-// Generated from /Volumes/study/code/C++/vscode/compiler/compiler/grammar/CACT.g4 by ANTLR 4.8
+// Generated from /Volumes/study/code/C++/vscode/compiler/compiler/grammar/SysY.g4 by ANTLR 4.8
 
 
 
-#include "CACTParser.h"
+#include "SysYParser.h"
 
 
 using namespace antlrcpp;
 using namespace antlr4;
 
-CACTParser::CACTParser(TokenStream *input) : Parser(input) {
+SysYParser::SysYParser(TokenStream *input) : Parser(input) {
   _interpreter = new atn::ParserATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
 }
 
-CACTParser::~CACTParser() {
+SysYParser::~SysYParser() {
   delete _interpreter;
 }
 
-std::string CACTParser::getGrammarFileName() const {
-  return "CACT.g4";
+std::string SysYParser::getGrammarFileName() const {
+  return "SysY.g4";
 }
 
-const std::vector<std::string>& CACTParser::getRuleNames() const {
+const std::vector<std::string>& SysYParser::getRuleNames() const {
   return _ruleNames;
 }
 
-dfa::Vocabulary& CACTParser::getVocabulary() const {
+dfa::Vocabulary& SysYParser::getVocabulary() const {
   return _vocabulary;
 }
 
 
 //----------------- CompUnitContext ------------------------------------------------------------------
 
-CACTParser::CompUnitContext::CompUnitContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::CompUnitContext::CompUnitContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* CACTParser::CompUnitContext::EOF() {
-  return getToken(CACTParser::EOF, 0);
+tree::TerminalNode* SysYParser::CompUnitContext::EOF() {
+  return getToken(SysYParser::EOF, 0);
 }
 
-std::vector<CACTParser::DeclContext *> CACTParser::CompUnitContext::decl() {
-  return getRuleContexts<CACTParser::DeclContext>();
+std::vector<SysYParser::DeclContext *> SysYParser::CompUnitContext::decl() {
+  return getRuleContexts<SysYParser::DeclContext>();
 }
 
-CACTParser::DeclContext* CACTParser::CompUnitContext::decl(size_t i) {
-  return getRuleContext<CACTParser::DeclContext>(i);
+SysYParser::DeclContext* SysYParser::CompUnitContext::decl(size_t i) {
+  return getRuleContext<SysYParser::DeclContext>(i);
 }
 
-std::vector<CACTParser::FuncDefContext *> CACTParser::CompUnitContext::funcDef() {
-  return getRuleContexts<CACTParser::FuncDefContext>();
+std::vector<SysYParser::FuncDefContext *> SysYParser::CompUnitContext::funcDef() {
+  return getRuleContexts<SysYParser::FuncDefContext>();
 }
 
-CACTParser::FuncDefContext* CACTParser::CompUnitContext::funcDef(size_t i) {
-  return getRuleContext<CACTParser::FuncDefContext>(i);
-}
-
-
-size_t CACTParser::CompUnitContext::getRuleIndex() const {
-  return CACTParser::RuleCompUnit;
+SysYParser::FuncDefContext* SysYParser::CompUnitContext::funcDef(size_t i) {
+  return getRuleContext<SysYParser::FuncDefContext>(i);
 }
 
 
-CACTParser::CompUnitContext* CACTParser::compUnit() {
+size_t SysYParser::CompUnitContext::getRuleIndex() const {
+  return SysYParser::RuleCompUnit;
+}
+
+
+SysYParser::CompUnitContext* SysYParser::compUnit() {
   CompUnitContext *_localctx = _tracker.createInstance<CompUnitContext>(_ctx, getState());
-  enterRule(_localctx, 0, CACTParser::RuleCompUnit);
+  enterRule(_localctx, 0, SysYParser::RuleCompUnit);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -99,14 +99,14 @@ CACTParser::CompUnitContext* CACTParser::compUnit() {
       _errHandler->sync(this);
       _la = _input->LA(1);
     } while ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__0)
-      | (1ULL << CACTParser::T__3)
-      | (1ULL << CACTParser::T__4)
-      | (1ULL << CACTParser::T__5)
-      | (1ULL << CACTParser::T__6)
-      | (1ULL << CACTParser::T__14))) != 0));
+      ((1ULL << _la) & ((1ULL << SysYParser::T__0)
+      | (1ULL << SysYParser::T__3)
+      | (1ULL << SysYParser::T__4)
+      | (1ULL << SysYParser::T__5)
+      | (1ULL << SysYParser::T__6)
+      | (1ULL << SysYParser::T__14))) != 0));
     setState(76);
-    match(CACTParser::EOF);
+    match(SysYParser::EOF);
    
   }
   catch (RecognitionException &e) {
@@ -120,27 +120,27 @@ CACTParser::CompUnitContext* CACTParser::compUnit() {
 
 //----------------- DeclContext ------------------------------------------------------------------
 
-CACTParser::DeclContext::DeclContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::DeclContext::DeclContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::ConstDeclContext* CACTParser::DeclContext::constDecl() {
-  return getRuleContext<CACTParser::ConstDeclContext>(0);
+SysYParser::ConstDeclContext* SysYParser::DeclContext::constDecl() {
+  return getRuleContext<SysYParser::ConstDeclContext>(0);
 }
 
-CACTParser::VarDeclContext* CACTParser::DeclContext::varDecl() {
-  return getRuleContext<CACTParser::VarDeclContext>(0);
-}
-
-
-size_t CACTParser::DeclContext::getRuleIndex() const {
-  return CACTParser::RuleDecl;
+SysYParser::VarDeclContext* SysYParser::DeclContext::varDecl() {
+  return getRuleContext<SysYParser::VarDeclContext>(0);
 }
 
 
-CACTParser::DeclContext* CACTParser::decl() {
+size_t SysYParser::DeclContext::getRuleIndex() const {
+  return SysYParser::RuleDecl;
+}
+
+
+SysYParser::DeclContext* SysYParser::decl() {
   DeclContext *_localctx = _tracker.createInstance<DeclContext>(_ctx, getState());
-  enterRule(_localctx, 2, CACTParser::RuleDecl);
+  enterRule(_localctx, 2, SysYParser::RuleDecl);
 
   auto onExit = finally([=] {
     exitRule();
@@ -149,17 +149,17 @@ CACTParser::DeclContext* CACTParser::decl() {
     setState(80);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::T__0: {
+      case SysYParser::T__0: {
         enterOuterAlt(_localctx, 1);
         setState(78);
         constDecl();
         break;
       }
 
-      case CACTParser::T__3:
-      case CACTParser::T__4:
-      case CACTParser::T__5:
-      case CACTParser::T__6: {
+      case SysYParser::T__3:
+      case SysYParser::T__4:
+      case SysYParser::T__5:
+      case SysYParser::T__6: {
         enterOuterAlt(_localctx, 2);
         setState(79);
         varDecl();
@@ -182,31 +182,31 @@ CACTParser::DeclContext* CACTParser::decl() {
 
 //----------------- ConstDeclContext ------------------------------------------------------------------
 
-CACTParser::ConstDeclContext::ConstDeclContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::ConstDeclContext::ConstDeclContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::BTypeContext* CACTParser::ConstDeclContext::bType() {
-  return getRuleContext<CACTParser::BTypeContext>(0);
+SysYParser::BTypeContext* SysYParser::ConstDeclContext::bType() {
+  return getRuleContext<SysYParser::BTypeContext>(0);
 }
 
-std::vector<CACTParser::ConstDefContext *> CACTParser::ConstDeclContext::constDef() {
-  return getRuleContexts<CACTParser::ConstDefContext>();
+std::vector<SysYParser::ConstDefContext *> SysYParser::ConstDeclContext::constDef() {
+  return getRuleContexts<SysYParser::ConstDefContext>();
 }
 
-CACTParser::ConstDefContext* CACTParser::ConstDeclContext::constDef(size_t i) {
-  return getRuleContext<CACTParser::ConstDefContext>(i);
-}
-
-
-size_t CACTParser::ConstDeclContext::getRuleIndex() const {
-  return CACTParser::RuleConstDecl;
+SysYParser::ConstDefContext* SysYParser::ConstDeclContext::constDef(size_t i) {
+  return getRuleContext<SysYParser::ConstDefContext>(i);
 }
 
 
-CACTParser::ConstDeclContext* CACTParser::constDecl() {
+size_t SysYParser::ConstDeclContext::getRuleIndex() const {
+  return SysYParser::RuleConstDecl;
+}
+
+
+SysYParser::ConstDeclContext* SysYParser::constDecl() {
   ConstDeclContext *_localctx = _tracker.createInstance<ConstDeclContext>(_ctx, getState());
-  enterRule(_localctx, 4, CACTParser::RuleConstDecl);
+  enterRule(_localctx, 4, SysYParser::RuleConstDecl);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -215,7 +215,7 @@ CACTParser::ConstDeclContext* CACTParser::constDecl() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(82);
-    match(CACTParser::T__0);
+    match(SysYParser::T__0);
     setState(83);
     bType();
     setState(84);
@@ -223,9 +223,9 @@ CACTParser::ConstDeclContext* CACTParser::constDecl() {
     setState(89);
     _errHandler->sync(this);
     _la = _input->LA(1);
-    while (_la == CACTParser::T__1) {
+    while (_la == SysYParser::T__1) {
       setState(85);
-      match(CACTParser::T__1);
+      match(SysYParser::T__1);
       setState(86);
       constDef();
       setState(91);
@@ -233,7 +233,7 @@ CACTParser::ConstDeclContext* CACTParser::constDecl() {
       _la = _input->LA(1);
     }
     setState(92);
-    match(CACTParser::T__2);
+    match(SysYParser::T__2);
    
   }
   catch (RecognitionException &e) {
@@ -247,19 +247,19 @@ CACTParser::ConstDeclContext* CACTParser::constDecl() {
 
 //----------------- BTypeContext ------------------------------------------------------------------
 
-CACTParser::BTypeContext::BTypeContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::BTypeContext::BTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::BTypeContext::getRuleIndex() const {
-  return CACTParser::RuleBType;
+size_t SysYParser::BTypeContext::getRuleIndex() const {
+  return SysYParser::RuleBType;
 }
 
 
-CACTParser::BTypeContext* CACTParser::bType() {
+SysYParser::BTypeContext* SysYParser::bType() {
   BTypeContext *_localctx = _tracker.createInstance<BTypeContext>(_ctx, getState());
-  enterRule(_localctx, 6, CACTParser::RuleBType);
+  enterRule(_localctx, 6, SysYParser::RuleBType);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -270,10 +270,10 @@ CACTParser::BTypeContext* CACTParser::bType() {
     setState(94);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__3)
-      | (1ULL << CACTParser::T__4)
-      | (1ULL << CACTParser::T__5)
-      | (1ULL << CACTParser::T__6))) != 0))) {
+      ((1ULL << _la) & ((1ULL << SysYParser::T__3)
+      | (1ULL << SysYParser::T__4)
+      | (1ULL << SysYParser::T__5)
+      | (1ULL << SysYParser::T__6))) != 0))) {
     _errHandler->recoverInline(this);
     }
     else {
@@ -293,31 +293,31 @@ CACTParser::BTypeContext* CACTParser::bType() {
 
 //----------------- ConstDefContext ------------------------------------------------------------------
 
-CACTParser::ConstDefContext::ConstDefContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::ConstDefContext::ConstDefContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* CACTParser::ConstDefContext::Ident() {
-  return getToken(CACTParser::Ident, 0);
+tree::TerminalNode* SysYParser::ConstDefContext::Ident() {
+  return getToken(SysYParser::Ident, 0);
 }
 
-CACTParser::ConstInitValContext* CACTParser::ConstDefContext::constInitVal() {
-  return getRuleContext<CACTParser::ConstInitValContext>(0);
+SysYParser::ConstInitValContext* SysYParser::ConstDefContext::constInitVal() {
+  return getRuleContext<SysYParser::ConstInitValContext>(0);
 }
 
-tree::TerminalNode* CACTParser::ConstDefContext::IntConst() {
-  return getToken(CACTParser::IntConst, 0);
-}
-
-
-size_t CACTParser::ConstDefContext::getRuleIndex() const {
-  return CACTParser::RuleConstDef;
+tree::TerminalNode* SysYParser::ConstDefContext::IntConst() {
+  return getToken(SysYParser::IntConst, 0);
 }
 
 
-CACTParser::ConstDefContext* CACTParser::constDef() {
+size_t SysYParser::ConstDefContext::getRuleIndex() const {
+  return SysYParser::RuleConstDef;
+}
+
+
+SysYParser::ConstDefContext* SysYParser::constDef() {
   ConstDefContext *_localctx = _tracker.createInstance<ConstDefContext>(_ctx, getState());
-  enterRule(_localctx, 8, CACTParser::RuleConstDef);
+  enterRule(_localctx, 8, SysYParser::RuleConstDef);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -326,21 +326,21 @@ CACTParser::ConstDefContext* CACTParser::constDef() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(96);
-    match(CACTParser::Ident);
+    match(SysYParser::Ident);
     setState(100);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
-    if (_la == CACTParser::T__7) {
+    if (_la == SysYParser::T__7) {
       setState(97);
-      match(CACTParser::T__7);
+      match(SysYParser::T__7);
       setState(98);
-      match(CACTParser::IntConst);
+      match(SysYParser::IntConst);
       setState(99);
-      match(CACTParser::T__8);
+      match(SysYParser::T__8);
     }
     setState(102);
-    match(CACTParser::T__9);
+    match(SysYParser::T__9);
     setState(103);
     constInitVal();
    
@@ -356,16 +356,16 @@ CACTParser::ConstDefContext* CACTParser::constDef() {
 
 //----------------- ConstInitValContext ------------------------------------------------------------------
 
-CACTParser::ConstInitValContext::ConstInitValContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::ConstInitValContext::ConstInitValContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::ConstInitValContext::getRuleIndex() const {
-  return CACTParser::RuleConstInitVal;
+size_t SysYParser::ConstInitValContext::getRuleIndex() const {
+  return SysYParser::RuleConstInitVal;
 }
 
-void CACTParser::ConstInitValContext::copyFrom(ConstInitValContext *ctx) {
+void SysYParser::ConstInitValContext::copyFrom(ConstInitValContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->type = ctx->type;
   this->size = ctx->size;
@@ -374,29 +374,29 @@ void CACTParser::ConstInitValContext::copyFrom(ConstInitValContext *ctx) {
 
 //----------------- ConstInitValOfVarContext ------------------------------------------------------------------
 
-CACTParser::ConstExpContext* CACTParser::ConstInitValOfVarContext::constExp() {
-  return getRuleContext<CACTParser::ConstExpContext>(0);
+SysYParser::ConstExpContext* SysYParser::ConstInitValOfVarContext::constExp() {
+  return getRuleContext<SysYParser::ConstExpContext>(0);
 }
 
-CACTParser::ConstInitValOfVarContext::ConstInitValOfVarContext(ConstInitValContext *ctx) { copyFrom(ctx); }
+SysYParser::ConstInitValOfVarContext::ConstInitValOfVarContext(ConstInitValContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- ConstInitValOfArrayContext ------------------------------------------------------------------
 
-std::vector<CACTParser::ConstExpContext *> CACTParser::ConstInitValOfArrayContext::constExp() {
-  return getRuleContexts<CACTParser::ConstExpContext>();
+std::vector<SysYParser::ConstExpContext *> SysYParser::ConstInitValOfArrayContext::constExp() {
+  return getRuleContexts<SysYParser::ConstExpContext>();
 }
 
-CACTParser::ConstExpContext* CACTParser::ConstInitValOfArrayContext::constExp(size_t i) {
-  return getRuleContext<CACTParser::ConstExpContext>(i);
+SysYParser::ConstExpContext* SysYParser::ConstInitValOfArrayContext::constExp(size_t i) {
+  return getRuleContext<SysYParser::ConstExpContext>(i);
 }
 
-CACTParser::ConstInitValOfArrayContext::ConstInitValOfArrayContext(ConstInitValContext *ctx) { copyFrom(ctx); }
+SysYParser::ConstInitValOfArrayContext::ConstInitValOfArrayContext(ConstInitValContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::ConstInitValContext* CACTParser::constInitVal() {
+SysYParser::ConstInitValContext* SysYParser::constInitVal() {
   ConstInitValContext *_localctx = _tracker.createInstance<ConstInitValContext>(_ctx, getState());
-  enterRule(_localctx, 10, CACTParser::RuleConstInitVal);
+  enterRule(_localctx, 10, SysYParser::RuleConstInitVal);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -406,51 +406,51 @@ CACTParser::ConstInitValContext* CACTParser::constInitVal() {
     setState(120);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::T__1:
-      case CACTParser::T__2:
-      case CACTParser::BoolConst:
-      case CACTParser::IntConst:
-      case CACTParser::FloatConst:
-      case CACTParser::DoubleConst: {
-        _localctx = dynamic_cast<ConstInitValContext *>(_tracker.createInstance<CACTParser::ConstInitValOfVarContext>(_localctx));
+      case SysYParser::T__1:
+      case SysYParser::T__2:
+      case SysYParser::BoolConst:
+      case SysYParser::IntConst:
+      case SysYParser::FloatConst:
+      case SysYParser::DoubleConst: {
+        _localctx = dynamic_cast<ConstInitValContext *>(_tracker.createInstance<SysYParser::ConstInitValOfVarContext>(_localctx));
         enterOuterAlt(_localctx, 1);
         setState(106);
         _errHandler->sync(this);
 
         _la = _input->LA(1);
         if ((((_la & ~ 0x3fULL) == 0) &&
-          ((1ULL << _la) & ((1ULL << CACTParser::BoolConst)
-          | (1ULL << CACTParser::IntConst)
-          | (1ULL << CACTParser::FloatConst)
-          | (1ULL << CACTParser::DoubleConst))) != 0)) {
+          ((1ULL << _la) & ((1ULL << SysYParser::BoolConst)
+          | (1ULL << SysYParser::IntConst)
+          | (1ULL << SysYParser::FloatConst)
+          | (1ULL << SysYParser::DoubleConst))) != 0)) {
           setState(105);
           constExp();
         }
         break;
       }
 
-      case CACTParser::T__10: {
-        _localctx = dynamic_cast<ConstInitValContext *>(_tracker.createInstance<CACTParser::ConstInitValOfArrayContext>(_localctx));
+      case SysYParser::T__10: {
+        _localctx = dynamic_cast<ConstInitValContext *>(_tracker.createInstance<SysYParser::ConstInitValOfArrayContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(108);
-        match(CACTParser::T__10);
+        match(SysYParser::T__10);
         setState(117);
         _errHandler->sync(this);
 
         _la = _input->LA(1);
         if ((((_la & ~ 0x3fULL) == 0) &&
-          ((1ULL << _la) & ((1ULL << CACTParser::BoolConst)
-          | (1ULL << CACTParser::IntConst)
-          | (1ULL << CACTParser::FloatConst)
-          | (1ULL << CACTParser::DoubleConst))) != 0)) {
+          ((1ULL << _la) & ((1ULL << SysYParser::BoolConst)
+          | (1ULL << SysYParser::IntConst)
+          | (1ULL << SysYParser::FloatConst)
+          | (1ULL << SysYParser::DoubleConst))) != 0)) {
           setState(109);
           constExp();
           setState(114);
           _errHandler->sync(this);
           _la = _input->LA(1);
-          while (_la == CACTParser::T__1) {
+          while (_la == SysYParser::T__1) {
             setState(110);
-            match(CACTParser::T__1);
+            match(SysYParser::T__1);
             setState(111);
             constExp();
             setState(116);
@@ -459,7 +459,7 @@ CACTParser::ConstInitValContext* CACTParser::constInitVal() {
           }
         }
         setState(119);
-        match(CACTParser::T__11);
+        match(SysYParser::T__11);
         break;
       }
 
@@ -479,31 +479,31 @@ CACTParser::ConstInitValContext* CACTParser::constInitVal() {
 
 //----------------- VarDeclContext ------------------------------------------------------------------
 
-CACTParser::VarDeclContext::VarDeclContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::VarDeclContext::VarDeclContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::BTypeContext* CACTParser::VarDeclContext::bType() {
-  return getRuleContext<CACTParser::BTypeContext>(0);
+SysYParser::BTypeContext* SysYParser::VarDeclContext::bType() {
+  return getRuleContext<SysYParser::BTypeContext>(0);
 }
 
-std::vector<CACTParser::VarDefContext *> CACTParser::VarDeclContext::varDef() {
-  return getRuleContexts<CACTParser::VarDefContext>();
+std::vector<SysYParser::VarDefContext *> SysYParser::VarDeclContext::varDef() {
+  return getRuleContexts<SysYParser::VarDefContext>();
 }
 
-CACTParser::VarDefContext* CACTParser::VarDeclContext::varDef(size_t i) {
-  return getRuleContext<CACTParser::VarDefContext>(i);
-}
-
-
-size_t CACTParser::VarDeclContext::getRuleIndex() const {
-  return CACTParser::RuleVarDecl;
+SysYParser::VarDefContext* SysYParser::VarDeclContext::varDef(size_t i) {
+  return getRuleContext<SysYParser::VarDefContext>(i);
 }
 
 
-CACTParser::VarDeclContext* CACTParser::varDecl() {
+size_t SysYParser::VarDeclContext::getRuleIndex() const {
+  return SysYParser::RuleVarDecl;
+}
+
+
+SysYParser::VarDeclContext* SysYParser::varDecl() {
   VarDeclContext *_localctx = _tracker.createInstance<VarDeclContext>(_ctx, getState());
-  enterRule(_localctx, 12, CACTParser::RuleVarDecl);
+  enterRule(_localctx, 12, SysYParser::RuleVarDecl);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -518,9 +518,9 @@ CACTParser::VarDeclContext* CACTParser::varDecl() {
     setState(128);
     _errHandler->sync(this);
     _la = _input->LA(1);
-    while (_la == CACTParser::T__1) {
+    while (_la == SysYParser::T__1) {
       setState(124);
-      match(CACTParser::T__1);
+      match(SysYParser::T__1);
       setState(125);
       varDef();
       setState(130);
@@ -528,7 +528,7 @@ CACTParser::VarDeclContext* CACTParser::varDecl() {
       _la = _input->LA(1);
     }
     setState(131);
-    match(CACTParser::T__2);
+    match(SysYParser::T__2);
    
   }
   catch (RecognitionException &e) {
@@ -542,31 +542,31 @@ CACTParser::VarDeclContext* CACTParser::varDecl() {
 
 //----------------- VarDefContext ------------------------------------------------------------------
 
-CACTParser::VarDefContext::VarDefContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::VarDefContext::VarDefContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* CACTParser::VarDefContext::Ident() {
-  return getToken(CACTParser::Ident, 0);
+tree::TerminalNode* SysYParser::VarDefContext::Ident() {
+  return getToken(SysYParser::Ident, 0);
 }
 
-tree::TerminalNode* CACTParser::VarDefContext::IntConst() {
-  return getToken(CACTParser::IntConst, 0);
+tree::TerminalNode* SysYParser::VarDefContext::IntConst() {
+  return getToken(SysYParser::IntConst, 0);
 }
 
-CACTParser::ConstInitValContext* CACTParser::VarDefContext::constInitVal() {
-  return getRuleContext<CACTParser::ConstInitValContext>(0);
-}
-
-
-size_t CACTParser::VarDefContext::getRuleIndex() const {
-  return CACTParser::RuleVarDef;
+SysYParser::ConstInitValContext* SysYParser::VarDefContext::constInitVal() {
+  return getRuleContext<SysYParser::ConstInitValContext>(0);
 }
 
 
-CACTParser::VarDefContext* CACTParser::varDef() {
+size_t SysYParser::VarDefContext::getRuleIndex() const {
+  return SysYParser::RuleVarDef;
+}
+
+
+SysYParser::VarDefContext* SysYParser::varDef() {
   VarDefContext *_localctx = _tracker.createInstance<VarDefContext>(_ctx, getState());
-  enterRule(_localctx, 14, CACTParser::RuleVarDef);
+  enterRule(_localctx, 14, SysYParser::RuleVarDef);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -575,26 +575,26 @@ CACTParser::VarDefContext* CACTParser::varDef() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(133);
-    match(CACTParser::Ident);
+    match(SysYParser::Ident);
     setState(137);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
-    if (_la == CACTParser::T__7) {
+    if (_la == SysYParser::T__7) {
       setState(134);
-      match(CACTParser::T__7);
+      match(SysYParser::T__7);
       setState(135);
-      match(CACTParser::IntConst);
+      match(SysYParser::IntConst);
       setState(136);
-      match(CACTParser::T__8);
+      match(SysYParser::T__8);
     }
     setState(141);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
-    if (_la == CACTParser::T__9) {
+    if (_la == SysYParser::T__9) {
       setState(139);
-      match(CACTParser::T__9);
+      match(SysYParser::T__9);
       setState(140);
       constInitVal();
     }
@@ -611,35 +611,35 @@ CACTParser::VarDefContext* CACTParser::varDef() {
 
 //----------------- FuncDefContext ------------------------------------------------------------------
 
-CACTParser::FuncDefContext::FuncDefContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::FuncDefContext::FuncDefContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::FuncTypeContext* CACTParser::FuncDefContext::funcType() {
-  return getRuleContext<CACTParser::FuncTypeContext>(0);
+SysYParser::FuncTypeContext* SysYParser::FuncDefContext::funcType() {
+  return getRuleContext<SysYParser::FuncTypeContext>(0);
 }
 
-tree::TerminalNode* CACTParser::FuncDefContext::Ident() {
-  return getToken(CACTParser::Ident, 0);
+tree::TerminalNode* SysYParser::FuncDefContext::Ident() {
+  return getToken(SysYParser::Ident, 0);
 }
 
-CACTParser::FuncBlockContext* CACTParser::FuncDefContext::funcBlock() {
-  return getRuleContext<CACTParser::FuncBlockContext>(0);
+SysYParser::FuncBlockContext* SysYParser::FuncDefContext::funcBlock() {
+  return getRuleContext<SysYParser::FuncBlockContext>(0);
 }
 
-CACTParser::FuncFParamsContext* CACTParser::FuncDefContext::funcFParams() {
-  return getRuleContext<CACTParser::FuncFParamsContext>(0);
-}
-
-
-size_t CACTParser::FuncDefContext::getRuleIndex() const {
-  return CACTParser::RuleFuncDef;
+SysYParser::FuncFParamsContext* SysYParser::FuncDefContext::funcFParams() {
+  return getRuleContext<SysYParser::FuncFParamsContext>(0);
 }
 
 
-CACTParser::FuncDefContext* CACTParser::funcDef() {
+size_t SysYParser::FuncDefContext::getRuleIndex() const {
+  return SysYParser::RuleFuncDef;
+}
+
+
+SysYParser::FuncDefContext* SysYParser::funcDef() {
   FuncDefContext *_localctx = _tracker.createInstance<FuncDefContext>(_ctx, getState());
-  enterRule(_localctx, 16, CACTParser::RuleFuncDef);
+  enterRule(_localctx, 16, SysYParser::RuleFuncDef);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -650,23 +650,23 @@ CACTParser::FuncDefContext* CACTParser::funcDef() {
     setState(143);
     funcType();
     setState(144);
-    match(CACTParser::Ident);
+    match(SysYParser::Ident);
     setState(145);
-    match(CACTParser::T__12);
+    match(SysYParser::T__12);
     setState(147);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__3)
-      | (1ULL << CACTParser::T__4)
-      | (1ULL << CACTParser::T__5)
-      | (1ULL << CACTParser::T__6))) != 0)) {
+      ((1ULL << _la) & ((1ULL << SysYParser::T__3)
+      | (1ULL << SysYParser::T__4)
+      | (1ULL << SysYParser::T__5)
+      | (1ULL << SysYParser::T__6))) != 0)) {
       setState(146);
       funcFParams();
     }
     setState(149);
-    match(CACTParser::T__13);
+    match(SysYParser::T__13);
     setState(150);
     funcBlock();
    
@@ -682,19 +682,19 @@ CACTParser::FuncDefContext* CACTParser::funcDef() {
 
 //----------------- FuncTypeContext ------------------------------------------------------------------
 
-CACTParser::FuncTypeContext::FuncTypeContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::FuncTypeContext::FuncTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::FuncTypeContext::getRuleIndex() const {
-  return CACTParser::RuleFuncType;
+size_t SysYParser::FuncTypeContext::getRuleIndex() const {
+  return SysYParser::RuleFuncType;
 }
 
 
-CACTParser::FuncTypeContext* CACTParser::funcType() {
+SysYParser::FuncTypeContext* SysYParser::funcType() {
   FuncTypeContext *_localctx = _tracker.createInstance<FuncTypeContext>(_ctx, getState());
-  enterRule(_localctx, 18, CACTParser::RuleFuncType);
+  enterRule(_localctx, 18, SysYParser::RuleFuncType);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -705,11 +705,11 @@ CACTParser::FuncTypeContext* CACTParser::funcType() {
     setState(152);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__3)
-      | (1ULL << CACTParser::T__4)
-      | (1ULL << CACTParser::T__5)
-      | (1ULL << CACTParser::T__6)
-      | (1ULL << CACTParser::T__14))) != 0))) {
+      ((1ULL << _la) & ((1ULL << SysYParser::T__3)
+      | (1ULL << SysYParser::T__4)
+      | (1ULL << SysYParser::T__5)
+      | (1ULL << SysYParser::T__6)
+      | (1ULL << SysYParser::T__14))) != 0))) {
     _errHandler->recoverInline(this);
     }
     else {
@@ -729,27 +729,27 @@ CACTParser::FuncTypeContext* CACTParser::funcType() {
 
 //----------------- FuncFParamsContext ------------------------------------------------------------------
 
-CACTParser::FuncFParamsContext::FuncFParamsContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::FuncFParamsContext::FuncFParamsContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<CACTParser::FuncFParamContext *> CACTParser::FuncFParamsContext::funcFParam() {
-  return getRuleContexts<CACTParser::FuncFParamContext>();
+std::vector<SysYParser::FuncFParamContext *> SysYParser::FuncFParamsContext::funcFParam() {
+  return getRuleContexts<SysYParser::FuncFParamContext>();
 }
 
-CACTParser::FuncFParamContext* CACTParser::FuncFParamsContext::funcFParam(size_t i) {
-  return getRuleContext<CACTParser::FuncFParamContext>(i);
-}
-
-
-size_t CACTParser::FuncFParamsContext::getRuleIndex() const {
-  return CACTParser::RuleFuncFParams;
+SysYParser::FuncFParamContext* SysYParser::FuncFParamsContext::funcFParam(size_t i) {
+  return getRuleContext<SysYParser::FuncFParamContext>(i);
 }
 
 
-CACTParser::FuncFParamsContext* CACTParser::funcFParams() {
+size_t SysYParser::FuncFParamsContext::getRuleIndex() const {
+  return SysYParser::RuleFuncFParams;
+}
+
+
+SysYParser::FuncFParamsContext* SysYParser::funcFParams() {
   FuncFParamsContext *_localctx = _tracker.createInstance<FuncFParamsContext>(_ctx, getState());
-  enterRule(_localctx, 20, CACTParser::RuleFuncFParams);
+  enterRule(_localctx, 20, SysYParser::RuleFuncFParams);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -762,9 +762,9 @@ CACTParser::FuncFParamsContext* CACTParser::funcFParams() {
     setState(159);
     _errHandler->sync(this);
     _la = _input->LA(1);
-    while (_la == CACTParser::T__1) {
+    while (_la == SysYParser::T__1) {
       setState(155);
-      match(CACTParser::T__1);
+      match(SysYParser::T__1);
       setState(156);
       funcFParam();
       setState(161);
@@ -784,31 +784,31 @@ CACTParser::FuncFParamsContext* CACTParser::funcFParams() {
 
 //----------------- FuncFParamContext ------------------------------------------------------------------
 
-CACTParser::FuncFParamContext::FuncFParamContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::FuncFParamContext::FuncFParamContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::BTypeContext* CACTParser::FuncFParamContext::bType() {
-  return getRuleContext<CACTParser::BTypeContext>(0);
+SysYParser::BTypeContext* SysYParser::FuncFParamContext::bType() {
+  return getRuleContext<SysYParser::BTypeContext>(0);
 }
 
-tree::TerminalNode* CACTParser::FuncFParamContext::Ident() {
-  return getToken(CACTParser::Ident, 0);
+tree::TerminalNode* SysYParser::FuncFParamContext::Ident() {
+  return getToken(SysYParser::Ident, 0);
 }
 
-CACTParser::BracketsContext* CACTParser::FuncFParamContext::brackets() {
-  return getRuleContext<CACTParser::BracketsContext>(0);
-}
-
-
-size_t CACTParser::FuncFParamContext::getRuleIndex() const {
-  return CACTParser::RuleFuncFParam;
+SysYParser::BracketsContext* SysYParser::FuncFParamContext::brackets() {
+  return getRuleContext<SysYParser::BracketsContext>(0);
 }
 
 
-CACTParser::FuncFParamContext* CACTParser::funcFParam() {
+size_t SysYParser::FuncFParamContext::getRuleIndex() const {
+  return SysYParser::RuleFuncFParam;
+}
+
+
+SysYParser::FuncFParamContext* SysYParser::funcFParam() {
   FuncFParamContext *_localctx = _tracker.createInstance<FuncFParamContext>(_ctx, getState());
-  enterRule(_localctx, 22, CACTParser::RuleFuncFParam);
+  enterRule(_localctx, 22, SysYParser::RuleFuncFParam);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -819,12 +819,12 @@ CACTParser::FuncFParamContext* CACTParser::funcFParam() {
     setState(162);
     bType();
     setState(163);
-    match(CACTParser::Ident);
+    match(SysYParser::Ident);
     setState(165);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
-    if (_la == CACTParser::T__7) {
+    if (_la == SysYParser::T__7) {
       setState(164);
       brackets();
     }
@@ -841,19 +841,19 @@ CACTParser::FuncFParamContext* CACTParser::funcFParam() {
 
 //----------------- BracketsContext ------------------------------------------------------------------
 
-CACTParser::BracketsContext::BracketsContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::BracketsContext::BracketsContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::BracketsContext::getRuleIndex() const {
-  return CACTParser::RuleBrackets;
+size_t SysYParser::BracketsContext::getRuleIndex() const {
+  return SysYParser::RuleBrackets;
 }
 
 
-CACTParser::BracketsContext* CACTParser::brackets() {
+SysYParser::BracketsContext* SysYParser::brackets() {
   BracketsContext *_localctx = _tracker.createInstance<BracketsContext>(_ctx, getState());
-  enterRule(_localctx, 24, CACTParser::RuleBrackets);
+  enterRule(_localctx, 24, SysYParser::RuleBrackets);
 
   auto onExit = finally([=] {
     exitRule();
@@ -861,9 +861,9 @@ CACTParser::BracketsContext* CACTParser::brackets() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(167);
-    match(CACTParser::T__7);
+    match(SysYParser::T__7);
     setState(168);
-    match(CACTParser::T__8);
+    match(SysYParser::T__8);
    
   }
   catch (RecognitionException &e) {
@@ -877,27 +877,27 @@ CACTParser::BracketsContext* CACTParser::brackets() {
 
 //----------------- FuncBlockContext ------------------------------------------------------------------
 
-CACTParser::FuncBlockContext::FuncBlockContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::FuncBlockContext::FuncBlockContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<CACTParser::FuncBlockItemContext *> CACTParser::FuncBlockContext::funcBlockItem() {
-  return getRuleContexts<CACTParser::FuncBlockItemContext>();
+std::vector<SysYParser::FuncBlockItemContext *> SysYParser::FuncBlockContext::funcBlockItem() {
+  return getRuleContexts<SysYParser::FuncBlockItemContext>();
 }
 
-CACTParser::FuncBlockItemContext* CACTParser::FuncBlockContext::funcBlockItem(size_t i) {
-  return getRuleContext<CACTParser::FuncBlockItemContext>(i);
-}
-
-
-size_t CACTParser::FuncBlockContext::getRuleIndex() const {
-  return CACTParser::RuleFuncBlock;
+SysYParser::FuncBlockItemContext* SysYParser::FuncBlockContext::funcBlockItem(size_t i) {
+  return getRuleContext<SysYParser::FuncBlockItemContext>(i);
 }
 
 
-CACTParser::FuncBlockContext* CACTParser::funcBlock() {
+size_t SysYParser::FuncBlockContext::getRuleIndex() const {
+  return SysYParser::RuleFuncBlock;
+}
+
+
+SysYParser::FuncBlockContext* SysYParser::funcBlock() {
   FuncBlockContext *_localctx = _tracker.createInstance<FuncBlockContext>(_ctx, getState());
-  enterRule(_localctx, 26, CACTParser::RuleFuncBlock);
+  enterRule(_localctx, 26, SysYParser::RuleFuncBlock);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -906,30 +906,30 @@ CACTParser::FuncBlockContext* CACTParser::funcBlock() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(170);
-    match(CACTParser::T__10);
+    match(SysYParser::T__10);
     setState(174);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__0)
-      | (1ULL << CACTParser::T__2)
-      | (1ULL << CACTParser::T__3)
-      | (1ULL << CACTParser::T__4)
-      | (1ULL << CACTParser::T__5)
-      | (1ULL << CACTParser::T__6)
-      | (1ULL << CACTParser::T__10)
-      | (1ULL << CACTParser::T__12)
-      | (1ULL << CACTParser::T__15)
-      | (1ULL << CACTParser::T__17)
-      | (1ULL << CACTParser::T__18)
-      | (1ULL << CACTParser::T__21)
-      | (1ULL << CACTParser::T__22)
-      | (1ULL << CACTParser::T__23)
-      | (1ULL << CACTParser::BoolConst)
-      | (1ULL << CACTParser::Ident)
-      | (1ULL << CACTParser::IntConst)
-      | (1ULL << CACTParser::FloatConst)
-      | (1ULL << CACTParser::DoubleConst))) != 0)) {
+      ((1ULL << _la) & ((1ULL << SysYParser::T__0)
+      | (1ULL << SysYParser::T__2)
+      | (1ULL << SysYParser::T__3)
+      | (1ULL << SysYParser::T__4)
+      | (1ULL << SysYParser::T__5)
+      | (1ULL << SysYParser::T__6)
+      | (1ULL << SysYParser::T__10)
+      | (1ULL << SysYParser::T__12)
+      | (1ULL << SysYParser::T__15)
+      | (1ULL << SysYParser::T__17)
+      | (1ULL << SysYParser::T__18)
+      | (1ULL << SysYParser::T__21)
+      | (1ULL << SysYParser::T__22)
+      | (1ULL << SysYParser::T__23)
+      | (1ULL << SysYParser::BoolConst)
+      | (1ULL << SysYParser::Ident)
+      | (1ULL << SysYParser::IntConst)
+      | (1ULL << SysYParser::FloatConst)
+      | (1ULL << SysYParser::DoubleConst))) != 0)) {
       setState(171);
       funcBlockItem();
       setState(176);
@@ -937,7 +937,7 @@ CACTParser::FuncBlockContext* CACTParser::funcBlock() {
       _la = _input->LA(1);
     }
     setState(177);
-    match(CACTParser::T__11);
+    match(SysYParser::T__11);
    
   }
   catch (RecognitionException &e) {
@@ -951,27 +951,27 @@ CACTParser::FuncBlockContext* CACTParser::funcBlock() {
 
 //----------------- FuncBlockItemContext ------------------------------------------------------------------
 
-CACTParser::FuncBlockItemContext::FuncBlockItemContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::FuncBlockItemContext::FuncBlockItemContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::DeclContext* CACTParser::FuncBlockItemContext::decl() {
-  return getRuleContext<CACTParser::DeclContext>(0);
+SysYParser::DeclContext* SysYParser::FuncBlockItemContext::decl() {
+  return getRuleContext<SysYParser::DeclContext>(0);
 }
 
-CACTParser::StmtContext* CACTParser::FuncBlockItemContext::stmt() {
-  return getRuleContext<CACTParser::StmtContext>(0);
-}
-
-
-size_t CACTParser::FuncBlockItemContext::getRuleIndex() const {
-  return CACTParser::RuleFuncBlockItem;
+SysYParser::StmtContext* SysYParser::FuncBlockItemContext::stmt() {
+  return getRuleContext<SysYParser::StmtContext>(0);
 }
 
 
-CACTParser::FuncBlockItemContext* CACTParser::funcBlockItem() {
+size_t SysYParser::FuncBlockItemContext::getRuleIndex() const {
+  return SysYParser::RuleFuncBlockItem;
+}
+
+
+SysYParser::FuncBlockItemContext* SysYParser::funcBlockItem() {
   FuncBlockItemContext *_localctx = _tracker.createInstance<FuncBlockItemContext>(_ctx, getState());
-  enterRule(_localctx, 28, CACTParser::RuleFuncBlockItem);
+  enterRule(_localctx, 28, SysYParser::RuleFuncBlockItem);
 
   auto onExit = finally([=] {
     exitRule();
@@ -980,31 +980,31 @@ CACTParser::FuncBlockItemContext* CACTParser::funcBlockItem() {
     setState(181);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::T__0:
-      case CACTParser::T__3:
-      case CACTParser::T__4:
-      case CACTParser::T__5:
-      case CACTParser::T__6: {
+      case SysYParser::T__0:
+      case SysYParser::T__3:
+      case SysYParser::T__4:
+      case SysYParser::T__5:
+      case SysYParser::T__6: {
         enterOuterAlt(_localctx, 1);
         setState(179);
         decl();
         break;
       }
 
-      case CACTParser::T__2:
-      case CACTParser::T__10:
-      case CACTParser::T__12:
-      case CACTParser::T__15:
-      case CACTParser::T__17:
-      case CACTParser::T__18:
-      case CACTParser::T__21:
-      case CACTParser::T__22:
-      case CACTParser::T__23:
-      case CACTParser::BoolConst:
-      case CACTParser::Ident:
-      case CACTParser::IntConst:
-      case CACTParser::FloatConst:
-      case CACTParser::DoubleConst: {
+      case SysYParser::T__2:
+      case SysYParser::T__10:
+      case SysYParser::T__12:
+      case SysYParser::T__15:
+      case SysYParser::T__17:
+      case SysYParser::T__18:
+      case SysYParser::T__21:
+      case SysYParser::T__22:
+      case SysYParser::T__23:
+      case SysYParser::BoolConst:
+      case SysYParser::Ident:
+      case SysYParser::IntConst:
+      case SysYParser::FloatConst:
+      case SysYParser::DoubleConst: {
         enterOuterAlt(_localctx, 2);
         setState(180);
         stmt();
@@ -1027,16 +1027,16 @@ CACTParser::FuncBlockItemContext* CACTParser::funcBlockItem() {
 
 //----------------- StmtContext ------------------------------------------------------------------
 
-CACTParser::StmtContext::StmtContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::StmtContext::StmtContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::StmtContext::getRuleIndex() const {
-  return CACTParser::RuleStmt;
+size_t SysYParser::StmtContext::getRuleIndex() const {
+  return SysYParser::RuleStmt;
 }
 
-void CACTParser::StmtContext::copyFrom(StmtContext *ctx) {
+void SysYParser::StmtContext::copyFrom(StmtContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->hasReturn = ctx->hasReturn;
   this->returnType = ctx->returnType;
@@ -1044,68 +1044,68 @@ void CACTParser::StmtContext::copyFrom(StmtContext *ctx) {
 
 //----------------- StmtBlockContext ------------------------------------------------------------------
 
-CACTParser::FuncBlockContext* CACTParser::StmtBlockContext::funcBlock() {
-  return getRuleContext<CACTParser::FuncBlockContext>(0);
+SysYParser::FuncBlockContext* SysYParser::StmtBlockContext::funcBlock() {
+  return getRuleContext<SysYParser::FuncBlockContext>(0);
 }
 
-CACTParser::StmtBlockContext::StmtBlockContext(StmtContext *ctx) { copyFrom(ctx); }
+SysYParser::StmtBlockContext::StmtBlockContext(StmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- StmtExpressionContext ------------------------------------------------------------------
 
-CACTParser::ExpContext* CACTParser::StmtExpressionContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
+SysYParser::ExpContext* SysYParser::StmtExpressionContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-CACTParser::StmtExpressionContext::StmtExpressionContext(StmtContext *ctx) { copyFrom(ctx); }
+SysYParser::StmtExpressionContext::StmtExpressionContext(StmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- StmtAssignmentContext ------------------------------------------------------------------
 
-CACTParser::LValContext* CACTParser::StmtAssignmentContext::lVal() {
-  return getRuleContext<CACTParser::LValContext>(0);
+SysYParser::LValContext* SysYParser::StmtAssignmentContext::lVal() {
+  return getRuleContext<SysYParser::LValContext>(0);
 }
 
-CACTParser::ExpContext* CACTParser::StmtAssignmentContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
+SysYParser::ExpContext* SysYParser::StmtAssignmentContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-CACTParser::StmtAssignmentContext::StmtAssignmentContext(StmtContext *ctx) { copyFrom(ctx); }
+SysYParser::StmtAssignmentContext::StmtAssignmentContext(StmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- StmtCtrlSeqContext ------------------------------------------------------------------
 
-CACTParser::CondContext* CACTParser::StmtCtrlSeqContext::cond() {
-  return getRuleContext<CACTParser::CondContext>(0);
+SysYParser::CondContext* SysYParser::StmtCtrlSeqContext::cond() {
+  return getRuleContext<SysYParser::CondContext>(0);
 }
 
-std::vector<CACTParser::StmtContext *> CACTParser::StmtCtrlSeqContext::stmt() {
-  return getRuleContexts<CACTParser::StmtContext>();
+std::vector<SysYParser::StmtContext *> SysYParser::StmtCtrlSeqContext::stmt() {
+  return getRuleContexts<SysYParser::StmtContext>();
 }
 
-CACTParser::StmtContext* CACTParser::StmtCtrlSeqContext::stmt(size_t i) {
-  return getRuleContext<CACTParser::StmtContext>(i);
+SysYParser::StmtContext* SysYParser::StmtCtrlSeqContext::stmt(size_t i) {
+  return getRuleContext<SysYParser::StmtContext>(i);
 }
 
-CACTParser::SubStmtContext* CACTParser::StmtCtrlSeqContext::subStmt() {
-  return getRuleContext<CACTParser::SubStmtContext>(0);
+SysYParser::SubStmtContext* SysYParser::StmtCtrlSeqContext::subStmt() {
+  return getRuleContext<SysYParser::SubStmtContext>(0);
 }
 
-CACTParser::StmtCtrlSeqContext::StmtCtrlSeqContext(StmtContext *ctx) { copyFrom(ctx); }
+SysYParser::StmtCtrlSeqContext::StmtCtrlSeqContext(StmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- StmtReturnContext ------------------------------------------------------------------
 
-CACTParser::ExpContext* CACTParser::StmtReturnContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
+SysYParser::ExpContext* SysYParser::StmtReturnContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-CACTParser::StmtReturnContext::StmtReturnContext(StmtContext *ctx) { copyFrom(ctx); }
+SysYParser::StmtReturnContext::StmtReturnContext(StmtContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::StmtContext* CACTParser::stmt() {
+SysYParser::StmtContext* SysYParser::stmt() {
   StmtContext *_localctx = _tracker.createInstance<StmtContext>(_ctx, getState());
-  enterRule(_localctx, 30, CACTParser::RuleStmt);
+  enterRule(_localctx, 30, SysYParser::RuleStmt);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -1116,46 +1116,46 @@ CACTParser::StmtContext* CACTParser::stmt() {
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 20, _ctx)) {
     case 1: {
-      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<CACTParser::StmtAssignmentContext>(_localctx));
+      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<SysYParser::StmtAssignmentContext>(_localctx));
       enterOuterAlt(_localctx, 1);
       setState(183);
       lVal();
       setState(184);
-      match(CACTParser::T__9);
+      match(SysYParser::T__9);
       setState(185);
       exp();
       setState(186);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
     case 2: {
-      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<CACTParser::StmtExpressionContext>(_localctx));
+      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<SysYParser::StmtExpressionContext>(_localctx));
       enterOuterAlt(_localctx, 2);
       setState(189);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
-        ((1ULL << _la) & ((1ULL << CACTParser::T__12)
-        | (1ULL << CACTParser::T__21)
-        | (1ULL << CACTParser::T__22)
-        | (1ULL << CACTParser::T__23)
-        | (1ULL << CACTParser::BoolConst)
-        | (1ULL << CACTParser::Ident)
-        | (1ULL << CACTParser::IntConst)
-        | (1ULL << CACTParser::FloatConst)
-        | (1ULL << CACTParser::DoubleConst))) != 0)) {
+        ((1ULL << _la) & ((1ULL << SysYParser::T__12)
+        | (1ULL << SysYParser::T__21)
+        | (1ULL << SysYParser::T__22)
+        | (1ULL << SysYParser::T__23)
+        | (1ULL << SysYParser::BoolConst)
+        | (1ULL << SysYParser::Ident)
+        | (1ULL << SysYParser::IntConst)
+        | (1ULL << SysYParser::FloatConst)
+        | (1ULL << SysYParser::DoubleConst))) != 0)) {
         setState(188);
         exp();
       }
       setState(191);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
     case 3: {
-      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<CACTParser::StmtBlockContext>(_localctx));
+      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<SysYParser::StmtBlockContext>(_localctx));
       enterOuterAlt(_localctx, 3);
       setState(192);
       funcBlock();
@@ -1163,16 +1163,16 @@ CACTParser::StmtContext* CACTParser::stmt() {
     }
 
     case 4: {
-      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<CACTParser::StmtCtrlSeqContext>(_localctx));
+      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<SysYParser::StmtCtrlSeqContext>(_localctx));
       enterOuterAlt(_localctx, 4);
       setState(193);
-      match(CACTParser::T__15);
+      match(SysYParser::T__15);
       setState(194);
-      match(CACTParser::T__12);
+      match(SysYParser::T__12);
       setState(195);
       cond();
       setState(196);
-      match(CACTParser::T__13);
+      match(SysYParser::T__13);
       setState(197);
       stmt();
       setState(200);
@@ -1181,7 +1181,7 @@ CACTParser::StmtContext* CACTParser::stmt() {
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 18, _ctx)) {
       case 1: {
         setState(198);
-        match(CACTParser::T__16);
+        match(SysYParser::T__16);
         setState(199);
         stmt();
         break;
@@ -1192,45 +1192,45 @@ CACTParser::StmtContext* CACTParser::stmt() {
     }
 
     case 5: {
-      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<CACTParser::StmtCtrlSeqContext>(_localctx));
+      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<SysYParser::StmtCtrlSeqContext>(_localctx));
       enterOuterAlt(_localctx, 5);
       setState(202);
-      match(CACTParser::T__17);
+      match(SysYParser::T__17);
       setState(203);
-      match(CACTParser::T__12);
+      match(SysYParser::T__12);
       setState(204);
       cond();
       setState(205);
-      match(CACTParser::T__13);
+      match(SysYParser::T__13);
       setState(206);
       subStmt();
       break;
     }
 
     case 6: {
-      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<CACTParser::StmtReturnContext>(_localctx));
+      _localctx = dynamic_cast<StmtContext *>(_tracker.createInstance<SysYParser::StmtReturnContext>(_localctx));
       enterOuterAlt(_localctx, 6);
       setState(208);
-      match(CACTParser::T__18);
+      match(SysYParser::T__18);
       setState(210);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
-        ((1ULL << _la) & ((1ULL << CACTParser::T__12)
-        | (1ULL << CACTParser::T__21)
-        | (1ULL << CACTParser::T__22)
-        | (1ULL << CACTParser::T__23)
-        | (1ULL << CACTParser::BoolConst)
-        | (1ULL << CACTParser::Ident)
-        | (1ULL << CACTParser::IntConst)
-        | (1ULL << CACTParser::FloatConst)
-        | (1ULL << CACTParser::DoubleConst))) != 0)) {
+        ((1ULL << _la) & ((1ULL << SysYParser::T__12)
+        | (1ULL << SysYParser::T__21)
+        | (1ULL << SysYParser::T__22)
+        | (1ULL << SysYParser::T__23)
+        | (1ULL << SysYParser::BoolConst)
+        | (1ULL << SysYParser::Ident)
+        | (1ULL << SysYParser::IntConst)
+        | (1ULL << SysYParser::FloatConst)
+        | (1ULL << SysYParser::DoubleConst))) != 0)) {
         setState(209);
         exp();
       }
       setState(212);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
@@ -1248,27 +1248,27 @@ CACTParser::StmtContext* CACTParser::stmt() {
 
 //----------------- BlockContext ------------------------------------------------------------------
 
-CACTParser::BlockContext::BlockContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::BlockContext::BlockContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<CACTParser::BlockItemContext *> CACTParser::BlockContext::blockItem() {
-  return getRuleContexts<CACTParser::BlockItemContext>();
+std::vector<SysYParser::BlockItemContext *> SysYParser::BlockContext::blockItem() {
+  return getRuleContexts<SysYParser::BlockItemContext>();
 }
 
-CACTParser::BlockItemContext* CACTParser::BlockContext::blockItem(size_t i) {
-  return getRuleContext<CACTParser::BlockItemContext>(i);
-}
-
-
-size_t CACTParser::BlockContext::getRuleIndex() const {
-  return CACTParser::RuleBlock;
+SysYParser::BlockItemContext* SysYParser::BlockContext::blockItem(size_t i) {
+  return getRuleContext<SysYParser::BlockItemContext>(i);
 }
 
 
-CACTParser::BlockContext* CACTParser::block() {
+size_t SysYParser::BlockContext::getRuleIndex() const {
+  return SysYParser::RuleBlock;
+}
+
+
+SysYParser::BlockContext* SysYParser::block() {
   BlockContext *_localctx = _tracker.createInstance<BlockContext>(_ctx, getState());
-  enterRule(_localctx, 32, CACTParser::RuleBlock);
+  enterRule(_localctx, 32, SysYParser::RuleBlock);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -1277,32 +1277,32 @@ CACTParser::BlockContext* CACTParser::block() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(215);
-    match(CACTParser::T__10);
+    match(SysYParser::T__10);
     setState(219);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__0)
-      | (1ULL << CACTParser::T__2)
-      | (1ULL << CACTParser::T__3)
-      | (1ULL << CACTParser::T__4)
-      | (1ULL << CACTParser::T__5)
-      | (1ULL << CACTParser::T__6)
-      | (1ULL << CACTParser::T__10)
-      | (1ULL << CACTParser::T__12)
-      | (1ULL << CACTParser::T__15)
-      | (1ULL << CACTParser::T__17)
-      | (1ULL << CACTParser::T__18)
-      | (1ULL << CACTParser::T__19)
-      | (1ULL << CACTParser::T__20)
-      | (1ULL << CACTParser::T__21)
-      | (1ULL << CACTParser::T__22)
-      | (1ULL << CACTParser::T__23)
-      | (1ULL << CACTParser::BoolConst)
-      | (1ULL << CACTParser::Ident)
-      | (1ULL << CACTParser::IntConst)
-      | (1ULL << CACTParser::FloatConst)
-      | (1ULL << CACTParser::DoubleConst))) != 0)) {
+      ((1ULL << _la) & ((1ULL << SysYParser::T__0)
+      | (1ULL << SysYParser::T__2)
+      | (1ULL << SysYParser::T__3)
+      | (1ULL << SysYParser::T__4)
+      | (1ULL << SysYParser::T__5)
+      | (1ULL << SysYParser::T__6)
+      | (1ULL << SysYParser::T__10)
+      | (1ULL << SysYParser::T__12)
+      | (1ULL << SysYParser::T__15)
+      | (1ULL << SysYParser::T__17)
+      | (1ULL << SysYParser::T__18)
+      | (1ULL << SysYParser::T__19)
+      | (1ULL << SysYParser::T__20)
+      | (1ULL << SysYParser::T__21)
+      | (1ULL << SysYParser::T__22)
+      | (1ULL << SysYParser::T__23)
+      | (1ULL << SysYParser::BoolConst)
+      | (1ULL << SysYParser::Ident)
+      | (1ULL << SysYParser::IntConst)
+      | (1ULL << SysYParser::FloatConst)
+      | (1ULL << SysYParser::DoubleConst))) != 0)) {
       setState(216);
       blockItem();
       setState(221);
@@ -1310,7 +1310,7 @@ CACTParser::BlockContext* CACTParser::block() {
       _la = _input->LA(1);
     }
     setState(222);
-    match(CACTParser::T__11);
+    match(SysYParser::T__11);
    
   }
   catch (RecognitionException &e) {
@@ -1324,27 +1324,27 @@ CACTParser::BlockContext* CACTParser::block() {
 
 //----------------- BlockItemContext ------------------------------------------------------------------
 
-CACTParser::BlockItemContext::BlockItemContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::BlockItemContext::BlockItemContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::DeclContext* CACTParser::BlockItemContext::decl() {
-  return getRuleContext<CACTParser::DeclContext>(0);
+SysYParser::DeclContext* SysYParser::BlockItemContext::decl() {
+  return getRuleContext<SysYParser::DeclContext>(0);
 }
 
-CACTParser::SubStmtContext* CACTParser::BlockItemContext::subStmt() {
-  return getRuleContext<CACTParser::SubStmtContext>(0);
-}
-
-
-size_t CACTParser::BlockItemContext::getRuleIndex() const {
-  return CACTParser::RuleBlockItem;
+SysYParser::SubStmtContext* SysYParser::BlockItemContext::subStmt() {
+  return getRuleContext<SysYParser::SubStmtContext>(0);
 }
 
 
-CACTParser::BlockItemContext* CACTParser::blockItem() {
+size_t SysYParser::BlockItemContext::getRuleIndex() const {
+  return SysYParser::RuleBlockItem;
+}
+
+
+SysYParser::BlockItemContext* SysYParser::blockItem() {
   BlockItemContext *_localctx = _tracker.createInstance<BlockItemContext>(_ctx, getState());
-  enterRule(_localctx, 34, CACTParser::RuleBlockItem);
+  enterRule(_localctx, 34, SysYParser::RuleBlockItem);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1353,33 +1353,33 @@ CACTParser::BlockItemContext* CACTParser::blockItem() {
     setState(226);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::T__0:
-      case CACTParser::T__3:
-      case CACTParser::T__4:
-      case CACTParser::T__5:
-      case CACTParser::T__6: {
+      case SysYParser::T__0:
+      case SysYParser::T__3:
+      case SysYParser::T__4:
+      case SysYParser::T__5:
+      case SysYParser::T__6: {
         enterOuterAlt(_localctx, 1);
         setState(224);
         decl();
         break;
       }
 
-      case CACTParser::T__2:
-      case CACTParser::T__10:
-      case CACTParser::T__12:
-      case CACTParser::T__15:
-      case CACTParser::T__17:
-      case CACTParser::T__18:
-      case CACTParser::T__19:
-      case CACTParser::T__20:
-      case CACTParser::T__21:
-      case CACTParser::T__22:
-      case CACTParser::T__23:
-      case CACTParser::BoolConst:
-      case CACTParser::Ident:
-      case CACTParser::IntConst:
-      case CACTParser::FloatConst:
-      case CACTParser::DoubleConst: {
+      case SysYParser::T__2:
+      case SysYParser::T__10:
+      case SysYParser::T__12:
+      case SysYParser::T__15:
+      case SysYParser::T__17:
+      case SysYParser::T__18:
+      case SysYParser::T__19:
+      case SysYParser::T__20:
+      case SysYParser::T__21:
+      case SysYParser::T__22:
+      case SysYParser::T__23:
+      case SysYParser::BoolConst:
+      case SysYParser::Ident:
+      case SysYParser::IntConst:
+      case SysYParser::FloatConst:
+      case SysYParser::DoubleConst: {
         enterOuterAlt(_localctx, 2);
         setState(225);
         subStmt();
@@ -1402,16 +1402,16 @@ CACTParser::BlockItemContext* CACTParser::blockItem() {
 
 //----------------- SubStmtContext ------------------------------------------------------------------
 
-CACTParser::SubStmtContext::SubStmtContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::SubStmtContext::SubStmtContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::SubStmtContext::getRuleIndex() const {
-  return CACTParser::RuleSubStmt;
+size_t SysYParser::SubStmtContext::getRuleIndex() const {
+  return SysYParser::RuleSubStmt;
 }
 
-void CACTParser::SubStmtContext::copyFrom(SubStmtContext *ctx) {
+void SysYParser::SubStmtContext::copyFrom(SubStmtContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->hasReturn = ctx->hasReturn;
   this->returnType = ctx->returnType;
@@ -1419,64 +1419,64 @@ void CACTParser::SubStmtContext::copyFrom(SubStmtContext *ctx) {
 
 //----------------- SubStmtExpressionContext ------------------------------------------------------------------
 
-CACTParser::ExpContext* CACTParser::SubStmtExpressionContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
+SysYParser::ExpContext* SysYParser::SubStmtExpressionContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-CACTParser::SubStmtExpressionContext::SubStmtExpressionContext(SubStmtContext *ctx) { copyFrom(ctx); }
+SysYParser::SubStmtExpressionContext::SubStmtExpressionContext(SubStmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- SubStmtBlockContext ------------------------------------------------------------------
 
-CACTParser::BlockContext* CACTParser::SubStmtBlockContext::block() {
-  return getRuleContext<CACTParser::BlockContext>(0);
+SysYParser::BlockContext* SysYParser::SubStmtBlockContext::block() {
+  return getRuleContext<SysYParser::BlockContext>(0);
 }
 
-CACTParser::SubStmtBlockContext::SubStmtBlockContext(SubStmtContext *ctx) { copyFrom(ctx); }
+SysYParser::SubStmtBlockContext::SubStmtBlockContext(SubStmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- SubStmtAssignmentContext ------------------------------------------------------------------
 
-CACTParser::LValContext* CACTParser::SubStmtAssignmentContext::lVal() {
-  return getRuleContext<CACTParser::LValContext>(0);
+SysYParser::LValContext* SysYParser::SubStmtAssignmentContext::lVal() {
+  return getRuleContext<SysYParser::LValContext>(0);
 }
 
-CACTParser::ExpContext* CACTParser::SubStmtAssignmentContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
+SysYParser::ExpContext* SysYParser::SubStmtAssignmentContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-CACTParser::SubStmtAssignmentContext::SubStmtAssignmentContext(SubStmtContext *ctx) { copyFrom(ctx); }
+SysYParser::SubStmtAssignmentContext::SubStmtAssignmentContext(SubStmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- SubStmtCtrlSeqContext ------------------------------------------------------------------
 
-CACTParser::CondContext* CACTParser::SubStmtCtrlSeqContext::cond() {
-  return getRuleContext<CACTParser::CondContext>(0);
+SysYParser::CondContext* SysYParser::SubStmtCtrlSeqContext::cond() {
+  return getRuleContext<SysYParser::CondContext>(0);
 }
 
-std::vector<CACTParser::SubStmtContext *> CACTParser::SubStmtCtrlSeqContext::subStmt() {
-  return getRuleContexts<CACTParser::SubStmtContext>();
+std::vector<SysYParser::SubStmtContext *> SysYParser::SubStmtCtrlSeqContext::subStmt() {
+  return getRuleContexts<SysYParser::SubStmtContext>();
 }
 
-CACTParser::SubStmtContext* CACTParser::SubStmtCtrlSeqContext::subStmt(size_t i) {
-  return getRuleContext<CACTParser::SubStmtContext>(i);
+SysYParser::SubStmtContext* SysYParser::SubStmtCtrlSeqContext::subStmt(size_t i) {
+  return getRuleContext<SysYParser::SubStmtContext>(i);
 }
 
-CACTParser::SubStmtCtrlSeqContext::SubStmtCtrlSeqContext(SubStmtContext *ctx) { copyFrom(ctx); }
+SysYParser::SubStmtCtrlSeqContext::SubStmtCtrlSeqContext(SubStmtContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- SubStmtReturnContext ------------------------------------------------------------------
 
-CACTParser::ExpContext* CACTParser::SubStmtReturnContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
+SysYParser::ExpContext* SysYParser::SubStmtReturnContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-CACTParser::SubStmtReturnContext::SubStmtReturnContext(SubStmtContext *ctx) { copyFrom(ctx); }
+SysYParser::SubStmtReturnContext::SubStmtReturnContext(SubStmtContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::SubStmtContext* CACTParser::subStmt() {
+SysYParser::SubStmtContext* SysYParser::subStmt() {
   SubStmtContext *_localctx = _tracker.createInstance<SubStmtContext>(_ctx, getState());
-  enterRule(_localctx, 36, CACTParser::RuleSubStmt);
+  enterRule(_localctx, 36, SysYParser::RuleSubStmt);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -1487,46 +1487,46 @@ CACTParser::SubStmtContext* CACTParser::subStmt() {
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 26, _ctx)) {
     case 1: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtAssignmentContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtAssignmentContext>(_localctx));
       enterOuterAlt(_localctx, 1);
       setState(228);
       lVal();
       setState(229);
-      match(CACTParser::T__9);
+      match(SysYParser::T__9);
       setState(230);
       exp();
       setState(231);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
     case 2: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtExpressionContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtExpressionContext>(_localctx));
       enterOuterAlt(_localctx, 2);
       setState(234);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
-        ((1ULL << _la) & ((1ULL << CACTParser::T__12)
-        | (1ULL << CACTParser::T__21)
-        | (1ULL << CACTParser::T__22)
-        | (1ULL << CACTParser::T__23)
-        | (1ULL << CACTParser::BoolConst)
-        | (1ULL << CACTParser::Ident)
-        | (1ULL << CACTParser::IntConst)
-        | (1ULL << CACTParser::FloatConst)
-        | (1ULL << CACTParser::DoubleConst))) != 0)) {
+        ((1ULL << _la) & ((1ULL << SysYParser::T__12)
+        | (1ULL << SysYParser::T__21)
+        | (1ULL << SysYParser::T__22)
+        | (1ULL << SysYParser::T__23)
+        | (1ULL << SysYParser::BoolConst)
+        | (1ULL << SysYParser::Ident)
+        | (1ULL << SysYParser::IntConst)
+        | (1ULL << SysYParser::FloatConst)
+        | (1ULL << SysYParser::DoubleConst))) != 0)) {
         setState(233);
         exp();
       }
       setState(236);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
     case 3: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtBlockContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtBlockContext>(_localctx));
       enterOuterAlt(_localctx, 3);
       setState(237);
       block();
@@ -1534,16 +1534,16 @@ CACTParser::SubStmtContext* CACTParser::subStmt() {
     }
 
     case 4: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtCtrlSeqContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtCtrlSeqContext>(_localctx));
       enterOuterAlt(_localctx, 4);
       setState(238);
-      match(CACTParser::T__15);
+      match(SysYParser::T__15);
       setState(239);
-      match(CACTParser::T__12);
+      match(SysYParser::T__12);
       setState(240);
       cond();
       setState(241);
-      match(CACTParser::T__13);
+      match(SysYParser::T__13);
       setState(242);
       subStmt();
       setState(245);
@@ -1552,7 +1552,7 @@ CACTParser::SubStmtContext* CACTParser::subStmt() {
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 24, _ctx)) {
       case 1: {
         setState(243);
-        match(CACTParser::T__16);
+        match(SysYParser::T__16);
         setState(244);
         subStmt();
         break;
@@ -1563,65 +1563,65 @@ CACTParser::SubStmtContext* CACTParser::subStmt() {
     }
 
     case 5: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtCtrlSeqContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtCtrlSeqContext>(_localctx));
       enterOuterAlt(_localctx, 5);
       setState(247);
-      match(CACTParser::T__17);
+      match(SysYParser::T__17);
       setState(248);
-      match(CACTParser::T__12);
+      match(SysYParser::T__12);
       setState(249);
       cond();
       setState(250);
-      match(CACTParser::T__13);
+      match(SysYParser::T__13);
       setState(251);
       subStmt();
       break;
     }
 
     case 6: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtCtrlSeqContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtCtrlSeqContext>(_localctx));
       enterOuterAlt(_localctx, 6);
       setState(253);
-      match(CACTParser::T__19);
+      match(SysYParser::T__19);
       setState(254);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
     case 7: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtCtrlSeqContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtCtrlSeqContext>(_localctx));
       enterOuterAlt(_localctx, 7);
       setState(255);
-      match(CACTParser::T__20);
+      match(SysYParser::T__20);
       setState(256);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
     case 8: {
-      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<CACTParser::SubStmtReturnContext>(_localctx));
+      _localctx = dynamic_cast<SubStmtContext *>(_tracker.createInstance<SysYParser::SubStmtReturnContext>(_localctx));
       enterOuterAlt(_localctx, 8);
       setState(257);
-      match(CACTParser::T__18);
+      match(SysYParser::T__18);
       setState(259);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
-        ((1ULL << _la) & ((1ULL << CACTParser::T__12)
-        | (1ULL << CACTParser::T__21)
-        | (1ULL << CACTParser::T__22)
-        | (1ULL << CACTParser::T__23)
-        | (1ULL << CACTParser::BoolConst)
-        | (1ULL << CACTParser::Ident)
-        | (1ULL << CACTParser::IntConst)
-        | (1ULL << CACTParser::FloatConst)
-        | (1ULL << CACTParser::DoubleConst))) != 0)) {
+        ((1ULL << _la) & ((1ULL << SysYParser::T__12)
+        | (1ULL << SysYParser::T__21)
+        | (1ULL << SysYParser::T__22)
+        | (1ULL << SysYParser::T__23)
+        | (1ULL << SysYParser::BoolConst)
+        | (1ULL << SysYParser::Ident)
+        | (1ULL << SysYParser::IntConst)
+        | (1ULL << SysYParser::FloatConst)
+        | (1ULL << SysYParser::DoubleConst))) != 0)) {
         setState(258);
         exp();
       }
       setState(261);
-      match(CACTParser::T__2);
+      match(SysYParser::T__2);
       break;
     }
 
@@ -1639,16 +1639,16 @@ CACTParser::SubStmtContext* CACTParser::subStmt() {
 
 //----------------- ExpContext ------------------------------------------------------------------
 
-CACTParser::ExpContext::ExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::ExpContext::ExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::ExpContext::getRuleIndex() const {
-  return CACTParser::RuleExp;
+size_t SysYParser::ExpContext::getRuleIndex() const {
+  return SysYParser::RuleExp;
 }
 
-void CACTParser::ExpContext::copyFrom(ExpContext *ctx) {
+void SysYParser::ExpContext::copyFrom(ExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
   this->size = ctx->size;
@@ -1657,25 +1657,25 @@ void CACTParser::ExpContext::copyFrom(ExpContext *ctx) {
 
 //----------------- ExpBoolExpContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::ExpBoolExpContext::BoolConst() {
-  return getToken(CACTParser::BoolConst, 0);
+tree::TerminalNode* SysYParser::ExpBoolExpContext::BoolConst() {
+  return getToken(SysYParser::BoolConst, 0);
 }
 
-CACTParser::ExpBoolExpContext::ExpBoolExpContext(ExpContext *ctx) { copyFrom(ctx); }
+SysYParser::ExpBoolExpContext::ExpBoolExpContext(ExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- ExpAddExpContext ------------------------------------------------------------------
 
-CACTParser::AddExpContext* CACTParser::ExpAddExpContext::addExp() {
-  return getRuleContext<CACTParser::AddExpContext>(0);
+SysYParser::AddExpContext* SysYParser::ExpAddExpContext::addExp() {
+  return getRuleContext<SysYParser::AddExpContext>(0);
 }
 
-CACTParser::ExpAddExpContext::ExpAddExpContext(ExpContext *ctx) { copyFrom(ctx); }
+SysYParser::ExpAddExpContext::ExpAddExpContext(ExpContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::ExpContext* CACTParser::exp() {
+SysYParser::ExpContext* SysYParser::exp() {
   ExpContext *_localctx = _tracker.createInstance<ExpContext>(_ctx, getState());
-  enterRule(_localctx, 38, CACTParser::RuleExp);
+  enterRule(_localctx, 38, SysYParser::RuleExp);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1684,26 +1684,26 @@ CACTParser::ExpContext* CACTParser::exp() {
     setState(266);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::T__12:
-      case CACTParser::T__21:
-      case CACTParser::T__22:
-      case CACTParser::T__23:
-      case CACTParser::Ident:
-      case CACTParser::IntConst:
-      case CACTParser::FloatConst:
-      case CACTParser::DoubleConst: {
-        _localctx = dynamic_cast<ExpContext *>(_tracker.createInstance<CACTParser::ExpAddExpContext>(_localctx));
+      case SysYParser::T__12:
+      case SysYParser::T__21:
+      case SysYParser::T__22:
+      case SysYParser::T__23:
+      case SysYParser::Ident:
+      case SysYParser::IntConst:
+      case SysYParser::FloatConst:
+      case SysYParser::DoubleConst: {
+        _localctx = dynamic_cast<ExpContext *>(_tracker.createInstance<SysYParser::ExpAddExpContext>(_localctx));
         enterOuterAlt(_localctx, 1);
         setState(264);
         addExp(0);
         break;
       }
 
-      case CACTParser::BoolConst: {
-        _localctx = dynamic_cast<ExpContext *>(_tracker.createInstance<CACTParser::ExpBoolExpContext>(_localctx));
+      case SysYParser::BoolConst: {
+        _localctx = dynamic_cast<ExpContext *>(_tracker.createInstance<SysYParser::ExpBoolExpContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(265);
-        match(CACTParser::BoolConst);
+        match(SysYParser::BoolConst);
         break;
       }
 
@@ -1723,23 +1723,23 @@ CACTParser::ExpContext* CACTParser::exp() {
 
 //----------------- CondContext ------------------------------------------------------------------
 
-CACTParser::CondContext::CondContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::CondContext::CondContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-CACTParser::LOrExpContext* CACTParser::CondContext::lOrExp() {
-  return getRuleContext<CACTParser::LOrExpContext>(0);
+SysYParser::LOrExpContext* SysYParser::CondContext::lOrExp() {
+  return getRuleContext<SysYParser::LOrExpContext>(0);
 }
 
 
-size_t CACTParser::CondContext::getRuleIndex() const {
-  return CACTParser::RuleCond;
+size_t SysYParser::CondContext::getRuleIndex() const {
+  return SysYParser::RuleCond;
 }
 
 
-CACTParser::CondContext* CACTParser::cond() {
+SysYParser::CondContext* SysYParser::cond() {
   CondContext *_localctx = _tracker.createInstance<CondContext>(_ctx, getState());
-  enterRule(_localctx, 40, CACTParser::RuleCond);
+  enterRule(_localctx, 40, SysYParser::RuleCond);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1761,27 +1761,27 @@ CACTParser::CondContext* CACTParser::cond() {
 
 //----------------- LValContext ------------------------------------------------------------------
 
-CACTParser::LValContext::LValContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::LValContext::LValContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* CACTParser::LValContext::Ident() {
-  return getToken(CACTParser::Ident, 0);
+tree::TerminalNode* SysYParser::LValContext::Ident() {
+  return getToken(SysYParser::Ident, 0);
 }
 
-CACTParser::ExpContext* CACTParser::LValContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
-}
-
-
-size_t CACTParser::LValContext::getRuleIndex() const {
-  return CACTParser::RuleLVal;
+SysYParser::ExpContext* SysYParser::LValContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
 
-CACTParser::LValContext* CACTParser::lVal() {
+size_t SysYParser::LValContext::getRuleIndex() const {
+  return SysYParser::RuleLVal;
+}
+
+
+SysYParser::LValContext* SysYParser::lVal() {
   LValContext *_localctx = _tracker.createInstance<LValContext>(_ctx, getState());
-  enterRule(_localctx, 42, CACTParser::RuleLVal);
+  enterRule(_localctx, 42, SysYParser::RuleLVal);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1789,18 +1789,18 @@ CACTParser::LValContext* CACTParser::lVal() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(270);
-    match(CACTParser::Ident);
+    match(SysYParser::Ident);
     setState(275);
     _errHandler->sync(this);
 
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 28, _ctx)) {
     case 1: {
       setState(271);
-      match(CACTParser::T__7);
+      match(SysYParser::T__7);
       setState(272);
       exp();
       setState(273);
-      match(CACTParser::T__8);
+      match(SysYParser::T__8);
       break;
     }
 
@@ -1818,16 +1818,16 @@ CACTParser::LValContext* CACTParser::lVal() {
 
 //----------------- PrimaryExpContext ------------------------------------------------------------------
 
-CACTParser::PrimaryExpContext::PrimaryExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::PrimaryExpContext::PrimaryExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::PrimaryExpContext::getRuleIndex() const {
-  return CACTParser::RulePrimaryExp;
+size_t SysYParser::PrimaryExpContext::getRuleIndex() const {
+  return SysYParser::RulePrimaryExp;
 }
 
-void CACTParser::PrimaryExpContext::copyFrom(PrimaryExpContext *ctx) {
+void SysYParser::PrimaryExpContext::copyFrom(PrimaryExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
   this->size = ctx->size;
@@ -1836,34 +1836,34 @@ void CACTParser::PrimaryExpContext::copyFrom(PrimaryExpContext *ctx) {
 
 //----------------- PrimaryExpNestExpContext ------------------------------------------------------------------
 
-CACTParser::ExpContext* CACTParser::PrimaryExpNestExpContext::exp() {
-  return getRuleContext<CACTParser::ExpContext>(0);
+SysYParser::ExpContext* SysYParser::PrimaryExpNestExpContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-CACTParser::PrimaryExpNestExpContext::PrimaryExpNestExpContext(PrimaryExpContext *ctx) { copyFrom(ctx); }
+SysYParser::PrimaryExpNestExpContext::PrimaryExpNestExpContext(PrimaryExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- PrimaryExpNumberContext ------------------------------------------------------------------
 
-CACTParser::NumberContext* CACTParser::PrimaryExpNumberContext::number() {
-  return getRuleContext<CACTParser::NumberContext>(0);
+SysYParser::NumberContext* SysYParser::PrimaryExpNumberContext::number() {
+  return getRuleContext<SysYParser::NumberContext>(0);
 }
 
-CACTParser::PrimaryExpNumberContext::PrimaryExpNumberContext(PrimaryExpContext *ctx) { copyFrom(ctx); }
+SysYParser::PrimaryExpNumberContext::PrimaryExpNumberContext(PrimaryExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- PrimaryExplValContext ------------------------------------------------------------------
 
-CACTParser::LValContext* CACTParser::PrimaryExplValContext::lVal() {
-  return getRuleContext<CACTParser::LValContext>(0);
+SysYParser::LValContext* SysYParser::PrimaryExplValContext::lVal() {
+  return getRuleContext<SysYParser::LValContext>(0);
 }
 
-CACTParser::PrimaryExplValContext::PrimaryExplValContext(PrimaryExpContext *ctx) { copyFrom(ctx); }
+SysYParser::PrimaryExplValContext::PrimaryExplValContext(PrimaryExpContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::PrimaryExpContext* CACTParser::primaryExp() {
+SysYParser::PrimaryExpContext* SysYParser::primaryExp() {
   PrimaryExpContext *_localctx = _tracker.createInstance<PrimaryExpContext>(_ctx, getState());
-  enterRule(_localctx, 44, CACTParser::RulePrimaryExp);
+  enterRule(_localctx, 44, SysYParser::RulePrimaryExp);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1872,30 +1872,30 @@ CACTParser::PrimaryExpContext* CACTParser::primaryExp() {
     setState(283);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::T__12: {
-        _localctx = dynamic_cast<PrimaryExpContext *>(_tracker.createInstance<CACTParser::PrimaryExpNestExpContext>(_localctx));
+      case SysYParser::T__12: {
+        _localctx = dynamic_cast<PrimaryExpContext *>(_tracker.createInstance<SysYParser::PrimaryExpNestExpContext>(_localctx));
         enterOuterAlt(_localctx, 1);
         setState(277);
-        match(CACTParser::T__12);
+        match(SysYParser::T__12);
         setState(278);
         exp();
         setState(279);
-        match(CACTParser::T__13);
+        match(SysYParser::T__13);
         break;
       }
 
-      case CACTParser::Ident: {
-        _localctx = dynamic_cast<PrimaryExpContext *>(_tracker.createInstance<CACTParser::PrimaryExplValContext>(_localctx));
+      case SysYParser::Ident: {
+        _localctx = dynamic_cast<PrimaryExpContext *>(_tracker.createInstance<SysYParser::PrimaryExplValContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(281);
         lVal();
         break;
       }
 
-      case CACTParser::IntConst:
-      case CACTParser::FloatConst:
-      case CACTParser::DoubleConst: {
-        _localctx = dynamic_cast<PrimaryExpContext *>(_tracker.createInstance<CACTParser::PrimaryExpNumberContext>(_localctx));
+      case SysYParser::IntConst:
+      case SysYParser::FloatConst:
+      case SysYParser::DoubleConst: {
+        _localctx = dynamic_cast<PrimaryExpContext *>(_tracker.createInstance<SysYParser::PrimaryExpNumberContext>(_localctx));
         enterOuterAlt(_localctx, 3);
         setState(282);
         number();
@@ -1918,16 +1918,16 @@ CACTParser::PrimaryExpContext* CACTParser::primaryExp() {
 
 //----------------- UnaryExpContext ------------------------------------------------------------------
 
-CACTParser::UnaryExpContext::UnaryExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::UnaryExpContext::UnaryExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::UnaryExpContext::getRuleIndex() const {
-  return CACTParser::RuleUnaryExp;
+size_t SysYParser::UnaryExpContext::getRuleIndex() const {
+  return SysYParser::RuleUnaryExp;
 }
 
-void CACTParser::UnaryExpContext::copyFrom(UnaryExpContext *ctx) {
+void SysYParser::UnaryExpContext::copyFrom(UnaryExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
   this->size = ctx->size;
@@ -1936,42 +1936,42 @@ void CACTParser::UnaryExpContext::copyFrom(UnaryExpContext *ctx) {
 
 //----------------- UnaryExpFuncContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::UnaryExpFuncContext::Ident() {
-  return getToken(CACTParser::Ident, 0);
+tree::TerminalNode* SysYParser::UnaryExpFuncContext::Ident() {
+  return getToken(SysYParser::Ident, 0);
 }
 
-CACTParser::FuncRParamsContext* CACTParser::UnaryExpFuncContext::funcRParams() {
-  return getRuleContext<CACTParser::FuncRParamsContext>(0);
+SysYParser::FuncRParamsContext* SysYParser::UnaryExpFuncContext::funcRParams() {
+  return getRuleContext<SysYParser::FuncRParamsContext>(0);
 }
 
-CACTParser::UnaryExpFuncContext::UnaryExpFuncContext(UnaryExpContext *ctx) { copyFrom(ctx); }
+SysYParser::UnaryExpFuncContext::UnaryExpFuncContext(UnaryExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- UnaryExpPrimaryExpContext ------------------------------------------------------------------
 
-CACTParser::PrimaryExpContext* CACTParser::UnaryExpPrimaryExpContext::primaryExp() {
-  return getRuleContext<CACTParser::PrimaryExpContext>(0);
+SysYParser::PrimaryExpContext* SysYParser::UnaryExpPrimaryExpContext::primaryExp() {
+  return getRuleContext<SysYParser::PrimaryExpContext>(0);
 }
 
-CACTParser::UnaryExpPrimaryExpContext::UnaryExpPrimaryExpContext(UnaryExpContext *ctx) { copyFrom(ctx); }
+SysYParser::UnaryExpPrimaryExpContext::UnaryExpPrimaryExpContext(UnaryExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- UnaryExpNestUnaryExpContext ------------------------------------------------------------------
 
-CACTParser::UnaryOpContext* CACTParser::UnaryExpNestUnaryExpContext::unaryOp() {
-  return getRuleContext<CACTParser::UnaryOpContext>(0);
+SysYParser::UnaryOpContext* SysYParser::UnaryExpNestUnaryExpContext::unaryOp() {
+  return getRuleContext<SysYParser::UnaryOpContext>(0);
 }
 
-CACTParser::UnaryExpContext* CACTParser::UnaryExpNestUnaryExpContext::unaryExp() {
-  return getRuleContext<CACTParser::UnaryExpContext>(0);
+SysYParser::UnaryExpContext* SysYParser::UnaryExpNestUnaryExpContext::unaryExp() {
+  return getRuleContext<SysYParser::UnaryExpContext>(0);
 }
 
-CACTParser::UnaryExpNestUnaryExpContext::UnaryExpNestUnaryExpContext(UnaryExpContext *ctx) { copyFrom(ctx); }
+SysYParser::UnaryExpNestUnaryExpContext::UnaryExpNestUnaryExpContext(UnaryExpContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::UnaryExpContext* CACTParser::unaryExp() {
+SysYParser::UnaryExpContext* SysYParser::unaryExp() {
   UnaryExpContext *_localctx = _tracker.createInstance<UnaryExpContext>(_ctx, getState());
-  enterRule(_localctx, 46, CACTParser::RuleUnaryExp);
+  enterRule(_localctx, 46, SysYParser::RuleUnaryExp);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -1982,7 +1982,7 @@ CACTParser::UnaryExpContext* CACTParser::unaryExp() {
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 31, _ctx)) {
     case 1: {
-      _localctx = dynamic_cast<UnaryExpContext *>(_tracker.createInstance<CACTParser::UnaryExpPrimaryExpContext>(_localctx));
+      _localctx = dynamic_cast<UnaryExpContext *>(_tracker.createInstance<SysYParser::UnaryExpPrimaryExpContext>(_localctx));
       enterOuterAlt(_localctx, 1);
       setState(285);
       primaryExp();
@@ -1990,36 +1990,36 @@ CACTParser::UnaryExpContext* CACTParser::unaryExp() {
     }
 
     case 2: {
-      _localctx = dynamic_cast<UnaryExpContext *>(_tracker.createInstance<CACTParser::UnaryExpFuncContext>(_localctx));
+      _localctx = dynamic_cast<UnaryExpContext *>(_tracker.createInstance<SysYParser::UnaryExpFuncContext>(_localctx));
       enterOuterAlt(_localctx, 2);
       setState(286);
-      match(CACTParser::Ident);
+      match(SysYParser::Ident);
       setState(287);
-      match(CACTParser::T__12);
+      match(SysYParser::T__12);
       setState(289);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
-        ((1ULL << _la) & ((1ULL << CACTParser::T__12)
-        | (1ULL << CACTParser::T__21)
-        | (1ULL << CACTParser::T__22)
-        | (1ULL << CACTParser::T__23)
-        | (1ULL << CACTParser::BoolConst)
-        | (1ULL << CACTParser::Ident)
-        | (1ULL << CACTParser::IntConst)
-        | (1ULL << CACTParser::FloatConst)
-        | (1ULL << CACTParser::DoubleConst))) != 0)) {
+        ((1ULL << _la) & ((1ULL << SysYParser::T__12)
+        | (1ULL << SysYParser::T__21)
+        | (1ULL << SysYParser::T__22)
+        | (1ULL << SysYParser::T__23)
+        | (1ULL << SysYParser::BoolConst)
+        | (1ULL << SysYParser::Ident)
+        | (1ULL << SysYParser::IntConst)
+        | (1ULL << SysYParser::FloatConst)
+        | (1ULL << SysYParser::DoubleConst))) != 0)) {
         setState(288);
         funcRParams();
       }
       setState(291);
-      match(CACTParser::T__13);
+      match(SysYParser::T__13);
       break;
     }
 
     case 3: {
-      _localctx = dynamic_cast<UnaryExpContext *>(_tracker.createInstance<CACTParser::UnaryExpNestUnaryExpContext>(_localctx));
+      _localctx = dynamic_cast<UnaryExpContext *>(_tracker.createInstance<SysYParser::UnaryExpNestUnaryExpContext>(_localctx));
       enterOuterAlt(_localctx, 3);
       setState(292);
       unaryOp();
@@ -2042,19 +2042,19 @@ CACTParser::UnaryExpContext* CACTParser::unaryExp() {
 
 //----------------- UnaryOpContext ------------------------------------------------------------------
 
-CACTParser::UnaryOpContext::UnaryOpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::UnaryOpContext::UnaryOpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::UnaryOpContext::getRuleIndex() const {
-  return CACTParser::RuleUnaryOp;
+size_t SysYParser::UnaryOpContext::getRuleIndex() const {
+  return SysYParser::RuleUnaryOp;
 }
 
 
-CACTParser::UnaryOpContext* CACTParser::unaryOp() {
+SysYParser::UnaryOpContext* SysYParser::unaryOp() {
   UnaryOpContext *_localctx = _tracker.createInstance<UnaryOpContext>(_ctx, getState());
-  enterRule(_localctx, 48, CACTParser::RuleUnaryOp);
+  enterRule(_localctx, 48, SysYParser::RuleUnaryOp);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2065,9 +2065,9 @@ CACTParser::UnaryOpContext* CACTParser::unaryOp() {
     setState(297);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__21)
-      | (1ULL << CACTParser::T__22)
-      | (1ULL << CACTParser::T__23))) != 0))) {
+      ((1ULL << _la) & ((1ULL << SysYParser::T__21)
+      | (1ULL << SysYParser::T__22)
+      | (1ULL << SysYParser::T__23))) != 0))) {
     _errHandler->recoverInline(this);
     }
     else {
@@ -2087,27 +2087,27 @@ CACTParser::UnaryOpContext* CACTParser::unaryOp() {
 
 //----------------- FuncRParamsContext ------------------------------------------------------------------
 
-CACTParser::FuncRParamsContext::FuncRParamsContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::FuncRParamsContext::FuncRParamsContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<CACTParser::ExpContext *> CACTParser::FuncRParamsContext::exp() {
-  return getRuleContexts<CACTParser::ExpContext>();
+std::vector<SysYParser::ExpContext *> SysYParser::FuncRParamsContext::exp() {
+  return getRuleContexts<SysYParser::ExpContext>();
 }
 
-CACTParser::ExpContext* CACTParser::FuncRParamsContext::exp(size_t i) {
-  return getRuleContext<CACTParser::ExpContext>(i);
-}
-
-
-size_t CACTParser::FuncRParamsContext::getRuleIndex() const {
-  return CACTParser::RuleFuncRParams;
+SysYParser::ExpContext* SysYParser::FuncRParamsContext::exp(size_t i) {
+  return getRuleContext<SysYParser::ExpContext>(i);
 }
 
 
-CACTParser::FuncRParamsContext* CACTParser::funcRParams() {
+size_t SysYParser::FuncRParamsContext::getRuleIndex() const {
+  return SysYParser::RuleFuncRParams;
+}
+
+
+SysYParser::FuncRParamsContext* SysYParser::funcRParams() {
   FuncRParamsContext *_localctx = _tracker.createInstance<FuncRParamsContext>(_ctx, getState());
-  enterRule(_localctx, 50, CACTParser::RuleFuncRParams);
+  enterRule(_localctx, 50, SysYParser::RuleFuncRParams);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2120,9 +2120,9 @@ CACTParser::FuncRParamsContext* CACTParser::funcRParams() {
     setState(304);
     _errHandler->sync(this);
     _la = _input->LA(1);
-    while (_la == CACTParser::T__1) {
+    while (_la == SysYParser::T__1) {
       setState(300);
-      match(CACTParser::T__1);
+      match(SysYParser::T__1);
       setState(301);
       exp();
       setState(306);
@@ -2142,16 +2142,16 @@ CACTParser::FuncRParamsContext* CACTParser::funcRParams() {
 
 //----------------- MulExpContext ------------------------------------------------------------------
 
-CACTParser::MulExpContext::MulExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::MulExpContext::MulExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::MulExpContext::getRuleIndex() const {
-  return CACTParser::RuleMulExp;
+size_t SysYParser::MulExpContext::getRuleIndex() const {
+  return SysYParser::RuleMulExp;
 }
 
-void CACTParser::MulExpContext::copyFrom(MulExpContext *ctx) {
+void SysYParser::MulExpContext::copyFrom(MulExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
   this->size = ctx->size;
@@ -2160,43 +2160,43 @@ void CACTParser::MulExpContext::copyFrom(MulExpContext *ctx) {
 
 //----------------- MulExpMulExpContext ------------------------------------------------------------------
 
-CACTParser::MulExpContext* CACTParser::MulExpMulExpContext::mulExp() {
-  return getRuleContext<CACTParser::MulExpContext>(0);
+SysYParser::MulExpContext* SysYParser::MulExpMulExpContext::mulExp() {
+  return getRuleContext<SysYParser::MulExpContext>(0);
 }
 
-CACTParser::MulOpContext* CACTParser::MulExpMulExpContext::mulOp() {
-  return getRuleContext<CACTParser::MulOpContext>(0);
+SysYParser::MulOpContext* SysYParser::MulExpMulExpContext::mulOp() {
+  return getRuleContext<SysYParser::MulOpContext>(0);
 }
 
-CACTParser::UnaryExpContext* CACTParser::MulExpMulExpContext::unaryExp() {
-  return getRuleContext<CACTParser::UnaryExpContext>(0);
+SysYParser::UnaryExpContext* SysYParser::MulExpMulExpContext::unaryExp() {
+  return getRuleContext<SysYParser::UnaryExpContext>(0);
 }
 
-CACTParser::MulExpMulExpContext::MulExpMulExpContext(MulExpContext *ctx) { copyFrom(ctx); }
+SysYParser::MulExpMulExpContext::MulExpMulExpContext(MulExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- MulExpUnaryExpContext ------------------------------------------------------------------
 
-CACTParser::UnaryExpContext* CACTParser::MulExpUnaryExpContext::unaryExp() {
-  return getRuleContext<CACTParser::UnaryExpContext>(0);
+SysYParser::UnaryExpContext* SysYParser::MulExpUnaryExpContext::unaryExp() {
+  return getRuleContext<SysYParser::UnaryExpContext>(0);
 }
 
-CACTParser::MulExpUnaryExpContext::MulExpUnaryExpContext(MulExpContext *ctx) { copyFrom(ctx); }
+SysYParser::MulExpUnaryExpContext::MulExpUnaryExpContext(MulExpContext *ctx) { copyFrom(ctx); }
 
 
 
-CACTParser::MulExpContext* CACTParser::mulExp() {
+SysYParser::MulExpContext* SysYParser::mulExp() {
    return mulExp(0);
 }
 
-CACTParser::MulExpContext* CACTParser::mulExp(int precedence) {
+SysYParser::MulExpContext* SysYParser::mulExp(int precedence) {
   ParserRuleContext *parentContext = _ctx;
   size_t parentState = getState();
-  CACTParser::MulExpContext *_localctx = _tracker.createInstance<MulExpContext>(_ctx, parentState);
-  CACTParser::MulExpContext *previousContext = _localctx;
+  SysYParser::MulExpContext *_localctx = _tracker.createInstance<MulExpContext>(_ctx, parentState);
+  SysYParser::MulExpContext *previousContext = _localctx;
   (void)previousContext; // Silence compiler, in case the context is not used by generated code.
   size_t startState = 52;
-  enterRecursionRule(_localctx, 52, CACTParser::RuleMulExp, precedence);
+  enterRecursionRule(_localctx, 52, SysYParser::RuleMulExp, precedence);
 
     
 
@@ -2247,19 +2247,19 @@ CACTParser::MulExpContext* CACTParser::mulExp(int precedence) {
 
 //----------------- MulOpContext ------------------------------------------------------------------
 
-CACTParser::MulOpContext::MulOpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::MulOpContext::MulOpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::MulOpContext::getRuleIndex() const {
-  return CACTParser::RuleMulOp;
+size_t SysYParser::MulOpContext::getRuleIndex() const {
+  return SysYParser::RuleMulOp;
 }
 
 
-CACTParser::MulOpContext* CACTParser::mulOp() {
+SysYParser::MulOpContext* SysYParser::mulOp() {
   MulOpContext *_localctx = _tracker.createInstance<MulOpContext>(_ctx, getState());
-  enterRule(_localctx, 54, CACTParser::RuleMulOp);
+  enterRule(_localctx, 54, SysYParser::RuleMulOp);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2270,9 +2270,9 @@ CACTParser::MulOpContext* CACTParser::mulOp() {
     setState(319);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << CACTParser::T__24)
-      | (1ULL << CACTParser::T__25)
-      | (1ULL << CACTParser::T__26))) != 0))) {
+      ((1ULL << _la) & ((1ULL << SysYParser::T__24)
+      | (1ULL << SysYParser::T__25)
+      | (1ULL << SysYParser::T__26))) != 0))) {
     _errHandler->recoverInline(this);
     }
     else {
@@ -2292,16 +2292,16 @@ CACTParser::MulOpContext* CACTParser::mulOp() {
 
 //----------------- AddExpContext ------------------------------------------------------------------
 
-CACTParser::AddExpContext::AddExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::AddExpContext::AddExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::AddExpContext::getRuleIndex() const {
-  return CACTParser::RuleAddExp;
+size_t SysYParser::AddExpContext::getRuleIndex() const {
+  return SysYParser::RuleAddExp;
 }
 
-void CACTParser::AddExpContext::copyFrom(AddExpContext *ctx) {
+void SysYParser::AddExpContext::copyFrom(AddExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->isArray = ctx->isArray;
   this->size = ctx->size;
@@ -2310,39 +2310,39 @@ void CACTParser::AddExpContext::copyFrom(AddExpContext *ctx) {
 
 //----------------- AddExpAddExpContext ------------------------------------------------------------------
 
-CACTParser::AddExpContext* CACTParser::AddExpAddExpContext::addExp() {
-  return getRuleContext<CACTParser::AddExpContext>(0);
+SysYParser::AddExpContext* SysYParser::AddExpAddExpContext::addExp() {
+  return getRuleContext<SysYParser::AddExpContext>(0);
 }
 
-CACTParser::MulExpContext* CACTParser::AddExpAddExpContext::mulExp() {
-  return getRuleContext<CACTParser::MulExpContext>(0);
+SysYParser::MulExpContext* SysYParser::AddExpAddExpContext::mulExp() {
+  return getRuleContext<SysYParser::MulExpContext>(0);
 }
 
-CACTParser::AddExpAddExpContext::AddExpAddExpContext(AddExpContext *ctx) { copyFrom(ctx); }
+SysYParser::AddExpAddExpContext::AddExpAddExpContext(AddExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- AddExpMulExpContext ------------------------------------------------------------------
 
-CACTParser::MulExpContext* CACTParser::AddExpMulExpContext::mulExp() {
-  return getRuleContext<CACTParser::MulExpContext>(0);
+SysYParser::MulExpContext* SysYParser::AddExpMulExpContext::mulExp() {
+  return getRuleContext<SysYParser::MulExpContext>(0);
 }
 
-CACTParser::AddExpMulExpContext::AddExpMulExpContext(AddExpContext *ctx) { copyFrom(ctx); }
+SysYParser::AddExpMulExpContext::AddExpMulExpContext(AddExpContext *ctx) { copyFrom(ctx); }
 
 
 
-CACTParser::AddExpContext* CACTParser::addExp() {
+SysYParser::AddExpContext* SysYParser::addExp() {
    return addExp(0);
 }
 
-CACTParser::AddExpContext* CACTParser::addExp(int precedence) {
+SysYParser::AddExpContext* SysYParser::addExp(int precedence) {
   ParserRuleContext *parentContext = _ctx;
   size_t parentState = getState();
-  CACTParser::AddExpContext *_localctx = _tracker.createInstance<AddExpContext>(_ctx, parentState);
-  CACTParser::AddExpContext *previousContext = _localctx;
+  SysYParser::AddExpContext *_localctx = _tracker.createInstance<AddExpContext>(_ctx, parentState);
+  SysYParser::AddExpContext *previousContext = _localctx;
   (void)previousContext; // Silence compiler, in case the context is not used by generated code.
   size_t startState = 56;
-  enterRecursionRule(_localctx, 56, CACTParser::RuleAddExp, precedence);
+  enterRecursionRule(_localctx, 56, SysYParser::RuleAddExp, precedence);
 
     size_t _la = 0;
 
@@ -2375,9 +2375,9 @@ CACTParser::AddExpContext* CACTParser::addExp(int precedence) {
         if (!(precpred(_ctx, 1))) throw FailedPredicateException(this, "precpred(_ctx, 1)");
         setState(325);
         _la = _input->LA(1);
-        if (!(_la == CACTParser::T__21
+        if (!(_la == SysYParser::T__21
 
-        || _la == CACTParser::T__22)) {
+        || _la == SysYParser::T__22)) {
         _errHandler->recoverInline(this);
         }
         else {
@@ -2402,64 +2402,64 @@ CACTParser::AddExpContext* CACTParser::addExp(int precedence) {
 
 //----------------- RelExpContext ------------------------------------------------------------------
 
-CACTParser::RelExpContext::RelExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::RelExpContext::RelExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::RelExpContext::getRuleIndex() const {
-  return CACTParser::RuleRelExp;
+size_t SysYParser::RelExpContext::getRuleIndex() const {
+  return SysYParser::RuleRelExp;
 }
 
-void CACTParser::RelExpContext::copyFrom(RelExpContext *ctx) {
+void SysYParser::RelExpContext::copyFrom(RelExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->metaDataType = ctx->metaDataType;
 }
 
 //----------------- RelExpRelExpContext ------------------------------------------------------------------
 
-CACTParser::RelExpContext* CACTParser::RelExpRelExpContext::relExp() {
-  return getRuleContext<CACTParser::RelExpContext>(0);
+SysYParser::RelExpContext* SysYParser::RelExpRelExpContext::relExp() {
+  return getRuleContext<SysYParser::RelExpContext>(0);
 }
 
-CACTParser::AddExpContext* CACTParser::RelExpRelExpContext::addExp() {
-  return getRuleContext<CACTParser::AddExpContext>(0);
+SysYParser::AddExpContext* SysYParser::RelExpRelExpContext::addExp() {
+  return getRuleContext<SysYParser::AddExpContext>(0);
 }
 
-CACTParser::RelExpRelExpContext::RelExpRelExpContext(RelExpContext *ctx) { copyFrom(ctx); }
+SysYParser::RelExpRelExpContext::RelExpRelExpContext(RelExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- RelExpAddExpContext ------------------------------------------------------------------
 
-CACTParser::AddExpContext* CACTParser::RelExpAddExpContext::addExp() {
-  return getRuleContext<CACTParser::AddExpContext>(0);
+SysYParser::AddExpContext* SysYParser::RelExpAddExpContext::addExp() {
+  return getRuleContext<SysYParser::AddExpContext>(0);
 }
 
-CACTParser::RelExpAddExpContext::RelExpAddExpContext(RelExpContext *ctx) { copyFrom(ctx); }
+SysYParser::RelExpAddExpContext::RelExpAddExpContext(RelExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- RelExpBoolConstContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::RelExpBoolConstContext::BoolConst() {
-  return getToken(CACTParser::BoolConst, 0);
+tree::TerminalNode* SysYParser::RelExpBoolConstContext::BoolConst() {
+  return getToken(SysYParser::BoolConst, 0);
 }
 
-CACTParser::RelExpBoolConstContext::RelExpBoolConstContext(RelExpContext *ctx) { copyFrom(ctx); }
+SysYParser::RelExpBoolConstContext::RelExpBoolConstContext(RelExpContext *ctx) { copyFrom(ctx); }
 
 
 
-CACTParser::RelExpContext* CACTParser::relExp() {
+SysYParser::RelExpContext* SysYParser::relExp() {
    return relExp(0);
 }
 
-CACTParser::RelExpContext* CACTParser::relExp(int precedence) {
+SysYParser::RelExpContext* SysYParser::relExp(int precedence) {
   ParserRuleContext *parentContext = _ctx;
   size_t parentState = getState();
-  CACTParser::RelExpContext *_localctx = _tracker.createInstance<RelExpContext>(_ctx, parentState);
-  CACTParser::RelExpContext *previousContext = _localctx;
+  SysYParser::RelExpContext *_localctx = _tracker.createInstance<RelExpContext>(_ctx, parentState);
+  SysYParser::RelExpContext *previousContext = _localctx;
   (void)previousContext; // Silence compiler, in case the context is not used by generated code.
   size_t startState = 58;
-  enterRecursionRule(_localctx, 58, CACTParser::RuleRelExp, precedence);
+  enterRecursionRule(_localctx, 58, SysYParser::RuleRelExp, precedence);
 
     size_t _la = 0;
 
@@ -2472,14 +2472,14 @@ CACTParser::RelExpContext* CACTParser::relExp(int precedence) {
     setState(335);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::T__12:
-      case CACTParser::T__21:
-      case CACTParser::T__22:
-      case CACTParser::T__23:
-      case CACTParser::Ident:
-      case CACTParser::IntConst:
-      case CACTParser::FloatConst:
-      case CACTParser::DoubleConst: {
+      case SysYParser::T__12:
+      case SysYParser::T__21:
+      case SysYParser::T__22:
+      case SysYParser::T__23:
+      case SysYParser::Ident:
+      case SysYParser::IntConst:
+      case SysYParser::FloatConst:
+      case SysYParser::DoubleConst: {
         _localctx = _tracker.createInstance<RelExpAddExpContext>(_localctx);
         _ctx = _localctx;
         previousContext = _localctx;
@@ -2489,12 +2489,12 @@ CACTParser::RelExpContext* CACTParser::relExp(int precedence) {
         break;
       }
 
-      case CACTParser::BoolConst: {
+      case SysYParser::BoolConst: {
         _localctx = _tracker.createInstance<RelExpBoolConstContext>(_localctx);
         _ctx = _localctx;
         previousContext = _localctx;
         setState(334);
-        match(CACTParser::BoolConst);
+        match(SysYParser::BoolConst);
         break;
       }
 
@@ -2519,10 +2519,10 @@ CACTParser::RelExpContext* CACTParser::relExp(int precedence) {
         setState(338);
         _la = _input->LA(1);
         if (!((((_la & ~ 0x3fULL) == 0) &&
-          ((1ULL << _la) & ((1ULL << CACTParser::T__27)
-          | (1ULL << CACTParser::T__28)
-          | (1ULL << CACTParser::T__29)
-          | (1ULL << CACTParser::T__30))) != 0))) {
+          ((1ULL << _la) & ((1ULL << SysYParser::T__27)
+          | (1ULL << SysYParser::T__28)
+          | (1ULL << SysYParser::T__29)
+          | (1ULL << SysYParser::T__30))) != 0))) {
         _errHandler->recoverInline(this);
         }
         else {
@@ -2547,55 +2547,55 @@ CACTParser::RelExpContext* CACTParser::relExp(int precedence) {
 
 //----------------- EqExpContext ------------------------------------------------------------------
 
-CACTParser::EqExpContext::EqExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::EqExpContext::EqExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::EqExpContext::getRuleIndex() const {
-  return CACTParser::RuleEqExp;
+size_t SysYParser::EqExpContext::getRuleIndex() const {
+  return SysYParser::RuleEqExp;
 }
 
-void CACTParser::EqExpContext::copyFrom(EqExpContext *ctx) {
+void SysYParser::EqExpContext::copyFrom(EqExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->metaDataType = ctx->metaDataType;
 }
 
 //----------------- EqExpRelExpContext ------------------------------------------------------------------
 
-CACTParser::RelExpContext* CACTParser::EqExpRelExpContext::relExp() {
-  return getRuleContext<CACTParser::RelExpContext>(0);
+SysYParser::RelExpContext* SysYParser::EqExpRelExpContext::relExp() {
+  return getRuleContext<SysYParser::RelExpContext>(0);
 }
 
-CACTParser::EqExpRelExpContext::EqExpRelExpContext(EqExpContext *ctx) { copyFrom(ctx); }
+SysYParser::EqExpRelExpContext::EqExpRelExpContext(EqExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- EqExpEqExpContext ------------------------------------------------------------------
 
-CACTParser::EqExpContext* CACTParser::EqExpEqExpContext::eqExp() {
-  return getRuleContext<CACTParser::EqExpContext>(0);
+SysYParser::EqExpContext* SysYParser::EqExpEqExpContext::eqExp() {
+  return getRuleContext<SysYParser::EqExpContext>(0);
 }
 
-CACTParser::RelExpContext* CACTParser::EqExpEqExpContext::relExp() {
-  return getRuleContext<CACTParser::RelExpContext>(0);
+SysYParser::RelExpContext* SysYParser::EqExpEqExpContext::relExp() {
+  return getRuleContext<SysYParser::RelExpContext>(0);
 }
 
-CACTParser::EqExpEqExpContext::EqExpEqExpContext(EqExpContext *ctx) { copyFrom(ctx); }
+SysYParser::EqExpEqExpContext::EqExpEqExpContext(EqExpContext *ctx) { copyFrom(ctx); }
 
 
 
-CACTParser::EqExpContext* CACTParser::eqExp() {
+SysYParser::EqExpContext* SysYParser::eqExp() {
    return eqExp(0);
 }
 
-CACTParser::EqExpContext* CACTParser::eqExp(int precedence) {
+SysYParser::EqExpContext* SysYParser::eqExp(int precedence) {
   ParserRuleContext *parentContext = _ctx;
   size_t parentState = getState();
-  CACTParser::EqExpContext *_localctx = _tracker.createInstance<EqExpContext>(_ctx, parentState);
-  CACTParser::EqExpContext *previousContext = _localctx;
+  SysYParser::EqExpContext *_localctx = _tracker.createInstance<EqExpContext>(_ctx, parentState);
+  SysYParser::EqExpContext *previousContext = _localctx;
   (void)previousContext; // Silence compiler, in case the context is not used by generated code.
   size_t startState = 60;
-  enterRecursionRule(_localctx, 60, CACTParser::RuleEqExp, precedence);
+  enterRecursionRule(_localctx, 60, SysYParser::RuleEqExp, precedence);
 
     size_t _la = 0;
 
@@ -2628,9 +2628,9 @@ CACTParser::EqExpContext* CACTParser::eqExp(int precedence) {
         if (!(precpred(_ctx, 1))) throw FailedPredicateException(this, "precpred(_ctx, 1)");
         setState(349);
         _la = _input->LA(1);
-        if (!(_la == CACTParser::T__31
+        if (!(_la == SysYParser::T__31
 
-        || _la == CACTParser::T__32)) {
+        || _la == SysYParser::T__32)) {
         _errHandler->recoverInline(this);
         }
         else {
@@ -2655,55 +2655,55 @@ CACTParser::EqExpContext* CACTParser::eqExp(int precedence) {
 
 //----------------- LAndExpContext ------------------------------------------------------------------
 
-CACTParser::LAndExpContext::LAndExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::LAndExpContext::LAndExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::LAndExpContext::getRuleIndex() const {
-  return CACTParser::RuleLAndExp;
+size_t SysYParser::LAndExpContext::getRuleIndex() const {
+  return SysYParser::RuleLAndExp;
 }
 
-void CACTParser::LAndExpContext::copyFrom(LAndExpContext *ctx) {
+void SysYParser::LAndExpContext::copyFrom(LAndExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->metaDataType = ctx->metaDataType;
 }
 
 //----------------- LAndExpLAndExpContext ------------------------------------------------------------------
 
-CACTParser::LAndExpContext* CACTParser::LAndExpLAndExpContext::lAndExp() {
-  return getRuleContext<CACTParser::LAndExpContext>(0);
+SysYParser::LAndExpContext* SysYParser::LAndExpLAndExpContext::lAndExp() {
+  return getRuleContext<SysYParser::LAndExpContext>(0);
 }
 
-CACTParser::EqExpContext* CACTParser::LAndExpLAndExpContext::eqExp() {
-  return getRuleContext<CACTParser::EqExpContext>(0);
+SysYParser::EqExpContext* SysYParser::LAndExpLAndExpContext::eqExp() {
+  return getRuleContext<SysYParser::EqExpContext>(0);
 }
 
-CACTParser::LAndExpLAndExpContext::LAndExpLAndExpContext(LAndExpContext *ctx) { copyFrom(ctx); }
+SysYParser::LAndExpLAndExpContext::LAndExpLAndExpContext(LAndExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- LAndExpEqExpContext ------------------------------------------------------------------
 
-CACTParser::EqExpContext* CACTParser::LAndExpEqExpContext::eqExp() {
-  return getRuleContext<CACTParser::EqExpContext>(0);
+SysYParser::EqExpContext* SysYParser::LAndExpEqExpContext::eqExp() {
+  return getRuleContext<SysYParser::EqExpContext>(0);
 }
 
-CACTParser::LAndExpEqExpContext::LAndExpEqExpContext(LAndExpContext *ctx) { copyFrom(ctx); }
+SysYParser::LAndExpEqExpContext::LAndExpEqExpContext(LAndExpContext *ctx) { copyFrom(ctx); }
 
 
 
-CACTParser::LAndExpContext* CACTParser::lAndExp() {
+SysYParser::LAndExpContext* SysYParser::lAndExp() {
    return lAndExp(0);
 }
 
-CACTParser::LAndExpContext* CACTParser::lAndExp(int precedence) {
+SysYParser::LAndExpContext* SysYParser::lAndExp(int precedence) {
   ParserRuleContext *parentContext = _ctx;
   size_t parentState = getState();
-  CACTParser::LAndExpContext *_localctx = _tracker.createInstance<LAndExpContext>(_ctx, parentState);
-  CACTParser::LAndExpContext *previousContext = _localctx;
+  SysYParser::LAndExpContext *_localctx = _tracker.createInstance<LAndExpContext>(_ctx, parentState);
+  SysYParser::LAndExpContext *previousContext = _localctx;
   (void)previousContext; // Silence compiler, in case the context is not used by generated code.
   size_t startState = 62;
-  enterRecursionRule(_localctx, 62, CACTParser::RuleLAndExp, precedence);
+  enterRecursionRule(_localctx, 62, SysYParser::RuleLAndExp, precedence);
 
     
 
@@ -2736,7 +2736,7 @@ CACTParser::LAndExpContext* CACTParser::lAndExp(int precedence) {
         if (!(precpred(_ctx, 1))) throw FailedPredicateException(this, "precpred(_ctx, 1)");
 
         setState(360);
-        match(CACTParser::T__33);
+        match(SysYParser::T__33);
         setState(361);
         eqExp(0); 
       }
@@ -2755,55 +2755,55 @@ CACTParser::LAndExpContext* CACTParser::lAndExp(int precedence) {
 
 //----------------- LOrExpContext ------------------------------------------------------------------
 
-CACTParser::LOrExpContext::LOrExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::LOrExpContext::LOrExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::LOrExpContext::getRuleIndex() const {
-  return CACTParser::RuleLOrExp;
+size_t SysYParser::LOrExpContext::getRuleIndex() const {
+  return SysYParser::RuleLOrExp;
 }
 
-void CACTParser::LOrExpContext::copyFrom(LOrExpContext *ctx) {
+void SysYParser::LOrExpContext::copyFrom(LOrExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->metaDataType = ctx->metaDataType;
 }
 
 //----------------- LOrExpLAndExpContext ------------------------------------------------------------------
 
-CACTParser::LAndExpContext* CACTParser::LOrExpLAndExpContext::lAndExp() {
-  return getRuleContext<CACTParser::LAndExpContext>(0);
+SysYParser::LAndExpContext* SysYParser::LOrExpLAndExpContext::lAndExp() {
+  return getRuleContext<SysYParser::LAndExpContext>(0);
 }
 
-CACTParser::LOrExpLAndExpContext::LOrExpLAndExpContext(LOrExpContext *ctx) { copyFrom(ctx); }
+SysYParser::LOrExpLAndExpContext::LOrExpLAndExpContext(LOrExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- LOrExpLOrExpContext ------------------------------------------------------------------
 
-CACTParser::LOrExpContext* CACTParser::LOrExpLOrExpContext::lOrExp() {
-  return getRuleContext<CACTParser::LOrExpContext>(0);
+SysYParser::LOrExpContext* SysYParser::LOrExpLOrExpContext::lOrExp() {
+  return getRuleContext<SysYParser::LOrExpContext>(0);
 }
 
-CACTParser::LAndExpContext* CACTParser::LOrExpLOrExpContext::lAndExp() {
-  return getRuleContext<CACTParser::LAndExpContext>(0);
+SysYParser::LAndExpContext* SysYParser::LOrExpLOrExpContext::lAndExp() {
+  return getRuleContext<SysYParser::LAndExpContext>(0);
 }
 
-CACTParser::LOrExpLOrExpContext::LOrExpLOrExpContext(LOrExpContext *ctx) { copyFrom(ctx); }
+SysYParser::LOrExpLOrExpContext::LOrExpLOrExpContext(LOrExpContext *ctx) { copyFrom(ctx); }
 
 
 
-CACTParser::LOrExpContext* CACTParser::lOrExp() {
+SysYParser::LOrExpContext* SysYParser::lOrExp() {
    return lOrExp(0);
 }
 
-CACTParser::LOrExpContext* CACTParser::lOrExp(int precedence) {
+SysYParser::LOrExpContext* SysYParser::lOrExp(int precedence) {
   ParserRuleContext *parentContext = _ctx;
   size_t parentState = getState();
-  CACTParser::LOrExpContext *_localctx = _tracker.createInstance<LOrExpContext>(_ctx, parentState);
-  CACTParser::LOrExpContext *previousContext = _localctx;
+  SysYParser::LOrExpContext *_localctx = _tracker.createInstance<LOrExpContext>(_ctx, parentState);
+  SysYParser::LOrExpContext *previousContext = _localctx;
   (void)previousContext; // Silence compiler, in case the context is not used by generated code.
   size_t startState = 64;
-  enterRecursionRule(_localctx, 64, CACTParser::RuleLOrExp, precedence);
+  enterRecursionRule(_localctx, 64, SysYParser::RuleLOrExp, precedence);
 
     
 
@@ -2836,7 +2836,7 @@ CACTParser::LOrExpContext* CACTParser::lOrExp(int precedence) {
         if (!(precpred(_ctx, 1))) throw FailedPredicateException(this, "precpred(_ctx, 1)");
 
         setState(371);
-        match(CACTParser::T__34);
+        match(SysYParser::T__34);
         setState(372);
         lAndExp(0); 
       }
@@ -2855,41 +2855,41 @@ CACTParser::LOrExpContext* CACTParser::lOrExp(int precedence) {
 
 //----------------- ConstExpContext ------------------------------------------------------------------
 
-CACTParser::ConstExpContext::ConstExpContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::ConstExpContext::ConstExpContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::ConstExpContext::getRuleIndex() const {
-  return CACTParser::RuleConstExp;
+size_t SysYParser::ConstExpContext::getRuleIndex() const {
+  return SysYParser::RuleConstExp;
 }
 
-void CACTParser::ConstExpContext::copyFrom(ConstExpContext *ctx) {
+void SysYParser::ConstExpContext::copyFrom(ConstExpContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->metaDataType = ctx->metaDataType;
 }
 
 //----------------- ConstExpBoolConstContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::ConstExpBoolConstContext::BoolConst() {
-  return getToken(CACTParser::BoolConst, 0);
+tree::TerminalNode* SysYParser::ConstExpBoolConstContext::BoolConst() {
+  return getToken(SysYParser::BoolConst, 0);
 }
 
-CACTParser::ConstExpBoolConstContext::ConstExpBoolConstContext(ConstExpContext *ctx) { copyFrom(ctx); }
+SysYParser::ConstExpBoolConstContext::ConstExpBoolConstContext(ConstExpContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- ConstExpNumberContext ------------------------------------------------------------------
 
-CACTParser::NumberContext* CACTParser::ConstExpNumberContext::number() {
-  return getRuleContext<CACTParser::NumberContext>(0);
+SysYParser::NumberContext* SysYParser::ConstExpNumberContext::number() {
+  return getRuleContext<SysYParser::NumberContext>(0);
 }
 
-CACTParser::ConstExpNumberContext::ConstExpNumberContext(ConstExpContext *ctx) { copyFrom(ctx); }
+SysYParser::ConstExpNumberContext::ConstExpNumberContext(ConstExpContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::ConstExpContext* CACTParser::constExp() {
+SysYParser::ConstExpContext* SysYParser::constExp() {
   ConstExpContext *_localctx = _tracker.createInstance<ConstExpContext>(_ctx, getState());
-  enterRule(_localctx, 66, CACTParser::RuleConstExp);
+  enterRule(_localctx, 66, SysYParser::RuleConstExp);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2898,21 +2898,21 @@ CACTParser::ConstExpContext* CACTParser::constExp() {
     setState(380);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::IntConst:
-      case CACTParser::FloatConst:
-      case CACTParser::DoubleConst: {
-        _localctx = dynamic_cast<ConstExpContext *>(_tracker.createInstance<CACTParser::ConstExpNumberContext>(_localctx));
+      case SysYParser::IntConst:
+      case SysYParser::FloatConst:
+      case SysYParser::DoubleConst: {
+        _localctx = dynamic_cast<ConstExpContext *>(_tracker.createInstance<SysYParser::ConstExpNumberContext>(_localctx));
         enterOuterAlt(_localctx, 1);
         setState(378);
         number();
         break;
       }
 
-      case CACTParser::BoolConst: {
-        _localctx = dynamic_cast<ConstExpContext *>(_tracker.createInstance<CACTParser::ConstExpBoolConstContext>(_localctx));
+      case SysYParser::BoolConst: {
+        _localctx = dynamic_cast<ConstExpContext *>(_tracker.createInstance<SysYParser::ConstExpBoolConstContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(379);
-        match(CACTParser::BoolConst);
+        match(SysYParser::BoolConst);
         break;
       }
 
@@ -2932,50 +2932,50 @@ CACTParser::ConstExpContext* CACTParser::constExp() {
 
 //----------------- NumberContext ------------------------------------------------------------------
 
-CACTParser::NumberContext::NumberContext(ParserRuleContext *parent, size_t invokingState)
+SysYParser::NumberContext::NumberContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t CACTParser::NumberContext::getRuleIndex() const {
-  return CACTParser::RuleNumber;
+size_t SysYParser::NumberContext::getRuleIndex() const {
+  return SysYParser::RuleNumber;
 }
 
-void CACTParser::NumberContext::copyFrom(NumberContext *ctx) {
+void SysYParser::NumberContext::copyFrom(NumberContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
   this->metaDataType = ctx->metaDataType;
 }
 
 //----------------- NumberDoubleConstContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::NumberDoubleConstContext::DoubleConst() {
-  return getToken(CACTParser::DoubleConst, 0);
+tree::TerminalNode* SysYParser::NumberDoubleConstContext::DoubleConst() {
+  return getToken(SysYParser::DoubleConst, 0);
 }
 
-CACTParser::NumberDoubleConstContext::NumberDoubleConstContext(NumberContext *ctx) { copyFrom(ctx); }
+SysYParser::NumberDoubleConstContext::NumberDoubleConstContext(NumberContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- NumberFloatConstContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::NumberFloatConstContext::FloatConst() {
-  return getToken(CACTParser::FloatConst, 0);
+tree::TerminalNode* SysYParser::NumberFloatConstContext::FloatConst() {
+  return getToken(SysYParser::FloatConst, 0);
 }
 
-CACTParser::NumberFloatConstContext::NumberFloatConstContext(NumberContext *ctx) { copyFrom(ctx); }
+SysYParser::NumberFloatConstContext::NumberFloatConstContext(NumberContext *ctx) { copyFrom(ctx); }
 
 
 //----------------- NumberIntConstContext ------------------------------------------------------------------
 
-tree::TerminalNode* CACTParser::NumberIntConstContext::IntConst() {
-  return getToken(CACTParser::IntConst, 0);
+tree::TerminalNode* SysYParser::NumberIntConstContext::IntConst() {
+  return getToken(SysYParser::IntConst, 0);
 }
 
-CACTParser::NumberIntConstContext::NumberIntConstContext(NumberContext *ctx) { copyFrom(ctx); }
+SysYParser::NumberIntConstContext::NumberIntConstContext(NumberContext *ctx) { copyFrom(ctx); }
 
 
-CACTParser::NumberContext* CACTParser::number() {
+SysYParser::NumberContext* SysYParser::number() {
   NumberContext *_localctx = _tracker.createInstance<NumberContext>(_ctx, getState());
-  enterRule(_localctx, 68, CACTParser::RuleNumber);
+  enterRule(_localctx, 68, SysYParser::RuleNumber);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2984,27 +2984,27 @@ CACTParser::NumberContext* CACTParser::number() {
     setState(385);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case CACTParser::IntConst: {
-        _localctx = dynamic_cast<NumberContext *>(_tracker.createInstance<CACTParser::NumberIntConstContext>(_localctx));
+      case SysYParser::IntConst: {
+        _localctx = dynamic_cast<NumberContext *>(_tracker.createInstance<SysYParser::NumberIntConstContext>(_localctx));
         enterOuterAlt(_localctx, 1);
         setState(382);
-        match(CACTParser::IntConst);
+        match(SysYParser::IntConst);
         break;
       }
 
-      case CACTParser::DoubleConst: {
-        _localctx = dynamic_cast<NumberContext *>(_tracker.createInstance<CACTParser::NumberDoubleConstContext>(_localctx));
+      case SysYParser::DoubleConst: {
+        _localctx = dynamic_cast<NumberContext *>(_tracker.createInstance<SysYParser::NumberDoubleConstContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(383);
-        match(CACTParser::DoubleConst);
+        match(SysYParser::DoubleConst);
         break;
       }
 
-      case CACTParser::FloatConst: {
-        _localctx = dynamic_cast<NumberContext *>(_tracker.createInstance<CACTParser::NumberFloatConstContext>(_localctx));
+      case SysYParser::FloatConst: {
+        _localctx = dynamic_cast<NumberContext *>(_tracker.createInstance<SysYParser::NumberFloatConstContext>(_localctx));
         enterOuterAlt(_localctx, 3);
         setState(384);
-        match(CACTParser::FloatConst);
+        match(SysYParser::FloatConst);
         break;
       }
 
@@ -3022,7 +3022,7 @@ CACTParser::NumberContext* CACTParser::number() {
   return _localctx;
 }
 
-bool CACTParser::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
+bool SysYParser::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
     case 26: return mulExpSempred(dynamic_cast<MulExpContext *>(context), predicateIndex);
     case 28: return addExpSempred(dynamic_cast<AddExpContext *>(context), predicateIndex);
@@ -3037,7 +3037,7 @@ bool CACTParser::sempred(RuleContext *context, size_t ruleIndex, size_t predicat
   return true;
 }
 
-bool CACTParser::mulExpSempred(MulExpContext *_localctx, size_t predicateIndex) {
+bool SysYParser::mulExpSempred(MulExpContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     case 0: return precpred(_ctx, 1);
 
@@ -3047,7 +3047,7 @@ bool CACTParser::mulExpSempred(MulExpContext *_localctx, size_t predicateIndex) 
   return true;
 }
 
-bool CACTParser::addExpSempred(AddExpContext *_localctx, size_t predicateIndex) {
+bool SysYParser::addExpSempred(AddExpContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     case 1: return precpred(_ctx, 1);
 
@@ -3057,7 +3057,7 @@ bool CACTParser::addExpSempred(AddExpContext *_localctx, size_t predicateIndex) 
   return true;
 }
 
-bool CACTParser::relExpSempred(RelExpContext *_localctx, size_t predicateIndex) {
+bool SysYParser::relExpSempred(RelExpContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     case 2: return precpred(_ctx, 2);
 
@@ -3067,7 +3067,7 @@ bool CACTParser::relExpSempred(RelExpContext *_localctx, size_t predicateIndex) 
   return true;
 }
 
-bool CACTParser::eqExpSempred(EqExpContext *_localctx, size_t predicateIndex) {
+bool SysYParser::eqExpSempred(EqExpContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     case 3: return precpred(_ctx, 1);
 
@@ -3077,7 +3077,7 @@ bool CACTParser::eqExpSempred(EqExpContext *_localctx, size_t predicateIndex) {
   return true;
 }
 
-bool CACTParser::lAndExpSempred(LAndExpContext *_localctx, size_t predicateIndex) {
+bool SysYParser::lAndExpSempred(LAndExpContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     case 4: return precpred(_ctx, 1);
 
@@ -3087,7 +3087,7 @@ bool CACTParser::lAndExpSempred(LAndExpContext *_localctx, size_t predicateIndex
   return true;
 }
 
-bool CACTParser::lOrExpSempred(LOrExpContext *_localctx, size_t predicateIndex) {
+bool SysYParser::lOrExpSempred(LOrExpContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     case 5: return precpred(_ctx, 1);
 
@@ -3098,14 +3098,14 @@ bool CACTParser::lOrExpSempred(LOrExpContext *_localctx, size_t predicateIndex) 
 }
 
 // Static vars and initialization.
-std::vector<dfa::DFA> CACTParser::_decisionToDFA;
-atn::PredictionContextCache CACTParser::_sharedContextCache;
+std::vector<dfa::DFA> SysYParser::_decisionToDFA;
+atn::PredictionContextCache SysYParser::_sharedContextCache;
 
 // We own the ATN which in turn owns the ATN states.
-atn::ATN CACTParser::_atn;
-std::vector<uint16_t> CACTParser::_serializedATN;
+atn::ATN SysYParser::_atn;
+std::vector<uint16_t> SysYParser::_serializedATN;
 
-std::vector<std::string> CACTParser::_ruleNames = {
+std::vector<std::string> SysYParser::_ruleNames = {
   "compUnit", "decl", "constDecl", "bType", "constDef", "constInitVal", 
   "varDecl", "varDef", "funcDef", "funcType", "funcFParams", "funcFParam", 
   "brackets", "funcBlock", "funcBlockItem", "stmt", "block", "blockItem", 
@@ -3114,25 +3114,25 @@ std::vector<std::string> CACTParser::_ruleNames = {
   "lOrExp", "constExp", "number"
 };
 
-std::vector<std::string> CACTParser::_literalNames = {
+std::vector<std::string> SysYParser::_literalNames = {
   "", "'const'", "','", "';'", "'int'", "'bool'", "'double'", "'float'", 
   "'['", "']'", "'='", "'{'", "'}'", "'('", "')'", "'void'", "'if'", "'else'", 
   "'while'", "'return'", "'break'", "'continue'", "'+'", "'-'", "'!'", "'*'", 
   "'/'", "'%'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'"
 };
 
-std::vector<std::string> CACTParser::_symbolicNames = {
+std::vector<std::string> SysYParser::_symbolicNames = {
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
   "BoolConst", "Ident", "IntConst", "DigitSequence", "FloatConst", "DoubleConst", 
   "NewLine", "WhiteSpace", "BlockComment", "LineComment"
 };
 
-dfa::Vocabulary CACTParser::_vocabulary(_literalNames, _symbolicNames);
+dfa::Vocabulary SysYParser::_vocabulary(_literalNames, _symbolicNames);
 
-std::vector<std::string> CACTParser::_tokenNames;
+std::vector<std::string> SysYParser::_tokenNames;
 
-CACTParser::Initializer::Initializer() {
+SysYParser::Initializer::Initializer() {
 	for (size_t i = 0; i < _symbolicNames.size(); ++i) {
 		std::string name = _vocabulary.getLiteralName(i);
 		if (name.empty()) {
@@ -3426,4 +3426,4 @@ CACTParser::Initializer::Initializer() {
   }
 }
 
-CACTParser::Initializer CACTParser::_init;
+SysYParser::Initializer SysYParser::_init;

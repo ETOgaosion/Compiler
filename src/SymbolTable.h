@@ -32,7 +32,7 @@ private:
     SymbolType symbolType;
     MetaDataType metaDataType;
     bool isArray;
-    std::size_t size;
+    std::vector<std::size_t> shape;
     int offset;
     uint64_t memPosition{};
 
@@ -40,17 +40,17 @@ protected:
 
 public:
     AbstractSymbol();
-    AbstractSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    AbstractSymbol(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape);
 
     virtual std::string getSymbolName() const;
     virtual SymbolType getSymbolType() const;
     virtual MetaDataType getMetaDataType() const;
     virtual bool getIsArray() const;
-    virtual std::size_t getSize() const;
+    virtual std::vector<std::size_t> getShape() const;
     virtual int getOffset() const;
     virtual uint64_t getMemPosition() const;
 
-    virtual bool setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    virtual bool setAttributes(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape);
     virtual bool setOffset(int inOffset);
     virtual bool setMemPosition(uint64_t inMemPosition);
 
@@ -93,7 +93,7 @@ private:
 protected:
 
 public:
-    ParamArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::size_t inSize);
+    ParamArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::vector<std::size_t> inShape);
 
 };
 
@@ -103,7 +103,7 @@ private:
 protected:
 
 public:
-    VarArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::size_t inSize);
+    VarArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::vector<std::size_t> inShape);
 
 };
 
@@ -113,7 +113,7 @@ private:
 protected:
 
 public:
-    ConstArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::size_t inSize);
+    ConstArraySymbol(const std::string& inSymbolName, MetaDataType inMetaDataType, std::vector<std::size_t> inShape);
 };
 
 class SymbolFactory {
@@ -122,7 +122,7 @@ private:
 protected:
 
 public:
-    static AbstractSymbol *createSymbol(const std::string& inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    static AbstractSymbol *createSymbol(const std::string& inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape);
 
 };
 
@@ -181,11 +181,11 @@ public:
     SymbolTable(SymbolTable *inParentSymbolTable);
     SymbolTable(TableType inTableType, SymbolTable *inParentSymbolTable);
 
-    virtual AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize);
+    virtual AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape);
     virtual AbstractSymbol *insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol);
-    virtual AbstractSymbol *insertParamSymbolSafely(const std::string &inSymbolName,  MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) { return nullptr;};
+    virtual AbstractSymbol *insertParamSymbolSafely(const std::string &inSymbolName,  MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) { return nullptr;};
     virtual AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) { return nullptr;};
-    virtual bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) { return false; };
+    virtual bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) { return false; };
     virtual bool insertParamType(AbstractSymbol *inParamSymbol) { return false; };
     virtual bool insertBindRegisters(Register *inRegister) { return false; };
 
@@ -193,14 +193,14 @@ public:
     virtual AbstractSymbol *lookUpAbstractSymbolGlobal(std::string inSymbolName) const;
     SymbolTable *lookUpFuncSymbolTable(std::string inFuncName) const override;
     virtual AbstractSymbol *lookUpParamSymbol(const std::string &inSymbolName) const { return nullptr; };
-    virtual std::tuple <MetaDataType, bool, std::size_t> lookUpParamDataType(const std::string &inSymbolName) const { return std::tuple <MetaDataType, bool, std::size_t>(MetaDataType::VOID, false, 0); };
+    virtual std::tuple <MetaDataType, bool, std::vector<std::size_t>> lookUpParamDataType(const std::string &inSymbolName) const { return {}; };
 
     virtual TableType getSymbolTableType() const;
     virtual SymbolTable *getParentSymbolTable() const;
     static SymbolTable *getGlobalSymbolTable();
     virtual std::string getFuncName() const { return {}; };
     virtual MetaDataType getReturnType() const { return MetaDataType::VOID; };
-    virtual std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const { return {}; };
+    virtual std::vector<std::tuple <MetaDataType, bool, std::vector<std::size_t>> > getParamDataTypeList() const { return {}; };
     virtual int getParamNum() const { return 0; };
     virtual int getFrameSize() const { return 0; };
     virtual std::vector<Register *> getBindRegisters() const { return {}; };
@@ -213,8 +213,8 @@ public:
     virtual bool setParamDataTypeList() { return false; };
     virtual bool setFrameSize(int inSize) { return false; }
 
-    virtual bool compareAbstractSymbolDataType(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) const;
-    virtual bool compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) const { return false; };
+    virtual bool compareAbstractSymbolDataType(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) const;
+    virtual bool compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) const { return false; };
 
 };
 
@@ -237,7 +237,7 @@ private:
     MetaDataType returnType;
     int paramNum{};
     std::unordered_map<std::string, AbstractSymbol *> paramSymbolList;
-    std::vector<std::tuple <MetaDataType, bool, std::size_t> > paramDataTypeList;
+    std::vector<std::tuple <MetaDataType, bool, std::vector<std::size_t>> > paramDataTypeList;
     int frameSize;
 
     std::vector<Register *> bindRegisters;
@@ -248,21 +248,21 @@ public:
     FuncSymbolTable();
     FuncSymbolTable(std::string inFuncName, MetaDataType inReturnType);
     FuncSymbolTable(std::string inFuncName, MetaDataType inReturnType, SymbolTable *inParentSymbolTable);
-    AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
+    AbstractSymbol *insertAbstractSymbolSafely(std::string inSymbolName, SymbolType inSymbolType, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) override;
     AbstractSymbol *insertAbstractSymbolSafely(AbstractSymbol *inAbstractSymbol) override;
-    AbstractSymbol *insertParamSymbolSafely(const std::string &inSymbolName, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
+    AbstractSymbol *insertParamSymbolSafely(const std::string &inSymbolName, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) override;
     AbstractSymbol *insertParamSymbolSafely(AbstractSymbol *inParamSymbol) override;
-    bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) override;
+    bool insertParamType(MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) override;
     bool insertParamType(AbstractSymbol *inParamSymbol) override;
     bool insertBindRegisters(Register *inRegister) override { bindRegisters.push_back(inRegister); return true;};
 
     AbstractSymbol *lookUpParamSymbol(const std::string &inSymbolName) const override;
-    std::tuple <MetaDataType, bool, std::size_t> lookUpParamDataType(const std::string &inSymbolName) const override;
+    std::tuple <MetaDataType, bool, std::vector<std::size_t>> lookUpParamDataType(const std::string &inSymbolName) const override;
 
     std::string getFuncName() const override;
     MetaDataType getReturnType() const override;
     int getParamNum() const override;
-    std::vector<std::tuple <MetaDataType, bool, std::size_t> > getParamDataTypeList() const override;
+    std::vector<std::tuple <MetaDataType, bool, std::vector<std::size_t>>> getParamDataTypeList() const override;
     int getFrameSize() const override;
     std::vector<Register *> getBindRegisters() const override { return bindRegisters; };
 
@@ -272,7 +272,7 @@ public:
     bool setParamDataTypeList() override;
     bool setFrameSize(int inSize) override;
 
-    bool compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, std::size_t inSize) const override;
+    bool compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, std::vector<std::size_t> inShape) const override;
 
 };
 

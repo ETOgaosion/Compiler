@@ -2,7 +2,7 @@
     #include "../src/SymbolTable.h"
 
 
-// Generated from /Volumes/study/code/C++/vscode/compiler/compiler/grammar/CACT.g4 by ANTLR 4.8
+// Generated from /Volumes/study/code/C++/vscode/compiler/compiler/grammar/SysY.g4 by ANTLR 4.8
 
 #pragma once
 
@@ -12,7 +12,7 @@
 
 
 
-class  CACTLexer : public antlr4::Lexer {
+class  SysYLexer : public antlr4::Lexer {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
@@ -25,8 +25,8 @@ public:
     WhiteSpace = 43, BlockComment = 44, LineComment = 45
   };
 
-  CACTLexer(antlr4::CharStream *input);
-  ~CACTLexer();
+  SysYLexer(antlr4::CharStream *input);
+  ~SysYLexer();
 
   virtual std::string getGrammarFileName() const override;
   virtual const std::vector<std::string>& getRuleNames() const override;

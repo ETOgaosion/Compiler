@@ -1,6 +1,6 @@
 # Compiler
 
-Antlr and CACT compiler demo.
+Antlr and SysY compiler demo.
 
 Platform temporarily only supports Ubuntu with g++-5.
 

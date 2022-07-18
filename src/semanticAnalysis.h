@@ -1,10 +1,10 @@
-#include "../grammar/CACTBaseListener.h"
+#include "../grammar/SysYBaseListener.h"
 #include "IRGenerator.h"
 #include "tools.h"
 
 #pragma once
 
-class SemanticAnalysis : public CACTBaseListener
+class SemanticAnalysis : public SysYBaseListener
 {
 private:
     int block;
@@ -19,182 +19,182 @@ public:
     SemanticAnalysis(/* args */){}
     ~SemanticAnalysis(){}
 
-  void enterCompUnit(CACTParser::CompUnitContext * /*ctx*/) override;
-  void exitCompUnit(CACTParser::CompUnitContext * /*ctx*/) override;
+     void enterCompUnit(SysYParser::CompUnitContext *ctx) override;
+     void exitCompUnit(SysYParser::CompUnitContext *ctx) override;
 
-  void enterDecl(CACTParser::DeclContext * /*ctx*/) override;
-  void exitDecl(CACTParser::DeclContext * /*ctx*/) override;
+     void enterDecl(SysYParser::DeclContext *ctx) override;
+     void exitDecl(SysYParser::DeclContext *ctx) override;
 
-  void enterConstDecl(CACTParser::ConstDeclContext * /*ctx*/) override;
-  void exitConstDecl(CACTParser::ConstDeclContext * /*ctx*/) override;
+     void enterConstDecl(SysYParser::ConstDeclContext *ctx) override;
+     void exitConstDecl(SysYParser::ConstDeclContext *ctx) override;
 
-  void enterBType(CACTParser::BTypeContext * /*ctx*/) override;
-  void exitBType(CACTParser::BTypeContext * /*ctx*/) override;
+     void enterBType(SysYParser::BTypeContext *ctx) override;
+     void exitBType(SysYParser::BTypeContext *ctx) override;
 
-  void enterConstDef(CACTParser::ConstDefContext * /*ctx*/) override;
-  void exitConstDef(CACTParser::ConstDefContext * /*ctx*/) override;
+     void enterConstDef(SysYParser::ConstDefContext *ctx) override;
+     void exitConstDef(SysYParser::ConstDefContext *ctx) override;
 
-  void enterConstInitValOfVar(CACTParser::ConstInitValOfVarContext * /*ctx*/) override;
-  void exitConstInitValOfVar(CACTParser::ConstInitValOfVarContext * /*ctx*/) override;
+     void enterConstInitValOfVar(SysYParser::ConstInitValOfVarContext *ctx) override;
+     void exitConstInitValOfVar(SysYParser::ConstInitValOfVarContext *ctx) override;
 
-  void enterConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * /*ctx*/) override;
-  void exitConstInitValOfArray(CACTParser::ConstInitValOfArrayContext * /*ctx*/) override;
+     void enterConstInitValOfArray(SysYParser::ConstInitValOfArrayContext *ctx) override;
+     void exitConstInitValOfArray(SysYParser::ConstInitValOfArrayContext *ctx) override;
 
-  void enterVarDecl(CACTParser::VarDeclContext * /*ctx*/) override;
-  void exitVarDecl(CACTParser::VarDeclContext * /*ctx*/) override;
+     void enterVarDecl(SysYParser::VarDeclContext *ctx) override;
+     void exitVarDecl(SysYParser::VarDeclContext *ctx) override;
 
-  void enterVarDef(CACTParser::VarDefContext * /*ctx*/) override;
-  void exitVarDef(CACTParser::VarDefContext * /*ctx*/) override;
+     void enterVarDef(SysYParser::VarDefContext *ctx) override;
+     void exitVarDef(SysYParser::VarDefContext *ctx) override;
 
-  void enterFuncDef(CACTParser::FuncDefContext * /*ctx*/) override;
-  void exitFuncDef(CACTParser::FuncDefContext * /*ctx*/) override;
+     void enterInitVal(SysYParser::InitValContext *ctx) override;
+     void exitInitVal(SysYParser::InitValContext *ctx) override;
 
-  void enterFuncType(CACTParser::FuncTypeContext * /*ctx*/) override;
-  void exitFuncType(CACTParser::FuncTypeContext * /*ctx*/) override;
+     void enterFuncDef(SysYParser::FuncDefContext *ctx) override;
+     void exitFuncDef(SysYParser::FuncDefContext *ctx) override;
 
-  void enterFuncFParams(CACTParser::FuncFParamsContext * /*ctx*/) override;
-  void exitFuncFParams(CACTParser::FuncFParamsContext * /*ctx*/) override;
+     void enterFuncType(SysYParser::FuncTypeContext *ctx) override;
+     void exitFuncType(SysYParser::FuncTypeContext *ctx) override;
 
-  void enterFuncFParam(CACTParser::FuncFParamContext * /*ctx*/) override;
-  void exitFuncFParam(CACTParser::FuncFParamContext * /*ctx*/) override;
+     void enterFuncFParams(SysYParser::FuncFParamsContext *ctx) override;
+     void exitFuncFParams(SysYParser::FuncFParamsContext *ctx) override;
 
-  void enterBrackets(CACTParser::BracketsContext * /*ctx*/) override;
-  void exitBrackets(CACTParser::BracketsContext * /*ctx*/) override;
+     void enterFuncFParam(SysYParser::FuncFParamContext *ctx) override;
+     void exitFuncFParam(SysYParser::FuncFParamContext *ctx) override;
 
-  void enterFuncBlock(CACTParser::FuncBlockContext * /*ctx*/) override;
-  void exitFuncBlock(CACTParser::FuncBlockContext * /*ctx*/) override;
+     void enterBrackets(SysYParser::BracketsContext *ctx) override;
+     void exitBrackets(SysYParser::BracketsContext *ctx) override;
 
-  void enterFuncBlockItem(CACTParser::FuncBlockItemContext * /*ctx*/) override;
-  void exitFuncBlockItem(CACTParser::FuncBlockItemContext * /*ctx*/) override;
+     void enterFuncBlock(SysYParser::FuncBlockContext *ctx) override;
+     void exitFuncBlock(SysYParser::FuncBlockContext *ctx) override;
 
-  void enterBlock(CACTParser::BlockContext * /*ctx*/) override;
-  void exitBlock(CACTParser::BlockContext * /*ctx*/) override;
+     void enterFuncBlockItem(SysYParser::FuncBlockItemContext *ctx) override;
+     void exitFuncBlockItem(SysYParser::FuncBlockItemContext *ctx) override;
 
-  void enterBlockItem(CACTParser::BlockItemContext * /*ctx*/) override;
-  void exitBlockItem(CACTParser::BlockItemContext * /*ctx*/) override;
+     void enterStmtAssignment(SysYParser::StmtAssignmentContext *ctx) override;
+     void exitStmtAssignment(SysYParser::StmtAssignmentContext *ctx) override;
 
-  void enterStmtAssignment(CACTParser::StmtAssignmentContext * /*ctx*/) override;
-  void exitStmtAssignment(CACTParser::StmtAssignmentContext * /*ctx*/) override;
+     void enterStmtExpression(SysYParser::StmtExpressionContext *ctx) override;
+     void exitStmtExpression(SysYParser::StmtExpressionContext *ctx) override;
 
-  void enterStmtExpression(CACTParser::StmtExpressionContext * /*ctx*/) override;
-  void exitStmtExpression(CACTParser::StmtExpressionContext * /*ctx*/) override;
+     void enterStmtBlock(SysYParser::StmtBlockContext *ctx) override;
+     void exitStmtBlock(SysYParser::StmtBlockContext *ctx) override;
 
-  void enterStmtBlock(CACTParser::StmtBlockContext * /*ctx*/) override;
-  void exitStmtBlock(CACTParser::StmtBlockContext * /*ctx*/) override;
+     void enterStmtCtrlSeq(SysYParser::StmtCtrlSeqContext *ctx) override;
+     void exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext *ctx) override;
 
-  void enterStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * /*ctx*/) override;
-  void exitStmtCtrlSeq(CACTParser::StmtCtrlSeqContext * /*ctx*/) override;
+     void enterStmtReturn(SysYParser::StmtReturnContext *ctx) override;
+     void exitStmtReturn(SysYParser::StmtReturnContext *ctx) override;
 
-  void enterStmtReturn(CACTParser::StmtReturnContext * /*ctx*/) override;
-  void exitStmtReturn(CACTParser::StmtReturnContext * /*ctx*/) override;
+     void enterBlock(SysYParser::BlockContext *ctx) override;
+     void exitBlock(SysYParser::BlockContext *ctx) override;
 
-  void enterSubStmtAssignment(CACTParser::SubStmtAssignmentContext * /*ctx*/) override;
-  void exitSubStmtAssignment(CACTParser::SubStmtAssignmentContext * /*ctx*/) override;
+     void enterBlockItem(SysYParser::BlockItemContext *ctx) override;
+     void exitBlockItem(SysYParser::BlockItemContext *ctx) override;
 
-  void enterSubStmtExpression(CACTParser::SubStmtExpressionContext * /*ctx*/) override;
-  void exitSubStmtExpression(CACTParser::SubStmtExpressionContext * /*ctx*/) override;
+     void enterSubStmtAssignment(SysYParser::SubStmtAssignmentContext *ctx) override;
+     void exitSubStmtAssignment(SysYParser::SubStmtAssignmentContext *ctx) override;
 
-  void enterSubStmtBlock(CACTParser::SubStmtBlockContext * /*ctx*/) override;
-  void exitSubStmtBlock(CACTParser::SubStmtBlockContext * /*ctx*/) override;
+     void enterSubStmtExpression(SysYParser::SubStmtExpressionContext *ctx) override;
+     void exitSubStmtExpression(SysYParser::SubStmtExpressionContext *ctx) override;
 
-  void enterSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * /*ctx*/) override;
-  void exitSubStmtCtrlSeq(CACTParser::SubStmtCtrlSeqContext * /*ctx*/) override;
+     void enterSubStmtBlock(SysYParser::SubStmtBlockContext *ctx) override;
+     void exitSubStmtBlock(SysYParser::SubStmtBlockContext *ctx) override;
 
-  void enterSubStmtReturn(CACTParser::SubStmtReturnContext * /*ctx*/) override;
-  void exitSubStmtReturn(CACTParser::SubStmtReturnContext * /*ctx*/) override;
+     void enterSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext *ctx) override;
+     void exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext *ctx) override;
 
-  void enterExpAddExp(CACTParser::ExpAddExpContext * /*ctx*/) override;
-  void exitExpAddExp(CACTParser::ExpAddExpContext * /*ctx*/) override;
+     void enterSubStmtReturn(SysYParser::SubStmtReturnContext *ctx) override;
+     void exitSubStmtReturn(SysYParser::SubStmtReturnContext *ctx) override;
 
-  void enterExpBoolExp(CACTParser::ExpBoolExpContext * /*ctx*/) override;
-  void exitExpBoolExp(CACTParser::ExpBoolExpContext * /*ctx*/) override;
+     void enterExp(SysYParser::ExpContext *ctx) override;
+     void exitExp(SysYParser::ExpContext *ctx) override;
 
-  void enterCond(CACTParser::CondContext * /*ctx*/) override;
-  void exitCond(CACTParser::CondContext * /*ctx*/) override;
+     void enterCond(SysYParser::CondContext *ctx) override;
+     void exitCond(SysYParser::CondContext *ctx) override;
 
-  void enterLVal(CACTParser::LValContext * /*ctx*/) override;
-  void exitLVal(CACTParser::LValContext * /*ctx*/) override;
+     void enterLVal(SysYParser::LValContext *ctx) override;
+     void exitLVal(SysYParser::LValContext *ctx) override;
 
-  void enterPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContext * /*ctx*/) override;
-  void exitPrimaryExpNestExp(CACTParser::PrimaryExpNestExpContext * /*ctx*/) override;
+     void enterPrimaryExpNestExp(SysYParser::PrimaryExpNestExpContext *ctx) override;
+     void exitPrimaryExpNestExp(SysYParser::PrimaryExpNestExpContext *ctx) override;
 
-  void enterPrimaryExplVal(CACTParser::PrimaryExplValContext * /*ctx*/) override;
-  void exitPrimaryExplVal(CACTParser::PrimaryExplValContext * /*ctx*/) override;
+     void enterPrimaryExplVal(SysYParser::PrimaryExplValContext *ctx) override;
+     void exitPrimaryExplVal(SysYParser::PrimaryExplValContext *ctx) override;
 
-  void enterPrimaryExpNumber(CACTParser::PrimaryExpNumberContext * /*ctx*/) override;
-  void exitPrimaryExpNumber(CACTParser::PrimaryExpNumberContext * /*ctx*/) override;
+     void enterPrimaryExpNumber(SysYParser::PrimaryExpNumberContext *ctx) override;
+     void exitPrimaryExpNumber(SysYParser::PrimaryExpNumberContext *ctx) override;
 
-  void enterUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpContext * /*ctx*/) override;
-  void exitUnaryExpPrimaryExp(CACTParser::UnaryExpPrimaryExpContext * /*ctx*/) override;
+     void enterUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpContext *ctx) override;
+     void exitUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpContext *ctx) override;
 
-  void enterUnaryExpFunc(CACTParser::UnaryExpFuncContext * /*ctx*/) override;
-  void exitUnaryExpFunc(CACTParser::UnaryExpFuncContext * /*ctx*/) override;
+     void enterUnaryExpFunc(SysYParser::UnaryExpFuncContext *ctx) override;
+     void exitUnaryExpFunc(SysYParser::UnaryExpFuncContext *ctx) override;
 
-  void enterUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * /*ctx*/) override;
-  void exitUnaryExpNestUnaryExp(CACTParser::UnaryExpNestUnaryExpContext * /*ctx*/) override;
+     void enterUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExpContext *ctx) override;
+     void exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExpContext *ctx) override;
 
-  void enterUnaryOp(CACTParser::UnaryOpContext * /*ctx*/) override;
-  void exitUnaryOp(CACTParser::UnaryOpContext * /*ctx*/) override;
+     void enterUnaryOp(SysYParser::UnaryOpContext *ctx) override;
+     void exitUnaryOp(SysYParser::UnaryOpContext *ctx) override;
 
-  void enterFuncRParams(CACTParser::FuncRParamsContext * /*ctx*/) override;
-  void exitFuncRParams(CACTParser::FuncRParamsContext * /*ctx*/) override;
+     void enterFuncRParams(SysYParser::FuncRParamsContext *ctx) override;
+     void exitFuncRParams(SysYParser::FuncRParamsContext *ctx) override;
 
-  void enterMulExpMulExp(CACTParser::MulExpMulExpContext * /*ctx*/) override;
-  void exitMulExpMulExp(CACTParser::MulExpMulExpContext * /*ctx*/) override;
+     void enterMulExpMulExp(SysYParser::MulExpMulExpContext *ctx) override;
+     void exitMulExpMulExp(SysYParser::MulExpMulExpContext *ctx) override;
 
-  void enterMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * /*ctx*/) override;
-  void exitMulExpUnaryExp(CACTParser::MulExpUnaryExpContext * /*ctx*/) override;
+     void enterMulExpUnaryExp(SysYParser::MulExpUnaryExpContext *ctx) override;
+     void exitMulExpUnaryExp(SysYParser::MulExpUnaryExpContext *ctx) override;
 
-  void enterMulOp(CACTParser::MulOpContext * /*ctx*/) override;
-  void exitMulOp(CACTParser::MulOpContext * /*ctx*/) override;
+     void enterMulOp(SysYParser::MulOpContext *ctx) override;
+     void exitMulOp(SysYParser::MulOpContext *ctx) override;
 
-  void enterAddExpAddExp(CACTParser::AddExpAddExpContext * /*ctx*/) override;
-  void exitAddExpAddExp(CACTParser::AddExpAddExpContext * /*ctx*/) override;
+     void enterAddExpAddExp(SysYParser::AddExpAddExpContext *ctx) override;
+     void exitAddExpAddExp(SysYParser::AddExpAddExpContext *ctx) override;
 
-  void enterAddExpMulExp(CACTParser::AddExpMulExpContext * /*ctx*/) override;
-  void exitAddExpMulExp(CACTParser::AddExpMulExpContext * /*ctx*/) override;
+     void enterAddExpMulExp(SysYParser::AddExpMulExpContext *ctx) override;
+     void exitAddExpMulExp(SysYParser::AddExpMulExpContext *ctx) override;
 
-  void enterRelExpRelExp(CACTParser::RelExpRelExpContext * /*ctx*/) override;
-  void exitRelExpRelExp(CACTParser::RelExpRelExpContext * /*ctx*/) override;
+     void enterAddOp(SysYParser::AddOpContext *ctx) override;
+     void exitAddOp(SysYParser::AddOpContext *ctx) override;
 
-  void enterRelExpAddExp(CACTParser::RelExpAddExpContext * /*ctx*/) override;
-  void exitRelExpAddExp(CACTParser::RelExpAddExpContext * /*ctx*/) override;
+     void enterRelExpRelExp(SysYParser::RelExpRelExpContext *ctx) override;
+     void exitRelExpRelExp(SysYParser::RelExpRelExpContext *ctx) override;
 
-  void enterRelExpBoolConst(CACTParser::RelExpBoolConstContext * /*ctx*/) override;
-  void exitRelExpBoolConst(CACTParser::RelExpBoolConstContext * /*ctx*/) override;
+     void enterRelExpAddExp(SysYParser::RelExpAddExpContext *ctx) override;
+     void exitRelExpAddExp(SysYParser::RelExpAddExpContext *ctx) override;
 
-  void enterEqExpRelExp(CACTParser::EqExpRelExpContext * /*ctx*/) override;
-  void exitEqExpRelExp(CACTParser::EqExpRelExpContext * /*ctx*/) override;
+     void enterRelOp(SysYParser::RelOpContext *ctx) override;
+     void exitRelOp(SysYParser::RelOpContext *ctx) override;
 
-  void enterEqExpEqExp(CACTParser::EqExpEqExpContext * /*ctx*/) override;
-  void exitEqExpEqExp(CACTParser::EqExpEqExpContext * /*ctx*/) override;
+     void enterEqExpRelExp(SysYParser::EqExpRelExpContext *ctx) override;
+     void exitEqExpRelExp(SysYParser::EqExpRelExpContext *ctx) override;
 
-  void enterLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * /*ctx*/) override;
-  void exitLAndExpLAndExp(CACTParser::LAndExpLAndExpContext * /*ctx*/) override;
+     void enterEqExpEqExp(SysYParser::EqExpEqExpContext *ctx) override;
+     void exitEqExpEqExp(SysYParser::EqExpEqExpContext *ctx) override;
 
-  void enterLAndExpEqExp(CACTParser::LAndExpEqExpContext * /*ctx*/) override;
-  void exitLAndExpEqExp(CACTParser::LAndExpEqExpContext * /*ctx*/) override;
+     void enterEqOp(SysYParser::EqOpContext *ctx) override;
+     void exitEqOp(SysYParser::EqOpContext *ctx) override;
 
-  void enterLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * /*ctx*/) override;
-  void exitLOrExpLAndExp(CACTParser::LOrExpLAndExpContext * /*ctx*/) override;
+     void enterLAndExpLAndExp(SysYParser::LAndExpLAndExpContext *ctx) override;
+     void exitLAndExpLAndExp(SysYParser::LAndExpLAndExpContext *ctx) override;
 
-  void enterLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * /*ctx*/) override;
-  void exitLOrExpLOrExp(CACTParser::LOrExpLOrExpContext * /*ctx*/) override;
+     void enterLAndExpEqExp(SysYParser::LAndExpEqExpContext *ctx) override;
+     void exitLAndExpEqExp(SysYParser::LAndExpEqExpContext *ctx) override;
 
-  void enterConstExpNumber(CACTParser::ConstExpNumberContext * /*ctx*/) override;
-  void exitConstExpNumber(CACTParser::ConstExpNumberContext * /*ctx*/) override;
+     void enterLOrExpLAndExp(SysYParser::LOrExpLAndExpContext *ctx) override;
+     void exitLOrExpLAndExp(SysYParser::LOrExpLAndExpContext *ctx) override;
 
-  void enterConstExpBoolConst(CACTParser::ConstExpBoolConstContext * /*ctx*/) override;
-  void exitConstExpBoolConst(CACTParser::ConstExpBoolConstContext * /*ctx*/) override;
+     void enterLOrExpLOrExp(SysYParser::LOrExpLOrExpContext *ctx) override;
+     void exitLOrExpLOrExp(SysYParser::LOrExpLOrExpContext *ctx) override;
 
-  void enterNumberIntConst(CACTParser::NumberIntConstContext * /*ctx*/) override;
-  void exitNumberIntConst(CACTParser::NumberIntConstContext * /*ctx*/) override;
+     void enterConstExpNumber(SysYParser::ConstExpNumberContext *ctx) override;
+     void exitConstExpNumber(SysYParser::ConstExpNumberContext *ctx) override;
 
-  void enterNumberDoubleConst(CACTParser::NumberDoubleConstContext * /*ctx*/) override;
-  void exitNumberDoubleConst(CACTParser::NumberDoubleConstContext * /*ctx*/) override;
+     void enterNumberIntConst(SysYParser::NumberIntConstContext *ctx) override;
+     void exitNumberIntConst(SysYParser::NumberIntConstContext *ctx) override;
 
-  void enterNumberFloatConst(CACTParser::NumberFloatConstContext * /*ctx*/) override;
-  void exitNumberFloatConst(CACTParser::NumberFloatConstContext * /*ctx*/) override;
+     void enterNumberFloatConst(SysYParser::NumberFloatConstContext *ctx) override;
+     void exitNumberFloatConst(SysYParser::NumberFloatConstContext *ctx) override;
 
 
   void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override;
