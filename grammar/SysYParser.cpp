@@ -459,12 +459,12 @@ void SysYParser::ConstInitValOfVarContext::exitRule(tree::ParseTreeListener *lis
 }
 //----------------- ConstInitValOfArrayContext ------------------------------------------------------------------
 
-std::vector<SysYParser::ConstExpContext *> SysYParser::ConstInitValOfArrayContext::constExp() {
-  return getRuleContexts<SysYParser::ConstExpContext>();
+std::vector<SysYParser::ConstInitValContext *> SysYParser::ConstInitValOfArrayContext::constInitVal() {
+  return getRuleContexts<SysYParser::ConstInitValContext>();
 }
 
-SysYParser::ConstExpContext* SysYParser::ConstInitValOfArrayContext::constExp(size_t i) {
-  return getRuleContext<SysYParser::ConstExpContext>(i);
+SysYParser::ConstInitValContext* SysYParser::ConstInitValOfArrayContext::constInitVal(size_t i) {
+  return getRuleContext<SysYParser::ConstInitValContext>(i);
 }
 
 SysYParser::ConstInitValOfArrayContext::ConstInitValOfArrayContext(ConstInitValContext *ctx) { copyFrom(ctx); }
@@ -509,11 +509,12 @@ SysYParser::ConstInitValContext* SysYParser::constInitVal() {
         _errHandler->sync(this);
 
         _la = _input->LA(1);
-        if (_la == SysYParser::IntConst
-
-        || _la == SysYParser::FloatConst) {
+        if ((((_la & ~ 0x3fULL) == 0) &&
+          ((1ULL << _la) & ((1ULL << SysYParser::T__8)
+          | (1ULL << SysYParser::IntConst)
+          | (1ULL << SysYParser::FloatConst))) != 0)) {
           setState(120);
-          constExp();
+          constInitVal();
           setState(125);
           _errHandler->sync(this);
           _la = _input->LA(1);
@@ -521,7 +522,7 @@ SysYParser::ConstInitValContext* SysYParser::constInitVal() {
             setState(121);
             match(SysYParser::T__1);
             setState(122);
-            constExp();
+            constInitVal();
             setState(127);
             _errHandler->sync(this);
             _la = _input->LA(1);
@@ -3958,8 +3959,8 @@ SysYParser::Initializer::Initializer() {
     0x3, 0x2, 0x2, 0x2, 0x74, 0x75, 0x7, 0xa, 0x2, 0x2, 0x75, 0x77, 0x5, 
     0xc, 0x7, 0x2, 0x76, 0x74, 0x3, 0x2, 0x2, 0x2, 0x76, 0x77, 0x3, 0x2, 
     0x2, 0x2, 0x77, 0xb, 0x3, 0x2, 0x2, 0x2, 0x78, 0x86, 0x5, 0x4c, 0x27, 
-    0x2, 0x79, 0x82, 0x7, 0xb, 0x2, 0x2, 0x7a, 0x7f, 0x5, 0x4c, 0x27, 0x2, 
-    0x7b, 0x7c, 0x7, 0x4, 0x2, 0x2, 0x7c, 0x7e, 0x5, 0x4c, 0x27, 0x2, 0x7d, 
+    0x2, 0x79, 0x82, 0x7, 0xb, 0x2, 0x2, 0x7a, 0x7f, 0x5, 0xc, 0x7, 0x2, 
+    0x7b, 0x7c, 0x7, 0x4, 0x2, 0x2, 0x7c, 0x7e, 0x5, 0xc, 0x7, 0x2, 0x7d, 
     0x7b, 0x3, 0x2, 0x2, 0x2, 0x7e, 0x81, 0x3, 0x2, 0x2, 0x2, 0x7f, 0x7d, 
     0x3, 0x2, 0x2, 0x2, 0x7f, 0x80, 0x3, 0x2, 0x2, 0x2, 0x80, 0x83, 0x3, 
     0x2, 0x2, 0x2, 0x81, 0x7f, 0x3, 0x2, 0x2, 0x2, 0x82, 0x7a, 0x3, 0x2, 

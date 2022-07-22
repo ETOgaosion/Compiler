@@ -204,8 +204,8 @@ public:
   public:
     ConstInitValOfArrayContext(ConstInitValContext *ctx);
 
-    std::vector<ConstExpContext *> constExp();
-    ConstExpContext* constExp(size_t i);
+    std::vector<ConstInitValContext *> constInitVal();
+    ConstInitValContext* constInitVal(size_t i);
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };
