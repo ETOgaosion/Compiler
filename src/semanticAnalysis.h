@@ -197,8 +197,8 @@ public:
      void exitNumberFloatConst(SysYParser::NumberFloatConstContext *ctx) override;
 
 
-  void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override;
-  void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override;
-  void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override;
-  void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override;
+    void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override;
+    void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override;
+    void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override;
+    void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override;
 };

@@ -57,8 +57,8 @@ constInitVal
         bool isArray,
         IRValue* value
     ]
-    : constExp                              #constInitValOfVar
-    | '{' (constExp (',' constExp)*)? '}'   #constInitValOfArray
+    : constExp                                      #constInitValOfVar
+    | '{' (constInitVal (',' constInitVal)*)? '}'   #constInitValOfArray
     ;
 
 varDecl

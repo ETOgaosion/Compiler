@@ -97,7 +97,7 @@ void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
         if (const_def->withType && const_def->type != type && const_def->type != MetaDataType::VOID) {
             throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
         }
-        AbstractSymbol *symbol = SymbolFactory::createSymbol(const_def->symbolName, SymbolType::CONST, type, const_def->isArray, const_def->size);
+        AbstractSymbol *symbol = SymbolFactory::createSymbol(const_def->symbolName, SymbolType::CONST, type, const_def->isArray, const_def->shape);
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
             throw std::runtime_error("[ERROR] > Redefine const symbol.\n");
         }
@@ -148,28 +148,31 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->symbolName = "";
     ctx->type = MetaDataType::VOID;
     ctx->withType = false;
-    ctx->size = 0;
+    ctx->shape = {};
     ctx->isArray = false;
 }
 
 void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
-    if(!ctx->IntConst()){
+    if(ctx->constExp().empty()){
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
-        ctx->size = stoi(ctx->IntConst()->getText());
+        ctx->shape.clear();
+        for (auto it : ctx->constExp()) {
+            ctx->shape.push_back(std::stoi(it->getText()));
+        }
     }
     if (ctx->constInitVal()) {
-        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->size > ctx->size)) {
-            throw std::runtime_error("[ERROR] > Const var initialize failure: type not match. " + std::to_string(ctx->constInitVal()->isArray) + " " + std::to_string(ctx->isArray) + " " + std::to_string(ctx->constInitVal()->size) + " " + std::to_string(ctx->size));
+        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->shape[0] > ctx->shape[0])) {
+            throw std::runtime_error("[ERROR] > Const var initialize failure: type not match. " + std::to_string(ctx->constInitVal()->isArray));
         }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
-        if (ctx->isArray && ctx->size > ctx->constInitVal()->value->getArraySize()) {
+        if (ctx->isArray && ctx->shape[0] > ctx->constInitVal()->value->getArraySize()) {
             std::vector<std::string> valVec = ctx->constInitVal()->value->getValues();
-            for (int i = ctx->constInitVal()->value->getArraySize(); i < ctx->size; i++) {
+            for (int i = ctx->constInitVal()->value->getArraySize(); i < ctx->shape; i++) {
                 valVec.emplace_back("0");
             }
             ctx->value = irGenerator->ir->addMulImmValue(ctx->type, valVec);
@@ -180,7 +183,7 @@ void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
     }
     else {
         if (ctx->isArray) {
-            ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->size);
+            ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->shape);
         }
         else {
             ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
@@ -192,7 +195,7 @@ void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
 void SemanticAnalysis::enterConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
 {
     ctx->type = MetaDataType::VOID;
-    ctx->size = 0;
+    ctx->shape = {};
     ctx->isArray = false;
     ctx->value = nullptr;
 }
@@ -200,25 +203,20 @@ void SemanticAnalysis::enterConstInitValOfVar(SysYParser::ConstInitValOfVarConte
 void SemanticAnalysis::exitConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
 {
     ctx->type = ctx->constExp()->metaDataType;
-    ctx->size = 1;
+    ctx->shape = {};
     ctx->isArray = false;
-    if (ctx->constExp()->metaDataType == MetaDataType::FLOAT || ctx->constExp()->metaDataType == MetaDataType::DOUBLE) {
+    if (ctx->constExp()->metaDataType == MetaDataType::FLOAT) {
         ctx->value = irGenerator->addImmValue(ctx->constExp()->metaDataType, ctx->constExp()->val);
     }
     else {
-        if (ctx->constExp()->metaDataType == MetaDataType::BOOL || ctx->constExp()->metaDataType == MetaDataType::INT) {
-            ctx->value = new IRValue(ctx->constExp()->metaDataType, ctx->constExp()->val, {}, false);
-        }
-        else {
-            ctx->value = irGenerator->addImmValue(ctx->constExp()->metaDataType, ctx->constExp()->val);
-        }
+        ctx->value = new IRValue(ctx->constExp()->metaDataType, ctx->constExp()->val, {}, false);
     }
 }
 
 void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
 {
     ctx->type = MetaDataType::VOID;
-    ctx->size = 0;
+    ctx->shape = {};
     ctx->isArray = false;
     ctx->value = nullptr;
 }
@@ -227,10 +225,10 @@ void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayCo
 {
     if(!ctx->constExp().empty()){
         ctx->type = ctx->constExp(0)->metaDataType;
-        ctx->size = ctx->constExp().size();
+        ctx->shape = ctx->constExp().size();
     } else {
         ctx->type = MetaDataType::VOID;
-        ctx->size = 0;
+        ctx->shape = 0;
     }
 
     for(const auto & const_exp : ctx->constExp()){
@@ -271,7 +269,7 @@ void SemanticAnalysis::exitVarDecl(SysYParser::VarDeclContext * ctx)
                 throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
             }
         }
-        AbstractSymbol *symbol = SymbolFactory::createSymbol(var_def->symbolName, SymbolType::VAR, type, var_def->isArray, var_def->size);
+        AbstractSymbol *symbol = SymbolFactory::createSymbol(var_def->symbolName, SymbolType::VAR, type, var_def->isArray, var_def->shape);
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
             throw std::runtime_error("[ERROR] > Redefine var symbol. " + symbol->getSymbolName());
         }
@@ -309,7 +307,7 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
     ctx->symbolName = "";
     ctx->type = MetaDataType::VOID;
     ctx->withType = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->isArray = false;
 }
 
@@ -320,17 +318,17 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
-        ctx->size = stoi(ctx->IntConst()->getText());
+        ctx->shape = stoi(ctx->IntConst()->getText());
     }
     if (ctx->constInitVal()) {
-        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->size > ctx->size)) {
-            throw std::runtime_error("[ERROR] > var initialize failure: type not match. " + std::to_string(ctx->constInitVal()->isArray) + " " + std::to_string(ctx->isArray) + " " + std::to_string(ctx->constInitVal()->size) + " " + std::to_string(ctx->size));
+        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->shape > ctx->shape)) {
+            throw std::runtime_error("[ERROR] > var initialize failure: type not match. " + std::to_string(ctx->constInitVal()->isArray) + " " + std::to_string(ctx->isArray) + " " + std::to_string(ctx->constInitVal()->shape) + " " + std::to_string(ctx->shape));
         }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
-        if (ctx->isArray && ctx->size > ctx->constInitVal()->value->getArraySize()) {
+        if (ctx->isArray && ctx->shape > ctx->constInitVal()->value->getArraySize()) {
             std::vector<std::string> valVec = ctx->constInitVal()->value->getValues();
-            for (int i = ctx->constInitVal()->value->getArraySize(); i < ctx->size; i++) {
+            for (int i = ctx->constInitVal()->value->getArraySize(); i < ctx->shape; i++) {
                 valVec.emplace_back("0");
             }
             ctx->value = irGenerator->ir->addMulImmValue(ctx->type, valVec);
@@ -341,13 +339,16 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
     }
     else {
         if (ctx->isArray) {
-            ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->size);
+            ctx->value = irGenerator->ir->addMulSameImmValue(MetaDataType::INT, "0", ctx->shape);
         }
         else {
             ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
         }
     }
 }
+
+void SemanticAnalysis::enterInitVal(SysYParser::InitValContext *ctx) {}
+void SemanticAnalysis::exitInitVal(SysYParser::InitValContext *ctx) {}
 
 void SemanticAnalysis::enterFuncDef(SysYParser::FuncDefContext * ctx)
 {
@@ -656,7 +657,7 @@ void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ct
         if (!ctx->exp()->isArray) {
             throw std::runtime_error("[ERROR] > non-array assignment to array.\n");
         }
-        if (ctx->lVal()->size != ctx->exp()->size) {
+        if (ctx->lVal()->shape != ctx->exp()->shape) {
             throw std::runtime_error("[ERROR] > array size mismatch in assignment.\n");
         }
     }
@@ -686,7 +687,7 @@ void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ct
         auto* one = new IRValue(MetaDataType::INT, std::to_string(1), {}, false);
         IRCode *code = new IRAddI(ctx->exp()->indexOperand, ctx->exp()->indexOperand, one);
         irGenerator->addCode(code);
-        auto* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
+        auto* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->shape), {}, false);
         IRTempVariable *tmp = irGenerator->addTempVariable(MetaDataType::INT);
         code = new IRSgeqI(tmp, ctx->exp()->indexOperand, sizeVal);
         irGenerator->addCode(code);
@@ -996,7 +997,7 @@ void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContex
         if (ctx->exp() && !ctx->exp()->isArray) {
             throw std::runtime_error("[ERROR] > non-array assignment to array.\n");
         }
-        if (ctx->lVal()->size != ctx->exp()->size) {
+        if (ctx->lVal()->shape != ctx->exp()->shape) {
             throw std::runtime_error("[ERROR] > array size mismatch in assignment.\n");
         }
     }
@@ -1026,7 +1027,7 @@ void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContex
         auto* one = new IRValue(MetaDataType::INT, std::to_string(1), {}, false);
         IRCode *code = new IRAddI(ctx->exp()->indexOperand, ctx->exp()->indexOperand, one);
         irGenerator->addCode(code);
-        auto* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->size), {}, false);
+        auto* sizeVal = new IRValue(MetaDataType::INT, std::to_string(ctx->lVal()->shape), {}, false);
         IRTempVariable *tmp = irGenerator->addTempVariable(MetaDataType::INT);
         code = new IRSgeqI(tmp, ctx->exp()->indexOperand, sizeVal);
         irGenerator->addCode(code);
@@ -1310,12 +1311,14 @@ void SemanticAnalysis::exitSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
         irGenerator->addCodes(ctx->codes);
 }
 
+void SemanticAnalysis::enterExp(SysYParser::ExpContext *ctx) {}
+void SemanticAnalysis::exitExp(SysYParser::ExpContext *ctx) {}
 
 // Exp
 void SemanticAnalysis::enterExpAddExp(SysYParser::ExpAddExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->addExp()->indexOperand = ctx->indexOperand;
@@ -1324,7 +1327,7 @@ void SemanticAnalysis::enterExpAddExp(SysYParser::ExpAddExpContext * ctx)
 void SemanticAnalysis::exitExpAddExp(SysYParser::ExpAddExpContext * ctx)
 {
     ctx->isArray = ctx->addExp()->isArray;
-    ctx->size = ctx->addExp()->size;
+    ctx->shape = ctx->addExp()->shape;
     ctx->metaDataType = ctx->addExp()->metaDataType;
     ctx->operand = ctx->addExp()->operand;
 }
@@ -1332,7 +1335,7 @@ void SemanticAnalysis::exitExpAddExp(SysYParser::ExpAddExpContext * ctx)
 void SemanticAnalysis::enterExpBoolExp(SysYParser::ExpBoolExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 }
 
@@ -1361,7 +1364,7 @@ void SemanticAnalysis::exitCond(SysYParser::CondContext * ctx)
 void SemanticAnalysis::enterLVal(SysYParser::LValContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->symbolType = SymbolType::PARAM;
     ctx->lValMetaDataType = MetaDataType::VOID;
     ctx->indexOperand = nullptr;
@@ -1380,7 +1383,7 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
     }
     if (searchLVal->getIsArray() && !ctx->exp()) {
         ctx->isArray = true;
-        ctx->size = searchLVal->getSize();
+        ctx->shape = searchLVal->getSize();
     }
     else {
         ctx->isArray = false;
@@ -1408,7 +1411,7 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
 void SemanticAnalysis::enterPrimaryExpNestExp(SysYParser::PrimaryExpNestExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->exp()->indexOperand = ctx->indexOperand;
@@ -1417,7 +1420,7 @@ void SemanticAnalysis::enterPrimaryExpNestExp(SysYParser::PrimaryExpNestExpConte
 void SemanticAnalysis::exitPrimaryExpNestExp(SysYParser::PrimaryExpNestExpContext * ctx)
 {
     ctx->isArray = ctx->exp()->isArray;
-    ctx->size = ctx->exp()->size;
+    ctx->shape = ctx->exp()->shape;
     ctx->metaDataType = ctx->exp()->metaDataType;
 
     ctx->operand = ctx->exp()->operand;
@@ -1426,14 +1429,14 @@ void SemanticAnalysis::exitPrimaryExpNestExp(SysYParser::PrimaryExpNestExpContex
 void SemanticAnalysis::enterPrimaryExplVal(SysYParser::PrimaryExplValContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 }
 
 void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ctx)
 {
     ctx->isArray = ctx->lVal()->isArray;
-    ctx->size = ctx->lVal()->size;
+    ctx->shape = ctx->lVal()->shape;
     ctx->metaDataType = ctx->lVal()->lValMetaDataType;
 
     if (ctx->lVal()->isArray && ctx->indexOperand) {
@@ -1485,7 +1488,7 @@ void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ct
 void SemanticAnalysis::enterPrimaryExpNumber(SysYParser::PrimaryExpNumberContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 }
 
@@ -1511,7 +1514,7 @@ void SemanticAnalysis::exitPrimaryExpNumber(SysYParser::PrimaryExpNumberContext 
 void SemanticAnalysis::enterUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->primaryExp()->indexOperand = ctx->indexOperand;
@@ -1520,7 +1523,7 @@ void SemanticAnalysis::enterUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpCon
 void SemanticAnalysis::exitUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpContext * ctx)
 {
     ctx->isArray = ctx->primaryExp()->isArray;
-    ctx->size = ctx->primaryExp()->size;
+    ctx->shape = ctx->primaryExp()->shape;
     ctx->metaDataType = ctx->primaryExp()->metaDataType;
     ctx->operand = ctx->primaryExp()->operand;
 }
@@ -1528,7 +1531,7 @@ void SemanticAnalysis::exitUnaryExpPrimaryExp(SysYParser::UnaryExpPrimaryExpCont
 void SemanticAnalysis::enterUnaryExpFunc(SysYParser::UnaryExpFuncContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
 }
@@ -1544,7 +1547,7 @@ void SemanticAnalysis::exitUnaryExpFunc(SysYParser::UnaryExpFuncContext * ctx)
             throw std::runtime_error("[ERROR] > in function calling, parameter number not match. " + std::to_string(ctx->funcRParams()->isArrayList.size()) + " " + std::to_string(funcSymbolTable->getParamNum()));
         }
         for (int i = 0; i < ctx->funcRParams()->isArrayList.size(); ++i) {
-            if (!funcSymbolTable->compareParamSymbolDataType(i, ctx->funcRParams()->metaDataTypeList[i], ctx->funcRParams()->isArrayList[i], ctx->funcRParams()->sizeList[i])) {
+            if (!funcSymbolTable->compareParamSymbolDataType(i, ctx->funcRParams()->metaDataTypeList[i], ctx->funcRParams()->isArrayList[i], ctx->funcRParams()->shapeList[i])) {
                 throw std::runtime_error("[ERROR] > calling function parameter type error.\n");
             }
         }
@@ -1592,7 +1595,7 @@ void SemanticAnalysis::exitUnaryExpFunc(SysYParser::UnaryExpFuncContext * ctx)
 void SemanticAnalysis::enterUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->unaryExp()->indexOperand = ctx->indexOperand;
@@ -1602,7 +1605,7 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExp
 {
     ctx->isArray = ctx->unaryExp()->isArray;
     ctx->metaDataType = ctx->unaryExp()->metaDataType;
-    ctx->size = ctx->unaryExp()->size;
+    ctx->shape = ctx->unaryExp()->shape;
     if (ctx->unaryOp()->getText() == "!") {
         if (ctx->metaDataType != MetaDataType::BOOL || ctx->isArray) {
             throw std::runtime_error("[ERROR] > use logic operator on non-boolean expression.\n");
@@ -1649,7 +1652,7 @@ void SemanticAnalysis::exitUnaryOp(SysYParser::UnaryOpContext * ctx)
 void SemanticAnalysis::enterFuncRParams(SysYParser::FuncRParamsContext * ctx)
 {
     ctx->isArrayList.clear();
-    ctx->sizeList.clear();
+    ctx->shapeList.clear();
     ctx->metaDataTypeList.clear();
 }
 
@@ -1657,7 +1660,7 @@ void SemanticAnalysis::exitFuncRParams(SysYParser::FuncRParamsContext * ctx)
 {
     for (auto & it : ctx->exp()) {
         ctx->isArrayList.emplace_back(it->isArray);
-        ctx->sizeList.emplace_back(it->size);
+        ctx->shapeList.emplace_back(it->shape);
         ctx->metaDataTypeList.emplace_back(it->metaDataType);
         switch (it->metaDataType) 
         {
@@ -1688,7 +1691,7 @@ void SemanticAnalysis::exitFuncRParams(SysYParser::FuncRParamsContext * ctx)
 void SemanticAnalysis::enterMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->mulExp()->indexOperand = ctx->indexOperand;
@@ -1699,7 +1702,7 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
 {
     ctx->isArray = ctx->mulExp()->isArray;
     ctx->metaDataType = ctx->mulExp()->metaDataType;
-    ctx->size = ctx->mulExp()->size;
+    ctx->shape = ctx->mulExp()->shape;
     if (ctx->metaDataType == MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > mul: arithmetic calculation with boolean expression.\n");
     }
@@ -1710,7 +1713,7 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
         if (!ctx->unaryExp()->isArray) {
             throw std::runtime_error("[ERROR] > mul: array:non-array calculation.\n");
         }
-        if (ctx->size != ctx->mulExp()->size) {
+        if (ctx->shape != ctx->mulExp()->shape) {
             throw std::runtime_error("[ERROR] > array size mismatch in calculation.\n");
         }
     }
@@ -1785,7 +1788,7 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
 void SemanticAnalysis::enterMulExpUnaryExp(SysYParser::MulExpUnaryExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->unaryExp()->indexOperand = ctx->indexOperand;
@@ -1795,7 +1798,7 @@ void SemanticAnalysis::exitMulExpUnaryExp(SysYParser::MulExpUnaryExpContext * ct
 {
     ctx->isArray = ctx->unaryExp()->isArray;
     ctx->metaDataType = ctx->unaryExp()->metaDataType;
-    ctx->size = ctx->unaryExp()->size;
+    ctx->shape = ctx->unaryExp()->shape;
 
     ctx->operand = ctx->unaryExp()->operand;
 }
@@ -1812,7 +1815,7 @@ void SemanticAnalysis::exitMulOp(SysYParser::MulOpContext * ctx)
 void SemanticAnalysis::enterAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->addExp()->indexOperand = ctx->indexOperand;
@@ -1823,7 +1826,7 @@ void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 {
     ctx->isArray = ctx->addExp()->isArray;
     ctx->metaDataType = ctx->addExp()->metaDataType;
-    ctx->size = ctx->addExp()->size;
+    ctx->shape = ctx->addExp()->shape;
     if (ctx->metaDataType == MetaDataType::BOOL) {
         throw std::runtime_error("[ERROR] > add: arithmetic calculation with boolean expression.\n");
     }
@@ -1834,7 +1837,7 @@ void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
         if (!ctx->mulExp()->isArray) {
             throw std::runtime_error("[ERROR] > add: array:non-array calculation.\n");
         }
-        if (ctx->size != ctx->mulExp()->size) {
+        if (ctx->shape != ctx->mulExp()->shape) {
             throw std::runtime_error("[ERROR] > array size mismatch in calculation.\n");
         }
     }
@@ -1883,17 +1886,20 @@ void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 void SemanticAnalysis::enterAddExpMulExp(SysYParser::AddExpMulExpContext * ctx)
 {
     ctx->isArray = false;
-    ctx->size = 0;
+    ctx->shape = 0;
     ctx->metaDataType = MetaDataType::VOID;
 
     ctx->mulExp()->indexOperand = ctx->indexOperand;
 }
 
+void SemanticAnalysis::enterAddOp(SysYParser::AddOpContext *ctx) {}
+void SemanticAnalysis::exitAddOp(SysYParser::AddOpContext *ctx) {}
+
 void SemanticAnalysis::exitAddExpMulExp(SysYParser::AddExpMulExpContext * ctx)
 {
     ctx->isArray = ctx->mulExp()->isArray;
     ctx->metaDataType = ctx->mulExp()->metaDataType;
-    ctx->size = ctx->mulExp()->size;
+    ctx->shape = ctx->mulExp()->shape;
 
     ctx->operand = ctx->mulExp()->operand;
 }
@@ -1992,6 +1998,9 @@ void SemanticAnalysis::exitRelExpAddExp(SysYParser::RelExpAddExpContext * ctx)
     ctx->operand = ctx->addExp()->operand;
 }
 
+void SemanticAnalysis::enterRelOp(SysYParser::RelOpContext *ctx) {}
+void SemanticAnalysis::exitRelOp(SysYParser::RelOpContext *ctx) {}
+
 void SemanticAnalysis::enterRelExpBoolConst(SysYParser::RelExpBoolConstContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
@@ -2069,6 +2078,9 @@ void SemanticAnalysis::exitEqExpEqExp(SysYParser::EqExpEqExpContext * ctx)
     irGenerator->addCode(code);
     ctx->operand = result;
 }
+
+void SemanticAnalysis::enterEqOp(SysYParser::EqOpContext *ctx) {}
+void SemanticAnalysis::exitEqOp(SysYParser::EqOpContext *ctx) {}
 
 //LAndExp
 void SemanticAnalysis::enterLAndExpLAndExp(SysYParser::LAndExpLAndExpContext * ctx)
