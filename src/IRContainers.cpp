@@ -211,6 +211,16 @@ void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp
     }
 }
 
+void IRFunction::def_use_list(){
+    for (int i = 0; i < codes.size(); i++) {
+            IRCode *code = codes[i];
+            IROperand* res = code->getResult();
+            for (int j = 0; j < codes.size(); j++)
+                if(codes[j]->getArg1() == res || codes[j]->getArg2() == res)
+                    code->use.push_back(codes[j]);
+    }
+}
+
 void IRFunction::constFolding() {
     for(int bnum = 0; bnum < basicBlocks.size(); bnum++) {
         auto block = basicBlocks[bnum]; 
@@ -1489,23 +1499,25 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
 
 
 void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
-    switch (inOptimizeLevel) {
-        case 1:
-            basicBlockDivision();
-            constFolding();
-            break;
-        case 2:
-            basicBlockDivision();
-            constFolding();
-            liveVarAnalysis();
-            delDeadCode();
-            break;
-        case 3:
-            basicBlockDivision();
-            // liveVarAnalysis();
-            // delDeadCode();
-            varBindRegisters(t);
-            break;
+    def_use_list();
+    switch (inOptimizeLevel)
+    {
+    case 1:
+        basicBlockDivision();
+        constFolding();
+        break;
+    case 2:
+        basicBlockDivision();
+        constFolding();
+        liveVarAnalysis();
+        delDeadCode();
+        break;
+    case 3:
+        basicBlockDivision();
+        // liveVarAnalysis();
+        // delDeadCode();
+        varBindRegisters(t);
+        break;
     }
 }
 

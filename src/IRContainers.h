@@ -62,6 +62,8 @@ public:
     IRValue* immMul(IROperand* op1, IROperand* op2);
     IRValue* immDiv(IROperand* op1, IROperand* op2);
     IRValue* immCmp(IROperand* op1, IROperand* op2, IROperation op);
+
+    void def_use_list();
     void constFolding();
 
     /* tool functions */

@@ -45,6 +45,7 @@ protected:
     IROperand *arg2;
 
 public:
+    std::vector<IRCode *> use;
     /* @initialize: never use these directly, use child's initialize functions */
     IRCode();
 
