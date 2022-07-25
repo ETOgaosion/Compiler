@@ -1,4 +1,5 @@
 #include "semanticAnalysis.h"
+#include "tools.h"
 
 void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
 {
@@ -152,6 +153,24 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->isArray = false;
 }
 
+void SemanticAnalysis::fillInArray(IRValue *fillArray, std::vector<std::size_t> shape, MetaDataType type) {
+    if (fillArray->getArrayShape().size() == 1) {
+        std::vector<std::string> valVec = fillArray->getValues();
+        while(valVec.size() < shape[0]) {
+            valVec.emplace_back("0");
+        }
+        return;
+    }
+    std::vector<IRValue *> valVec = fillArray->getSubValues();
+    while (valVec.size() < shape[0]) {
+        valVec.push_back(new IRValue(type, true, true,                              std::vector<std::size_t>(shape.begin() + 1, shape.end()), {}));
+    }
+    for (auto it : fillArray->getSubValues()) {
+        fillInArray(it, std::vector<std::size_t>(shape.begin() + 1, shape.end()), type);
+    }
+    fillArray->setSubValues(valVec);
+}
+
 void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
@@ -165,17 +184,13 @@ void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
         }
     }
     if (ctx->constInitVal()) {
-        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->shape[0] > ctx->shape[0])) {
+        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->shape != ctx->shape && !Tools::arrayCmp<size_t>(ctx->constInitVal()->shape, ctx->shape))) {
             throw std::runtime_error("[ERROR] > Const var initialize failure: type not match. " + std::to_string(ctx->constInitVal()->isArray));
         }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
-        if (ctx->isArray && ctx->shape[0] > ctx->constInitVal()->value->getArraySize()) {
-            std::vector<std::string> valVec = ctx->constInitVal()->value->getValues();
-            for (int i = ctx->constInitVal()->value->getArraySize(); i < ctx->shape; i++) {
-                valVec.emplace_back("0");
-            }
-            ctx->value = irGenerator->ir->addMulImmValue(ctx->type, valVec);
+        if (ctx->isArray && Tools::arrayCmp<std::size_t>(ctx->shape, ctx->constInitVal()->value->getArrayShape())) {
+            fillInArray(ctx->constInitVal()->value, ctx->shape, ctx->type);
         }
         else {
             ctx->value = ctx->constInitVal()->value;
@@ -223,26 +238,37 @@ void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayC
 
 void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
 {
-    if(!ctx->constExp().empty()){
-        ctx->type = ctx->constExp(0)->metaDataType;
-        ctx->shape = ctx->constExp().size();
+    if(!ctx->constInitVal().empty()){
+        ctx->type = ctx->constInitVal(0)->type;
+        ctx->shape = {};
+        std::vector<std::size_t> maxVec;
+        for (auto it : ctx->constInitVal()) {
+            if (it->type != ctx->type)  {
+                throw std::runtime_error("[ERROR] > Array data type is not consistent.\n");;
+            }
+            for (int i = 0; i < it->shape.size(); i++) {
+                if (i >= maxVec.size()) {
+                    maxVec.push_back(it->shape[i]);
+                }
+                else if (it->shape[i] > maxVec[i]) {
+                    maxVec[i] = it->shape[i];
+                }
+            }
+        }
+        ctx->shape = maxVec;
     } else {
         ctx->type = MetaDataType::VOID;
-        ctx->shape = 0;
+        ctx->shape = {};
     }
 
-    for(const auto & const_exp : ctx->constExp()){
-        if(const_exp->metaDataType != ctx->type)
-            throw std::runtime_error("[ERROR] > Array data type is not consistent.\n");
-    }
     ctx->isArray = true;
 
-    if(!ctx->constExp().empty()){
-        std::vector<std::string> immVal;
-        for(auto &const_exp : ctx->constExp()){
-            immVal.push_back(const_exp->val);
+    if (!ctx->constInitVal().empty()){
+        std::vector<IRValue *> mulVal;
+        for (auto it : ctx->constInitVal()) {
+            mulVal.push_back(it->value);
         }
-        ctx->value = irGenerator->ir->addMulImmValue(ctx->type, immVal);
+        ctx->value = new IRValue(ctx->type, mulVal, ctx->shape, {});
     }
     else {
         ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);

@@ -70,7 +70,7 @@ public:
     /* add operand in vector but no same insertion */
     void addOperandToVec(std::vector<IROperand*>& vars, IROperand* op);
     /* compare between two vectors */
-    bool cmpTwoInVars(std::vector<IROperand*> & vec1, std::vector<IROperand*> & vec2);
+    static bool cmpTwoInVars(std::vector<IROperand*> & vec1, std::vector<IROperand*> & vec2);
     /* swap operand of a code in exactly the same operation */
     static void substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp_op, IROperation op);
 
@@ -140,7 +140,7 @@ public:
     bool addSymbolFunction(IRSymbolFunction *funcSymbol);
     IRValue *addImmValue(MetaDataType inMetaDataType, const std::string &inValue);
     IRValue *addImmValue(const std::string &inLabel, MetaDataType inMetaDataType, const std::string &inValue);
-    IRValue *addMulSameImmValue(MetaDataType inMetaDataType, const std::string &inValue, int num);
+    IRValue *addMulSameImmValue(MetaDataType inMetaDataType, const std::string &inValue, const std::vector<std::size_t>& shape);
     IRValue *addMulImmValue(MetaDataType inMetaDataType, std::vector<std::string> &inValues);
 
     std::unordered_map<std::string, IRSymbolVariable *> getGlobalVariables() const {return globalVariables; };

@@ -1,6 +1,7 @@
 #include "SymbolTable.h"
 #include "TargetCodes.h"
 
+#include <utility>
 #include <vector>
 
 #pragma once
@@ -42,6 +43,7 @@ public:
     virtual std::vector<std::string> getValues() const { return {}; };
     virtual std::string getValueLabel() const { return {}; };
     virtual bool getAssigned() const { return false; };
+    virtual std::vector<IRValue *> getSubValues() const { return {}; };
     virtual std::vector<IROperand *> getHistorySymbols() const { return {}; };
     virtual IROperand *getLatestVersionSymbol() const { return nullptr; };
     virtual bool getAliasToSymbol() const { return false; };
@@ -52,7 +54,8 @@ public:
     virtual int getMemOffset() const { return 0; };
     virtual IRValue *getInitialValue() const { return nullptr; };
     virtual bool getIsArray() const { return false; };
-    virtual int getArraySize() const { return 0; };
+    virtual std::size_t getArraySize() const { return 0; };
+    virtual std::vector<std::size_t> getArrayShape() const { return {}; };
     virtual uint64_t getMemPosition() const { return 0; };
     virtual bool getIsGlobalSymbolVar() const { return 0; };
     virtual int getFrameSize() const { return 0; };
@@ -70,6 +73,7 @@ public:
     virtual bool setSymbolVariable(IROperand *inSymbolVariable) { return false; };
     virtual bool setFunctionSymbolTable(SymbolTable *inFunctionTable) { return false; };
     virtual void setMemOffset(int offset) {};
+    virtual bool setArrayShape(std::vector<std::size_t> newArrayShape) { return false; };
     virtual bool setMemPosition(uint64_t inMemPosition) { return false; };
     virtual void addValue(const std::string& newValue) {};
     virtual void addValues(const std::vector<std::string>& newValues) {};
@@ -77,8 +81,9 @@ public:
     virtual bool setMetaDataType(MetaDataType newType) { return false; };
     virtual bool setActiveRegions(std::vector<int> inActiveRegion) { return false; };
     virtual bool setBindRegister(bool toBindRegister) { return false; };
-    virtual bool setTargetBindRegister(Register *intargetBindRegister) { return false; };
+    virtual bool setTargetBindRegister(Register *inTargetBindRegister) { return false; };
     virtual bool setWasColored(bool inWasColored) { wasColored = inWasColored; return true; };        // used for graph-coloring register allocation
+    virtual bool setSubValues(std::vector<IRValue *>newSubValues) { return false; };
 
     virtual Register *load(TargetCodes * t, bool isGeneralPurposeRegister) { return nullptr; };
     virtual Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) { return nullptr; };
@@ -126,6 +131,9 @@ class IRValue : public IROperand {
 private:
     MetaDataType metaDataType;          // immediate data type
     std::vector<std::string> values;    // single value immediate only has 1 member, while multi-value array occupies more
+    std::vector<IRValue *> subValues;   // for multi-dimensional vector
+    std::vector<std::size_t> arrayShape;
+    bool allZero;
     std::string valueLabel;             // some immediate numbers are stored globally in (ro-)data section, so use label as index
     bool isArray;                       // judge whether it describes an array
 
@@ -141,23 +149,32 @@ public:
     IRValue(MetaDataType newMetaDataType, const std::string &newValue, const std::string &newLabel, bool newIsArray);
     /* @method: 3. for index rules 2 array case, you can directly initialize array multiple value */
     IRValue(MetaDataType newMetaDataType, const std::vector<std::string>& newValues, const std::string &newLabel, bool newIsArray);
+    /* @method: 4. for index rules 2 array case, you can directly initialize array multiple value */
+    IRValue(MetaDataType newMetaDataType, const std::vector<IRValue *>& newSubValues, std::vector<std::size_t> newShape, const std::string &newLabel);
+    /* @method: 5. if all value in vector are zero */
+    IRValue(MetaDataType newMetaDataType, bool newIsAllZero, bool newIsArray, std::vector<std::size_t> newArrayShape, std::string newValueLabel);
 
     MetaDataType getMetaDataType() const override { return metaDataType; };
     /* only return first value, used for single value */
     std::string getValue() const override { return values.front(); };
     /* get all value in array */
     std::vector<std::string> getValues() const override { return values; };
+    /* get all sub value in array */
+    std::vector<IRValue *> getSubValues() const override { return subValues; };
     /* return label which can index the value */
     std::string getValueLabel() const override { return valueLabel; };
     /* used for array value */
     bool getIsArray() const override { return  isArray; };
-    int getArraySize() const override { return values.size(); };
+    std::size_t getArraySize() const override { return values.size(); };
+    std::vector<std::size_t> getArrayShape() const override { return arrayShape; };
 
     /* modify and access values field */
     void addValue(const std::string& newValue) override;
     void addValues(const std::vector<std::string>& newValues) override;
-    bool setLabel(const std::string& newLabel) override { valueLabel = newLabel; };
-    bool setMetaDataType(MetaDataType newType) override { metaDataType = newType; };
+    bool setLabel(const std::string& newLabel) override { valueLabel = newLabel; return true; };
+    bool setMetaDataType(MetaDataType newType) override { metaDataType = newType; return true; };
+    bool setArrayShape(std::vector<std::size_t> newArrayShape) override { arrayShape = newArrayShape; return true; };
+    bool setSubValues(std::vector<IRValue *>newSubValues) override { subValues = std::move(newSubValues); return true; };
 
     /* for target codes translation */
     Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
@@ -194,7 +211,7 @@ public:
     MetaDataType getMetaDataType() const override { return symbol->getMetaDataType(); };
     int getMemOffset() const override { return symbol->getOffset(); };
     bool getIsArray() const override { return symbol->getIsArray(); };
-    int getArraySize() const override { return symbol->getSize(); };
+    std::vector<std::size_t> getArrayShape() const override { return symbol->getShape(); };
     uint64_t getMemPosition() const override { return symbol->getMemPosition(); };  // commonly don't use this method, use memOffset instead
     /* SSA */
     bool getAssigned() const override { return assigned; };
@@ -215,11 +232,10 @@ public:
 
     bool getIsAlive() const override { return alive; };
     void setAlive(bool set) override { alive = set; };
-
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
     bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
-    bool setTargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
+    bool setTargetBindRegister(Register *inTargetBindRegister) override { targetBindRegister = inTargetBindRegister; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
 
     Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
@@ -262,6 +278,8 @@ class IRTempVariable : public IROperand {
 private:
     std::string symbolName;             // temp var name generated by compiler, must be different within function but can be same globally
     MetaDataType metaDataType;          // data type
+    std::vector<std::size_t> arrayShape;
+    bool isArray;
     /* SSA */
     bool assigned;                      // whether temp vars are assigned, shared expression optimization may use
     bool aliasToSymbol;                 // whether is type-2
@@ -278,30 +296,35 @@ public:
     /* @initialize */
     /* @method: 1. type-1 temp var, determine name and data type */
     IRTempVariable(std::string newName, MetaDataType newMetaDataType);
-    /* @method: 2. type-2 temp var, pass parent symbol var directly and fixed */
+    /* @method: 2. type-1 temp var, determine name and data type */
+    IRTempVariable(std::string newName, MetaDataType newMetaDataType, std::vector<std::size_t> newShape, bool newIsArray);
+    /* @method: 3. type-2 temp var, pass parent symbol var directly and fixed */
     IRTempVariable(std::string newName, MetaDataType newMetaDataType, IROperand *parentVariable);
-    /* @method: 3. type-1 temp var, determine name, data type and also initial value */
+    /* @method: 4. type-1 temp var, determine name, data type and also initial value */
     IRTempVariable(std::string newName, MetaDataType newMetaDataType, IRValue *newValue);
 
     std::string getSymbolName() const override { return symbolName; };
     MetaDataType getMetaDataType() const override { return metaDataType; };
     bool getAssigned() const override { return assigned; };
+    std::vector<std::size_t> getArrayShape() const override { return arrayShape; };
+    bool getIsArray() const override { return  isArray; };
     bool getAliasToSymbol() const override { return aliasToSymbol; };
     IROperand *getSymbolVariable() const override { return symbolVariable; };
     IRValue *getInitialValue() const override { return initialValue; };
     std::vector<int> getActiveRegions() const override { return activeRegions; };
     bool getBindRegister() const override { return bindRegister; };
     Register *getTargetBindRegister() const override { return targetBindRegister; };
-
     bool getIsAlive() const override { return alive; };
-    void setAlive(bool set) override { alive = set; };
 
+    void setAlive(bool set) override { alive = set; };
     bool setAssigned() override { assigned = true; return true; };
+    bool setArrayShape(std::vector<std::size_t> newArrayShape) override { arrayShape = newArrayShape; return true; };
+    bool setIsArray(bool newIsArray) { isArray = newIsArray; return true; };
     bool setAliasToSymbol() override { aliasToSymbol = true; return true; };
     bool setSymbolVariable(IROperand *inSymbolVariable) override { aliasToSymbol = true; symbolVariable = inSymbolVariable; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
-    bool setTargetBindRegister(Register *intargetBindRegister) override { targetBindRegister = intargetBindRegister; return true; };
+    bool setTargetBindRegister(Register *inTargetBindRegister) override { targetBindRegister = inTargetBindRegister; return true; };
 
     void setMemOffset(int inOffset) override { offset = inOffset; };
     int getMemOffset() const override { return offset; };

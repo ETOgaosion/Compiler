@@ -1314,7 +1314,7 @@ vector<vector<IROperand *>> IRFunction::calRegisterGraph(unordered_map<IROperand
         nodes.push_back(i.first);
         degrees.push_back(i.second.size());
     }
-    for (auto i : Tools::sort_indexes(degrees)) {
+    for (auto i : Tools::sortIndexes(degrees)) {
         sortedNodes.push_back(nodes[i]);
     }
     for (int i = sortedNodes.size() - 1; i >= 0; i--) {
@@ -1399,7 +1399,7 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
         operands.emplace_back(it.first);
         costs.emplace_back(it.second);
     }
-    for (auto i : Tools::sort_indexes(costs)) {
+    for (auto i : Tools::sortIndexes(costs)) {
         sortedOperands.push_back(operands[i]);
     }
     int numGenPurposeRegAlloc = 0;
@@ -1657,7 +1657,9 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
         auto param = paramTypeList.back();
         cout << static_cast<int>(get<0>(param));
         if (get<1>(param)) {
-            cout << "[" << get<2>(param) << "]";
+            for (auto it : get<2>(param)) {
+                cout << "[" << it << "]";
+            }
         }
     }
     cout << ") => " << static_cast<int>(functionTable->getReturnType()) << ":\n";
@@ -1793,12 +1795,14 @@ IRValue *IRProgram::addImmValue(const string &inLabel, MetaDataType inMetaDataTy
     return newValue;
 }
 
-IRValue *IRProgram::addMulSameImmValue(MetaDataType inMetaDataType, const string &inValue, int num) {
+IRValue *IRProgram::addMulSameImmValue(MetaDataType inMetaDataType, const string &inValue, const std::vector<std::size_t>& shape) {
     string valueKey = {};
     vector<string> values;
-    for (int i = 0; i < num; i++) {
-        valueKey += (inValue + ",");
-        values.push_back(inValue);
+    for (unsigned long i : shape) {
+        for (int j = 0; j < i; j++) {
+            valueKey += (inValue + ",");
+            values.push_back(inValue);
+        }
     }
     if (immValues.find(valueKey) != immValues.end()) {
         return immValues[valueKey];

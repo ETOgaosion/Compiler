@@ -32,6 +32,7 @@ public:
      void exitBType(SysYParser::BTypeContext *ctx) override;
 
      void enterConstDef(SysYParser::ConstDefContext *ctx) override;
+     void fillInArray(IRValue *fillArray, std::vector<std::size_t> shape, MetaDataType type);
      void exitConstDef(SysYParser::ConstDefContext *ctx) override;
 
      void enterConstInitValOfVar(SysYParser::ConstInitValOfVarContext *ctx) override;
