@@ -215,10 +215,40 @@ void IRFunction::def_use_list(){
     for (int i = 0; i < codes.size(); i++) {
             IRCode *code = codes[i];
             IROperand* res = code->getResult();
-            for (int j = 0; j < codes.size(); j++)
+            for (int j = i + 1; j < codes.size(); j++)
                 if(codes[j]->getArg1() == res || codes[j]->getArg2() == res)
                     code->use.push_back(codes[j]);
     }
+}
+
+int IRFunction::Replacewith(IRCode* I, IROperand* val){
+    //int count = 0;
+    if (I->use.empty())
+    {
+        ;
+    }
+    else
+    {
+        IROperand *res = I->getResult();
+        for (int i = 0; i < I->use.size(); i++)
+        {
+            IRCode* UI = I->use[i];
+            if(UI->getOperation() == IROperation::CALL)
+                continue;
+            if(UI->getOperation() == IROperation::ASSIGN_ARRAY_ELEM && res == UI->getArg1())
+                continue;
+            if(UI->getOperation() == IROperation::REPLACE){
+                //count++;
+                continue;
+            }
+
+            if(UI->getArg1() == res)
+                UI->setArg1(val);
+            if(UI->getArg2() == res)
+                UI->setArg2(val);
+        }
+    }
+    return 0;
 }
 
 void IRFunction::constFolding() {
@@ -237,7 +267,7 @@ void IRFunction::constFolding() {
                 if(arg1->getOperandType() != OperandType::VALUE)
                     continue;
 
-                for(int j = i + 1; j < block.size(); j++){
+                /*for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
@@ -252,13 +282,15 @@ void IRFunction::constFolding() {
                         }
                         // substitute res to arg1 (immValue)
                         substituteUseOp(new_code, arg1, res, new_op);
-                }
-                // block.erase(block.begin() + i);
-                // codes.erase(codes.begin() + entrances[bnum] + i);
-                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                //     entrances[k]--;
+                }*/
+                Replacewith(code, arg1);
+                block.erase(block.begin() + i);
+                codes.erase(codes.begin() + entrances[bnum] + i);
+                for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                    entrances[k]--;
                 // delete code;
-                // i--;
+                i--;
+
                 continue;
             } else if (op == IROperation::NOT) {
                 if(arg1->getOperandType() != OperandType::VALUE)
@@ -269,7 +301,7 @@ void IRFunction::constFolding() {
                 else if(arg1->getValue() == "0")
                     new_value = new IRValue(MetaDataType::INT, "1", {}, false);
 
-                if(new_value){
+                /*if(new_value){
                     for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
@@ -284,13 +316,17 @@ void IRFunction::constFolding() {
                         // substitute res to new_value
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
+                }*/
+                if(new_value){
+                    Replacewith(code, new_value);
+                    block.erase(block.begin() + i);
+                    codes.erase(codes.begin() + entrances[bnum] + i);
+                    for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    // delete code;
+                    i--;
                 }
-                // block.erase(block.begin() + i);
-                // codes.erase(codes.begin() + entrances[bnum] + i);
-                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                //     entrances[k]--;
-                // delete code;
-                // i--;
+
                 continue;
             } else if (op == IROperation::NEG) {
                 if(arg1->getOperandType() != OperandType::VALUE)
@@ -309,7 +345,7 @@ void IRFunction::constFolding() {
                     }
                 }
 
-                if(new_value){
+                /*if(new_value){
                     for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
@@ -324,13 +360,17 @@ void IRFunction::constFolding() {
                         // substitute res to new_value
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
+                }*/
+                if(new_value){
+                    Replacewith(code, new_value);
+                    block.erase(block.begin() + i);
+                    codes.erase(codes.begin() + entrances[bnum] + i);
+                    for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    // delete code;
+                    i--;
                 }
-                // block.erase(block.begin() + i);
-                // codes.erase(codes.begin() + entrances[bnum] + i);
-                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                //     entrances[k]--;
-                // delete code;
-                // i--;
+
                 continue;
             } else if (op == IROperation::BEQZ) {
                 if(arg1->getOperandType() != OperandType::VALUE)
@@ -390,7 +430,7 @@ void IRFunction::constFolding() {
                 }
 
                 if(new_value){
-                    for(int j = i + 1; j < block.size(); j++){
+                    /*for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
@@ -412,13 +452,16 @@ void IRFunction::constFolding() {
                         case MetaDataType::FLOAT:
                             codes[entrances[bnum] + i] = new IRAssignF(res, new_value);
                             break;
-                    }
-                    // block.erase(block.begin() + i);
-                    // codes.erase(codes.begin() + entrances[bnum] + i);
-                    // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                    //     entrances[k]--;
+                    }*/
+                    
+                    Replacewith(code, new_value);
+                    block.erase(block.begin() + i);
+                    codes.erase(codes.begin() + entrances[bnum] + i);
+                    for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
                     // delete code;
-                    // i--;
+                    i--;
+                
                 }
 
             } else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
@@ -517,6 +560,55 @@ void IRFunction::constFolding() {
                     }
                 }
             }
+        }
+    }
+}
+
+void IRFunction::CSE(){
+    std::vector<IRCode *> record;
+    record.clear();
+    for (int i = 0; i < codes.size(); i++)
+    {
+        IRCode *I = codes[i];
+        IRCode *toRep = nullptr;
+        int match = 0;
+        IROperand* op1 = I->getArg1();
+        IROperand* op2 = I->getArg2();
+        IROperation op = I->getOperation();
+        if (record.empty())
+            ;
+        else
+            for (int j = 0; j < record.size(); j++)
+            {
+                IROperand* ar1 = record[j]->getArg1();
+                IROperand* ar2 = record[j]->getArg2();
+                IROperation opr = record[j]->getOperation();
+                if(op == opr && IRCode::isTwoArgAssignmentOperation(op))
+                    if(op1 == ar1 && op2 == ar2)
+                        match = 1;
+                    else if(IRCode::isOrderIndependentOperation(op) && op1 == ar2 && op2 == ar1)
+                        match = 1;
+                if(match){
+                    toRep = record[j];
+                    break;
+                }
+            }
+        
+        if(match){
+            Replacewith(I, toRep->getResult());
+            int bnum;
+            for (bnum = 0; bnum < basicBlocks.size(); bnum++)
+                if(entrances[bnum]> i){
+                    bnum--;
+                    break;
+                }
+            auto block = basicBlocks[bnum];
+            block.erase(block.begin() + i - entrances[bnum]);
+            codes.erase(codes.begin() + i);
+            for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                entrances[k]--;
+        }else if(IRCode::isTwoArgAssignmentOperation(op)){
+            record.push_back(I);
         }
     }
 }

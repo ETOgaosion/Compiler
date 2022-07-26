@@ -49,6 +49,21 @@ bool IRCode::isTwoArgAssignmentOperation(IROperation inOperation) {
     }
 }
 
+bool IRCode::isOrderIndependentOperation(IROperation inOperation) {
+    switch(inOperation) {
+        case IROperation::ADD:
+        case IROperation::MUL:
+        case IROperation::OR:
+        case IROperation::AND:
+        case IROperation::SEQ:
+        case IROperation::SNE:
+            return true;
+            break;
+        default:
+            return false;
+    }
+}
+
 bool IRCode::isAssignmentOperation(IROperation inOperation) {
     switch(inOperation) {
         case IROperation::BEQZ:

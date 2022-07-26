@@ -62,9 +62,11 @@ public:
     IRValue* immMul(IROperand* op1, IROperand* op2);
     IRValue* immDiv(IROperand* op1, IROperand* op2);
     IRValue* immCmp(IROperand* op1, IROperand* op2, IROperation op);
-
+    
     void def_use_list();
+    int Replacewith(IRCode *I, IROperand *val);
     void constFolding();
+    void CSE();
 
     /* tool functions */
     /* find and delete op in vector */

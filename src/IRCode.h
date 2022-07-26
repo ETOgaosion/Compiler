@@ -93,6 +93,10 @@ public:
     /* @return: true if have lVal, else false */
     static bool isAssignmentOperation(IROperation inOperation);
 
+    /* judge whether the result of an operation is order independent */
+    /* @return: true if independent, else false */
+    static bool isOrderIndependentOperation(IROperation inOperation);
+
     /* judge whether an operation has lVal, arg1 and arg2 */
     /* @return: true if have 2 args, else false */
     static bool isTwoArgAssignmentOperation(IROperation inOperation);
