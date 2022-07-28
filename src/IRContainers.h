@@ -24,6 +24,7 @@ private:
     /* Optimization */
     std::vector<int> entrances;                                             // entrance offset in codes of each basic block
     std::vector<std::vector<IRCode *>> basicBlocks;                         // each codes inside are in a basic block
+    std::vector<std::vector<int>> Pred;                                     // "Pred", which means blocks' id that each block can come from
     std::vector<std::vector<int>> controlFlow;                              // "control flow", which means blocks' id that each block can goto
     std::vector<int> cycleNum;                                              // the levels of cycle each block is in
     /* live var analysis */
@@ -67,6 +68,7 @@ public:
     int Replacewith(IRCode *I, IROperand *val);
     void constFolding();
     void CSE();
+    void JumpThreading();
 
     /* tool functions */
     /* find and delete op in vector */

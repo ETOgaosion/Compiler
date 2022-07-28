@@ -1060,9 +1060,19 @@ void IRFunction::basicBlockDivision() {
         basicBlocks.emplace_back(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
     }
     entrances.pop_back();
-    for (int i = 0; i < basicBlocks.size(); i++) {
-        controlFlow.emplace_back(1, i + 1);
-        for (auto & j : basicBlocks[i]) {
+
+    for(int i = 0; i < basicBlocks.size(); i++)
+        Pred.push_back(vector<int>());
+
+    for (int i = 0; i < basicBlocks.size(); i++)
+    {
+        if(codes[entrances[i+1]-1]->getOperation() != IROperation::GOTO)
+            controlFlow.emplace_back(1, i + 1);
+        else
+            controlFlow.push_back(vector<int>());
+            
+        for (auto &j : basicBlocks[i])
+        {
             if (j->getOperation() == IROperation::BEQZ || j->getOperation() == IROperation::GOTO) {
                 for (int k = 0; k < entrances.size(); k++) {
                     if (codes[entrances[k]]->getOperation() != IROperation::ADD_LABEL) {
@@ -1070,9 +1080,11 @@ void IRFunction::basicBlockDivision() {
                     }
                     if (j->getOperation() == IROperation::BEQZ && codes[entrances[k]]->getArg1()->getSymbolName() == j->getArg2()->getSymbolName()) {
                         controlFlow.back().push_back(k);
+                        Pred[k].push_back(i);
                     }
                     else if (j->getOperation() == IROperation::GOTO && codes[entrances[k]]->getArg1()->getSymbolName() == j->getArg1()->getSymbolName()) {
                         controlFlow.back().push_back(k);
+                        Pred[k].push_back(i);
                     }
                 }
             }
@@ -1085,6 +1097,122 @@ void IRFunction::basicBlockDivision() {
                 for (int k = j; k <= i; k++) {
                     cycleNum[k]++;
                 }
+            }
+        }
+    }
+}
+
+void IRFunction::JumpThreading(){
+    for (int i = 0; i < basicBlocks.size() - 1; i++) {
+        IRCode * I = basicBlocks[i].back();
+        if(I->getOperation() != IROperation::GOTO){
+            if(I->getOperation() == IROperation::BEQZ && codes[entrances[i + 1]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName()){
+                basicBlocks[i].erase(basicBlocks[i].end() - 1);
+                codes.erase(codes.begin() + entrances[i + 1] - 1);
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k]--;
+            }
+            
+            if(Pred[i + 1].size() == 1 && Pred[i+1].back() == i){
+                if(codes[entrances[i + 1]]->getOperation() == IROperation::ADD_LABEL){
+                    basicBlocks[i + 1].erase(basicBlocks[i + 1].begin());
+                    codes.erase(codes.begin() + entrances[i + 1]);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                }
+
+                basicBlocks[i].insert(basicBlocks[i].end(), basicBlocks[i + 1].begin(), basicBlocks[i + 1].end());
+                basicBlocks.erase(basicBlocks.begin() + i + 1);
+                entrances.erase(entrances.begin() + i + 1);
+                Pred.erase(Pred.begin() + i + 1);
+                controlFlow[i].erase(controlFlow[i].begin());
+                controlFlow[i].insert(controlFlow[i].end(), controlFlow[i + 1].begin(), controlFlow[i + 1].end());
+                controlFlow.erase(controlFlow.begin() + i + 1);
+            }
+        }else if(I->getOperation() == IROperation::GOTO){
+            int tar = -1;
+            for (int k = 0; k < controlFlow[i].size(); k++){
+                int tmp = controlFlow[i][k];
+                if (codes[entrances[tmp]]->getArg1()->getSymbolName() == I->getArg1()->getSymbolName())
+                {
+                    tar = tmp;
+                    break;
+                }
+            }
+            if(tar >= 0 && Pred[tar].size() == 1 && Pred[tar].back() == i){
+                if(codes[entrances[tar]]->getOperation() == IROperation::ADD_LABEL){
+                    basicBlocks[tar].erase(basicBlocks[tar].begin());
+                    codes.erase(codes.begin() + entrances[tar]);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                }
+                //delete GOTO
+                basicBlocks[i].erase(basicBlocks[i].begin() + basicBlocks[i].size() - 1);
+                codes.erase(codes.begin() + entrances[i] + basicBlocks[i].size() - 1);
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k]--;
+                //move code
+                codes.insert(codes.begin() + entrances[i + 1], basicBlocks[tar].begin(), basicBlocks[tar].end());
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k] += basicBlocks[tar].size();
+                codes.erase(codes.begin() + entrances[tar], codes.begin() + entrances[tar] + basicBlocks[tar].size());
+                for(int k = tar + 1; k < basicBlocks.size(); k++)
+                    entrances[k] -= basicBlocks[tar].size();
+                
+                basicBlocks[i].insert(basicBlocks[i].end(), basicBlocks[tar].begin(), basicBlocks[tar].end());
+                basicBlocks.erase(basicBlocks.begin() + tar);
+                entrances.erase(entrances.begin() + tar);
+                Pred.erase(Pred.begin() + tar);
+                controlFlow[i].pop_back();
+                controlFlow[i].insert(controlFlow[i].end(), controlFlow[tar].begin(), controlFlow[tar].end());
+                controlFlow.erase(controlFlow.begin() + tar);
+
+                if(i >= tar)
+                    i--;
+            }
+            else if (basicBlocks[i][0]->getOperation() == IROperation::ADD_LABEL && basicBlocks[i][1]->getOperation() == IROperation::GOTO)
+            {
+                int tar = controlFlow[i].back();
+                for (int k = 0; k < Pred[i].size(); k++)
+                {
+                    int tmp = Pred[i][k];
+                    IRCode *j = basicBlocks[tmp][basicBlocks[tmp].size() - 1];
+                    if (j->getOperation() == IROperation::BEQZ && codes[entrances[i]]->getArg1()->getSymbolName() == j->getArg2()->getSymbolName()) {
+                        j->setArg2(basicBlocks[i].back()->getArg1());
+                    }
+                    else if (j->getOperation() == IROperation::GOTO && codes[entrances[i]]->getArg1()->getSymbolName() == j->getArg1()->getSymbolName()) {
+                        j->setArg1(basicBlocks[i].back()->getArg1());
+                    }
+
+                    int sign = 0;
+                    for (int a = 0; a < controlFlow[tmp].size(); a++)
+                    {
+                        int j = controlFlow[tmp][a];
+                        if (j == i){
+                            controlFlow[tmp][a] = tar;
+                            j = tar;
+                        }
+
+                        if(j == tar && !sign)
+                            sign = 1;
+                        else if(j == tar && sign){
+                            controlFlow[tmp].erase(controlFlow[tmp].begin() + a);
+                            a--;
+                        }
+                    }
+                }
+
+                codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i] + basicBlocks[i].size());
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k] -= basicBlocks[i].size();
+                
+                entrances.erase(entrances.begin() + i);
+                Pred.erase(Pred.begin() + i);
+                controlFlow.erase(controlFlow.begin() + i);
+                
+                basicBlocks[i].clear();
+                basicBlocks.erase(basicBlocks.begin() + i);
+                i--;
             }
         }
     }
