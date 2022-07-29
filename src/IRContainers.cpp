@@ -1115,13 +1115,14 @@ bool IRFunction::BBisinvalid(int i){
 void IRFunction::JumpThreading(){
     for (int i = 0; i < basicBlocks.size() - 1; i++) {
         IRCode * I = basicBlocks[i].back();
-        if(I->getOperation() != IROperation::GOTO){
-            if(I->getOperation() == IROperation::BEQZ && codes[entrances[i + 1]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName()){
-                basicBlocks[i].erase(basicBlocks[i].end() - 1);
-                codes.erase(codes.begin() + entrances[i + 1] - 1);
-                for(int k = i + 1; k < basicBlocks.size(); k++)
-                    entrances[k]--;
-            }
+        if(I->getOperation() == IROperation::BEQZ && codes[entrances[i + 1]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName()){
+            basicBlocks[i].erase(basicBlocks[i].end() - 1);
+            codes.erase(codes.begin() + entrances[i + 1] - 1);
+            for(int k = i + 1; k < basicBlocks.size(); k++)
+                entrances[k]--;
+        }
+
+        if(I->getOperation() != IROperation::GOTO && I->getOperation() != IROperation::BEQZ){
             
             if(Pred[i + 1].size() == 1 && Pred[i+1].back() == i){
                 if(codes[entrances[i + 1]]->getOperation() == IROperation::ADD_LABEL){
@@ -1141,14 +1142,12 @@ void IRFunction::JumpThreading(){
             }
         }else if(I->getOperation() == IROperation::GOTO){
             int tar = -1;
-            for (int k = 0; k < controlFlow[i].size(); k++){
-                int tmp = controlFlow[i][k];
-                if (codes[entrances[tmp]]->getArg1()->getSymbolName() == I->getArg1()->getSymbolName())
-                {
-                    tar = tmp;
-                    break;
-                }
+            int tmp = controlFlow[i].back();
+            if (codes[entrances[tmp]]->getArg1()->getSymbolName() == I->getArg1()->getSymbolName())
+            {
+                tar = tmp;
             }
+
             if(tar >= 0 && Pred[tar].size() == 1 && Pred[tar].back() == i){
                 if(codes[entrances[tar]]->getOperation() == IROperation::ADD_LABEL){
                     basicBlocks[tar].erase(basicBlocks[tar].begin());
