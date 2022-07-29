@@ -1102,6 +1102,16 @@ void IRFunction::basicBlockDivision() {
     }
 }
 
+bool IRFunction::BBisinvalid(int i){
+    for(auto &j: basicBlocks[i]){
+        IROperation op = j->getOperation();
+        if (op != IROperation::ADD_LABEL && op != IROperation::GOTO && op != IROperation::BEQZ)
+            return false;
+    }
+
+    return true;
+}
+
 void IRFunction::JumpThreading(){
     for (int i = 0; i < basicBlocks.size() - 1; i++) {
         IRCode * I = basicBlocks[i].back();
@@ -1170,13 +1180,13 @@ void IRFunction::JumpThreading(){
                 if(i >= tar)
                     i--;
             }
-            else if (basicBlocks[i][0]->getOperation() == IROperation::ADD_LABEL && basicBlocks[i][1]->getOperation() == IROperation::GOTO)
+            else if (basicBlocks[i].size() > 1 && BBisinvalid(i))
             {
                 int tar = controlFlow[i].back();
                 for (int k = 0; k < Pred[i].size(); k++)
                 {
                     int tmp = Pred[i][k];
-                    IRCode *j = basicBlocks[tmp][basicBlocks[tmp].size() - 1];
+                    IRCode *j = basicBlocks[tmp].back();
                     if (j->getOperation() == IROperation::BEQZ && codes[entrances[i]]->getArg1()->getSymbolName() == j->getArg2()->getSymbolName()) {
                         j->setArg2(basicBlocks[i].back()->getArg1());
                     }

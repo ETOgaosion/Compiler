@@ -67,7 +67,10 @@ public:
     void def_use_list();
     int Replacewith(IRCode *I, IROperand *val);
     void constFolding();
+
     void CSE();
+
+    bool BBisinvalid(int i);
     void JumpThreading();
 
     /* tool functions */
