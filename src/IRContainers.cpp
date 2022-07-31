@@ -1094,12 +1094,60 @@ void IRFunction::basicBlockDivision() {
     for (int i = 0; i < controlFlow.size(); i++) {
         for (int j : controlFlow[i]) {
             if (j <= i) {
-                for (int k = j; k <= i; k++) {
+                for (int k = j; k <= i; k++)
+                {
                     cycleNum[k]++;
-                }
+                }               
             }
         }
     }
+
+    loop.clear();
+    updateloop(0, cycleNum.size(), 0);
+}
+
+struct loopinfo* IRFunction::updateloop(int first, int end, int base){
+    int now = 0;
+    for (int i = first; i < end; i++)
+    {
+        int layer = cycleNum[i];
+        if (layer > now && layer == base + 1)
+        {
+            now = cycleNum[i];
+            struct loopinfo in;
+            in.subloop.clear();
+            in.cyclelayer = cycleNum[i];
+            in.handled = 0;
+            in.start = i;
+            for (int j = i; j < end; j++){
+                if(cycleNum[j] > now)
+                    in.subloop.push_back(updateloop(j, end, now));
+                else if (cycleNum[j] < now)
+                {
+                    in.end = j - 1;
+                    break;
+                }
+                else if (j == end - 1)
+                    in.end = j;
+            }
+
+            in.pred = Pred[i];
+            while(auto pos = std::find_first_of(in.pred.begin(), in.pred.end(), in.start(), in.end() + 1))
+                if(pos != in.pred.end())
+                    in.pred.erase(pos);
+                else
+                    break;
+
+            loop.push_back(in);
+        }else if(base && layer <= base)
+            break;
+        else if(layer < now)
+            now = layer;
+    }
+    if(!loop.empty())
+        return &loop.back();
+    else
+        return nullptr;
 }
 
 bool IRFunction::BBisinvalid(int i){
@@ -1194,7 +1242,17 @@ void IRFunction::JumpThreading(){
                     }
 
                     int sign = 0;
-                    for (int a = 0; a < controlFlow[tmp].size(); a++)
+                    while(auto pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i) ){
+                        if(pos != controlFlow[tmp].end() && !sign){
+                            controlFlow[tmp][pos - controlFlow[tmp].begin()] = tar;
+                            sign = 1;
+                        }
+                        else if(pos != controlFlow[tmp].end() && sign)
+                            controlFlow[tmp].erase(pos);
+                        else
+                            break;
+                    }
+                    /*for (int a = 0; a < controlFlow[tmp].size(); a++)
                     {
                         int j = controlFlow[tmp][a];
                         if (j == i){
@@ -1208,7 +1266,7 @@ void IRFunction::JumpThreading(){
                             controlFlow[tmp].erase(controlFlow[tmp].begin() + a);
                             a--;
                         }
-                    }
+                    }*/
                 }
 
                 codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i] + basicBlocks[i].size());
@@ -1225,6 +1283,50 @@ void IRFunction::JumpThreading(){
             }
         }
     }
+}
+
+struct loopinfo* IRFunction::loopchoose(int i){
+    int first, end;
+    for (first = i; first < basicBlocks.size(); first++)
+        if(cycleNum[first] > 0){
+            int layer = cycleNum[first];
+            for (auto j : loop)
+            {
+                if(j.cyclelayer == layer && j.start == first && !j.handled){
+                    struct loopinfo tmp = j;
+                    while(!tmp.subloop.empty()){
+                        int pos = 1;
+                        if (!tmp.subloop.front()->handled){
+                            tmp = tmp.subloop.front();
+                            continue;
+                        }
+                        while(tmp.subloop[pos]->handled)
+                        {
+                            pos++;
+                            if(pos >= tmp.subloop.size())
+                                break;
+                        }
+
+                        if(pos >= tmp.subloop.size())
+                            break;
+                        if(!tmp.subloop[pos]->handled){
+                            tmp = tmp.subloop[pos];
+                            continue;
+                        }
+                    }
+
+                    tmp.handled = 1;
+                    return &j;
+                }
+            }
+        }
+
+    return nullptr;
+}
+
+void IRFunction::LICM(){
+    for (int j = 0; j < basicBlocks.size(); j++)
+
 }
 
 void IRFunction::calVarActiveRegions() {

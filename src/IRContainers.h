@@ -3,6 +3,15 @@
 
 #pragma once
 
+struct loopinfo{
+    int cyclelayer;
+    int handled;
+    int start;
+    int end;
+    std::vector<loopinfo*> subloop;
+    std::vector<int> pred;
+};
+
 class IRProgram;
 
 /* IRCodes are stored in function, optimization units within a function */
@@ -26,7 +35,9 @@ private:
     std::vector<std::vector<IRCode *>> basicBlocks;                         // each codes inside are in a basic block
     std::vector<std::vector<int>> Pred;                                     // "Pred", which means blocks' id that each block can come from
     std::vector<std::vector<int>> controlFlow;                              // "control flow", which means blocks' id that each block can goto
-    std::vector<int> cycleNum;                                              // the levels of cycle each block is in
+    std::vector<int> cycleNum;                                              // the levels of cycle each block is in 
+    std::vector<loopinfo> loop;
+
     /* live var analysis */
     std::vector<std::vector<IROperand*>> inVars;                            // live vars inward a function
     std::vector<std::vector<IROperand*>> outVars;                           // live vars outward a function
@@ -63,15 +74,19 @@ public:
     IRValue* immMul(IROperand* op1, IROperand* op2);
     IRValue* immDiv(IROperand* op1, IROperand* op2);
     IRValue* immCmp(IROperand* op1, IROperand* op2, IROperation op);
-    
+    /*Constant propagation*/
     void def_use_list();
     int Replacewith(IRCode *I, IROperand *val);
     void constFolding();
-
+    /*Common subexpression extraction*/
     void CSE();
-
+    /*jumpthreading*/
     bool BBisinvalid(int i);
     void JumpThreading();
+    /*Loop invariant*/
+    struct loopinfo* updateloop(int first, int end);
+    struct loopinfo* loopchoose(int i);
+    void LICM();
 
     /* tool functions */
     /* find and delete op in vector */
