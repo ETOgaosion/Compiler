@@ -1242,7 +1242,8 @@ void IRFunction::JumpThreading(){
                     }
 
                     int sign = 0;
-                    while(auto pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i) ){
+                    auto pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i);
+                    while( pos  != controlFlow[tmp].end()){
                         if(pos != controlFlow[tmp].end() && !sign){
                             controlFlow[tmp][pos - controlFlow[tmp].begin()] = tar;
                             sign = 1;
@@ -1251,6 +1252,7 @@ void IRFunction::JumpThreading(){
                             controlFlow[tmp].erase(pos);
                         else
                             break;
+                        pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i);
                     }
                     /*for (int a = 0; a < controlFlow[tmp].size(); a++)
                     {
@@ -1297,7 +1299,7 @@ struct loopinfo* IRFunction::loopchoose(int i){
                     while(!tmp.subloop.empty()){
                         int pos = 1;
                         if (!tmp.subloop.front()->handled){
-                            tmp = tmp.subloop.front();
+                            tmp = *tmp.subloop.front();
                             continue;
                         }
                         while(tmp.subloop[pos]->handled)
@@ -1310,7 +1312,7 @@ struct loopinfo* IRFunction::loopchoose(int i){
                         if(pos >= tmp.subloop.size())
                             break;
                         if(!tmp.subloop[pos]->handled){
-                            tmp = tmp.subloop[pos];
+                            tmp = *tmp.subloop[pos];
                             continue;
                         }
                     }

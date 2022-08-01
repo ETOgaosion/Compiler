@@ -10,7 +10,7 @@ IRCode::IRCode() {
     arg1 = nullptr;
     arg2 = nullptr;
     use.clear();
-    loop.clear();
+    //loop.clear();
 }
 
 bool IRCode::setArg1(IROperand *arg){

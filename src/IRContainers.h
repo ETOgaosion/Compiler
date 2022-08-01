@@ -84,7 +84,7 @@ public:
     bool BBisinvalid(int i);
     void JumpThreading();
     /*Loop invariant*/
-    struct loopinfo* updateloop(int first, int end);
+    struct loopinfo* updateloop(int first, int end, int base);
     struct loopinfo* loopchoose(int i);
     void LICM();
 
