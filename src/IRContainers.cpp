@@ -1057,6 +1057,9 @@ void IRFunction::basicBlockDivision() {
     }
     entrances.push_back(codes.size());
     for (int i = 0; i < entrances.size() - 1; i++) {
+        for(int j = entrances[i];j < entrances[i+1];j++){
+            codes[j]->getResult()->which_bb = i;
+        }
         basicBlocks.emplace_back(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
     }
     entrances.pop_back();
@@ -1107,7 +1110,7 @@ void IRFunction::basicBlockDivision() {
 }
 
 struct loopinfo* IRFunction::updateloop(int first, int end, int base){
-    int now = 0;
+    int now = base;
     for (int i = first; i < end; i++)
     {
         int layer = cycleNum[i];
@@ -1132,11 +1135,11 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
             }
 
             in.pred = Pred[i];
-            while(auto pos = std::find_first_of(in.pred.begin(), in.pred.end(), in.start(), in.end() + 1))
-                if(pos != in.pred.end())
-                    in.pred.erase(pos);
-                else
-                    break;
+            auto pos = std::find_first_of(in.pred.begin(), in.pred.end(), in.start, in.end + 1);
+            while(pos != in.pred.end()){
+                in.pred.erase(pos);
+                pos = std::find_first_of(in.pred.begin(), in.pred.end(), in.start, in.end + 1);
+            }
 
             loop.push_back(in);
         }else if(base && layer <= base)
@@ -1292,33 +1295,34 @@ struct loopinfo* IRFunction::loopchoose(int i){
     for (first = i; first < basicBlocks.size(); first++)
         if(cycleNum[first] > 0){
             int layer = cycleNum[first];
-            for (auto j : loop)
+            for (int k = 0;k < loop.size();k++ )
             {
-                if(j.cyclelayer == layer && j.start == first && !j.handled){
-                    struct loopinfo tmp = j;
-                    while(!tmp.subloop.empty()){
+                loopinfo* j = &loop[k];
+                if(j->cyclelayer == layer && j->start == first && !j->handled){
+                    struct loopinfo * tmp = j;
+                    while(!tmp->subloop.empty()){
                         int pos = 1;
-                        if (!tmp.subloop.front()->handled){
-                            tmp = *tmp.subloop.front();
+                        if (!tmp->subloop.front()->handled){
+                            tmp = tmp->subloop.front();
                             continue;
                         }
-                        while(tmp.subloop[pos]->handled)
+                        while(tmp->subloop[pos]->handled)
                         {
                             pos++;
-                            if(pos >= tmp.subloop.size())
+                            if(pos >= tmp->subloop.size())
                                 break;
                         }
 
-                        if(pos >= tmp.subloop.size())
+                        if(pos >= tmp->subloop.size())
                             break;
-                        if(!tmp.subloop[pos]->handled){
-                            tmp = *tmp.subloop[pos];
+                        if(!tmp->subloop[pos]->handled){
+                            tmp = tmp->subloop[pos];
                             continue;
                         }
                     }
 
-                    tmp.handled = 1;
-                    return &j;
+                    tmp->handled = 1;
+                    return tmp;
                 }
             }
         }
@@ -1326,8 +1330,24 @@ struct loopinfo* IRFunction::loopchoose(int i){
     return nullptr;
 }
 
+void IRFunction:: HoistOnLoop(loopinfo * currentloop){
+
+}
+
+void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
+    int bnum;
+    int boff;
+    for(int i = entrance+1; i < entrances.size();i ++){
+        entrances[i] ++;
+    }
+    int push_pos = basicBlocks[entrance].size();
+    basicBlocks[entrance].push_back(code_pos);
+    codes.insert(codes.begin()+entrances[entrance]+push_pos,code_pos);
+}
+
 void IRFunction::LICM(){
     for (int j = 0; j < basicBlocks.size(); j++)
+        ;
 
 }
 

@@ -87,6 +87,8 @@ public:
     struct loopinfo* updateloop(int first, int end, int base);
     struct loopinfo* loopchoose(int i);
     void LICM();
+    void HoistOnLoop(loopinfo * currentloop);
+    void Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance);
 
     /* tool functions */
     /* find and delete op in vector */
