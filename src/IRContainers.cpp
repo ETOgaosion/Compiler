@@ -1057,9 +1057,11 @@ void IRFunction::basicBlockDivision() {
     }
     entrances.push_back(codes.size());
     for (int i = 0; i < entrances.size() - 1; i++) {
+        /*
         for(int j = entrances[i];j < entrances[i+1];j++){
             codes[j]->getResult()->which_bb = i;
         }
+        */
         basicBlocks.emplace_back(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
     }
     entrances.pop_back();
@@ -1182,10 +1184,12 @@ void IRFunction::JumpThreading(){
                     for(int k = i + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
                 }
+                /*
                 for(int k = entrances[i+1];k < codes.size();k++){
                     if(codes[k]->getResult())
                         codes[k]->getResult()->which_bb --;
                 }
+                */
                 basicBlocks[i].insert(basicBlocks[i].end(), basicBlocks[i + 1].begin(), basicBlocks[i + 1].end());
                 basicBlocks.erase(basicBlocks.begin() + i + 1);
                 entrances.erase(entrances.begin() + i + 1);
@@ -1215,6 +1219,7 @@ void IRFunction::JumpThreading(){
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k]--;
                 //move code
+                /*
                 for(int k = 0; k < basicBlocks[tar].size(); k++)
                 {
                     if(basicBlocks[tar][k]->getResult()){
@@ -1226,6 +1231,7 @@ void IRFunction::JumpThreading(){
                         codes[k]->getResult()->which_bb --;
                     }
                 }
+                */
                 codes.insert(codes.begin() + entrances[i + 1], basicBlocks[tar].begin(), basicBlocks[tar].end());
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k] += basicBlocks[tar].size();
@@ -1287,13 +1293,13 @@ void IRFunction::JumpThreading(){
                         }
                     }*/
                 }
-
+                /*
                 for(int k = entrances[i + 1];k < codes.size();k ++){
                     if(codes[k]->getResult()){
                         codes[k]->getResult()->which_bb --;
                     }
                 }
-
+                */
                 codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i] + basicBlocks[i].size());
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k] -= basicBlocks[i].size();
@@ -1534,6 +1540,13 @@ void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance)
 }
 
 void IRFunction::LICM(){
+    for(int i = 0;i < basicBlocks.size();i ++){
+        for(int j = 0;j < basicBlocks[i].size();j ++){
+            if(basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->getResult()->which_bb = i;
+            }
+        }
+    }
     for (int j = 0; j < loop.size(); j++){
         if(loop[j].cyclelayer == 1)
             HoistOnLoop(&loop[j]);
