@@ -1331,7 +1331,92 @@ struct loopinfo* IRFunction::loopchoose(int i){
 }
 
 void IRFunction:: HoistOnLoop(loopinfo * currentloop){
-
+    /*use recursing to process sub loop*/
+    if(currentloop->subloop.size() > 0){
+        for(int i = 0;i < currentloop->subloop.size();i ++)
+            HoistOnLoop(currentloop->subloop[i]);
+    }
+    /*process this loop*/
+    if(currentloop->pred.size() == 0){
+        /*no prevous basic block, create a new bb*/
+        entrances.insert(entrances.begin()+currentloop->start,entrances[currentloop->start]);
+        basicBlocks.insert(basicBlocks.begin() + currentloop->start,{});
+        for(int i = 0;i < Pred.size();i++){
+            for(int j = 0;j < Pred[i].size();j ++){
+                if(Pred[i][j] >= currentloop->start){
+                    Pred[i][j] ++;
+                }
+            }
+        }
+        Pred[currentloop->start].push_back(currentloop->start);
+        Pred.insert(Pred.begin() + currentloop->start,{});
+        for(int i = 0;i < controlFlow.size();i++){
+            for(int j = 0;j < controlFlow[i].size();j ++){
+                if(controlFlow[i][j] >= currentloop->start){
+                    controlFlow[i][j] ++;
+                }
+            }
+        }
+        controlFlow.insert(controlFlow.begin() + currentloop->start,{});
+        controlFlow[currentloop->start].push_back(currentloop->start+1);
+        cycleNum.insert(cycleNum.begin() + currentloop->start,0);
+        int prev_start = currentloop->start;
+        currentloop->pred.push_back(prev_start);
+        for(int i = 0;i < loop.size();i ++){
+            if(loop[i].start >= prev_start){
+                loop[i].start ++;
+            }
+            if(loop[i].end >= prev_start){
+                loop[i].start ++;
+            }
+            for(int j = 0;j < loop[i].pred.size();j ++){
+                if(loop[i].pred[j] >= prev_start){
+                    loop[i].pred[j] ++;
+                }
+            }
+        }
+        for(int i = entrances[prev_start+1];i < codes.size();i ++){
+            codes[i]->getResult()->which_bb++;
+        }
+        /*create new bb, process as one prevous bb*/
+        for(int bnum = currentloop->start;bnum <= currentloop->end;bnum ++){
+            for(int cnum = 0; cnum < basicBlocks[bnum].size();cnum ++){
+                if(basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start &&
+                   basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start ){
+                    IRCode* tmp = basicBlocks[bnum][cnum];
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
+                    codes.erase(codes.begin() + entrances[bnum] + cnum);
+                    for(int k = bnum+1;k < basicBlocks.size();k++)
+                        entrances[k] --;
+                    Hoist(currentloop,tmp,currentloop->pred[0]);
+                    tmp->getResult()->which_bb = currentloop->pred[0];
+                }
+            }
+        }
+    }
+    else if(currentloop->pred.size() == 1){
+        /*one prevous basic block, use this bb*/
+        for(int bnum = currentloop->start;bnum <= currentloop->end;bnum ++){
+            if(cycleNum[bnum] == currentloop->cyclelayer){
+                for(int cnum = 0; cnum < basicBlocks[bnum].size();cnum ++){
+                    if(basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start &&
+                        basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start ){
+                        IRCode* tmp = basicBlocks[bnum][cnum];
+                        basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
+                        codes.erase(codes.begin() + entrances[bnum] + cnum);
+                        for(int k = bnum+1;k < basicBlocks.size();k++)
+                            entrances[k] --;
+                        Hoist(currentloop,tmp,currentloop->pred[0]);
+                        tmp->getResult()->which_bb = currentloop->pred[0];
+                    }
+                }
+            }
+        }
+    }
+    else{
+        /*two or more prevous, create a new bb, all prev bb flow to this new bb*/
+        ;
+    }
 }
 
 void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
@@ -1346,8 +1431,10 @@ void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance)
 }
 
 void IRFunction::LICM(){
-    for (int j = 0; j < basicBlocks.size(); j++)
-        ;
+    for (int j = 0; j < loop.size(); j++){
+        if(loop[j].cyclelayer == 1)
+            HoistOnLoop(&loop[j]);
+    }
 
 }
 
