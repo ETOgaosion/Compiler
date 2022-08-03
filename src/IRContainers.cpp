@@ -1394,7 +1394,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
         controlFlow.insert(controlFlow.begin() + currentloop->start,{});
         controlFlow[currentloop->start].push_back(currentloop->start+1);
 
-        cycleNum.insert(cycleNum.begin() + currentloop->start,0);
+        cycleNum.insert(cycleNum.begin() + currentloop->start,currentloop->cyclelayer-1);
 
         prev_start = currentloop->start;
         for(int i = 0;i < loop.size();i ++){
@@ -1473,7 +1473,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
             }
         }
 
-        cycleNum.insert(cycleNum.begin() + currentloop->start,0);
+        cycleNum.insert(cycleNum.begin() + currentloop->start,currentloop->cyclelayer-1);
 
         prev_start = currentloop->start;
         while(!currentloop->pred.empty()){
