@@ -214,7 +214,8 @@ void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp
 void IRFunction::def_use_list(){
     for (int i = 0; i < codes.size(); i++) {
             IRCode *code = codes[i];
-            IROperand* res = code->getResult();
+            code->use.clear();
+            IROperand *res = code->getResult();
             for (int j = i + 1; j < codes.size(); j++)
                 if(codes[j]->getArg1() == res || codes[j]->getArg2() == res)
                     code->use.push_back(codes[j]);
@@ -565,6 +566,7 @@ void IRFunction::constFolding() {
 }
 
 void IRFunction::CSE(){
+    def_use_list();
     std::vector<IRCode *> record;
     record.clear();
     for (int i = 0; i < codes.size(); i++)
@@ -1137,10 +1139,12 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
             }
 
             in.pred = Pred[i];
-            auto pos = std::find_first_of(in.pred.begin(), in.pred.end(), in.start, in.end + 1);
-            while(pos != in.pred.end()){
-                in.pred.erase(pos);
-                pos = std::find_first_of(in.pred.begin(), in.pred.end(), in.start, in.end + 1);
+            for (int k = in.start; k <= in.end; k++){
+                auto pos = std::find(in.pred.begin(), in.pred.end(), k);
+                while(pos != in.pred.end()){
+                    in.pred.erase(pos);
+                    pos = std::find(in.pred.begin(), in.pred.end(), k);
+                }
             }
 
             loop.push_back(in);
@@ -1522,11 +1526,11 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN_ARRAY_ELEM)){
                     IRCode* tmp = basicBlocks[bnum][cnum];
                     Hoist(currentloop,tmp,currentloop->pred[0]);
+                    tmp->getResult()->which_bb = currentloop->pred[0];
                     basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
                     codes.erase(codes.begin() + entrances[bnum] + cnum);
                     for(int k = bnum+1;k < basicBlocks.size();k++)
                         entrances[k] --;
-                    tmp->getResult()->which_bb = currentloop->pred[0];
                 }
             }
         }
