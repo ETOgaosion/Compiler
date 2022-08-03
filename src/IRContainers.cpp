@@ -1445,8 +1445,6 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                 if(Pred[currentloop->start][i] == Pred[currentloop->start+1][j]){
                     Pred[currentloop->start+1].erase(Pred[currentloop->start+1].begin()+j);
                 }
-                if(Pred[currentloop->start][i] > currentloop->start)
-                    currentloop->pred[i]++;
             }
         }
 
@@ -1460,12 +1458,17 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
         controlFlow.insert(controlFlow.begin() + currentloop->start,{});
         controlFlow[currentloop->start].push_back(currentloop->start+1);
         for(int i = 0;i < currentloop->pred.size();i ++){
-            for(int j = 0;j < controlFlow[currentloop->pred[i]].size();j ++){
-                if(currentloop->pred[i] >= currentloop->start && controlFlow[currentloop->pred[i]+1][j] == currentloop->start+1){
-                    controlFlow[currentloop->pred[i]+1][j] = currentloop->start;
+            if(currentloop->pred[i] >= currentloop->start){
+                for(int j = 0;j < controlFlow[currentloop->pred[i]+1].size();j ++){
+                    if(controlFlow[currentloop->pred[i]+1][j] == currentloop->start+1){
+                        controlFlow[currentloop->pred[i]+1][j] = currentloop->start;
+                    }
                 }
-                else if(controlFlow[currentloop->pred[i]][j] == currentloop->start+1){
-                    controlFlow[currentloop->pred[i]][j] = currentloop->start;
+            }else{
+                for(int j = 0;j < controlFlow[currentloop->pred[i]].size();j ++){
+                    if(controlFlow[currentloop->pred[i]][j] == currentloop->start+1){
+                        controlFlow[currentloop->pred[i]][j] = currentloop->start;
+                    }
                 }
             }
         }
