@@ -1109,8 +1109,6 @@ void IRFunction::basicBlockDivision() {
         }
     }
 
-    loop.clear();
-    updateloop(0, cycleNum.size(), 0);
 }
 
 struct loopinfo* IRFunction::updateloop(int first, int end, int base){
@@ -1177,6 +1175,57 @@ void IRFunction::JumpThreading(){
             codes.erase(codes.begin() + entrances[i + 1] - 1);
             for(int k = i + 1; k < basicBlocks.size(); k++)
                 entrances[k]--;
+        }
+
+        if(I->getOperation() == IROperation::BEQZ && I->getArg1()->getOperandType() == OperandType::VALUE){
+            if(stoi(I->getArg1()->getValue()) == 0){
+                IRGoto* newcode = new IRGoto(I->getArg2());
+                basicBlocks[i].pop_back();
+                codes.erase(codes.begin() + entrances[i + 1] - 1);
+                basicBlocks[i].push_back(newcode);
+                codes.insert(codes.begin() + entrances[i + 1] - 1, newcode);
+
+                auto pos = std::find(controlFlow[i].begin(),controlFlow[i].end(), i + 1);
+                while( pos  != controlFlow[i].end()){
+                    controlFlow[i].erase(pos);
+                    pos = std::find(controlFlow[i].begin(), controlFlow[i].end(), i + 1);
+                }
+                pos = std::find(Pred[i + 1].begin(),Pred[i + 1].end(), i);
+                while( pos  != Pred[i + 1].end()){
+                    Pred[i + 1].erase(pos);
+                    pos = std::find(Pred[i + 1].begin(), Pred[i + 1].end(), i);
+                }
+            }
+            else
+            {
+                basicBlocks[i].erase(basicBlocks[i].end() - 1);
+                codes.erase(codes.begin() + entrances[i + 1] - 1);
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k]--;
+
+                int tar;
+                for (int j = 0; j < controlFlow[i].size(); j++)
+                {
+                    tar = controlFlow[i][j];
+                    if (codes[entrances[tar]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName())
+                        break;
+                    else
+                        tar = -1;
+                }
+
+                if(tar >= 0){
+                    auto pos = std::find(controlFlow[i].begin(),controlFlow[i].end(), tar);
+                    while( pos  != controlFlow[i].end()){
+                        controlFlow[i].erase(pos);
+                        pos = std::find(controlFlow[i].begin(), controlFlow[i].end(), tar);
+                    }
+                    pos = std::find(Pred[tar].begin(), Pred[tar].end(), i);
+                    while( pos  != Pred[tar].end()){
+                        Pred[i + 1].erase(pos);
+                        pos = std::find(Pred[tar].begin(), Pred[tar].end(), i);
+                    }
+                }
+            }
         }
 
         if(I->getOperation() != IROperation::GOTO && I->getOperation() != IROperation::BEQZ){
@@ -1560,6 +1609,9 @@ void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance)
 }
 
 void IRFunction::LICM(){
+    loop.clear();
+    updateloop(0, cycleNum.size(), 0);
+    
     for(int i = 0;i < basicBlocks.size();i ++){
         for(int j = 0;j < basicBlocks[i].size();j ++){
             if(basicBlocks[i][j]->getResult()){
