@@ -567,6 +567,68 @@ void IRFunction::constFolding() {
 
 void IRFunction::CSE(){
     def_use_list();
+    for(int i = 0;i < basicBlocks.size();i ++){
+        for(int j = 0;j < basicBlocks[i].size();j ++){
+            if(basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->getResult()->which_bb = i;
+            }
+        }
+    }
+
+    dom.clear();
+    dom.push_back(vector(0));
+
+    std::vector<int> all;
+    all.clear();
+    for (int i = 0; i < basicBlocks.size(); i++)
+        all.push_back(i);
+    
+    for (int i = 1; i < basicBlocks.size(); i++)
+        dom.push_back(all);
+
+    bool change = true;
+    while(change){
+        change = false;
+        for (int i = 1; i < basicBlocks.size(); i++)
+        {
+            if (Pred[i].size() == 1)
+            {
+                dom[i].clear();
+                std::vector<int> tmp = vector(i);
+                std::vector<int> res;
+                set_intersection(dom[Pred[i][0]].begin(), dom[Pred[i][0]].end(), tmp.begin(), tmp.end(), back_inserter(res));
+                sort(res.begin(), res.end());
+                sort(dom[i].begin(), dom[i].end());
+                if(res != dom[i]){
+                    dom[i].assign(res.begin(), res.end());
+                    change = true;
+                }
+            }
+            else if (Pred[i].size() > 1)
+            {
+                std::vector<int> tmp = dom[Pred[i][0]];
+                std::vector<int> res;
+                for (int j = 1; j < Pred[i].size(); j++)
+                {
+                    res.clear();
+                    set_union(tmp.begin(), tmp.end(), dom[Pred[i][j]].begin(), dom[Pred[i][j]].end(), back_inserter(res));
+                    tmp.assign(res.begin(), res.end());
+                }
+
+                std::vector<int> tmp2 = vector(i);
+                res.clear();
+                set_intersection(tmp.begin(), tmp.end(), tmp2.begin(), tmp2.end(), back_inserter(res));
+                sort(res.begin(), res.end());
+                sort(dom[i].begin(), dom[i].end());
+                if(res != dom[i]){
+                    dom[i].assign(res.begin(), res.end());
+                    change = true;
+                }
+
+            }
+        }
+    }
+
     std::vector<IRCode *> record;
     record.clear();
     for (int i = 0; i < codes.size(); i++)
@@ -576,6 +638,7 @@ void IRFunction::CSE(){
         int match = 0;
         IROperand* op1 = I->getArg1();
         IROperand* op2 = I->getArg2();
+        IROperand *re = I->getResult();
         IROperation op = I->getOperation();
         if (record.empty())
             ;
@@ -584,8 +647,12 @@ void IRFunction::CSE(){
             {
                 IROperand* ar1 = record[j]->getArg1();
                 IROperand* ar2 = record[j]->getArg2();
+                IROperand* res = record[j]->getResult();
                 IROperation opr = record[j]->getOperation();
-                if(op == opr && IRCode::isTwoArgAssignmentOperation(op))
+                auto pos = std::find(dom[re->which_bb].begin(), dom[re->which_bb].end(), res->which_bb);
+                if(pos == dom[re->which_bb].end())
+                    continue;
+                if (op == opr && IRCode::isTwoArgAssignmentOperation(op))
                     if(op1 == ar1 && op2 == ar2)
                         match = 1;
                     else if(IRCode::isOrderIndependentOperation(op) && op1 == ar2 && op2 == ar1)
@@ -1109,6 +1176,21 @@ void IRFunction::basicBlockDivision() {
         }
     }
 
+    /*sure.clear();
+    for (int i = 0; i < controlFlow.size(); i++)
+        sure.push_back(0);
+    
+    sure[0] = 1;
+    for (int i = 0; i < controlFlow.size(); i++)
+    {
+        if(controlFlow[i].size == 1)
+            sure[controlFlow[i][0]] |= sure[i];
+        else if(controlFlow[i].size > 1)
+            for (int j : controlFlow[i])
+            {
+                sure[controlFlow[i][j]] |= 0;
+            }
+    }*/
 }
 
 struct loopinfo* IRFunction::updateloop(int first, int end, int base){

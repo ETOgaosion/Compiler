@@ -37,6 +37,7 @@ private:
     std::vector<std::vector<int>> controlFlow;                              // "control flow", which means blocks' id that each block can goto
     std::vector<int> cycleNum;                                              // the levels of cycle each block is in 
     std::vector<loopinfo> loop;
+    std::vector<std::vector<int>> dom;
 
     /* live var analysis */
     std::vector<std::vector<IROperand*>> inVars;                            // live vars inward a function
