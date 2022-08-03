@@ -1445,6 +1445,8 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                 if(Pred[currentloop->start][i] == Pred[currentloop->start+1][j]){
                     Pred[currentloop->start+1].erase(Pred[currentloop->start+1].begin()+j);
                 }
+                if(Pred[currentloop->start][i] > currentloop->start)
+                    currentloop->pred[i]++;
             }
         }
 
