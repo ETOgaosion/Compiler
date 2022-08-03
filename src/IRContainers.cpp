@@ -1432,30 +1432,33 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
             }
         }
         //Pred[currentloop->start].push_back(currentloop->start);
-        Pred.insert(Pred.begin() + currentloop->start + 1,{});
+        Pred.insert(Pred.begin() + currentloop->start,{});
+        Pred[currentloop->start].insert(Pred[currentloop->start].end(),currentloop->pred.begin(),currentloop->pred.end());
         Pred[currentloop->start + 1].push_back(currentloop->start);
-        int i = 0;
-        while(i < Pred[currentloop->start].size()){
-            if(Pred[currentloop->start][i] > currentloop->start){
-                Pred[currentloop->start + 1].push_back(Pred[currentloop->start][i]);
-                Pred[currentloop->start].erase(Pred[currentloop->start].begin() + i);
-            }else{
-                i++;
+        for(int i = 0;i < Pred[currentloop->start].size();i ++){
+            for(int j = 0;j < Pred[currentloop->start+1].size();j++){
+                if(Pred[currentloop->start][i] == Pred[currentloop->start+1][j]){
+                    Pred[currentloop->start+1].erase(Pred[currentloop->start+1].begin()+j);
+                }
             }
         }
 
-
         for(int i = 0;i < controlFlow.size();i++){
             for(int j = 0;j < controlFlow[i].size();j ++){
-                if(controlFlow[i][j] > currentloop->start ){
-                    controlFlow[i][j] ++;
-                }else if(controlFlow[i][j] == currentloop->start && i >= currentloop->start){
+                if(controlFlow[i][j] >= currentloop->start ){
                     controlFlow[i][j] ++;
                 }
             }
         }
         controlFlow.insert(controlFlow.begin() + currentloop->start,{});
         controlFlow[currentloop->start].push_back(currentloop->start+1);
+        for(int i = 0;i < currentloop->pred.size();i ++){
+            for(int j = 0;j < controlFlow[currentloop->pred[i]].size();j ++){
+                if(controlFlow[currentloop->pred[i]][j] == currentloop->start+1){
+                    controlFlow[currentloop->pred[i]][j] = currentloop->start;
+                }
+            }
+        }
 
         cycleNum.insert(cycleNum.begin() + currentloop->start,0);
 
@@ -1516,16 +1519,17 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN_ARRAY_ELEM)){
                     IRCode* tmp = basicBlocks[bnum][cnum];
+                    Hoist(currentloop,tmp,currentloop->pred[0]);
                     basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
                     codes.erase(codes.begin() + entrances[bnum] + cnum);
                     for(int k = bnum+1;k < basicBlocks.size();k++)
                         entrances[k] --;
-                    Hoist(currentloop,tmp,currentloop->pred[0]);
                     tmp->getResult()->which_bb = currentloop->pred[0];
                 }
             }
         }
     }
+
 }
 
 void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
@@ -1551,7 +1555,49 @@ void IRFunction::LICM(){
         if(loop[j].cyclelayer == 1)
             HoistOnLoop(&loop[j]);
     }
+    for(int i = 0;i < basicBlocks.size();i ++){
+        if(basicBlocks[i].size() == 0){
+            entrances.erase(entrances.begin() + i);
 
+            basicBlocks.erase(basicBlocks.begin() + i);
+
+            for(int j = 0;j < Pred.size();j ++){
+                for(int k = 0;k < Pred[j].size();k ++){
+                    if(Pred[j][k] >= i){
+                        Pred[j][k] --;
+                    }
+                }
+            }
+            Pred[i+1].insert(Pred[i+1].end(),Pred[i].begin(),Pred[i].end());
+            Pred.erase(Pred.begin() + i);
+
+            for(int j = 0;j < controlFlow.size();j ++){
+                for(int k = 0;k < controlFlow[j].size();k ++){
+                    if(controlFlow[j][k] > i){
+                        controlFlow[j][k] --;
+                    }
+                }
+            }
+            controlFlow[i-1].insert(controlFlow[i-1].end(),controlFlow[i].begin(),controlFlow[i].end());
+            controlFlow.erase(controlFlow.begin() + i);
+
+            cycleNum.erase(cycleNum.begin() + i);
+
+            for(int j = 0;j < loop.size();j ++){
+                if(loop[j].start > i){
+                    loop[j].start --;
+                }
+                if(loop[j].end > i){
+                    loop[j].end --;
+                }
+                for(int k = 0;k < loop[j].pred.size();k ++){
+                    if(loop[j].pred[k] >= i){
+                        loop[j].pred[k] --;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void IRFunction::calVarActiveRegions() {
