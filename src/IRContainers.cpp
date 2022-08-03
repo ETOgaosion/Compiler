@@ -1525,8 +1525,8 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN_ARRAY_ELEM)){
                     IRCode* tmp = basicBlocks[bnum][cnum];
-                    Hoist(currentloop,tmp,currentloop->pred[0]);
                     tmp->getResult()->which_bb = currentloop->pred[0];
+                    Hoist(currentloop,tmp,currentloop->pred[0]);
                     basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
                     codes.erase(codes.begin() + entrances[bnum] + cnum);
                     for(int k = bnum+1;k < basicBlocks.size();k++)
