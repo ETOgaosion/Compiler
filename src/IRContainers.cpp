@@ -1367,6 +1367,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
             HoistOnLoop(currentloop->subloop[i]);
     }
     /*process this loop*/
+    int prev_start;
     if(currentloop->pred.size() == 0){
         /*no prevous basic block, create a new bb*/
         entrances.insert(entrances.begin()+currentloop->start,entrances[currentloop->start]);
@@ -1395,7 +1396,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
 
         cycleNum.insert(cycleNum.begin() + currentloop->start,0);
 
-        int prev_start = currentloop->start;
+        prev_start = currentloop->start;
         for(int i = 0;i < loop.size();i ++){
             if(loop[i].start >= prev_start){
                 loop[i].start ++;
@@ -1419,7 +1420,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
     }
     else if(currentloop->pred.size() == 1){
         /*one prevous basic block, use this bb*/
-        ;
+        prev_start = currentloop->pred[0];
     }
     else{
         /*two or more prevous, create a new bb, all prev bb flow to this new bb*/
@@ -1458,7 +1459,10 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
         controlFlow[currentloop->start].push_back(currentloop->start+1);
         for(int i = 0;i < currentloop->pred.size();i ++){
             for(int j = 0;j < controlFlow[currentloop->pred[i]].size();j ++){
-                if(controlFlow[currentloop->pred[i]][j] == currentloop->start+1){
+                if(currentloop->pred[i] >= currentloop->start && controlFlow[currentloop->pred[i]+1][j] == currentloop->start+1){
+                    controlFlow[currentloop->pred[i]+1][j] = currentloop->start;
+                }
+                else if(controlFlow[currentloop->pred[i]][j] == currentloop->start+1){
                     controlFlow[currentloop->pred[i]][j] = currentloop->start;
                 }
             }
@@ -1466,7 +1470,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
 
         cycleNum.insert(cycleNum.begin() + currentloop->start,0);
 
-        int prev_start = currentloop->start;
+        prev_start = currentloop->start;
         while(!currentloop->pred.empty()){
             currentloop->pred.pop_back();
         }
@@ -1525,7 +1529,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN_ARRAY_ELEM)){
                     IRCode* tmp = basicBlocks[bnum][cnum];
-                    tmp->getResult()->which_bb = currentloop->pred[0];
+                    tmp->getResult()->which_bb = prev_start;
                     Hoist(currentloop,tmp,currentloop->pred[0]);
                     basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
                     codes.erase(codes.begin() + entrances[bnum] + cnum);
