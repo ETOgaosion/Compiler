@@ -576,7 +576,7 @@ void IRFunction::CSE(){
     }
 
     dom.clear();
-    dom.push_back(vector(0));
+    dom.emplace_back(1, 0);
 
     std::vector<int> all;
     all.clear();
@@ -594,9 +594,9 @@ void IRFunction::CSE(){
             if (Pred[i].size() == 1)
             {
                 dom[i].clear();
-                std::vector<int> tmp = vector(i);
+                std::vector<int> tmp = vector<int>(1, i);
                 std::vector<int> res;
-                set_intersection(dom[Pred[i][0]].begin(), dom[Pred[i][0]].end(), tmp.begin(), tmp.end(), back_inserter(res));
+                set_union(dom[Pred[i][0]].begin(), dom[Pred[i][0]].end(), tmp.begin(), tmp.end(), back_inserter(res));
                 sort(res.begin(), res.end());
                 sort(dom[i].begin(), dom[i].end());
                 if(res != dom[i]){
@@ -611,13 +611,13 @@ void IRFunction::CSE(){
                 for (int j = 1; j < Pred[i].size(); j++)
                 {
                     res.clear();
-                    set_union(tmp.begin(), tmp.end(), dom[Pred[i][j]].begin(), dom[Pred[i][j]].end(), back_inserter(res));
+                    set_intersection(tmp.begin(), tmp.end(), dom[Pred[i][j]].begin(), dom[Pred[i][j]].end(), back_inserter(res));
                     tmp.assign(res.begin(), res.end());
                 }
 
-                std::vector<int> tmp2 = vector(i);
+                std::vector<int> tmp2 = vector<int>(1, i);
                 res.clear();
-                set_intersection(tmp.begin(), tmp.end(), tmp2.begin(), tmp2.end(), back_inserter(res));
+                set_union(tmp.begin(), tmp.end(), tmp2.begin(), tmp2.end(), back_inserter(res));
                 sort(res.begin(), res.end());
                 sort(dom[i].begin(), dom[i].end());
                 if(res != dom[i]){
