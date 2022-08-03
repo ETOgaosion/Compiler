@@ -1512,8 +1512,10 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
     for(int bnum = currentloop->start;bnum <= currentloop->end;bnum ++){
         if(cycleNum[bnum] == currentloop->cyclelayer){
             for(int cnum = 0; cnum < basicBlocks[bnum].size();cnum ++){
-                if(basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start &&
-                   basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start &&
+                if((basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
+                   basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start) &&
+                   (basicBlocks[bnum][cnum]->getArg2()->getOperandType() == OperandType::VALUE ||
+                   basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start) &&
                    (IRCode::isTwoArgAssignmentOperation(basicBlocks[bnum][cnum]->getOperation()) ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
