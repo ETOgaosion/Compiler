@@ -1505,13 +1505,18 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
         
         /* make all bbs flowing to currentloop now flow to the new bb*/
         IRLabel* prevlabel = (IRLabel*) basicBlocks[currentloop->start][0]->getArg1();
-        for(int i = 0;i < Pred[prev_start].size();i ++){
-            for(int j = 0;j < basicBlocks[i].size();j ++){
-                if(basicBlocks[i][j]->getOperation() == IROperation::ADD_LABEL){
-                    IRLabel* tmplabel = (IRLabel*) basicBlocks[i][j]->getArg1();
-                    if(tmplabel == prevlabel){
-                        basicBlocks[i][j]->setArg1(newlabel);
-                    }
+        for(int i = 0; i < Pred[prev_start].size();i ++){
+            int j = basicBlocks[i].size() - 1;
+            if (basicBlocks[i][j]->getOperation() == IROperation::GOTO)
+            {
+                IRLabel* tmplabel = (IRLabel*) basicBlocks[i][j]->getArg1();
+                if(tmplabel == prevlabel){
+                    basicBlocks[i][j]->setArg1(newlabel);
+                }
+            }else if(basicBlocks[i][j]->getOperation() == IROperation::BEQZ){
+                IRLabel* tmplabel = (IRLabel*) basicBlocks[i][j]->getArg2();
+                if(tmplabel == prevlabel){
+                    basicBlocks[i][j]->setArg2(newlabel);
                 }
             }
         }
