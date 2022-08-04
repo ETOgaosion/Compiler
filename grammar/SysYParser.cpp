@@ -436,6 +436,8 @@ void SysYParser::ConstInitValContext::copyFrom(ConstInitValContext *ctx) {
   this->type = ctx->type;
   this->shape = ctx->shape;
   this->isArray = ctx->isArray;
+  this->vals = ctx->vals;
+  this->singleVal = ctx->singleVal;
   this->value = ctx->value;
 }
 
