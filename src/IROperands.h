@@ -77,6 +77,7 @@ public:
     virtual bool setMemPosition(uint64_t inMemPosition) { return false; };
     virtual void addValue(const std::string& newValue) {};
     virtual void addValues(const std::vector<std::string>& newValues) {};
+    virtual bool setValues(std::vector<std::string> inValues) { return false; };
     virtual bool setLabel(const std::string& newLabel) { return false; };
     virtual bool setMetaDataType(MetaDataType newType) { return false; };
     virtual bool setActiveRegions(std::vector<int> inActiveRegion) { return false; };
@@ -133,7 +134,6 @@ class IRValue : public IROperand {
 private:
     MetaDataType metaDataType;          // immediate data type
     std::vector<std::string> values;    // single value immediate only has 1 member, while multi-value array occupies more
-    std::vector<IRValue *> subValues;   // for multi-dimensional vector
     std::vector<std::size_t> arrayShape;
     bool allZero;
     std::string valueLabel;             // some immediate numbers are stored globally in (ro-)data section, so use label as index
@@ -152,7 +152,7 @@ public:
     /* @method: 3. for index rules 2 array case, you can directly initialize array multiple value */
     IRValue(MetaDataType newMetaDataType, const std::vector<std::string>& newValues, const std::string &newLabel, bool newIsArray);
     /* @method: 4. for index rules 2 array case, you can directly initialize array multiple value */
-    IRValue(MetaDataType newMetaDataType, const std::vector<IRValue *>& newSubValues, std::vector<std::size_t> newShape, const std::string &newLabel);
+    IRValue(MetaDataType newMetaDataType, const std::vector<std::string>& newValues, std::vector<std::size_t> newShape, const std::string &newLabel);
     /* @method: 5. if all value in vector are zero */
     IRValue(MetaDataType newMetaDataType, bool newIsAllZero, bool newIsArray, std::vector<std::size_t> newArrayShape, std::string newValueLabel);
 
@@ -161,8 +161,6 @@ public:
     std::string getValue() const override { return values.front(); };
     /* get all value in array */
     std::vector<std::string> getValues() const override { return values; };
-    /* get all sub value in array */
-    std::vector<IRValue *> getSubValues() const override { return subValues; };
     /* return label which can index the value */
     std::string getValueLabel() const override { return valueLabel; };
     /* used for array value */
@@ -176,7 +174,7 @@ public:
     bool setLabel(const std::string& newLabel) override { valueLabel = newLabel; return true; };
     bool setMetaDataType(MetaDataType newType) override { metaDataType = newType; return true; };
     bool setArrayShape(std::vector<std::size_t> newArrayShape) override { arrayShape = newArrayShape; return true; };
-    bool setSubValues(std::vector<IRValue *>newSubValues) override { subValues = std::move(newSubValues); return true; };
+    bool setValues(std::vector<std::string> inValues) override { values = inValues; };
 
     /* for target codes translation */
     Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;

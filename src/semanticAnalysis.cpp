@@ -13,7 +13,7 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();
-    
+
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putfloat", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, {});
     funcSymbolTable->setParamDataTypeList();
@@ -84,7 +84,7 @@ void SemanticAnalysis::exitDecl(SysYParser::DeclContext * ctx)
 }
 
 void SemanticAnalysis::enterConstDecl(SysYParser::ConstDeclContext * ctx)
-{   
+{
 }
 
 void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
@@ -96,7 +96,19 @@ void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
     {
         // TODO: type conversion
         if (const_def->withType && const_def->type != type && const_def->type != MetaDataType::VOID) {
-            throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
+            const_def->value->setMetaDataType(type);
+            std::vector<std::string> value = const_def->value->getValues();
+            if (type == MetaDataType::INT) {
+                for (auto &val: value) {
+                    val = std::to_string(std::stoi(val));
+                }
+            }
+            else {
+                for (auto &val: value) {
+                    val = std::to_string(std::stof(val));
+                }
+            }
+            const_def->value->setValues(value);
         }
         AbstractSymbol *symbol = SymbolFactory::createSymbol(const_def->symbolName, SymbolType::CONST, type, const_def->isArray, const_def->shape);
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
@@ -140,7 +152,7 @@ void SemanticAnalysis::exitBType(SysYParser::BTypeContext * ctx)
     }
     else{
         throw std::runtime_error("[ERROR] > Data Type not supported.\n");
-    }  
+    }
 }
 
 // ConstDef
@@ -151,24 +163,13 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->withType = false;
     ctx->shape = {};
     ctx->isArray = false;
-}
-
-void SemanticAnalysis::fillInArray(IRValue *fillArray, std::vector<std::size_t> shape, MetaDataType type) {
-    if (fillArray->getArrayShape().size() == 1) {
-        std::vector<std::string> valVec = fillArray->getValues();
-        while(valVec.size() < shape[0]) {
-            valVec.emplace_back("0");
+    if (ctx->constExp().size() > 0) {
+        if (ctx->constInitVal()) {
+            for (auto val : ctx->constExp()) {
+                ctx->constInitVal()->shape.push_back(std::stoi(val->val));
+            }
         }
-        return;
     }
-    std::vector<IRValue *> valVec = fillArray->getSubValues();
-    while (valVec.size() < shape[0]) {
-        valVec.push_back(new IRValue(type, true, true,                              std::vector<std::size_t>(shape.begin() + 1, shape.end()), {}));
-    }
-    for (auto it : fillArray->getSubValues()) {
-        fillInArray(it, std::vector<std::size_t>(shape.begin() + 1, shape.end()), type);
-    }
-    fillArray->setSubValues(valVec);
 }
 
 void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
@@ -184,17 +185,9 @@ void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
         }
     }
     if (ctx->constInitVal()) {
-        if (ctx->constInitVal()->isArray != ctx->isArray || (ctx->isArray && ctx->constInitVal()->shape != ctx->shape && !Tools::arrayCmp<size_t>(ctx->constInitVal()->shape, ctx->shape))) {
-            throw std::runtime_error("[ERROR] > Const var initialize failure: type not match. " + std::to_string(ctx->constInitVal()->isArray));
-        }
         ctx->withType = true;
         ctx->type = ctx->constInitVal()->type;
-        if (ctx->isArray && Tools::arrayCmp<std::size_t>(ctx->shape, ctx->constInitVal()->value->getArrayShape())) {
-            fillInArray(ctx->constInitVal()->value, ctx->shape, ctx->type);
-        }
-        else {
-            ctx->value = ctx->constInitVal()->value;
-        }
+        ctx->value = ctx->constInitVal()->value;
     }
     else {
         if (ctx->isArray) {
@@ -226,6 +219,9 @@ void SemanticAnalysis::exitConstInitValOfVar(SysYParser::ConstInitValOfVarContex
     else {
         ctx->value = new IRValue(ctx->constExp()->metaDataType, ctx->constExp()->val, {}, false);
     }
+}
+
+void SemanticAnalysis::fillInArray(IRValue *fillArray, std::vector<std::size_t> shape, MetaDataType type) {
 }
 
 void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
@@ -287,13 +283,7 @@ void SemanticAnalysis::exitVarDecl(SysYParser::VarDeclContext * ctx)
     for(const auto & var_def : ctx->varDef())
     {
         if (var_def->withType && var_def->type != type && var_def->type != MetaDataType::VOID) {
-            if (var_def->withType && var_def->type == MetaDataType::DOUBLE && type == MetaDataType::FLOAT) {
-                var_def->type = MetaDataType::FLOAT;
-                var_def->value->setMetaDataType(MetaDataType::FLOAT);
-            }
-            else {
-                throw std::runtime_error("[ERROR] > error in var initialization: type mismatch.\n");
-            }
+            // TODO: type conversion
         }
         AbstractSymbol *symbol = SymbolFactory::createSymbol(var_def->symbolName, SymbolType::VAR, type, var_def->isArray, var_def->shape);
         if (!curSymbolTable->insertAbstractSymbolSafely(symbol)) {
@@ -434,7 +424,7 @@ void SemanticAnalysis::enterFuncType(SysYParser::FuncTypeContext * ctx)
 }
 
 void SemanticAnalysis::exitFuncType(SysYParser::FuncTypeContext * ctx)
-{   
+{
 }
 
 void SemanticAnalysis::enterFuncFParams(SysYParser::FuncFParamsContext * ctx)
@@ -949,7 +939,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
 
 void SemanticAnalysis::enterStmtReturn(SysYParser::StmtReturnContext * ctx)
 {
-    
+
 }
 
 void SemanticAnalysis::exitStmtReturn(SysYParser::StmtReturnContext * ctx)
@@ -964,7 +954,7 @@ void SemanticAnalysis::exitStmtReturn(SysYParser::StmtReturnContext * ctx)
     }
     ctx->hasReturn = true;
     ctx->returnType = ctx->exp() ? ctx->exp()->metaDataType : MetaDataType::VOID;
-    
+
     IRCode *code = nullptr;
 
     if(ctx->exp()){
@@ -983,7 +973,7 @@ void SemanticAnalysis::exitStmtReturn(SysYParser::StmtReturnContext * ctx)
                 break;
             default:
                 break;
-        }        
+        }
     } else {
         code = new IRReturnV(new IRSymbolFunction(irGenerator->currentIRFunc->getFuncSymbolTable()));
     }
@@ -1327,7 +1317,7 @@ void SemanticAnalysis::exitSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
                 break;
             default:
                 break;
-        }        
+        }
     } else {
         code = new IRReturnV(new IRSymbolFunction(irGenerator->currentIRFunc->getFuncSymbolTable()));
     }
@@ -1375,7 +1365,7 @@ void SemanticAnalysis::exitExpBoolExp(SysYParser::ExpBoolExpContext * ctx)
 // Cond
 void SemanticAnalysis::enterCond(SysYParser::CondContext * ctx)
 {
-    
+
 }
 
 void SemanticAnalysis::exitCond(SysYParser::CondContext * ctx)
@@ -1506,7 +1496,7 @@ void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ct
     } else { // normal symbolVar
         if ((ctx->lVal()->identOperand->getOperandType() == OperandType::SYMBOLVAR) && ctx->lVal()->identOperand->getAssigned())
             ctx->operand = ctx->lVal()->identOperand->getLatestVersionSymbol();
-        else 
+        else
             ctx->operand = ctx->lVal()->identOperand;
     }
 }
@@ -1590,29 +1580,29 @@ void SemanticAnalysis::exitUnaryExpFunc(SysYParser::UnaryExpFuncContext * ctx)
     IRSymbolFunction *selfFunc = irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName());
     IRCode *code = new IRCall(func, selfFunc);
     irGenerator->addCode(code);
-    
+
     if(funcSymbolTable->getReturnType() != MetaDataType::VOID){
         IRTempVariable *newResult = irGenerator->addTempVariable(funcSymbolTable->getReturnType());
         switch (funcSymbolTable->getReturnType())
         {
-        case MetaDataType::BOOL:
-            code = new IRGetReturnB(newResult);
-            irGenerator->addCode(code);
-            break;
-        case MetaDataType::INT:
-            code = new IRGetReturnI(newResult);
-            irGenerator->addCode(code);
-            break;
-        case MetaDataType::FLOAT:
-            code = new IRGetReturnF(newResult);
-            irGenerator->addCode(code);
-            break;
-        case MetaDataType::DOUBLE:
-            code = new IRGetReturnD(newResult);
-            irGenerator->addCode(code);
-            break;
-        default:
-            break;
+            case MetaDataType::BOOL:
+                code = new IRGetReturnB(newResult);
+                irGenerator->addCode(code);
+                break;
+            case MetaDataType::INT:
+                code = new IRGetReturnI(newResult);
+                irGenerator->addCode(code);
+                break;
+            case MetaDataType::FLOAT:
+                code = new IRGetReturnF(newResult);
+                irGenerator->addCode(code);
+                break;
+            case MetaDataType::DOUBLE:
+                code = new IRGetReturnD(newResult);
+                irGenerator->addCode(code);
+                break;
+            default:
+                break;
         }
         ctx->operand = newResult;
     }
@@ -1657,7 +1647,7 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExp
             case MetaDataType::DOUBLE:
                 code = new IRNegD(result, ctx->unaryExp()->operand);
                 break;
-        } 
+        }
     }
     else if(ctx->unaryOp()->getText() == "!"){
         code = new IRNot(result, ctx->unaryExp()->operand);
@@ -1688,27 +1678,27 @@ void SemanticAnalysis::exitFuncRParams(SysYParser::FuncRParamsContext * ctx)
         ctx->isArrayList.emplace_back(it->isArray);
         ctx->shapeList.emplace_back(it->shape);
         ctx->metaDataTypeList.emplace_back(it->metaDataType);
-        switch (it->metaDataType) 
+        switch (it->metaDataType)
         {
-        case MetaDataType::BOOL:
-            irGenerator->addCode(new IRAddParamB(it->operand));
-            break;
+            case MetaDataType::BOOL:
+                irGenerator->addCode(new IRAddParamB(it->operand));
+                break;
 
-        case MetaDataType::INT:
-            irGenerator->addCode(new IRAddParamI(it->operand));
-            break;
+            case MetaDataType::INT:
+                irGenerator->addCode(new IRAddParamI(it->operand));
+                break;
 
-        case MetaDataType::FLOAT:
-            irGenerator->addCode(new IRAddParamF(it->operand));
-            break;
+            case MetaDataType::FLOAT:
+                irGenerator->addCode(new IRAddParamF(it->operand));
+                break;
 
-        case MetaDataType::DOUBLE:
-            irGenerator->addCode(new IRAddParamD(it->operand));
-            break;
+            case MetaDataType::DOUBLE:
+                irGenerator->addCode(new IRAddParamD(it->operand));
+                break;
 
-        default:
-            throw std::runtime_error("[ERROR] > data type fault.\n");
-            break;
+            default:
+                throw std::runtime_error("[ERROR] > data type fault.\n");
+                break;
         }
     }
 }
@@ -1875,7 +1865,7 @@ void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 
     IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
     IRCode* code = nullptr;
-   
+
     if (ctx->addOp()->getText() == "+"){
         switch (ctx->addExp()->metaDataType) {
             case MetaDataType::INT:
@@ -1904,7 +1894,7 @@ void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
     }
     else
         throw std::runtime_error("[ERROR] > addop illegal.\n");
-    
+
     irGenerator->addCode(code);
     ctx->operand = result;
 }
@@ -2179,20 +2169,6 @@ void SemanticAnalysis::exitConstExpNumber(SysYParser::ConstExpNumberContext * ct
 {
     ctx->metaDataType = ctx->number()->metaDataType;
     ctx->val = ctx->getText();
-}
-
-void SemanticAnalysis::enterConstExpBoolConst(SysYParser::ConstExpBoolConstContext * ctx)
-{
-}
-
-void SemanticAnalysis::exitConstExpBoolConst(SysYParser::ConstExpBoolConstContext * ctx)
-{
-    ctx->metaDataType = MetaDataType::BOOL;
-    if(ctx->getText() == "true"){
-        ctx->val = std::string("1");
-    } else if (ctx->getText() == "false") {
-        ctx->val = std::string("0");
-    }
 }
 
 // Number

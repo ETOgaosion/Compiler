@@ -38,20 +38,15 @@ IRValue::IRValue(MetaDataType newMetaDataType, const string& newValue, const str
 IRValue::IRValue(MetaDataType newMetaDataType, const vector<string>& newValues, const string &newLabel, bool newIsArray) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
     values.clear();
-    for(const auto& newValue : newValues) {
-        values.push_back(newValue);
-    }
+    values = newValues;
     valueLabel = newLabel;
     isArray = newIsArray;
     allZero = false;
 }
 
-IRValue::IRValue(MetaDataType newMetaDataType, const std::vector<IRValue *>& newSubValues, std::vector<std::size_t> newShape, const std::string &newLabel) : IROperand(OperandType::VALUE) {
+IRValue::IRValue(MetaDataType newMetaDataType, const std::vector<std::string>& newValues, std::vector<std::size_t> newShape, const std::string &newLabel) : IROperand(OperandType::VALUE) {
     metaDataType = newMetaDataType;
-    values.clear();
-    for(const auto& newValue : newSubValues) {
-        subValues.push_back(newValue);
-    }
+    values = newValues;
     valueLabel = newLabel;
     arrayShape = std::move(newShape);
     isArray = true;
@@ -59,13 +54,12 @@ IRValue::IRValue(MetaDataType newMetaDataType, const std::vector<IRValue *>& new
 }
 
 IRValue::IRValue(MetaDataType newMetaDataType, bool newIsAllZero, bool newIsArray, std::vector<std::size_t> newArrayShape, std::string newValueLabel) : IROperand(OperandType::VALUE) {
-        metaDataType = newMetaDataType;
-        values.clear();
-        subValues.clear();
-        valueLabel = std::move(newValueLabel);
-        arrayShape = std::move(newArrayShape);
-        isArray = newIsArray;
-        allZero = newIsAllZero;
+    metaDataType = newMetaDataType;
+    values.clear();
+    valueLabel = std::move(newValueLabel);
+    arrayShape = std::move(newArrayShape);
+    isArray = newIsArray;
+    allZero = newIsAllZero;
 }
 
 void IRValue::addValue(const string& newValue) {
@@ -87,8 +81,8 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
     if (valueLabel.empty()) {
         Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
         if (dataType == MetaDataType::INT) {
-            freeRegister = 
-            t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
+            freeRegister =
+                    t->getNextFreeRegister(true, false, FloatPointType::NONE, hasFreeRegister);
             if (values.front() == "0") {
                 t->addCodeMv(freeRegister, zero,FloatPointType::NONE, FloatPointType::NONE);
             }
@@ -102,8 +96,8 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
             }
         }
         else {
-            freeRegister = 
-            t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
+            freeRegister =
+                    t->getNextFreeRegister(false, false, FloatPointType::NONE, hasFreeRegister);
             if (values.front() == "0") {
                 if (dataType == MetaDataType::FLOAT) {
                     t->addCodeMv(freeRegister, zero, FloatPointType::SINGLE, FloatPointType::NONE);
@@ -146,8 +140,8 @@ Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralP
     Register *freeRegister = nullptr;
     Register *targetRegister = nullptr;
     if (valueLabel.empty()) {
-        targetRegister = 
-        t->tryGetCertainRegister(true, regName, hasFreeRegister);
+        targetRegister =
+                t->tryGetCertainRegister(true, regName, hasFreeRegister);
         Register *zero = t->tryGetCertainRegister(true, "zero", hasFreeRegister);
         if (values.front() == "0") {
             t->addCodeMv(targetRegister, zero,FloatPointType::NONE, FloatPointType::NONE);
