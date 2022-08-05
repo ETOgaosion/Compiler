@@ -88,8 +88,8 @@ initVal
         std::vector<std::string> vals,
         IRValue* value
     ]
-    : exp                                   #initValofVar
-    | '{' (initVal (',' initVal)*)? '}'     #initValofArray
+    : exp                                   #initValOfVar
+    | '{' (initVal (',' initVal)*)? '}'     #initValOfArray
     ;
 
 funcDef

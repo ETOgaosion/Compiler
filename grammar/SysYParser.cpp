@@ -730,45 +730,45 @@ void SysYParser::InitValContext::copyFrom(InitValContext *ctx) {
   this->value = ctx->value;
 }
 
-//----------------- InitValofVarContext ------------------------------------------------------------------
+//----------------- InitValOfVarContext ------------------------------------------------------------------
 
-SysYParser::ExpContext* SysYParser::InitValofVarContext::exp() {
+SysYParser::ExpContext* SysYParser::InitValOfVarContext::exp() {
   return getRuleContext<SysYParser::ExpContext>(0);
 }
 
-SysYParser::InitValofVarContext::InitValofVarContext(InitValContext *ctx) { copyFrom(ctx); }
+SysYParser::InitValOfVarContext::InitValOfVarContext(InitValContext *ctx) { copyFrom(ctx); }
 
-void SysYParser::InitValofVarContext::enterRule(tree::ParseTreeListener *listener) {
+void SysYParser::InitValOfVarContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<SysYListener *>(listener);
   if (parserListener != nullptr)
-    parserListener->enterInitValofVar(this);
+    parserListener->enterInitValOfVar(this);
 }
-void SysYParser::InitValofVarContext::exitRule(tree::ParseTreeListener *listener) {
+void SysYParser::InitValOfVarContext::exitRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<SysYListener *>(listener);
   if (parserListener != nullptr)
-    parserListener->exitInitValofVar(this);
+    parserListener->exitInitValOfVar(this);
 }
-//----------------- InitValofArrayContext ------------------------------------------------------------------
+//----------------- InitValOfArrayContext ------------------------------------------------------------------
 
-std::vector<SysYParser::InitValContext *> SysYParser::InitValofArrayContext::initVal() {
+std::vector<SysYParser::InitValContext *> SysYParser::InitValOfArrayContext::initVal() {
   return getRuleContexts<SysYParser::InitValContext>();
 }
 
-SysYParser::InitValContext* SysYParser::InitValofArrayContext::initVal(size_t i) {
+SysYParser::InitValContext* SysYParser::InitValOfArrayContext::initVal(size_t i) {
   return getRuleContext<SysYParser::InitValContext>(i);
 }
 
-SysYParser::InitValofArrayContext::InitValofArrayContext(InitValContext *ctx) { copyFrom(ctx); }
+SysYParser::InitValOfArrayContext::InitValOfArrayContext(InitValContext *ctx) { copyFrom(ctx); }
 
-void SysYParser::InitValofArrayContext::enterRule(tree::ParseTreeListener *listener) {
+void SysYParser::InitValOfArrayContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<SysYListener *>(listener);
   if (parserListener != nullptr)
-    parserListener->enterInitValofArray(this);
+    parserListener->enterInitValOfArray(this);
 }
-void SysYParser::InitValofArrayContext::exitRule(tree::ParseTreeListener *listener) {
+void SysYParser::InitValOfArrayContext::exitRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<SysYListener *>(listener);
   if (parserListener != nullptr)
-    parserListener->exitInitValofArray(this);
+    parserListener->exitInitValOfArray(this);
 }
 SysYParser::InitValContext* SysYParser::initVal() {
   InitValContext *_localctx = _tracker.createInstance<InitValContext>(_ctx, getState());
@@ -789,7 +789,7 @@ SysYParser::InitValContext* SysYParser::initVal() {
       case SysYParser::Ident:
       case SysYParser::IntConst:
       case SysYParser::FloatConst: {
-        _localctx = dynamic_cast<InitValContext *>(_tracker.createInstance<SysYParser::InitValofVarContext>(_localctx));
+        _localctx = dynamic_cast<InitValContext *>(_tracker.createInstance<SysYParser::InitValOfVarContext>(_localctx));
         enterOuterAlt(_localctx, 1);
         setState(158);
         exp();
@@ -797,7 +797,7 @@ SysYParser::InitValContext* SysYParser::initVal() {
       }
 
       case SysYParser::T__8: {
-        _localctx = dynamic_cast<InitValContext *>(_tracker.createInstance<SysYParser::InitValofArrayContext>(_localctx));
+        _localctx = dynamic_cast<InitValContext *>(_tracker.createInstance<SysYParser::InitValOfArrayContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(159);
         match(SysYParser::T__8);

@@ -48,11 +48,11 @@ public:
   virtual void enterVarDef(SysYParser::VarDefContext *ctx) = 0;
   virtual void exitVarDef(SysYParser::VarDefContext *ctx) = 0;
 
-  virtual void enterInitValofVar(SysYParser::InitValofVarContext *ctx) = 0;
-  virtual void exitInitValofVar(SysYParser::InitValofVarContext *ctx) = 0;
+  virtual void enterInitValOfVar(SysYParser::InitValOfVarContext *ctx) = 0;
+  virtual void exitInitValOfVar(SysYParser::InitValOfVarContext *ctx) = 0;
 
-  virtual void enterInitValofArray(SysYParser::InitValofArrayContext *ctx) = 0;
-  virtual void exitInitValofArray(SysYParser::InitValofArrayContext *ctx) = 0;
+  virtual void enterInitValOfArray(SysYParser::InitValOfArrayContext *ctx) = 0;
+  virtual void exitInitValOfArray(SysYParser::InitValOfArrayContext *ctx) = 0;
 
   virtual void enterFuncDef(SysYParser::FuncDefContext *ctx) = 0;
   virtual void exitFuncDef(SysYParser::FuncDefContext *ctx) = 0;

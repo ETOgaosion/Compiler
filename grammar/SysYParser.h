@@ -270,18 +270,18 @@ public:
    
   };
 
-  class  InitValofVarContext : public InitValContext {
+  class  InitValOfVarContext : public InitValContext {
   public:
-    InitValofVarContext(InitValContext *ctx);
+    InitValOfVarContext(InitValContext *ctx);
 
     ExpContext *exp();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };
 
-  class  InitValofArrayContext : public InitValContext {
+  class  InitValOfArrayContext : public InitValContext {
   public:
-    InitValofArrayContext(InitValContext *ctx);
+    InitValOfArrayContext(InitValContext *ctx);
 
     std::vector<InitValContext *> initVal();
     InitValContext* initVal(size_t i);
