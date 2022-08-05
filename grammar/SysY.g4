@@ -52,11 +52,11 @@ constDef
 
 constInitVal
     locals [
+        bool outside,
         MetaDataType type,
         std::vector<std::size_t> shape,
         bool isArray,
         std::vector<std::string> vals,
-        std::string singleVal,
         IRValue* value
     ]
     : constExp                                      #constInitValOfVar
@@ -81,11 +81,11 @@ varDef
 
 initVal
     locals [
+        bool outside,
         MetaDataType type,
         std::vector<std::size_t> shape,
         bool isArray,
         std::vector<std::string> vals,
-        std::string singleVal,
         IRValue* value
     ]
     : exp
