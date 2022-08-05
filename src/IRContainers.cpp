@@ -1173,7 +1173,7 @@ void IRFunction::basicBlockDivision() {
     entrances.pop_back();
 
     for(int i = 0; i < basicBlocks.size(); i++){
-        if(i > 0 && codes[entrances[i] - 1]->getOperation() != IROperation::GOTO && codes[entrances[i] - 1]->getOperation() != IROperation::BEQZ)
+        if(i > 0 && codes[entrances[i] - 1]->getOperation() != IROperation::GOTO )
             Pred.emplace_back(1, i - 1);
         else
             Pred.push_back(vector<int>());
@@ -1223,7 +1223,7 @@ void IRFunction::basicBlockDivision() {
     }*/
 }
 
-struct loopinfo* IRFunction::updateloop(int first, int end, int base){
+int IRFunction::updateloop(int first, int end, int base){
     int now = base;
     for (int i = first; i < end; i++)
     {
@@ -1237,8 +1237,11 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
             in.handled = 0;
             in.start = i;
             for (int j = i; j < end; j++){
-                if(cycleNum[j] > now)
-                    in.subloop.push_back(updateloop(j, end, now));
+                if(cycleNum[j] > now){
+                    int sub = updateloop(j, end, now);
+                    in.subloop.push_back(sub);
+                    j = loop[sub].end + 1;
+                }
                 else if (cycleNum[j] < now)
                 {
                     in.end = j - 1;
@@ -1263,10 +1266,8 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
         else if(layer < now)
             now = layer;
     }
-    if(!loop.empty())
-        return &loop.back();
-    else
-        return nullptr;
+
+    return loop.size() - 1;
 }
 
 bool IRFunction::BBisinvalid(int i){
@@ -1541,7 +1542,7 @@ void IRFunction::JumpThreading(){
         }
     }
 }
-
+/*
 struct loopinfo* IRFunction::loopchoose(int i){
     int first, end;
     for (first = i; first < basicBlocks.size(); first++)
@@ -1581,12 +1582,12 @@ struct loopinfo* IRFunction::loopchoose(int i){
 
     return nullptr;
 }
-
+*/
 void IRFunction:: HoistOnLoop(loopinfo * currentloop){
     /*use recursing to process sub loop*/
     if(currentloop->subloop.size() > 0){
         for(int i = 0;i < currentloop->subloop.size();i ++)
-            HoistOnLoop(currentloop->subloop[i]);
+            HoistOnLoop(&loop[currentloop->subloop[i]]);
     }
     /*process this loop*/
     if(currentloop->pred.size() == 0){
@@ -1748,12 +1749,13 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
     for(int bnum = currentloop->start;bnum <= currentloop->end;bnum ++){
         if(cycleNum[bnum] == currentloop->cyclelayer){
             for(int cnum = 0; cnum < basicBlocks[bnum].size();cnum ++){
-                if((basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
+                if(basicBlocks[bnum][cnum]->getArg1() &&
+                   (basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
                    basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start) &&
+                   basicBlocks[bnum][cnum]->getArg2() &&
                    (basicBlocks[bnum][cnum]->getArg2()->getOperandType() == OperandType::VALUE ||
                    basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start) &&
                    (IRCode::isTwoArgAssignmentOperation(basicBlocks[bnum][cnum]->getOperation()) ||
-                   basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN_ARRAY_ELEM)){
                     IRCode* tmp = basicBlocks[bnum][cnum];
@@ -1764,6 +1766,20 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                     for(int k = bnum+1;k < basicBlocks.size();k++)
                         entrances[k] --;
                 }
+
+                else if(basicBlocks[bnum][cnum]->getArg1() &&
+                        (basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
+                        basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start) &&
+                        basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN ){
+                    IRCode* tmp = basicBlocks[bnum][cnum];
+                    tmp->getResult()->which_bb = currentloop->pred[0];
+                    Hoist(currentloop,tmp,currentloop->pred[0]);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
+                    codes.erase(codes.begin() + entrances[bnum] + cnum);
+                    for(int k = bnum+1;k < basicBlocks.size();k++)
+                        entrances[k] --;
+                }
+                
             }
         }
     }
@@ -1783,6 +1799,7 @@ void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance)
 }
 
 void IRFunction::LICM(){
+    loop.clear();
     if(!cycleNum.empty())
         cycleNum.clear();
     cycleNum = vector<int>(entrances.size(), 0);
@@ -1792,12 +1809,25 @@ void IRFunction::LICM(){
                 for (int k = j; k <= i; k++)
                 {
                     cycleNum[k]++;
-                }               
+                } 
+                /*
+                struct loopinfo in;
+                in.subloop.clear();
+                in.cyclelayer = 1;
+                in.handled = 0;
+                in.start = j;
+                in.end = i;
+
+                for (int k = 0;k < loop.size(); k ++){
+                    if(loop[k].cyclelayer == 1 && loop[k].start >= j && loop[k].end <= i){
+                        ;
+                    }
+                } 
+                */            
             }
         }
     }
 
-    loop.clear();
     updateloop(0, cycleNum.size(), 0);
     
     for(int i = 0;i < basicBlocks.size();i ++){
@@ -2374,13 +2404,6 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     def_use_list();
     switch (inOptimizeLevel)
     {
-    case 0:
-        basicBlockDivision();
-        constFolding();
-        liveVarAnalysis();
-        delDeadCode();
-        JumpThreading();
-        break;
     case 1:
         basicBlockDivision();
         constFolding();
@@ -2397,6 +2420,12 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         // liveVarAnalysis();
         // delDeadCode();
         varBindRegisters(t);
+        break;
+    case 4:
+        basicBlockDivision();
+        liveVarAnalysis();
+        delDeadCode();
+        //LICM();
         break;
     }
 }
