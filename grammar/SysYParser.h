@@ -176,11 +176,11 @@ public:
 
   class  ConstInitValContext : public antlr4::ParserRuleContext {
   public:
+    bool outside;
     MetaDataType type;
     std::vector<std::size_t> shape;
     bool isArray;
     std::vector<std::string> vals;
-    std::string singleVal;
     IRValue* value;
     ConstInitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
@@ -253,11 +253,11 @@ public:
 
   class  InitValContext : public antlr4::ParserRuleContext {
   public:
+    bool outside;
     MetaDataType type;
     std::vector<std::size_t> shape;
     bool isArray;
     std::vector<std::string> vals;
-    std::string singleVal;
     IRValue* value;
     InitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;

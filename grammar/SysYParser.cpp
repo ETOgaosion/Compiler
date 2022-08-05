@@ -433,11 +433,11 @@ size_t SysYParser::ConstInitValContext::getRuleIndex() const {
 
 void SysYParser::ConstInitValContext::copyFrom(ConstInitValContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
+  this->outside = ctx->outside;
   this->type = ctx->type;
   this->shape = ctx->shape;
   this->isArray = ctx->isArray;
   this->vals = ctx->vals;
-  this->singleVal = ctx->singleVal;
   this->value = ctx->value;
 }
 
