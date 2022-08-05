@@ -286,6 +286,7 @@ void IRFunction::constFolding() {
                 }*/
                 Replacewith(code, arg1);
                 block.erase(block.begin() + i);
+                basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                 codes.erase(codes.begin() + entrances[bnum] + i);
                 for(int k = bnum + 1; k < basicBlocks.size(); k++)
                     entrances[k]--;
@@ -321,6 +322,7 @@ void IRFunction::constFolding() {
                 if(new_value){
                     Replacewith(code, new_value);
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -365,6 +367,7 @@ void IRFunction::constFolding() {
                 if(new_value){
                     Replacewith(code, new_value);
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -385,6 +388,7 @@ void IRFunction::constFolding() {
                 }
                 else {
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -457,6 +461,7 @@ void IRFunction::constFolding() {
                     
                     Replacewith(code, new_value);
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
