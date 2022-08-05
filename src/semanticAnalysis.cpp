@@ -163,6 +163,7 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->withType = false;
     ctx->shape = {};
     ctx->isArray = false;
+    ctx->constInitVal()->outside = true;
     if (ctx->constExp().size() > 0) {
         if (ctx->constInitVal()) {
             for (auto val : ctx->constExp()) {
@@ -202,6 +203,9 @@ void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
 // ConstInitVal
 void SemanticAnalysis::enterConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
 {
+    if (ctx->outside && !ctx->shape.empty()) {
+        throw std::runtime_error("declare array but initialize with number");
+    }
     ctx->type = MetaDataType::VOID;
     ctx->isArray = false;
     ctx->value = nullptr;
@@ -222,9 +226,6 @@ void SemanticAnalysis::exitConstInitValOfVar(SysYParser::ConstInitValOfVarContex
         ctx->vals.push_back(ctx->getText());
     }
     ctx->shape = {};
-}
-
-void SemanticAnalysis::fillInArray(IRValue *fillArray, std::vector<std::size_t> shape, MetaDataType type) {
 }
 
 void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
@@ -265,15 +266,12 @@ void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayCo
 
     ctx->isArray = true;
 
-    if (!ctx->constInitVal().empty()){
-        std::vector<IRValue *> mulVal;
-        for (auto it : ctx->constInitVal()) {
-            mulVal.push_back(it->value);
+    if (ctx->outside) {
+        if (!ctx->constInitVal().empty()) {
+            ctx->value = irGenerator->ir->addMulImmValue(ctx->type, ctx->vals);
+        } else {
+            ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
         }
-        ctx->value = new IRValue(ctx->type, mulVal, ctx->shape, {});
-    }
-    else {
-        ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
     }
 }
 
@@ -325,6 +323,14 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
     ctx->withType = false;
     ctx->shape = {};
     ctx->isArray = false;
+    ctx->initVal()->outside = true;
+    if (ctx->constExp().size() > 0) {
+        if (ctx->initVal()) {
+            for (auto val : ctx->constExp()) {
+                ctx->initVal()->shape.push_back(std::stoi(val->val));
+            }
+        }
+    }
 }
 
 void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
@@ -334,24 +340,15 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
-        ctx->shape = stoi(ctx->constExp()->getText());
+        ctx->shape.clear();
+        for (auto it : ctx->constExp()) {
+            ctx->shape.push_back(std::stoi(it->getText()));
+        }
     }
     if (ctx->initVal()) {
-        if (ctx->initVal()->isArray != ctx->isArray || (ctx->isArray && ctx->initVal()->shape > ctx->shape)) {
-            throw std::runtime_error("[ERROR] > var initialize failure: type not match. ");
-        }
         ctx->withType = true;
         ctx->type = ctx->initVal()->type;
-        if (ctx->isArray && ctx->shape > ctx->initVal()->value->getArraySize()) {
-            std::vector<std::string> valVec = ctx->initVal()->value->getValues();
-            for (int i = ctx->initVal()->value->getArraySize(); i < ctx->shape; i++) {
-                valVec.emplace_back("0");
-            }
-            ctx->value = irGenerator->ir->addMulImmValue(ctx->type, valVec);
-        }
-        else {
-            ctx->value = ctx->initVal()->value;
-        }
+        ctx->value = ctx->initVal()->value;
     }
     else {
         if (ctx->isArray) {
@@ -364,6 +361,7 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
 }
 
 void SemanticAnalysis::enterInitVal(SysYParser::InitValContext *ctx) {}
+
 void SemanticAnalysis::exitInitVal(SysYParser::InitValContext *ctx) {}
 
 void SemanticAnalysis::enterFuncDef(SysYParser::FuncDefContext * ctx)
