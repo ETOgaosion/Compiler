@@ -386,6 +386,7 @@ void IRFunction::constFolding() {
                     basicBlocks[bnum][i] = code;
                     codes[entrances[bnum] + i] = code;
                     controlFlow[i].erase(controlFlow[i].begin());
+                    //delete code;
                 }
                 else {
                     block.erase(block.begin() + i);
@@ -394,7 +395,7 @@ void IRFunction::constFolding() {
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
                     controlFlow[i].erase(controlFlow[i].begin() + 1);
-                    delete code;
+                    
                 }
             }
 
@@ -467,7 +468,7 @@ void IRFunction::constFolding() {
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
-                    // delete code;
+                    //delete code;
                     i--;
                 
                 }
@@ -1264,8 +1265,10 @@ void IRFunction::EraseBB(int i){
         for(int k = 0; k < controlFlow[j].size(); k++)
             if(controlFlow[j][k] > i)
                 controlFlow[j][k]--;
-            else if(controlFlow[j][k] == i)
+            else if(controlFlow[j][k] == i){
                 controlFlow[j].erase(controlFlow[j].begin() + k);
+                k--;
+            }
     }
 
     for (int j = 0; j < Pred.size(); j++){
@@ -1274,8 +1277,10 @@ void IRFunction::EraseBB(int i){
         for(int k = 0; k < Pred[j].size(); k++)
             if(Pred[j][k] > i)
                 Pred[j][k]--;
-            else if(Pred[j][k] == i)
+            else if(Pred[j][k] == i){
                 Pred[j].erase(Pred[j].begin() + k);
+                k--;
+            }
     }
 
     controlFlow.erase(controlFlow.begin() + i);
@@ -1286,7 +1291,6 @@ void IRFunction::EraseBB(int i){
 
 void IRFunction::JumpThreading(){
     for (int i = 0; i < basicBlocks.size() - 1; i++) {
-        printf("%d", i);
         IRCode *I = basicBlocks[i].back();
         if(i > 0 && codes[entrances[i] - 1]->getOperation() == IROperation::GOTO && codes[entrances[i]]->getOperation() != IROperation::ADD_LABEL){
             EraseBB(i);
@@ -1327,6 +1331,7 @@ void IRFunction::JumpThreading(){
                 codes.erase(codes.begin() + entrances[i + 1] - 1);
                 basicBlocks[i].push_back(newcode);
                 codes.insert(codes.begin() + entrances[i + 1] - 1, newcode);
+                delete newcode;
 
                 auto pos = std::find(controlFlow[i].begin(),controlFlow[i].end(), i + 1);
                 while( pos  != controlFlow[i].end()){
@@ -1406,35 +1411,22 @@ void IRFunction::JumpThreading(){
                 if(codes[entrances[tar]]->getOperation() == IROperation::ADD_LABEL){
                     basicBlocks[tar].erase(basicBlocks[tar].begin());
                     codes.erase(codes.begin() + entrances[tar]);
-                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                    for(int k = tar + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
                 }
-                //delete GOTO
-                basicBlocks[i].erase(basicBlocks[i].begin() + basicBlocks[i].size() - 1);
+                //delete GOTO 
                 codes.erase(codes.begin() + entrances[i] + basicBlocks[i].size() - 1);
+                basicBlocks[i].erase(basicBlocks[i].end() - 1);
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k]--;
                 //move code
-                /*
-                for(int k = 0; k < basicBlocks[tar].size(); k++)
-                {
-                    if(basicBlocks[tar][k]->getResult()){
-                        basicBlocks[tar][k]->getResult()->which_bb = i;
-                    }
-                }
-                for(int k = entrances[tar + 1];k < codes.size();k ++){
-                    if(codes[k]->getResult()){
-                        codes[k]->getResult()->which_bb --;
-                    }
-                }
-                */
                 codes.insert(codes.begin() + entrances[i + 1], basicBlocks[tar].begin(), basicBlocks[tar].end());
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k] += basicBlocks[tar].size();
                 codes.erase(codes.begin() + entrances[tar], codes.begin() + entrances[tar] + basicBlocks[tar].size());
                 for(int k = tar + 1; k < basicBlocks.size(); k++)
                     entrances[k] -= basicBlocks[tar].size();
-                
+
                 basicBlocks[i].insert(basicBlocks[i].end(), basicBlocks[tar].begin(), basicBlocks[tar].end());
                 basicBlocks.erase(basicBlocks.begin() + tar);
                 entrances.erase(entrances.begin() + tar);
@@ -1473,29 +1465,7 @@ void IRFunction::JumpThreading(){
                             break;
                         pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i);
                     }
-                    /*for (int a = 0; a < controlFlow[tmp].size(); a++)
-                    {
-                        int j = controlFlow[tmp][a];
-                        if (j == i){
-                            controlFlow[tmp][a] = tar;
-                            j = tar;
-                        }
-
-                        if(j == tar && !sign)
-                            sign = 1;
-                        else if(j == tar && sign){
-                            controlFlow[tmp].erase(controlFlow[tmp].begin() + a);
-                            a--;
-                        }
-                    }*/
                 }
-                /*
-                for(int k = entrances[i + 1];k < codes.size();k ++){
-                    if(codes[k]->getResult()){
-                        codes[k]->getResult()->which_bb --;
-                    }
-                }
-                */
                 codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i] + basicBlocks[i].size());
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k] -= basicBlocks[i].size();
