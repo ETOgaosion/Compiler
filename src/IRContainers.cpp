@@ -1151,7 +1151,7 @@ void IRFunction::basicBlockDivision() {
 
     for (int i = 0; i < basicBlocks.size(); i++)
     {
-        if(codes[entrances[i+1]-1]->getOperation() != IROperation::GOTO)
+        if(i < basicBlocks.size() - 1 && codes[entrances[i+1]-1]->getOperation() != IROperation::GOTO)
             controlFlow.emplace_back(1, i + 1);
         else
             controlFlow.push_back(vector<int>());
@@ -1297,7 +1297,7 @@ void IRFunction::JumpThreading(){
         if(codes[entrances[i]]->getOperation() == IROperation::ADD_LABEL && Pred[i].size() == 1){
             if(i > 0 && Pred[i][0] == i - 1){
                 if((i == 1 || basicBlocks[i - 1].size() > 1) && codes[entrances[i] - 1]->getOperation() == IROperation::GOTO && codes[entrances[i] - 1]->getArg1()->getSymbolName() == codes[entrances[i]]->getArg1()->getSymbolName()){
-                    basicBlocks[i - 1].erase(basicBlocks[i].end() - 1);
+                    basicBlocks[i - 1].erase(basicBlocks[i - 1].end() - 1);
                     codes.erase(codes.begin() + entrances[i] - 1);
                     for(int k = i; k < basicBlocks.size(); k++)
                         entrances[k]--;
