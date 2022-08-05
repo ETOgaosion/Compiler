@@ -855,8 +855,23 @@ void IRFunction::delDeadCode() {
             if (basicBlocks[i].empty()) {
                 basicBlocks.erase(basicBlocks.begin() + i);
                 controlFlow.erase(controlFlow.begin() + i);
+                Pred.erase(Pred.begin() + i);
                 entrances.erase(entrances.begin() + i);
                 cycleNum.erase(cycleNum.begin() + i);
+                for(int j;j < controlFlow.size();j ++){
+                    for(int k;k < controlFlow[j].size();k ++){
+                        if(controlFlow[j][k] > i){
+                            controlFlow[j][k] --;
+                        }
+                    }
+                }
+                for(int j;j < Pred.size();j ++){
+                    for(int k;k < Pred[j].size();k ++){
+                        if(Pred[j][k] >= i){
+                            Pred[j][k] --;
+                        }
+                    }
+                }
             }
         }
         auto block = basicBlocks[i];
@@ -2326,6 +2341,13 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     def_use_list();
     switch (inOptimizeLevel)
     {
+    case 0:
+        basicBlockDivision();
+        constFolding();
+        liveVarAnalysis();
+        delDeadCode();
+        JumpThreading();
+        break;
     case 1:
         basicBlockDivision();
         constFolding();
