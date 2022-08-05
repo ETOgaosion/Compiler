@@ -86,7 +86,7 @@ initVal
         std::vector<std::size_t> shape,
         bool isArray,
         std::vector<std::string> vals,
-        IRValue* value
+        IROperand* value
     ]
     : exp                                   #initValOfVar
     | '{' (initVal (',' initVal)*)? '}'     #initValOfArray

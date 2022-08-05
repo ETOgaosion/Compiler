@@ -360,9 +360,34 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
     }
 }
 
-void SemanticAnalysis::enterInitVal(SysYParser::InitValContext *ctx) {}
+void SemanticAnalysis::enterInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
+    if (ctx->outside && !ctx->shape.empty()) {
+        throw std::runtime_error("declare array but initialize with number");
+    }
+    ctx->type = MetaDataType::VOID;
+    ctx->isArray = false;
+    ctx->value = nullptr;
+}
 
-void SemanticAnalysis::exitInitVal(SysYParser::InitValContext *ctx) {}
+void SemanticAnalysis::exitInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
+    ctx->type = ctx->exp()->metaDataType;
+    ctx->isArray = false;
+    if (ctx->shape.empty()) {
+        if (ctx->exp()->metaDataType == MetaDataType::FLOAT) {
+            ctx->value = irGenerator->addImmValue(ctx->exp()->metaDataType, ctx->exp()->val);
+        } else {
+            ctx->value = new IRValue(ctx->exp()->metaDataType, ctx->exp()->val, {}, false);
+        }
+    }
+    else {
+        ctx->vals.push_back(ctx->getText());
+    }
+    ctx->shape = {};
+}
+
+void SemanticAnalysis::enterInitValOfArray(SysYParser::InitValOfArrayContext *ctx) { }
+
+void SemanticAnalysis::exitInitValOfArray(SysYParser::InitValOfArrayContext *ctx) {}
 
 void SemanticAnalysis::enterFuncDef(SysYParser::FuncDefContext * ctx)
 {
@@ -1259,8 +1284,19 @@ void SemanticAnalysis::exitSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
         irGenerator->addCodes(ctx->codes);
 }
 
-void SemanticAnalysis::enterExp(SysYParser::ExpContext *ctx) {}
-void SemanticAnalysis::exitExp(SysYParser::ExpContext *ctx) {}
+void SemanticAnalysis::enterExp(SysYParser::ExpContext *ctx) {
+    ctx->isArray = false;
+    ctx->shape = {};
+    ctx->metaDataType = MetaDataType::VOID;
+    ctx->addExp()->indexOperand = ctx->indexOperand;
+}
+
+void SemanticAnalysis::exitExp(SysYParser::ExpContext *ctx) {
+    ctx->isArray = ctx->addExp()->isArray;
+    ctx->shape = ctx->addExp()->shape;
+    ctx->metaDataType = ctx->addExp()->metaDataType;
+    ctx->operand = ctx->addExp()->operand;
+}
 
 // Cond
 void SemanticAnalysis::enterCond(SysYParser::CondContext * ctx)
