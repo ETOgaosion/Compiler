@@ -851,13 +851,43 @@ void IRFunction::liveVarAnalysis() {
 
 // algorithm only works in Basic Block
 void IRFunction::delDeadCode() {
+    
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }               
+            }
+        }
+    }
+    
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
         for (int i = 0; i < basicBlocks.size(); i++) {
             if (basicBlocks[i].empty()) {
                 basicBlocks.erase(basicBlocks.begin() + i);
                 controlFlow.erase(controlFlow.begin() + i);
+                Pred.erase(Pred.begin() + i);
                 entrances.erase(entrances.begin() + i);
                 cycleNum.erase(cycleNum.begin() + i);
+                for(int j;j < controlFlow.size();j ++){
+                    for(int k;k < controlFlow[j].size();k ++){
+                        if(controlFlow[j][k] > i){
+                            controlFlow[j][k] --;
+                        }
+                    }
+                }
+                for(int j;j < Pred.size();j ++){
+                    for(int k;k < Pred[j].size();k ++){
+                        if(Pred[j][k] >= i){
+                            Pred[j][k] --;
+                        }
+                    }
+                }
             }
         }
         auto block = basicBlocks[i];
@@ -1713,6 +1743,18 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
 void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
     int bnum;
     int boff;
+    
+    for(int i = entrance+1; i < entrances.size();i ++){
+        entrances[i] ++;
+    }
+    int push_pos = basicBlocks[entrance].size();
+    basicBlocks[entrance].push_back(code_pos);
+    codes.insert(codes.begin()+entrances[entrance]+push_pos,code_pos);
+}
+
+void IRFunction::LICM(){
+    if(!cycleNum.empty())
+        cycleNum.clear();
     cycleNum = vector<int>(entrances.size(), 0);
     for (int i = 0; i < controlFlow.size(); i++) {
         for (int j : controlFlow[i]) {
@@ -1724,15 +1766,7 @@ void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance)
             }
         }
     }
-    for(int i = entrance+1; i < entrances.size();i ++){
-        entrances[i] ++;
-    }
-    int push_pos = basicBlocks[entrance].size();
-    basicBlocks[entrance].push_back(code_pos);
-    codes.insert(codes.begin()+entrances[entrance]+push_pos,code_pos);
-}
 
-void IRFunction::LICM(){
     loop.clear();
     updateloop(0, cycleNum.size(), 0);
     
@@ -2192,6 +2226,20 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
 }
 
 void IRFunction::varBindRegisters(TargetCodes *t) {
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }               
+            }
+        }
+    }
+
     calVarActiveRegions();
     unordered_map<IROperand *, vector<IROperand *>> conflictVar = calConflictVarRelations();
     vector<vector<IROperand *>> registerGraph = calRegisterGraph(conflictVar);
@@ -2296,6 +2344,13 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     def_use_list();
     switch (inOptimizeLevel)
     {
+    case 0:
+        basicBlockDivision();
+        constFolding();
+        liveVarAnalysis();
+        delDeadCode();
+        JumpThreading();
+        break;
     case 1:
         basicBlockDivision();
         constFolding();
