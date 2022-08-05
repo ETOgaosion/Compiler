@@ -1164,17 +1164,6 @@ void IRFunction::basicBlockDivision() {
             }
         }
     }
-    cycleNum = vector<int>(entrances.size(), 0);
-    for (int i = 0; i < controlFlow.size(); i++) {
-        for (int j : controlFlow[i]) {
-            if (j <= i) {
-                for (int k = j; k <= i; k++)
-                {
-                    cycleNum[k]++;
-                }               
-            }
-        }
-    }
 
     /*sure.clear();
     for (int i = 0; i < controlFlow.size(); i++)
@@ -1252,6 +1241,26 @@ bool IRFunction::BBisinvalid(int i){
 void IRFunction::JumpThreading(){
     for (int i = 0; i < basicBlocks.size() - 1; i++) {
         IRCode * I = basicBlocks[i].back();
+        if(codes[entrances[i] - 1]->getOperation() == IROperation::GOTO && codes[entrances[i]]->getOperation() != IROperation::ADD_LABEL){
+            for (int j = i + 1; j < entrances.size(); j++)
+                entrances[j] -= basicBlocks[i].size();
+            entrances.erase(entrances.begin() + i);
+            for(int j = 0; j < controlFlow[i].size(); j++){
+                int k = controlFlow[i][j];
+                auto pos = std::find(Pred[k].begin(), Pred[k].end(), i);
+                while( pos  != Pred[k].end()){
+                    Pred[k].erase(pos);
+                    pos = std::find(Pred[k].begin(), Pred[k].end(), i);
+                }
+            }
+            controlFlow.erase(controlFlow.begin() + i);
+            Pred.erase(Pred.begin() + i);
+            codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
+            basicBlocks.erase(basicBlocks.begin() + i);
+            i--;
+            continue;
+        }
+
         if(I->getOperation() == IROperation::BEQZ && codes[entrances[i + 1]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName()){
             basicBlocks[i].erase(basicBlocks[i].end() - 1);
             codes.erase(codes.begin() + entrances[i + 1] - 1);
@@ -1682,6 +1691,17 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
 void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
     int bnum;
     int boff;
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }               
+            }
+        }
+    }
     for(int i = entrance+1; i < entrances.size();i ++){
         entrances[i] ++;
     }
@@ -2257,6 +2277,7 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     case 1:
         basicBlockDivision();
         constFolding();
+        JumpThreading();
         break;
     case 2:
         basicBlockDivision();

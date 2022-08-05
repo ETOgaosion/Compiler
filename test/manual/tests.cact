@@ -1,11 +1,15 @@
 int main()
 {
     int n = 0, result;
-    if(n > 1)
+    if(n > 1){
         result = 999 * 2000;
-    else {
+        print_int(result);
+    }else {
         result = 1 + 2 * 8 + 100 - 9999 + 10000/5;
+        print_int(result);
         n = result + 1000;
+        print_int(n);
     }
+    print_int(n);
     return 0;
 }
