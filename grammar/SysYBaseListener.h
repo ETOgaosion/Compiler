@@ -50,8 +50,11 @@ public:
   virtual void enterVarDef(SysYParser::VarDefContext * /*ctx*/) override { }
   virtual void exitVarDef(SysYParser::VarDefContext * /*ctx*/) override { }
 
-  virtual void enterInitVal(SysYParser::InitValContext * /*ctx*/) override { }
-  virtual void exitInitVal(SysYParser::InitValContext * /*ctx*/) override { }
+  virtual void enterInitValofVar(SysYParser::InitValofVarContext * /*ctx*/) override { }
+  virtual void exitInitValofVar(SysYParser::InitValofVarContext * /*ctx*/) override { }
+
+  virtual void enterInitValofArray(SysYParser::InitValofArrayContext * /*ctx*/) override { }
+  virtual void exitInitValofArray(SysYParser::InitValofArrayContext * /*ctx*/) override { }
 
   virtual void enterFuncDef(SysYParser::FuncDefContext * /*ctx*/) override { }
   virtual void exitFuncDef(SysYParser::FuncDefContext * /*ctx*/) override { }

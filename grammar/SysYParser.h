@@ -260,14 +260,33 @@ public:
     std::vector<std::string> vals;
     IRValue* value;
     InitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExpContext *exp();
-    std::vector<InitValContext *> initVal();
-    InitValContext* initVal(size_t i);
+   
+    InitValContext() = default;
+    void copyFrom(InitValContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
 
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  InitValofVarContext : public InitValContext {
+  public:
+    InitValofVarContext(InitValContext *ctx);
+
+    ExpContext *exp();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-   
+  };
+
+  class  InitValofArrayContext : public InitValContext {
+  public:
+    InitValofArrayContext(InitValContext *ctx);
+
+    std::vector<InitValContext *> initVal();
+    InitValContext* initVal(size_t i);
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };
 
   InitValContext* initVal();

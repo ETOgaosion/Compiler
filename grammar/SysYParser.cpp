@@ -715,35 +715,61 @@ SysYParser::InitValContext::InitValContext(ParserRuleContext *parent, size_t inv
   : ParserRuleContext(parent, invokingState) {
 }
 
-SysYParser::ExpContext* SysYParser::InitValContext::exp() {
-  return getRuleContext<SysYParser::ExpContext>(0);
-}
-
-std::vector<SysYParser::InitValContext *> SysYParser::InitValContext::initVal() {
-  return getRuleContexts<SysYParser::InitValContext>();
-}
-
-SysYParser::InitValContext* SysYParser::InitValContext::initVal(size_t i) {
-  return getRuleContext<SysYParser::InitValContext>(i);
-}
-
 
 size_t SysYParser::InitValContext::getRuleIndex() const {
   return SysYParser::RuleInitVal;
 }
 
-void SysYParser::InitValContext::enterRule(tree::ParseTreeListener *listener) {
-  auto parserListener = dynamic_cast<SysYListener *>(listener);
-  if (parserListener != nullptr)
-    parserListener->enterInitVal(this);
+void SysYParser::InitValContext::copyFrom(InitValContext *ctx) {
+  ParserRuleContext::copyFrom(ctx);
+  this->outside = ctx->outside;
+  this->type = ctx->type;
+  this->shape = ctx->shape;
+  this->isArray = ctx->isArray;
+  this->vals = ctx->vals;
+  this->value = ctx->value;
 }
 
-void SysYParser::InitValContext::exitRule(tree::ParseTreeListener *listener) {
-  auto parserListener = dynamic_cast<SysYListener *>(listener);
-  if (parserListener != nullptr)
-    parserListener->exitInitVal(this);
+//----------------- InitValofVarContext ------------------------------------------------------------------
+
+SysYParser::ExpContext* SysYParser::InitValofVarContext::exp() {
+  return getRuleContext<SysYParser::ExpContext>(0);
 }
 
+SysYParser::InitValofVarContext::InitValofVarContext(InitValContext *ctx) { copyFrom(ctx); }
+
+void SysYParser::InitValofVarContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<SysYListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterInitValofVar(this);
+}
+void SysYParser::InitValofVarContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<SysYListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitInitValofVar(this);
+}
+//----------------- InitValofArrayContext ------------------------------------------------------------------
+
+std::vector<SysYParser::InitValContext *> SysYParser::InitValofArrayContext::initVal() {
+  return getRuleContexts<SysYParser::InitValContext>();
+}
+
+SysYParser::InitValContext* SysYParser::InitValofArrayContext::initVal(size_t i) {
+  return getRuleContext<SysYParser::InitValContext>(i);
+}
+
+SysYParser::InitValofArrayContext::InitValofArrayContext(InitValContext *ctx) { copyFrom(ctx); }
+
+void SysYParser::InitValofArrayContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<SysYListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterInitValofArray(this);
+}
+void SysYParser::InitValofArrayContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<SysYListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitInitValofArray(this);
+}
 SysYParser::InitValContext* SysYParser::initVal() {
   InitValContext *_localctx = _tracker.createInstance<InitValContext>(_ctx, getState());
   enterRule(_localctx, 16, SysYParser::RuleInitVal);
@@ -763,6 +789,7 @@ SysYParser::InitValContext* SysYParser::initVal() {
       case SysYParser::Ident:
       case SysYParser::IntConst:
       case SysYParser::FloatConst: {
+        _localctx = dynamic_cast<InitValContext *>(_tracker.createInstance<SysYParser::InitValofVarContext>(_localctx));
         enterOuterAlt(_localctx, 1);
         setState(158);
         exp();
@@ -770,6 +797,7 @@ SysYParser::InitValContext* SysYParser::initVal() {
       }
 
       case SysYParser::T__8: {
+        _localctx = dynamic_cast<InitValContext *>(_tracker.createInstance<SysYParser::InitValofArrayContext>(_localctx));
         enterOuterAlt(_localctx, 2);
         setState(159);
         match(SysYParser::T__8);
