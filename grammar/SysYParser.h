@@ -258,7 +258,7 @@ public:
     std::vector<std::size_t> shape;
     bool isArray;
     std::vector<std::string> vals;
-    IRValue* value;
+    IROperand* value;
     InitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     InitValContext() = default;
