@@ -3,7 +3,6 @@ int main()
     int n = 0, result;
     if(n > 1){
         result = 999 * 2000;
-        print_int(result);
     }else {
         result = 1 + 2 * 8 + 100 - 9999 + 10000/5;
         print_int(result);

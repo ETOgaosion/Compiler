@@ -78,6 +78,7 @@ public:
     /*Constant propagation*/
     void def_use_list();
     int Replacewith(IRCode *I, IROperand *val);
+    void EraseBB(int i);
     void constFolding();
     /*Common subexpression extraction*/
     void CSE();
