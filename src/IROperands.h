@@ -84,6 +84,8 @@ public:
     virtual void genTargetValue(TargetCodes *t) const {};
     virtual void genTargetGlobalValue(TargetCodes *t) const {};
 
+    /*figure out which basic block is used when operand is defined*/
+    int which_bb;
 };
 
 class IRLabel : public IROperand {

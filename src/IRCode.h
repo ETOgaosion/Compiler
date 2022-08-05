@@ -48,6 +48,8 @@ public:
 
     IRCode(IROperation newOp, IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
 
+    std::vector<IRCode *> use;
+
     IROperation getOperation() const { return operation; };
 
     IROperand *getArg1() const { return arg1; };
@@ -73,6 +75,9 @@ public:
     static bool isAssignmentOperation(IROperation inOperation);
 
     static bool isTwoArgAssignmentOperation(IROperation inOperation);
+
+    static bool isOrderIndependentOperation(IROperation inOperation);
+
 };
 
 //!!!!!!!! consider immediate and metaDataType when generating target code !!!!!!!!!!

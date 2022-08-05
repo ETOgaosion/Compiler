@@ -9,7 +9,29 @@
 
 using namespace std;
 
-vector<size_t> Tools::sort_indexes(const vector<int> &v) {
+template<typename T>
+bool Tools::arrayCmp(vector<T> a, vector<T> b) {
+    if (a.size() > b.size()) {
+        return true;
+    }
+    else if (a.size() < b.size()) {
+        return false;
+    }
+    else {
+        bool hasLarger = false;
+        for (int i = 0; i < a.size(); i++) {
+            if (a[i] < b[i]) {
+                return false;
+            }
+            else if (a[i] > b[i]) {
+                hasLarger = true;
+            }
+        }
+        return hasLarger;
+    }
+}
+
+vector<size_t> Tools::sortIndexes(const vector<int> &v) {
     // initialize original index locations
     vector<size_t> idx(v.size());
     iota(idx.begin(), idx.end(), 0);

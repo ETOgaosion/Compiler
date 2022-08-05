@@ -62,16 +62,6 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
                 }
             }
                 break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                if(op == IROperation::ADD) {
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_d));
-                }
-                else if (op == IROperation::SUB) {
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_d));
-                }
-            }
-                break;
             default:
                 break;
         }
@@ -94,44 +84,6 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
                     retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a - val_b_f));
             }
                 break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_d));
-                else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_d));
-            }
-                break;
-            default:
-                break;
-        }
-    } else if (type1 == MetaDataType::DOUBLE){
-        double val_a = stod(op1->getValue());
-        switch(type2){
-            case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
-                if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_i));
-                else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_i));
-            }
-                break;
-            case MetaDataType::FLOAT: {
-                float val_b_f = stof(op2->getValue());
-                if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_f));
-                else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_f));
-            }
-                break;
-            case MetaDataType::DOUBLE: {
-                double val_b_d = stod(op2->getValue());
-                if(op == IROperation::ADD)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a + val_b_d));
-                else if (op == IROperation::SUB)
-                    retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a - val_b_d));
-            }
-                break;
             default:
                 break;
         }
@@ -151,10 +103,6 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
         float val_a = stof(op1->getValue());
         float val_b = stof(op2->getValue());
         retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a * val_b));
-    } else if (type1 == MetaDataType::DOUBLE){
-        double val_a = stod(op1->getValue());
-        double val_b = stod(op2->getValue());
-        retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a * val_b));
     }
     return retVal;
 }
@@ -171,10 +119,6 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
         float val_a = stof(op1->getValue());
         float val_b = stof(op2->getValue());
         retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a / val_b));
-    } else if (type1 == MetaDataType::DOUBLE){
-        double val_a = stod(op1->getValue());
-        double val_b = stod(op2->getValue());
-        retVal = ir->addImmValue(MetaDataType::DOUBLE, to_string(val_a / val_b));
     }
     return retVal;
 }
@@ -188,27 +132,27 @@ IRValue* IRFunction::immCmp(IROperand* op1, IROperand* op2, IROperation op){
         switch(op){
             case IROperation::SLT:
                 if(val_a < val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             case IROperation::SGT:
                 if(val_a > val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             case IROperation::SLEQ:
                 if(val_a <= val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             case IROperation::SGEQ:
                 if(val_a >= val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             default:
                 break;
@@ -219,58 +163,27 @@ IRValue* IRFunction::immCmp(IROperand* op1, IROperand* op2, IROperation op){
         switch(op){
             case IROperation::SLT:
                 if(val_a < val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             case IROperation::SGT:
                 if(val_a > val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             case IROperation::SLEQ:
                 if(val_a <= val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             case IROperation::SGEQ:
                 if(val_a >= val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "1", {}, false);
                 else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
-                break;
-            default:
-                break;
-        }
-    } else if (type == MetaDataType::DOUBLE) {
-        double val_a = stod(op1->getValue());
-        double val_b = stod(op2->getValue());
-        switch(op){
-            case IROperation::SLT:
-                if(val_a < val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
-                break;
-            case IROperation::SGT:
-                if(val_a > val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
-                break;
-            case IROperation::SLEQ:
-                if(val_a <= val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
-                break;
-            case IROperation::SGEQ:
-                if(val_a >= val_b)
-                    retVal = new IRValue(MetaDataType::BOOL, "1", {}, false);
-                else
-                    retVal = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    retVal = new IRValue(MetaDataType::INT, "0", {}, false);
                 break;
             default:
                 break;
@@ -298,6 +211,47 @@ void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp
     }
 }
 
+void IRFunction::def_use_list(){
+    for (int i = 0; i < codes.size(); i++) {
+            IRCode *code = codes[i];
+            code->use.clear();
+            IROperand *res = code->getResult();
+            for (int j = i + 1; j < codes.size(); j++)
+                if(codes[j]->getArg1() == res || codes[j]->getArg2() == res)
+                    code->use.push_back(codes[j]);
+    }
+}
+
+int IRFunction::Replacewith(IRCode* I, IROperand* val){
+    //int count = 0;
+    if (I->use.empty())
+    {
+        ;
+    }
+    else
+    {
+        IROperand *res = I->getResult();
+        for (int i = 0; i < I->use.size(); i++)
+        {
+            IRCode* UI = I->use[i];
+            if(UI->getOperation() == IROperation::CALL)
+                continue;
+            if(UI->getOperation() == IROperation::ASSIGN_ARRAY_ELEM && res == UI->getArg1())
+                continue;
+            if(UI->getOperation() == IROperation::REPLACE){
+                //count++;
+                continue;
+            }
+
+            if(UI->getArg1() == res)
+                UI->setArg1(val);
+            if(UI->getArg2() == res)
+                UI->setArg2(val);
+        }
+    }
+    return 0;
+}
+
 void IRFunction::constFolding() {
     for(int bnum = 0; bnum < basicBlocks.size(); bnum++) {
         auto block = basicBlocks[bnum]; 
@@ -314,7 +268,7 @@ void IRFunction::constFolding() {
                 if(arg1->getOperandType() != OperandType::VALUE)
                     continue;
 
-                for(int j = i + 1; j < block.size(); j++){
+                /*for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
@@ -329,24 +283,26 @@ void IRFunction::constFolding() {
                         }
                         // substitute res to arg1 (immValue)
                         substituteUseOp(new_code, arg1, res, new_op);
-                }
-                // block.erase(block.begin() + i);
-                // codes.erase(codes.begin() + entrances[bnum] + i);
-                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                //     entrances[k]--;
+                }*/
+                Replacewith(code, arg1);
+                block.erase(block.begin() + i);
+                codes.erase(codes.begin() + entrances[bnum] + i);
+                for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                    entrances[k]--;
                 // delete code;
-                // i--;
+                i--;
+
                 continue;
             } else if (op == IROperation::NOT) {
                 if(arg1->getOperandType() != OperandType::VALUE)
                     continue;
                 IRValue* new_value = nullptr;
                 if(arg1->getValue() == "1")
-                    new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                    new_value = new IRValue(MetaDataType::INT, "0", {}, false);
                 else if(arg1->getValue() == "0")
-                    new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                    new_value = new IRValue(MetaDataType::INT, "1", {}, false);
 
-                if(new_value){
+                /*if(new_value){
                     for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
@@ -361,13 +317,17 @@ void IRFunction::constFolding() {
                         // substitute res to new_value
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
+                }*/
+                if(new_value){
+                    Replacewith(code, new_value);
+                    block.erase(block.begin() + i);
+                    codes.erase(codes.begin() + entrances[bnum] + i);
+                    for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    // delete code;
+                    i--;
                 }
-                // block.erase(block.begin() + i);
-                // codes.erase(codes.begin() + entrances[bnum] + i);
-                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                //     entrances[k]--;
-                // delete code;
-                // i--;
+
                 continue;
             } else if (op == IROperation::NEG) {
                 if(arg1->getOperandType() != OperandType::VALUE)
@@ -384,14 +344,9 @@ void IRFunction::constFolding() {
                         new_value = ir->addImmValue(MetaDataType::FLOAT, std::to_string(0 - val));
                         break;
                     }
-                    case MetaDataType::DOUBLE:{
-                        double val = stod(arg1->getValue());
-                        new_value = ir->addImmValue(MetaDataType::DOUBLE, std::to_string(0 - val));
-                        break;
-                    }
                 }
 
-                if(new_value){
+                /*if(new_value){
                     for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
@@ -406,13 +361,17 @@ void IRFunction::constFolding() {
                         // substitute res to new_value
                         substituteUseOp(new_code, new_value, res, new_op);
                     }
+                }*/
+                if(new_value){
+                    Replacewith(code, new_value);
+                    block.erase(block.begin() + i);
+                    codes.erase(codes.begin() + entrances[bnum] + i);
+                    for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    // delete code;
+                    i--;
                 }
-                // block.erase(block.begin() + i);
-                // codes.erase(codes.begin() + entrances[bnum] + i);
-                // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                //     entrances[k]--;
-                // delete code;
-                // i--;
+
                 continue;
             } else if (op == IROperation::BEQZ) {
                 if(arg1->getOperandType() != OperandType::VALUE)
@@ -449,30 +408,30 @@ void IRFunction::constFolding() {
                     new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
                 } else if (op == IROperation::OR) {
                     if(arg1->getValue() == "1" || arg2->getValue() == "1")
-                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "1", {}, false);
                     else 
-                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "0", {}, false);
                 } else if (op == IROperation::AND) {
                     if(arg1->getValue() == "1" && arg2->getValue() == "1")
-                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "1", {}, false);
                     else 
-                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "0", {}, false);
                 } else if (op == IROperation::SEQ) {
                     if(arg1->getValue() == arg2->getValue())
-                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "1", {}, false);
                     else   
-                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "0", {}, false);
                 } else if (op == IROperation::SNE) {
                     if(arg1->getValue() != arg2->getValue())
-                        new_value = new IRValue(MetaDataType::BOOL, "1", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "1", {}, false);
                     else   
-                        new_value = new IRValue(MetaDataType::BOOL, "0", {}, false);
+                        new_value = new IRValue(MetaDataType::INT, "0", {}, false);
                 } else {
                     new_value = immCmp(arg1, arg2, op);
                 }
 
                 if(new_value){
-                    for(int j = i + 1; j < block.size(); j++){
+                    /*for(int j = i + 1; j < block.size(); j++){
                         IRCode* new_code = block[j];
                         IROperation new_op = new_code->getOperation();
                         // break at next def
@@ -488,25 +447,22 @@ void IRFunction::constFolding() {
                     }
 
                     switch(new_value->getMetaDataType()){
-                        case MetaDataType::BOOL:
-                            codes[entrances[bnum] + i] = new IRAssignB(res, new_value);
-                            break;
                         case MetaDataType::INT:
                             codes[entrances[bnum] + i] = new IRAssignI(res, new_value);
                             break;
                         case MetaDataType::FLOAT:
                             codes[entrances[bnum] + i] = new IRAssignF(res, new_value);
                             break;
-                        case MetaDataType::DOUBLE:
-                            codes[entrances[bnum] + i] = new IRAssignD(res, new_value);
-                            break;
-                    }
-                    // block.erase(block.begin() + i);
-                    // codes.erase(codes.begin() + entrances[bnum] + i);
-                    // for(int k = bnum + 1; k < basicBlocks.size(); k++)
-                    //     entrances[k]--;
+                    }*/
+                    
+                    Replacewith(code, new_value);
+                    block.erase(block.begin() + i);
+                    codes.erase(codes.begin() + entrances[bnum] + i);
+                    for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
                     // delete code;
-                    // i--;
+                    i--;
+                
                 }
 
             } else if (arg1->getOperandType() == OperandType::VALUE || arg2->getOperandType() == OperandType::VALUE) {
@@ -536,9 +492,6 @@ void IRFunction::constFolding() {
                                 case MetaDataType::FLOAT:
                                     codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), var_arg, new_value);
                                     break;
-                                case MetaDataType::DOUBLE:
-                                    codes[entrances[bnum] + j] = new IRAddD(new_code->getResult(), var_arg, new_value);
-                                    break;
                             }
                             
                         } else if (op == IROperation::SUB) {
@@ -551,9 +504,6 @@ void IRFunction::constFolding() {
                                 case MetaDataType::FLOAT:
                                     codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), var_arg, new_value);
                                     break;
-                                case MetaDataType::DOUBLE:
-                                    codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), var_arg, new_value);
-                                    break;
                                 }
                             } else { // origin code: arg2 is var
                                 IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
@@ -563,9 +513,6 @@ void IRFunction::constFolding() {
                                     break;
                                 case MetaDataType::FLOAT:
                                     codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), new_value, var_arg);
-                                    break;
-                                case MetaDataType::DOUBLE:
-                                    codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), new_value, var_arg);
                                     break;
                                 }                          
                             }
@@ -602,12 +549,6 @@ void IRFunction::constFolding() {
                                     else
                                         codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), new_value, var_arg);
                                     break;
-                                case MetaDataType::DOUBLE:
-                                    if(new_op == IROperation::ADD)
-                                        codes[entrances[bnum] + j] = new IRSubD(new_code->getResult(), new_value, var_arg);
-                                    else
-                                        codes[entrances[bnum] + j] = new IRAddD(new_code->getResult(), new_value, var_arg);
-                                    break;
                                 } 
                             }
                         } else if (op == IROperation::MUL) {
@@ -620,6 +561,123 @@ void IRFunction::constFolding() {
                     }
                 }
             }
+        }
+    }
+}
+
+void IRFunction::CSE(){
+    def_use_list();
+    for(int i = 0;i < basicBlocks.size();i ++){
+        for(int j = 0;j < basicBlocks[i].size();j ++){
+            if(basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->getResult()->which_bb = i;
+            }
+        }
+    }
+
+    dom.clear();
+    dom.emplace_back(1, 0);
+
+    std::vector<int> all;
+    all.clear();
+    for (int i = 0; i < basicBlocks.size(); i++)
+        all.push_back(i);
+    
+    for (int i = 1; i < basicBlocks.size(); i++)
+        dom.push_back(all);
+
+    bool change = true;
+    while(change){
+        change = false;
+        for (int i = 1; i < basicBlocks.size(); i++)
+        {
+            if (Pred[i].size() == 1)
+            {
+                dom[i].clear();
+                std::vector<int> tmp = vector<int>(1, i);
+                std::vector<int> res;
+                set_union(dom[Pred[i][0]].begin(), dom[Pred[i][0]].end(), tmp.begin(), tmp.end(), back_inserter(res));
+                sort(res.begin(), res.end());
+                sort(dom[i].begin(), dom[i].end());
+                if(res != dom[i]){
+                    dom[i].assign(res.begin(), res.end());
+                    change = true;
+                }
+            }
+            else if (Pred[i].size() > 1)
+            {
+                std::vector<int> tmp = dom[Pred[i][0]];
+                std::vector<int> res;
+                for (int j = 1; j < Pred[i].size(); j++)
+                {
+                    res.clear();
+                    set_intersection(tmp.begin(), tmp.end(), dom[Pred[i][j]].begin(), dom[Pred[i][j]].end(), back_inserter(res));
+                    tmp.assign(res.begin(), res.end());
+                }
+
+                std::vector<int> tmp2 = vector<int>(1, i);
+                res.clear();
+                set_union(tmp.begin(), tmp.end(), tmp2.begin(), tmp2.end(), back_inserter(res));
+                sort(res.begin(), res.end());
+                sort(dom[i].begin(), dom[i].end());
+                if(res != dom[i]){
+                    dom[i].assign(res.begin(), res.end());
+                    change = true;
+                }
+
+            }
+        }
+    }
+
+    std::vector<IRCode *> record;
+    record.clear();
+    for (int i = 0; i < codes.size(); i++)
+    {
+        IRCode *I = codes[i];
+        IRCode *toRep = nullptr;
+        int match = 0;
+        IROperand* op1 = I->getArg1();
+        IROperand* op2 = I->getArg2();
+        IROperand *re = I->getResult();
+        IROperation op = I->getOperation();
+        if (record.empty())
+            ;
+        else
+            for (int j = 0; j < record.size(); j++)
+            {
+                IROperand* ar1 = record[j]->getArg1();
+                IROperand* ar2 = record[j]->getArg2();
+                IROperand* res = record[j]->getResult();
+                IROperation opr = record[j]->getOperation();
+                auto pos = std::find(dom[re->which_bb].begin(), dom[re->which_bb].end(), res->which_bb);
+                if(pos == dom[re->which_bb].end())
+                    continue;
+                if (op == opr && IRCode::isTwoArgAssignmentOperation(op))
+                    if(op1 == ar1 && op2 == ar2)
+                        match = 1;
+                    else if(IRCode::isOrderIndependentOperation(op) && op1 == ar2 && op2 == ar1)
+                        match = 1;
+                if(match){
+                    toRep = record[j];
+                    break;
+                }
+            }
+        
+        if(match){
+            Replacewith(I, toRep->getResult());
+            int bnum;
+            for (bnum = 0; bnum < basicBlocks.size(); bnum++)
+                if(entrances[bnum]> i){
+                    bnum--;
+                    break;
+                }
+            auto block = basicBlocks[bnum];
+            block.erase(block.begin() + i - entrances[bnum]);
+            codes.erase(codes.begin() + i);
+            for(int k = bnum + 1; k < basicBlocks.size(); k++)
+                entrances[k]--;
+        }else if(IRCode::isTwoArgAssignmentOperation(op)){
+            record.push_back(I);
         }
     }
 }
@@ -640,7 +698,7 @@ void IRFunction::addOperandToVec(vector<IROperand*>& vars, IROperand* op){
         vars.push_back(op);
 }
 
-void IRFunction::usedefVarsAnalysis() {
+void IRFunction::useDefVarsAnalysis() {
     for(int i = 0; i < basicBlocks.size(); i++) {
         auto block = basicBlocks[i];
         std::vector<IROperand*> use;
@@ -727,19 +785,14 @@ bool IRFunction::cmpTwoInVars(vector<IROperand*> & vec1, vector<IROperand*> & ve
     if (vec1.size() != vec2.size()) {
         return false;
     }
-    for(IROperand* var : vec2){
-        auto it = find(vec1.begin(), vec1.end(), var);
-        if(it == vec1.end()){ // var is not in vec1
-            return false;
-        }
-        // vec1.erase(it);
-    }
-    return true;
+    sort(vec1.begin(), vec1.end());
+    sort(vec2.begin(), vec2.end());
+    return vec1 == vec2;
 } 
 
 void IRFunction::liveVarAnalysis() {
     bool changed;
-    usedefVarsAnalysis();
+    useDefVarsAnalysis();
     inVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
     outVars = std::vector<std::vector<IROperand*>>(basicBlocks.size(), std::vector<IROperand*>());
 
@@ -1073,12 +1126,27 @@ void IRFunction::basicBlockDivision() {
     }
     entrances.push_back(codes.size());
     for (int i = 0; i < entrances.size() - 1; i++) {
+        /*
+        for(int j = entrances[i];j < entrances[i+1];j++){
+            codes[j]->getResult()->which_bb = i;
+        }
+        */
         basicBlocks.emplace_back(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
     }
     entrances.pop_back();
-    for (int i = 0; i < basicBlocks.size(); i++) {
-        controlFlow.emplace_back(1, i + 1);
-        for (auto & j : basicBlocks[i]) {
+
+    for(int i = 0; i < basicBlocks.size(); i++)
+        Pred.push_back(vector<int>());
+
+    for (int i = 0; i < basicBlocks.size(); i++)
+    {
+        if(codes[entrances[i+1]-1]->getOperation() != IROperation::GOTO)
+            controlFlow.emplace_back(1, i + 1);
+        else
+            controlFlow.push_back(vector<int>());
+            
+        for (auto &j : basicBlocks[i])
+        {
             if (j->getOperation() == IROperation::BEQZ || j->getOperation() == IROperation::GOTO) {
                 for (int k = 0; k < entrances.size(); k++) {
                     if (codes[entrances[k]]->getOperation() != IROperation::ADD_LABEL) {
@@ -1086,9 +1154,11 @@ void IRFunction::basicBlockDivision() {
                     }
                     if (j->getOperation() == IROperation::BEQZ && codes[entrances[k]]->getArg1()->getSymbolName() == j->getArg2()->getSymbolName()) {
                         controlFlow.back().push_back(k);
+                        Pred[k].push_back(i);
                     }
                     else if (j->getOperation() == IROperation::GOTO && codes[entrances[k]]->getArg1()->getSymbolName() == j->getArg1()->getSymbolName()) {
                         controlFlow.back().push_back(k);
+                        Pred[k].push_back(i);
                     }
                 }
             }
@@ -1098,8 +1168,582 @@ void IRFunction::basicBlockDivision() {
     for (int i = 0; i < controlFlow.size(); i++) {
         for (int j : controlFlow[i]) {
             if (j <= i) {
-                for (int k = j; k <= i; k++) {
+                for (int k = j; k <= i; k++)
+                {
                     cycleNum[k]++;
+                }               
+            }
+        }
+    }
+
+    /*sure.clear();
+    for (int i = 0; i < controlFlow.size(); i++)
+        sure.push_back(0);
+    
+    sure[0] = 1;
+    for (int i = 0; i < controlFlow.size(); i++)
+    {
+        if(controlFlow[i].size == 1)
+            sure[controlFlow[i][0]] |= sure[i];
+        else if(controlFlow[i].size > 1)
+            for (int j : controlFlow[i])
+            {
+                sure[controlFlow[i][j]] |= 0;
+            }
+    }*/
+}
+
+struct loopinfo* IRFunction::updateloop(int first, int end, int base){
+    int now = base;
+    for (int i = first; i < end; i++)
+    {
+        int layer = cycleNum[i];
+        if (layer > now && layer == base + 1)
+        {
+            now = cycleNum[i];
+            struct loopinfo in;
+            in.subloop.clear();
+            in.cyclelayer = cycleNum[i];
+            in.handled = 0;
+            in.start = i;
+            for (int j = i; j < end; j++){
+                if(cycleNum[j] > now)
+                    in.subloop.push_back(updateloop(j, end, now));
+                else if (cycleNum[j] < now)
+                {
+                    in.end = j - 1;
+                    break;
+                }
+                else if (j == end - 1)
+                    in.end = j;
+            }
+
+            in.pred = Pred[i];
+            for (int k = in.start; k <= in.end; k++){
+                auto pos = std::find(in.pred.begin(), in.pred.end(), k);
+                while(pos != in.pred.end()){
+                    in.pred.erase(pos);
+                    pos = std::find(in.pred.begin(), in.pred.end(), k);
+                }
+            }
+
+            loop.push_back(in);
+        }else if(base && layer <= base)
+            break;
+        else if(layer < now)
+            now = layer;
+    }
+    if(!loop.empty())
+        return &loop.back();
+    else
+        return nullptr;
+}
+
+bool IRFunction::BBisinvalid(int i){
+    for(auto &j: basicBlocks[i]){
+        IROperation op = j->getOperation();
+        if (op != IROperation::ADD_LABEL && op != IROperation::GOTO && op != IROperation::BEQZ)
+            return false;
+    }
+
+    return true;
+}
+
+void IRFunction::JumpThreading(){
+    for (int i = 0; i < basicBlocks.size() - 1; i++) {
+        IRCode * I = basicBlocks[i].back();
+        if(I->getOperation() == IROperation::BEQZ && codes[entrances[i + 1]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName()){
+            basicBlocks[i].erase(basicBlocks[i].end() - 1);
+            codes.erase(codes.begin() + entrances[i + 1] - 1);
+            for(int k = i + 1; k < basicBlocks.size(); k++)
+                entrances[k]--;
+        }
+
+        if(I->getOperation() == IROperation::BEQZ && I->getArg1()->getOperandType() == OperandType::VALUE){
+            if(stoi(I->getArg1()->getValue()) == 0){
+                IRGoto* newcode = new IRGoto(I->getArg2());
+                basicBlocks[i].pop_back();
+                codes.erase(codes.begin() + entrances[i + 1] - 1);
+                basicBlocks[i].push_back(newcode);
+                codes.insert(codes.begin() + entrances[i + 1] - 1, newcode);
+
+                auto pos = std::find(controlFlow[i].begin(),controlFlow[i].end(), i + 1);
+                while( pos  != controlFlow[i].end()){
+                    controlFlow[i].erase(pos);
+                    pos = std::find(controlFlow[i].begin(), controlFlow[i].end(), i + 1);
+                }
+                pos = std::find(Pred[i + 1].begin(),Pred[i + 1].end(), i);
+                while( pos  != Pred[i + 1].end()){
+                    Pred[i + 1].erase(pos);
+                    pos = std::find(Pred[i + 1].begin(), Pred[i + 1].end(), i);
+                }
+            }
+            else
+            {
+                basicBlocks[i].erase(basicBlocks[i].end() - 1);
+                codes.erase(codes.begin() + entrances[i + 1] - 1);
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k]--;
+
+                int tar;
+                for (int j = 0; j < controlFlow[i].size(); j++)
+                {
+                    tar = controlFlow[i][j];
+                    if (codes[entrances[tar]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName())
+                        break;
+                    else
+                        tar = -1;
+                }
+
+                if(tar >= 0){
+                    auto pos = std::find(controlFlow[i].begin(),controlFlow[i].end(), tar);
+                    while( pos  != controlFlow[i].end()){
+                        controlFlow[i].erase(pos);
+                        pos = std::find(controlFlow[i].begin(), controlFlow[i].end(), tar);
+                    }
+                    pos = std::find(Pred[tar].begin(), Pred[tar].end(), i);
+                    while( pos  != Pred[tar].end()){
+                        Pred[i + 1].erase(pos);
+                        pos = std::find(Pred[tar].begin(), Pred[tar].end(), i);
+                    }
+                }
+            }
+        }
+
+        if(I->getOperation() != IROperation::GOTO && I->getOperation() != IROperation::BEQZ){
+            
+            if(Pred[i + 1].size() == 1 && Pred[i+1].back() == i){
+                if(codes[entrances[i + 1]]->getOperation() == IROperation::ADD_LABEL){
+                    basicBlocks[i + 1].erase(basicBlocks[i + 1].begin());
+                    codes.erase(codes.begin() + entrances[i + 1]);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                }
+                /*
+                for(int k = entrances[i+1];k < codes.size();k++){
+                    if(codes[k]->getResult())
+                        codes[k]->getResult()->which_bb --;
+                }
+                */
+                basicBlocks[i].insert(basicBlocks[i].end(), basicBlocks[i + 1].begin(), basicBlocks[i + 1].end());
+                basicBlocks.erase(basicBlocks.begin() + i + 1);
+                entrances.erase(entrances.begin() + i + 1);
+                Pred.erase(Pred.begin() + i + 1);
+                controlFlow[i].erase(controlFlow[i].begin());
+                controlFlow[i].insert(controlFlow[i].end(), controlFlow[i + 1].begin(), controlFlow[i + 1].end());
+                controlFlow.erase(controlFlow.begin() + i + 1);
+            }
+        }else if(I->getOperation() == IROperation::GOTO){
+            int tar = -1;
+            int tmp = controlFlow[i].back();
+            if (codes[entrances[tmp]]->getArg1()->getSymbolName() == I->getArg1()->getSymbolName())
+            {
+                tar = tmp;
+            }
+
+            if(tar >= 0 && Pred[tar].size() == 1 && Pred[tar].back() == i){
+                if(codes[entrances[tar]]->getOperation() == IROperation::ADD_LABEL){
+                    basicBlocks[tar].erase(basicBlocks[tar].begin());
+                    codes.erase(codes.begin() + entrances[tar]);
+                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                }
+                //delete GOTO
+                basicBlocks[i].erase(basicBlocks[i].begin() + basicBlocks[i].size() - 1);
+                codes.erase(codes.begin() + entrances[i] + basicBlocks[i].size() - 1);
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k]--;
+                //move code
+                /*
+                for(int k = 0; k < basicBlocks[tar].size(); k++)
+                {
+                    if(basicBlocks[tar][k]->getResult()){
+                        basicBlocks[tar][k]->getResult()->which_bb = i;
+                    }
+                }
+                for(int k = entrances[tar + 1];k < codes.size();k ++){
+                    if(codes[k]->getResult()){
+                        codes[k]->getResult()->which_bb --;
+                    }
+                }
+                */
+                codes.insert(codes.begin() + entrances[i + 1], basicBlocks[tar].begin(), basicBlocks[tar].end());
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k] += basicBlocks[tar].size();
+                codes.erase(codes.begin() + entrances[tar], codes.begin() + entrances[tar] + basicBlocks[tar].size());
+                for(int k = tar + 1; k < basicBlocks.size(); k++)
+                    entrances[k] -= basicBlocks[tar].size();
+                
+                basicBlocks[i].insert(basicBlocks[i].end(), basicBlocks[tar].begin(), basicBlocks[tar].end());
+                basicBlocks.erase(basicBlocks.begin() + tar);
+                entrances.erase(entrances.begin() + tar);
+                Pred.erase(Pred.begin() + tar);
+                controlFlow[i].pop_back();
+                controlFlow[i].insert(controlFlow[i].end(), controlFlow[tar].begin(), controlFlow[tar].end());
+                controlFlow.erase(controlFlow.begin() + tar);
+
+                if(i >= tar)
+                    i--;
+            }
+            else if (basicBlocks[i].size() > 1 && BBisinvalid(i))
+            {
+                int tar = controlFlow[i].back();
+                for (int k = 0; k < Pred[i].size(); k++)
+                {
+                    int tmp = Pred[i][k];
+                    IRCode *j = basicBlocks[tmp].back();
+                    if (j->getOperation() == IROperation::BEQZ && codes[entrances[i]]->getArg1()->getSymbolName() == j->getArg2()->getSymbolName()) {
+                        j->setArg2(basicBlocks[i].back()->getArg1());
+                    }
+                    else if (j->getOperation() == IROperation::GOTO && codes[entrances[i]]->getArg1()->getSymbolName() == j->getArg1()->getSymbolName()) {
+                        j->setArg1(basicBlocks[i].back()->getArg1());
+                    }
+
+                    int sign = 0;
+                    auto pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i);
+                    while( pos  != controlFlow[tmp].end()){
+                        if(pos != controlFlow[tmp].end() && !sign){
+                            controlFlow[tmp][pos - controlFlow[tmp].begin()] = tar;
+                            sign = 1;
+                        }
+                        else if(pos != controlFlow[tmp].end() && sign)
+                            controlFlow[tmp].erase(pos);
+                        else
+                            break;
+                        pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i);
+                    }
+                    /*for (int a = 0; a < controlFlow[tmp].size(); a++)
+                    {
+                        int j = controlFlow[tmp][a];
+                        if (j == i){
+                            controlFlow[tmp][a] = tar;
+                            j = tar;
+                        }
+
+                        if(j == tar && !sign)
+                            sign = 1;
+                        else if(j == tar && sign){
+                            controlFlow[tmp].erase(controlFlow[tmp].begin() + a);
+                            a--;
+                        }
+                    }*/
+                }
+                /*
+                for(int k = entrances[i + 1];k < codes.size();k ++){
+                    if(codes[k]->getResult()){
+                        codes[k]->getResult()->which_bb --;
+                    }
+                }
+                */
+                codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i] + basicBlocks[i].size());
+                for(int k = i + 1; k < basicBlocks.size(); k++)
+                    entrances[k] -= basicBlocks[i].size();
+                
+                entrances.erase(entrances.begin() + i);
+                Pred.erase(Pred.begin() + i);
+                controlFlow.erase(controlFlow.begin() + i);
+                
+                basicBlocks[i].clear();
+                basicBlocks.erase(basicBlocks.begin() + i);
+                i--;
+            }
+        }
+    }
+}
+
+struct loopinfo* IRFunction::loopchoose(int i){
+    int first, end;
+    for (first = i; first < basicBlocks.size(); first++)
+        if(cycleNum[first] > 0){
+            int layer = cycleNum[first];
+            for (int k = 0;k < loop.size();k++ )
+            {
+                loopinfo* j = &loop[k];
+                if(j->cyclelayer == layer && j->start == first && !j->handled){
+                    struct loopinfo * tmp = j;
+                    while(!tmp->subloop.empty()){
+                        int pos = 1;
+                        if (!tmp->subloop.front()->handled){
+                            tmp = tmp->subloop.front();
+                            continue;
+                        }
+                        while(tmp->subloop[pos]->handled)
+                        {
+                            pos++;
+                            if(pos >= tmp->subloop.size())
+                                break;
+                        }
+
+                        if(pos >= tmp->subloop.size())
+                            break;
+                        if(!tmp->subloop[pos]->handled){
+                            tmp = tmp->subloop[pos];
+                            continue;
+                        }
+                    }
+
+                    tmp->handled = 1;
+                    return tmp;
+                }
+            }
+        }
+
+    return nullptr;
+}
+
+void IRFunction:: HoistOnLoop(loopinfo * currentloop){
+    /*use recursing to process sub loop*/
+    if(currentloop->subloop.size() > 0){
+        for(int i = 0;i < currentloop->subloop.size();i ++)
+            HoistOnLoop(currentloop->subloop[i]);
+    }
+    /*process this loop*/
+    if(currentloop->pred.size() == 0){
+        /*no prevous basic block, create a new bb*/
+        entrances.insert(entrances.begin()+currentloop->start,entrances[currentloop->start]);
+
+        basicBlocks.insert(basicBlocks.begin() + currentloop->start,{});
+
+        for(int i = 0;i < Pred.size();i++){
+            for(int j = 0;j < Pred[i].size();j ++){
+                if(Pred[i][j] >= currentloop->start){
+                    Pred[i][j] ++;
+                }
+            }
+        }
+        Pred[currentloop->start].push_back(currentloop->start);
+        Pred.insert(Pred.begin() + currentloop->start,{});
+
+        for(int i = 0;i < controlFlow.size();i++){
+            for(int j = 0;j < controlFlow[i].size();j ++){
+                if(controlFlow[i][j] >= currentloop->start){
+                    controlFlow[i][j] ++;
+                }
+            }
+        }
+        controlFlow.insert(controlFlow.begin() + currentloop->start,{});
+        controlFlow[currentloop->start].push_back(currentloop->start+1);
+
+        cycleNum.insert(cycleNum.begin() + currentloop->start, currentloop->cyclelayer - 1);
+
+        int prev_start = currentloop->start;
+        for(int i = 0;i < loop.size();i ++){
+            if(loop[i].start >= prev_start){
+                loop[i].start ++;
+            }
+            if(loop[i].end >= prev_start){
+                loop[i].end ++;
+            }
+            for(int j = 0;j < loop[i].pred.size();j ++){
+                if(loop[i].pred[j] >= prev_start){
+                    loop[i].pred[j] ++;
+                }
+            }
+        }
+        currentloop->pred.push_back(prev_start);
+
+        for(int i = entrances[prev_start+1];i < codes.size();i ++){
+            codes[i]->getResult()->which_bb++;
+        }
+        /*create new bb, process as one prevous bb*/
+    
+    }
+    else if(currentloop->pred.size() == 1){
+        /*one prevous basic block, use this bb*/
+        ;
+    }
+    else{
+        /*two or more prevous, create a new bb, all prev bb flow to this new bb*/
+        /*create a new basic block*/
+        entrances.insert(entrances.begin()+currentloop->start,entrances[currentloop->start]);
+
+        basicBlocks.insert(basicBlocks.begin() + currentloop->start,{});
+
+        for(int i = 0;i < Pred.size();i++){
+            for(int j = 0;j < Pred[i].size();j ++){
+                if(Pred[i][j] >= currentloop->start){
+                    Pred[i][j] ++;
+                }
+            }
+        }
+        //Pred[currentloop->start].push_back(currentloop->start);
+        Pred.insert(Pred.begin() + currentloop->start,{});
+        Pred[currentloop->start].insert(Pred[currentloop->start].end(),currentloop->pred.begin(),currentloop->pred.end());
+        Pred[currentloop->start + 1].push_back(currentloop->start);
+        for(int i = 0;i < Pred[currentloop->start].size();i ++){
+            for(int j = 0;j < Pred[currentloop->start+1].size();j++){
+                if(Pred[currentloop->start][i] == Pred[currentloop->start+1][j]){
+                    Pred[currentloop->start+1].erase(Pred[currentloop->start+1].begin()+j);
+                }
+                if(Pred[currentloop->start][i] > currentloop->start)
+                    currentloop->pred[i]++;
+            }
+        }
+
+        for(int i = 0;i < controlFlow.size();i++){
+            for(int j = 0;j < controlFlow[i].size();j ++){
+                if(controlFlow[i][j] >= currentloop->start ){
+                    controlFlow[i][j] ++;
+                }
+            }
+        }
+
+        int prev_start = currentloop->start;
+        for(int i = 0;i < loop.size();i ++){
+            if(loop[i].start >= prev_start){
+                loop[i].start ++;
+            }
+            if(loop[i].end >= prev_start){
+                loop[i].end ++;
+            }
+            for(int j = 0;j < loop[i].pred.size();j ++){
+                if(loop[i].pred[j] >= prev_start){
+                    loop[i].pred[j] ++;
+                }
+            }
+        }
+
+        controlFlow.insert(controlFlow.begin() + prev_start,{});
+        controlFlow[prev_start].push_back(prev_start+1);
+        for(int i = 0;i < currentloop->pred.size();i ++){
+            for(int j = 0;j < controlFlow[currentloop->pred[i]].size();j ++){
+                if(controlFlow[currentloop->pred[i]][j] == prev_start + 1){
+                    controlFlow[currentloop->pred[i]][j] = prev_start;
+                }
+            }
+        }
+
+        cycleNum.insert(cycleNum.begin() + currentloop->start, currentloop->cyclelayer - 1);
+
+        while(!currentloop->pred.empty()){
+            currentloop->pred.pop_back();
+        }
+
+        currentloop->pred.push_back(prev_start);
+
+        for(int i = entrances[prev_start+1];i < codes.size();i ++){
+            codes[i]->getResult()->which_bb++;
+        }
+
+        /*add label in new bb */
+        IRLabel* newlabel = addLabel();
+        IRAddLabel* newcode = new IRAddLabel(newlabel); 
+        for(int i = prev_start + 1;i < basicBlocks.size();i ++){
+            entrances[i] ++;
+        }
+        basicBlocks[prev_start].push_back(newcode);
+        codes.insert(codes.begin() + entrances[prev_start],newcode);
+        
+        /* make all bbs flowing to currentloop now flow to the new bb*/
+        IRLabel* prevlabel = (IRLabel*) basicBlocks[currentloop->start][0]->getArg1();
+        for(int i = 0; i < Pred[prev_start].size();i ++){
+            int j = basicBlocks[i].size() - 1;
+            if (basicBlocks[i][j]->getOperation() == IROperation::GOTO)
+            {
+                IRLabel* tmplabel = (IRLabel*) basicBlocks[i][j]->getArg1();
+                if(tmplabel == prevlabel){
+                    basicBlocks[i][j]->setArg1(newlabel);
+                }
+            }else if(basicBlocks[i][j]->getOperation() == IROperation::BEQZ){
+                IRLabel* tmplabel = (IRLabel*) basicBlocks[i][j]->getArg2();
+                if(tmplabel == prevlabel){
+                    basicBlocks[i][j]->setArg2(newlabel);
+                }
+            }
+        }
+
+    }
+    /*after adding new basic block before loop, process as one prevous basic block*/
+    for(int bnum = currentloop->start;bnum <= currentloop->end;bnum ++){
+        if(cycleNum[bnum] == currentloop->cyclelayer){
+            for(int cnum = 0; cnum < basicBlocks[bnum].size();cnum ++){
+                if((basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
+                   basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start) &&
+                   (basicBlocks[bnum][cnum]->getArg2()->getOperandType() == OperandType::VALUE ||
+                   basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start) &&
+                   (IRCode::isTwoArgAssignmentOperation(basicBlocks[bnum][cnum]->getOperation()) ||
+                   basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN ||
+                   basicBlocks[bnum][cnum]->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
+                   basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN_ARRAY_ELEM)){
+                    IRCode* tmp = basicBlocks[bnum][cnum];
+                    tmp->getResult()->which_bb = currentloop->pred[0];
+                    Hoist(currentloop,tmp,currentloop->pred[0]);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
+                    codes.erase(codes.begin() + entrances[bnum] + cnum);
+                    for(int k = bnum+1;k < basicBlocks.size();k++)
+                        entrances[k] --;
+                }
+            }
+        }
+    }
+
+}
+
+void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
+    int bnum;
+    int boff;
+    for(int i = entrance+1; i < entrances.size();i ++){
+        entrances[i] ++;
+    }
+    int push_pos = basicBlocks[entrance].size();
+    basicBlocks[entrance].push_back(code_pos);
+    codes.insert(codes.begin()+entrances[entrance]+push_pos,code_pos);
+}
+
+void IRFunction::LICM(){
+    loop.clear();
+    updateloop(0, cycleNum.size(), 0);
+    
+    for(int i = 0;i < basicBlocks.size();i ++){
+        for(int j = 0;j < basicBlocks[i].size();j ++){
+            if(basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->getResult()->which_bb = i;
+            }
+        }
+    }
+    for (int j = 0; j < loop.size(); j++){
+        if(loop[j].cyclelayer == 1)
+            HoistOnLoop(&loop[j]);
+    }
+    for(int i = 0;i < basicBlocks.size();i ++){
+        if(basicBlocks[i].size() == 0){
+            entrances.erase(entrances.begin() + i);
+
+            basicBlocks.erase(basicBlocks.begin() + i);
+
+            for(int j = 0;j < Pred.size();j ++){
+                for(int k = 0;k < Pred[j].size();k ++){
+                    if(Pred[j][k] >= i){
+                        Pred[j][k] --;
+                    }
+                }
+            }
+            Pred[i+1].insert(Pred[i+1].end(),Pred[i].begin(),Pred[i].end());
+            Pred.erase(Pred.begin() + i);
+
+            for(int j = 0;j < controlFlow.size();j ++){
+                for(int k = 0;k < controlFlow[j].size();k ++){
+                    if(controlFlow[j][k] > i){
+                        controlFlow[j][k] --;
+                    }
+                }
+            }
+            controlFlow[i-1].insert(controlFlow[i-1].end(),controlFlow[i].begin(),controlFlow[i].end());
+            controlFlow.erase(controlFlow.begin() + i);
+
+            cycleNum.erase(cycleNum.begin() + i);
+
+            for(int j = 0;j < loop.size();j ++){
+                if(loop[j].start > i){
+                    loop[j].start --;
+                }
+                if(loop[j].end > i){
+                    loop[j].end --;
+                }
+                for(int k = 0;k < loop[j].pred.size();k ++){
+                    if(loop[j].pred[k] >= i){
+                        loop[j].pred[k] --;
+                    }
                 }
             }
         }
@@ -1432,7 +2076,7 @@ vector<vector<IROperand *>> IRFunction::calRegisterGraph(unordered_map<IROperand
         nodes.push_back(i.first);
         degrees.push_back(i.second.size());
     }
-    for (auto i : Tools::sort_indexes(degrees)) {
+    for (auto i : Tools::sortIndexes(degrees)) {
         sortedNodes.push_back(nodes[i]);
     }
     for (int i = sortedNodes.size() - 1; i >= 0; i--) {
@@ -1517,7 +2161,7 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
         operands.emplace_back(it.first);
         costs.emplace_back(it.second);
     }
-    for (auto i : Tools::sort_indexes(costs)) {
+    for (auto i : Tools::sortIndexes(costs)) {
         sortedOperands.push_back(operands[i]);
     }
     int numGenPurposeRegAlloc = 0;
@@ -1529,7 +2173,7 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
         if (sortedOperands[i]->getBindRegister()) {
             continue;
         }
-        if (sortedOperands[i]->getMetaDataType() == MetaDataType::BOOL || sortedOperands[i]->getMetaDataType() == MetaDataType::INT) {
+        if (sortedOperands[i]->getMetaDataType() == MetaDataType::INT) {
             if (numGenPurposeRegAlloc >= maxGenPurposeRegAlloc) {
                 if (numFloatPointRegAlloc < maxFloatPointRegAlloc) {
                     continue;
@@ -1607,23 +2251,25 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
 
 
 void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
-    switch (inOptimizeLevel) {
-        case 1:
-            basicBlockDivision();
-            constFolding();
-            break;
-        case 2:
-            basicBlockDivision();
-            constFolding();
-            liveVarAnalysis();
-            delDeadCode();
-            break;
-        case 3:
-            basicBlockDivision();
-            // liveVarAnalysis();
-            // delDeadCode();
-            varBindRegisters(t);
-            break;
+    def_use_list();
+    switch (inOptimizeLevel)
+    {
+    case 1:
+        basicBlockDivision();
+        constFolding();
+        break;
+    case 2:
+        basicBlockDivision();
+        constFolding();
+        liveVarAnalysis();
+        delDeadCode();
+        break;
+    case 3:
+        basicBlockDivision();
+        // liveVarAnalysis();
+        // delDeadCode();
+        varBindRegisters(t);
+        break;
     }
 }
 
@@ -1765,7 +2411,7 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
     cout << functionTable->getFuncName() << "(";
     auto paramTypeList = functionTable->getParamDataTypeList();
     if (!paramTypeList.empty()) {
-        for (auto param : vector<tuple<MetaDataType, bool, size_t>>(paramTypeList.begin(), paramTypeList.end() - 1)) {
+        for (auto param : vector<tuple<MetaDataType, bool,std::size_t>>(paramTypeList.begin(), paramTypeList.end() - 1)) {
             cout << static_cast<int>(get<0>(param));
             if (get<1>(param)) {
                 cout << "[" << get<2>(param) << "]";
@@ -1857,13 +2503,13 @@ IRProgram *IRProgram::getIRProgram(string newProgramName, SymbolTable *newGlobal
     static IRProgram instance;
     static bool initialized = false;
     if (!initialized) {
-        instance.initializeFileds(newProgramName, newGlobalSymbolTable);
+        instance.initializeFields(newProgramName, newGlobalSymbolTable);
         initialized = true;
     }
     return &instance;
 }
 
-void IRProgram::initializeFileds(string newProgramName, SymbolTable *newGlobalSymbolTable) {
+void IRProgram::initializeFields(string newProgramName, SymbolTable *newGlobalSymbolTable) {
     programName = move(newProgramName);
     globalSymbolTable = newGlobalSymbolTable;
     globalVariables.clear();
@@ -1925,6 +2571,7 @@ IRValue *IRProgram::addMulSameImmValue(MetaDataType inMetaDataType, const string
     immValues[valueKey] = newValue;
     return newValue;
 }
+
 
 IRValue *IRProgram::addMulImmValue(MetaDataType inMetaDataType, vector<string> &inValues) {
     string valueKey = {};
