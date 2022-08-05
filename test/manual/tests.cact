@@ -6,7 +6,10 @@ int main()
     }else {
         result = 1 + 2 * 8 + 100 - 9999 + 10000/5;
         print_int(result);
-        n = result + 1000;
+        if(n > 0)
+            n = result + 1;
+        else
+            n = result + 1000;
         print_int(n);
     }
     print_int(n);
