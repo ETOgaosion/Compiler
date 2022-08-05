@@ -850,6 +850,21 @@ void IRFunction::liveVarAnalysis() {
 
 // algorithm only works in Basic Block
 void IRFunction::delDeadCode() {
+    
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }               
+            }
+        }
+    }
+    
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
         for (int i = 0; i < basicBlocks.size(); i++) {
             if (basicBlocks[i].empty()) {
@@ -1758,6 +1773,18 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
 void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
     int bnum;
     int boff;
+    
+    for(int i = entrance+1; i < entrances.size();i ++){
+        entrances[i] ++;
+    }
+    int push_pos = basicBlocks[entrance].size();
+    basicBlocks[entrance].push_back(code_pos);
+    codes.insert(codes.begin()+entrances[entrance]+push_pos,code_pos);
+}
+
+void IRFunction::LICM(){
+    if(!cycleNum.empty())
+        cycleNum.clear();
     cycleNum = vector<int>(entrances.size(), 0);
     for (int i = 0; i < controlFlow.size(); i++) {
         for (int j : controlFlow[i]) {
@@ -1769,15 +1796,7 @@ void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance)
             }
         }
     }
-    for(int i = entrance+1; i < entrances.size();i ++){
-        entrances[i] ++;
-    }
-    int push_pos = basicBlocks[entrance].size();
-    basicBlocks[entrance].push_back(code_pos);
-    codes.insert(codes.begin()+entrances[entrance]+push_pos,code_pos);
-}
 
-void IRFunction::LICM(){
     loop.clear();
     updateloop(0, cycleNum.size(), 0);
     
@@ -2237,6 +2256,20 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
 }
 
 void IRFunction::varBindRegisters(TargetCodes *t) {
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }               
+            }
+        }
+    }
+
     calVarActiveRegions();
     unordered_map<IROperand *, vector<IROperand *>> conflictVar = calConflictVarRelations();
     vector<vector<IROperand *>> registerGraph = calRegisterGraph(conflictVar);
