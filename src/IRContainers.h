@@ -8,7 +8,7 @@ struct loopinfo{
     int handled;
     int start;
     int end;
-    std::vector<loopinfo*> subloop;
+    std::vector<int> subloop;
     std::vector<int> pred;
 };
 
@@ -86,7 +86,7 @@ public:
     bool BBisinvalid(int i);
     void JumpThreading();
     /*Loop invariant*/
-    struct loopinfo* updateloop(int first, int end, int base);
+    int updateloop(int first, int end, int base);
     struct loopinfo* loopchoose(int i);
     void LICM();
     void HoistOnLoop(loopinfo * currentloop);

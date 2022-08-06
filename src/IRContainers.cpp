@@ -1174,7 +1174,7 @@ void IRFunction::basicBlockDivision() {
     entrances.pop_back();
 
     for(int i = 0; i < basicBlocks.size(); i++){
-        if(i > 0 && codes[entrances[i] - 1]->getOperation() != IROperation::GOTO && codes[entrances[i] - 1]->getOperation() != IROperation::BEQZ)
+        if(i > 0 && codes[entrances[i] - 1]->getOperation() != IROperation::GOTO)
             Pred.emplace_back(1, i - 1);
         else
             Pred.push_back(vector<int>());
@@ -1224,7 +1224,7 @@ void IRFunction::basicBlockDivision() {
     }*/
 }
 
-struct loopinfo* IRFunction::updateloop(int first, int end, int base){
+int IRFunction::updateloop(int first, int end, int base){
     int now = base;
     for (int i = first; i < end; i++)
     {
@@ -1238,8 +1238,11 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
             in.handled = 0;
             in.start = i;
             for (int j = i; j < end; j++){
-                if(cycleNum[j] > now)
-                    in.subloop.push_back(updateloop(j, end, now));
+                if(cycleNum[j] > now){
+                    int sub = updateloop(j, end, now);
+                    in.subloop.push_back(sub);
+                    j = loop[sub].end + 1;
+                }
                 else if (cycleNum[j] < now)
                 {
                     in.end = j - 1;
@@ -1264,10 +1267,8 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
         else if(layer < now)
             now = layer;
     }
-    if(!loop.empty())
-        return &loop.back();
-    else
-        return nullptr;
+
+    return loop.size() - 1;
 }
 
 bool IRFunction::BBisinvalid(int i){
@@ -2347,9 +2348,9 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
     case 0:
         basicBlockDivision();
         constFolding();
+        JumpThreading();
         liveVarAnalysis();
         delDeadCode();
-        JumpThreading();
         break;
     case 1:
         basicBlockDivision();
