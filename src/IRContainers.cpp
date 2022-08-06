@@ -1765,13 +1765,13 @@ void IRFunction::calVarActiveRegions() {
                 continue;
             }
             if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToVar()) {
-                 res = res->getSymbolVariable();
+                 res = res->getParentVariable();
             }
             if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToVar()) {
-                arg1 = arg1->getSymbolVariable();
+                arg1 = arg1->getParentVariable();
             }
             if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToVar()) {
-                arg2 = arg2->getSymbolVariable();
+                arg2 = arg2->getParentVariable();
             }
             if (!res->getIsGlobalSymbolVar() && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)) {
                 if (definitions.find(res) != definitions.end()) {
@@ -1820,7 +1820,7 @@ void IRFunction::calVarActiveRegions() {
                     continue;
                 }
                 if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToVar()) {
-                    res = res->getSymbolVariable();
+                    res = res->getParentVariable();
                 }
                 if (!res->getIsGlobalSymbolVar() && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)) {
                     if (definitions.find(res) != definitions.end()) {
@@ -1838,7 +1838,7 @@ void IRFunction::calVarActiveRegions() {
             }
             if (arg1) {
                 if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToVar()) {
-                    arg1 = arg1->getSymbolVariable();
+                    arg1 = arg1->getParentVariable();
                 }
                 if (!arg1->getIsGlobalSymbolVar() && (arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR)) {
                     if (uses.find(arg1) != uses.end()) {
@@ -1851,7 +1851,7 @@ void IRFunction::calVarActiveRegions() {
             }
             if (arg2) {
                 if (arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToVar()) {
-                    arg2 = arg2->getSymbolVariable();
+                    arg2 = arg2->getParentVariable();
                 }
                 if (!arg2) {
                     continue;
@@ -2112,7 +2112,7 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
             IROperand *arg1 = j->getArg1();
             IROperand *arg2 = j->getArg2();
             if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToVar()) {
-                res = res->getSymbolVariable();
+                res = res->getParentVariable();
             }
             if ((res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR) && !res->getIsGlobalSymbolVar()) {
                 if (ret.find(res) == ret.end()) {
@@ -2123,7 +2123,7 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
                 }
             }
             if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToVar()) {
-                arg1 = arg1->getSymbolVariable();
+                arg1 = arg1->getParentVariable();
             }
             if ((arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR) && !arg1->getIsGlobalSymbolVar()) {
                 if (ret.find(arg1) == ret.end()) {
@@ -2134,7 +2134,7 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
                 }
             }
             if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToVar()) {
-                arg2 = arg2->getSymbolVariable();
+                arg2 = arg2->getParentVariable();
             }
             if (arg2 && (arg2->getOperandType() == OperandType::SYMBOLVAR || arg2->getOperandType() == OperandType::TEMPVAR) && !arg2->getIsGlobalSymbolVar()) {
                 if (ret.find(arg2) == ret.end()) {
@@ -2337,8 +2337,8 @@ int IRFunction::calFrameSize() {
             it.second->setMemOffset(frameSize + varSize);
             frameSize += varSize;
         }
-        else if (!it.second->getSymbolVariable()->getIsGlobalSymbolVar()){
-            it.second->setMemOffset(it.second->getSymbolVariable()->getMemOffset());
+        else if (!it.second->getParentVariable()->getIsGlobalSymbolVar()){
+            it.second->setMemOffset(it.second->getParentVariable()->getMemOffset());
         }
     }
     if (frameSize % 8) {
