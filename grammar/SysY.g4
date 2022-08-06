@@ -74,7 +74,7 @@ varDef
         bool withType,
         std::vector<std::size_t> shape,
         bool isArray,
-        IRValue* value
+        IROperand* value
     ]
     : Ident ('[' constExp ']')* ('=' initVal)?
     ;

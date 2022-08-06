@@ -348,7 +348,7 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
     if (ctx->initVal()) {
         ctx->withType = true;
         ctx->type = ctx->initVal()->type;
-        ctx->value = ctx->initVal()->value;
+        ctx->value = ctx->initVal()->operand;
     }
     else {
         if (ctx->isArray) {
@@ -373,11 +373,7 @@ void SemanticAnalysis::exitInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
     ctx->type = ctx->exp()->metaDataType;
     ctx->isArray = false;
     if (ctx->shape.empty()) {
-        if (ctx->exp()->metaDataType == MetaDataType::FLOAT) {
-            ctx->value = irGenerator->addImmValue(ctx->exp()->metaDataType, ctx->exp()->val);
-        } else {
-            ctx->value = new IRValue(ctx->exp()->metaDataType, ctx->exp()->val, {}, false);
-        }
+        ctx->value = ctx->exp()->operand;
     }
     else {
         ctx->vals.push_back(ctx->getText());
@@ -385,7 +381,7 @@ void SemanticAnalysis::exitInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
     ctx->shape = {};
 }
 
-void SemanticAnalysis::enterInitValOfArray(SysYParser::InitValOfArrayContext *ctx) { }
+void SemanticAnalysis::enterInitValOfArray(SysYParser::InitValOfArrayContext *ctx) {}
 
 void SemanticAnalysis::exitInitValOfArray(SysYParser::InitValOfArrayContext *ctx) {}
 
