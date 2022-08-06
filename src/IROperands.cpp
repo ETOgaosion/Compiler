@@ -281,7 +281,7 @@ void IRValue::genTargetValue(TargetCodes *t) const {
     t->addCodeDirectives(stream.str());
 }
 
-IRSymbolVariable::IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue, bool newIsGlobalSymbolVar) : IROperand(OperandType::SYMBOLVAR) {
+IRSymbolVariable::IRSymbolVariable(AbstractSymbol *newSymbol, IROperand *newValue, bool newIsGlobalSymbolVar) : IROperand(OperandType::SYMBOLVAR) {
     symbol = newSymbol;
     assigned = false;
     alive = false;
@@ -700,8 +700,8 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : I
     metaDataType = newMetaDataType;
     assigned = false;
     alive = false;
-    aliasToSymbol = false;
-    symbolVariable = nullptr;
+    aliasToVar = false;
+    parentVariable = nullptr;
     offset = 0;
     initialValue = nullptr;
     bindRegister = false;
@@ -715,20 +715,20 @@ IRTempVariable::IRTempVariable(std::string newName, MetaDataType newMetaDataType
     isArray = newIsArray;
     assigned = false;
     alive = false;
-    aliasToSymbol = false;
-    symbolVariable = nullptr;
+    aliasToVar = false;
+    parentVariable = nullptr;
     offset = 0;
     initialValue = nullptr;
     bindRegister = false;
     targetBindRegister = nullptr;
 }
 
-IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IROperand *parentVariable) : IROperand(OperandType::TEMPVAR) {
+IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IROperand *newParentVariable) : IROperand(OperandType::TEMPVAR) {
     symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
-    aliasToSymbol = true;
-    symbolVariable = parentVariable;
+    aliasToVar = true;
+    parentVariable = newParentVariable;
     offset = 0;
     initialValue = nullptr;
     isArray = false;
@@ -739,8 +739,8 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IRV
     symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
-    aliasToSymbol = false;
-    symbolVariable = nullptr;
+    aliasToVar = false;
+    parentVariable = nullptr;
     offset = 0;
     initialValue = newValue;
     isArray = false;
@@ -748,7 +748,7 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IRV
 }
 
 Register *IRTempVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
-    if (!aliasToSymbol) {
+    if (!aliasToVar) {
         bool hasFreeRegister;
         Register *freeRegister = nullptr;
         if (bindRegister) {
@@ -788,12 +788,12 @@ Register *IRTempVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
         return freeRegister;
     }
     else {
-        return symbolVariable->load(t, isGeneralPurposeRegister);
+        return parentVariable->load(t, isGeneralPurposeRegister);
     }
 }
 
 Register *IRTempVariable::loadTo(TargetCodes *t, const string &regName, bool isGeneralPurposeRegister) {
-    if (!aliasToSymbol) {
+    if (!aliasToVar) {
         bool hasFreeRegister;
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         Register *targetRegister = nullptr;
@@ -843,12 +843,12 @@ Register *IRTempVariable::loadTo(TargetCodes *t, const string &regName, bool isG
         return targetRegister;
     }
     else {
-        return symbolVariable->loadTo(t, regName, isGeneralPurposeRegister);
+        return parentVariable->loadTo(t, regName, isGeneralPurposeRegister);
     }
 }
 
 Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
-    if (!aliasToSymbol) {
+    if (!aliasToVar) {
         bool hasFreeRegister;
         if (bindRegister) {
             switch (metaDataType) {
@@ -883,12 +883,12 @@ Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
         return inReg;
     }
     else {
-        return symbolVariable->loadTo(t, inReg);
+        return parentVariable->loadTo(t, inReg);
     }
 }
 
 void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
-    if (!aliasToSymbol) {
+    if (!aliasToVar) {
         bool hasFreeRegister;
         if (bindRegister) {
             switch (metaDataType) {
@@ -928,12 +928,12 @@ void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
         t->setRegisterFree(sp);
     }
     else {
-        return symbolVariable->storeFrom(t, reg);
+        return parentVariable->storeFrom(t, reg);
     }
 }
 
 void IRTempVariable::print() const {
-    if (!aliasToSymbol) {
+    if (!aliasToVar) {
         cout << symbolName << ":= symbol type: TEMP VAR; data type: " << static_cast<int>(metaDataType);
         if (initialValue) {
             cout << "; initValue: ";

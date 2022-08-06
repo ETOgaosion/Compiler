@@ -20,16 +20,20 @@ IRGenerator *IRGenerator::getIRGenerator(IRProgram *newIR) {
     return &instance;
 }
 
-IRSymbolVariable* IRGenerator::addGlobalVariable(AbstractSymbol *Symbol, IRValue* newValue){
+IRSymbolVariable* IRGenerator::addGlobalVariable(AbstractSymbol *Symbol, IROperand* newValue){
     return ir->addGlobalVariable(Symbol, newValue);
 }
 
-IRSymbolVariable* IRGenerator::addSymbolVariable(int block, AbstractSymbol* symbol, IRValue* newValue) {
+IRSymbolVariable* IRGenerator::addSymbolVariable(int block, AbstractSymbol* symbol, IROperand* newValue) {
     return currentIRFunc->addSymbolVariable(block, symbol, newValue);
 }
 
 IRTempVariable* IRGenerator::addTempVariable(MetaDataType newMetaDataType) {
     return currentIRFunc->addTempVariable(newMetaDataType);
+}
+
+IRTempVariable* IRGenerator::addTempVariable(IROperand *parentSymbolVariable) {
+    return currentIRFunc->addTempVariable(parentSymbolVariable);
 }
 
 bool IRGenerator::addCode(IRCode *newCode)

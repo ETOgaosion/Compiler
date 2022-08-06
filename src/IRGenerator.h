@@ -15,7 +15,7 @@ public:
 
     static IRGenerator *getIRGenerator(IRProgram *newIR);
 
-    IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol, IRValue* newValue);
+    IRSymbolVariable *addGlobalVariable(AbstractSymbol *Symbol, IROperand *newValue);
     IRValue *addImmValue(MetaDataType inMetaDataType, const std::string &inValue);
     IRValue *addImmValue(const std::string &inLabel, MetaDataType inMetaDataType, const std::string &inValue);
 
@@ -24,8 +24,9 @@ public:
 
     // add Operand
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
+    IRTempVariable *addTempVariable(IROperand *parentSymbolVariable);
     IRLabel *addLabel();
-    IRSymbolVariable* addSymbolVariable(int block, AbstractSymbol *Symbol, IRValue* newValue);
+    IRSymbolVariable* addSymbolVariable(int block, AbstractSymbol *Symbol, IROperand* newValue);
     IRSymbolFunction* getSymbolFunction(std::string funcName);
 
     bool enterFunction(SymbolTable *function);

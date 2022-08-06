@@ -1764,13 +1764,13 @@ void IRFunction::calVarActiveRegions() {
             if (res->getIsArray()) {
                 continue;
             }
-            if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToSymbol()) {
+            if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToVar()) {
                  res = res->getSymbolVariable();
             }
-            if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToSymbol()) {
+            if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToVar()) {
                 arg1 = arg1->getSymbolVariable();
             }
-            if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToSymbol()) {
+            if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToVar()) {
                 arg2 = arg2->getSymbolVariable();
             }
             if (!res->getIsGlobalSymbolVar() && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)) {
@@ -1819,7 +1819,7 @@ void IRFunction::calVarActiveRegions() {
                 if (res->getIsArray()) {
                     continue;
                 }
-                if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToSymbol()) {
+                if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToVar()) {
                     res = res->getSymbolVariable();
                 }
                 if (!res->getIsGlobalSymbolVar() && (res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR)) {
@@ -1837,7 +1837,7 @@ void IRFunction::calVarActiveRegions() {
                 }
             }
             if (arg1) {
-                if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToSymbol()) {
+                if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToVar()) {
                     arg1 = arg1->getSymbolVariable();
                 }
                 if (!arg1->getIsGlobalSymbolVar() && (arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR)) {
@@ -1850,7 +1850,7 @@ void IRFunction::calVarActiveRegions() {
                 }
             }
             if (arg2) {
-                if (arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToSymbol()) {
+                if (arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToVar()) {
                     arg2 = arg2->getSymbolVariable();
                 }
                 if (!arg2) {
@@ -1932,7 +1932,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calConflictVarRelati
                 }
             }
             for (auto & tempVariable : tempVariables) {
-                if (tempVariable.second->getIsArray() || tempVariable.second->getAliasToSymbol()) {
+                if (tempVariable.second->getIsArray() || tempVariable.second->getAliasToVar()) {
                     continue;
                 }
                 if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
@@ -1952,7 +1952,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calConflictVarRelati
             }
         }
         for (auto & tempVariable : tempVariables) {
-            if (tempVariable.second->getIsArray() || tempVariable.second->getAliasToSymbol()) {
+            if (tempVariable.second->getIsArray() || tempVariable.second->getAliasToVar()) {
                 continue;
             }
             if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
@@ -1983,7 +1983,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calConflictVarRelati
                 }
             }
             for (auto & tempVariable : tempVariables) {
-                if (tempVariable.second->getAliasToSymbol() || tempVariable.second->getIsArray()) {
+                if (tempVariable.second->getAliasToVar() || tempVariable.second->getIsArray()) {
                     continue;
                 }
                 if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
@@ -2003,7 +2003,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calConflictVarRelati
             }
         }
         for (auto & tempVariable : tempVariables) {
-            if (tempVariable.second->getAliasToSymbol() || tempVariable.second->getIsArray()) {
+            if (tempVariable.second->getAliasToVar() || tempVariable.second->getIsArray()) {
                 continue;
             }
             if (vectorOverlap((*it).second->getActiveRegions(), tempVariable.second->getActiveRegions())) {
@@ -2013,12 +2013,12 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calConflictVarRelati
     }
     if (tempVariables.size() > 1) {
         for (auto it = tempVariables.begin(); next(it) != tempVariables.end(); it++) {
-            if ((*it).second->getIsArray() || (*it).second->getAliasToSymbol()) {
+            if ((*it).second->getIsArray() || (*it).second->getAliasToVar()) {
                 continue;
             }
             ret[(*it).second] = vector<IROperand *>();
             for (auto in_it = next(it); in_it != tempVariables.end(); in_it++) {
-                if ((*in_it).second->getIsArray() || (*in_it).second->getAliasToSymbol()) {
+                if ((*in_it).second->getIsArray() || (*in_it).second->getAliasToVar()) {
                     continue;
                 }
                 if (vectorOverlap((*it).second->getActiveRegions(), (*in_it).second->getActiveRegions())) {
@@ -2045,7 +2045,7 @@ unordered_map<IROperand *, vector<IROperand *>> IRFunction::calConflictVarRelati
     }
     else if (tempVariables.size() == 1) {
         auto it = tempVariables.begin();
-        if (!(*it).second->getAliasToSymbol() && !(*it).second->getIsArray()) {
+        if (!(*it).second->getAliasToVar() && !(*it).second->getIsArray()) {
             for (auto & paramVariable : paramVariables) {
                 if (paramVariable.second->getIsArray()) {
                     continue;
@@ -2111,7 +2111,7 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
             }
             IROperand *arg1 = j->getArg1();
             IROperand *arg2 = j->getArg2();
-            if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToSymbol()) {
+            if (res->getOperandType() == OperandType::TEMPVAR && res->getAliasToVar()) {
                 res = res->getSymbolVariable();
             }
             if ((res->getOperandType() == OperandType::SYMBOLVAR || res->getOperandType() == OperandType::TEMPVAR) && !res->getIsGlobalSymbolVar()) {
@@ -2122,7 +2122,7 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
                     ret[res] += cycleNum[i] * 10;
                 }
             }
-            if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToSymbol()) {
+            if (arg1->getOperandType() == OperandType::TEMPVAR && arg1->getAliasToVar()) {
                 arg1 = arg1->getSymbolVariable();
             }
             if ((arg1->getOperandType() == OperandType::SYMBOLVAR || arg1->getOperandType() == OperandType::TEMPVAR) && !arg1->getIsGlobalSymbolVar()) {
@@ -2133,7 +2133,7 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
                     ret[arg1] += cycleNum[i] * 10;
                 }
             }
-            if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToSymbol()) {
+            if (arg2 && arg2->getOperandType() == OperandType::TEMPVAR && arg2->getAliasToVar()) {
                 arg2 = arg2->getSymbolVariable();
             }
             if (arg2 && (arg2->getOperandType() == OperandType::SYMBOLVAR || arg2->getOperandType() == OperandType::TEMPVAR) && !arg2->getIsGlobalSymbolVar()) {
@@ -2288,7 +2288,7 @@ IRTempVariable* IRFunction::addTempVariable(IROperand *parentSymbolVariable) {
     return newIRTempVar;
 }
 
-IRSymbolVariable* IRFunction::addSymbolVariable(int block, AbstractSymbol *newSymbol, IRValue *initVal) {
+IRSymbolVariable* IRFunction::addSymbolVariable(int block, AbstractSymbol *newSymbol, IROperand *initVal) {
     auto *newSymVar = new IRSymbolVariable(newSymbol, initVal, false);
     addLocalVariable(block,newSymVar);
     return newSymVar;
@@ -2329,7 +2329,7 @@ int IRFunction::calFrameSize() {
         frameSize += varSize;
     }
     for (const auto& it : tempVariables) {
-        if (!it.second->getAliasToSymbol()) {
+        if (!it.second->getAliasToVar()) {
             varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
             if (it.second->getIsArray()) {
                 varSize *= it.second->getArraySize();
@@ -2521,7 +2521,7 @@ void IRProgram::initializeFields(string newProgramName, SymbolTable *newGlobalSy
     valueCount = 0;
 }
 
-IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IRValue *newValue) {
+IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IROperand *newValue) {
     string valueKey = {};
     for (const auto &val : newValue->getValues()) {
         valueKey += (val + ",");

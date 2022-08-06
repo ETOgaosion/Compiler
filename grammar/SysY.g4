@@ -235,8 +235,8 @@ primaryExp
         bool isArray,
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
-        IROperand* operand,         
-        IROperand* indexOperand     
+        IROperand* operand,
+        IROperand* indexOperand
     ]
     : '(' exp ')'   #primaryExpNestExp
     | lVal          #primaryExplVal
@@ -248,8 +248,8 @@ unaryExp
         bool isArray,
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
-        IROperand* operand,         
-        IROperand* indexOperand     
+        IROperand* operand,
+        IROperand* indexOperand
     ]
     : primaryExp                        #unaryExpPrimaryExp
     | Ident '(' (funcRParams)? ')'      #unaryExpFunc
@@ -277,8 +277,8 @@ mulExp
         bool isArray,
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
-        IROperand* operand,         
-        IROperand* indexOperand     
+        IROperand* operand,
+        IROperand* indexOperand
     ]
     : unaryExp                              #mulExpUnaryExp
     | mulExp mulOp unaryExp                 #mulExpMulExp
@@ -292,8 +292,8 @@ addExp
         bool isArray,
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
-        IROperand* operand,         
-        IROperand* indexOperand     
+        IROperand* operand,
+        IROperand* indexOperand
     ]
     : mulExp                        #addExpMulExp
     | addExp addOp mulExp           #addExpAddExp

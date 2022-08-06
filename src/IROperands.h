@@ -46,13 +46,13 @@ public:
     virtual std::vector<IRValue *> getSubValues() const { return {}; };
     virtual std::vector<IROperand *> getHistorySymbols() const { return {}; };
     virtual IROperand *getLatestVersionSymbol() const { return nullptr; };
-    virtual bool getAliasToSymbol() const { return false; };
-    virtual IROperand *getSymbolVariable() const { return nullptr; }
+    virtual bool getAliasToVar() const { return false; };
+    virtual IROperand *getParentVariable() const { return nullptr; }
     virtual std::string getFunctionName() const { return {}; };
     virtual MetaDataType getReturnType() const { return {}; };
     virtual SymbolTable *getFunctionSymbolTable() const { return nullptr; };
     virtual int getMemOffset() const { return 0; };
-    virtual IRValue *getInitialValue() const { return nullptr; };
+    virtual IROperand *getInitialValue() const { return nullptr; };
     virtual bool getIsArray() const { return false; };
     virtual std::size_t getArraySize() const { return 0; };
     virtual std::vector<std::size_t> getArrayShape() const { return {}; };
@@ -69,8 +69,8 @@ public:
     virtual void setAlive(bool set) {};
     virtual bool setAssigned() { return false; }
     virtual bool addHistorySymbol(IROperand *inSymbol) { return false; };
-    virtual bool setAliasToSymbol() { return false; };
-    virtual bool setSymbolVariable(IROperand *inSymbolVariable) { return false; };
+    virtual bool setAliasToVar() { return false; };
+    virtual bool setParentVariable(IROperand *inParentVariable) { return false; };
     virtual bool setFunctionSymbolTable(SymbolTable *inFunctionTable) { return false; };
     virtual void setMemOffset(int offset) {};
     virtual bool setArrayShape(std::vector<std::size_t> newArrayShape) { return false; };
@@ -195,7 +195,7 @@ private:
     bool assigned;                              // whether this symbol was defined in lVal
     std::vector<IROperand *> historySymbols;    // if user defined symbols are defined, we use temp vars to replace it, and those vars will be pushed into this field
 
-    IRValue *initialValue;                      // if user initialized value for this symbol, those value will be linked here
+    IROperand *initialValue;                      // if user initialized value for this symbol, those value will be linked here
     bool isGlobalSymbolVar;                     // determine whether this is globally defined
     /* Optimization */
     std::vector<int> activeRegions;             // used for calculation of variable active regions
@@ -204,7 +204,7 @@ private:
     bool alive;                                 // used for calculation of variable live and death
 
 public:
-    IRSymbolVariable(AbstractSymbol *newSymbol, IRValue *newValue, bool newIsGlobalSymbolVar);
+    IRSymbolVariable(AbstractSymbol *newSymbol, IROperand *newValue, bool newIsGlobalSymbolVar);
 
     /* return fields stored in symbol table */
     std::string getSymbolName() const override { return symbol->getSymbolName(); };
@@ -219,7 +219,7 @@ public:
     /* return latest version of replace temp var */
     IROperand *getLatestVersionSymbol() const override { return historySymbols.back(); };
 
-    IRValue *getInitialValue() const override { return initialValue; };
+    IROperand *getInitialValue() const override { return initialValue; };
     bool getIsGlobalSymbolVar() const override { return isGlobalSymbolVar; };
 
     /* Optimization fields */
@@ -281,9 +281,10 @@ private:
     std::vector<std::size_t> arrayShape;
     bool isArray;
     /* SSA */
-    bool assigned;                      // whether temp vars are assigned, shared expression optimization may use
-    bool aliasToSymbol;                 // whether is type-2
-    IROperand *symbolVariable;          // if is type-2, point to symbol var
+    bool assigned;                      // whether temp vars are assigned, shared expression
+    std::vector<IROperand *> historySymbols;    // if user defined symbols are defined, we use temp vars to replace it, and those vars will be pushed into this field optimization may use
+    bool aliasToVar;                 // whether is type-2
+    IROperand *parentVariable;          // if is type-2, point to symbol var
     int offset;                         // memory offset
     IRValue *initialValue;              // not used
     /* Optimization */
@@ -299,18 +300,21 @@ public:
     /* @method: 2. type-1 temp var, determine name and data type */
     IRTempVariable(std::string newName, MetaDataType newMetaDataType, std::vector<std::size_t> newShape, bool newIsArray);
     /* @method: 3. type-2 temp var, pass parent symbol var directly and fixed */
-    IRTempVariable(std::string newName, MetaDataType newMetaDataType, IROperand *parentVariable);
+    IRTempVariable(std::string newName, MetaDataType newMetaDataType, IROperand *newParentVariable);
     /* @method: 4. type-1 temp var, determine name, data type and also initial value */
     IRTempVariable(std::string newName, MetaDataType newMetaDataType, IRValue *newValue);
 
     std::string getSymbolName() const override { return symbolName; };
     MetaDataType getMetaDataType() const override { return metaDataType; };
     bool getAssigned() const override { return assigned; };
+    std::vector<IROperand *> getHistorySymbols() const override { return historySymbols; };
+    /* return latest version of replace temp var */
+    IROperand *getLatestVersionSymbol() const override { return historySymbols.back(); };
     std::vector<std::size_t> getArrayShape() const override { return arrayShape; };
     bool getIsArray() const override { return  isArray; };
-    bool getAliasToSymbol() const override { return aliasToSymbol; };
-    IROperand *getSymbolVariable() const override { return symbolVariable; };
-    IRValue *getInitialValue() const override { return initialValue; };
+    bool getAliasToVar() const override { return aliasToVar; };
+    IROperand *getParentVariable() const override { return parentVariable; };
+    IROperand *getInitialValue() const override { return initialValue; };
     std::vector<int> getActiveRegions() const override { return activeRegions; };
     bool getBindRegister() const override { return bindRegister; };
     Register *getTargetBindRegister() const override { return targetBindRegister; };
@@ -318,10 +322,11 @@ public:
 
     void setAlive(bool set) override { alive = set; };
     bool setAssigned() override { assigned = true; return true; };
+    bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; };
     bool setArrayShape(std::vector<std::size_t> newArrayShape) override { arrayShape = newArrayShape; return true; };
     bool setIsArray(bool newIsArray) { isArray = newIsArray; return true; };
-    bool setAliasToSymbol() override { aliasToSymbol = true; return true; };
-    bool setSymbolVariable(IROperand *inSymbolVariable) override { aliasToSymbol = true; symbolVariable = inSymbolVariable; return true; };
+    bool setAliasToVar() override { aliasToVar = true; return true; };
+    bool setParentVariable(IROperand *inParentVariable) override { aliasToVar = true; parentVariable = inParentVariable; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
     bool setTargetBindRegister(Register *inTargetBindRegister) override { targetBindRegister = inTargetBindRegister; return true; };

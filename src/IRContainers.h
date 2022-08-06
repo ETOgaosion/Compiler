@@ -60,7 +60,7 @@ public:
     bool addLocalVariable(int block, IRSymbolVariable *newVariable);
     IRTempVariable *addTempVariable(MetaDataType newMetaDataType);
     IRTempVariable *addTempVariable(IROperand *parentSymbolVariable);
-    IRSymbolVariable *addSymbolVariable(int block, AbstractSymbol *newSymbol, IRValue *initVal);
+    IRSymbolVariable *addSymbolVariable(int block, AbstractSymbol *newSymbol, IROperand *initVal);
     IRLabel *addLabel();
     bool addCode(IRCode *newCode);
     bool addCodes(const std::vector<IRCode *>& newCodes);
@@ -162,7 +162,7 @@ public:
     static IRProgram *getIRProgram(std::string newProgramName, SymbolTable *newGlobalSymbolTable);
     void initializeFields(std::string newProgramName, SymbolTable *newGlobalSymbolTable);
 
-    IRSymbolVariable *addGlobalVariable(AbstractSymbol *symbol, IRValue *newValue);
+    IRSymbolVariable *addGlobalVariable(AbstractSymbol *symbol, IROperand *newValue);
     bool addFunction(IRFunction *newFunction);
     bool addSymbolFunction(IRSymbolFunction *funcSymbol);
     IRValue *addImmValue(MetaDataType inMetaDataType, const std::string &inValue);
