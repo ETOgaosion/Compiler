@@ -10,42 +10,33 @@ result := symbol type: 1; data type: 2; initValue: 0
 n := symbol type: 1; data type: 2; initValue: 0
 
 ----------- tempVars ------------
-t_13:= symbol type: TEMP VAR; data type: 2
-t_0:= symbol type: TEMP VAR; data type: 1
-t_8:= symbol type: TEMP VAR; data type: 2
-t_11:= symbol type: TEMP VAR; data type: 2
-t_1:= symbol type: TEMP VAR; data type: 2
-t_3:= symbol type: TEMP VAR; data type: 2
-t_10:= symbol type: TEMP VAR; data type: 1
-t_4:= symbol type: TEMP VAR; data type: 2
-t_5:= symbol type: TEMP VAR; data type: 2
 t_6:= symbol type: TEMP VAR; data type: 2
-t_7:= symbol type: TEMP VAR; data type: 2
+t_4:= symbol type: TEMP VAR; data type: 2
+t_0:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	goto L_0_main;
-	t_2 <= result;
+	n = 0;
+	result = 0;
+	t_0 = n > 0;
+	beqz t_0 L_0_main;
+	t_1 <= result;
+	t_1 = 1;
 	goto L_1_main;
 L_0_main:
-	t_9 <= result;
-	addparam -7882;
-	call print_int; 
-	goto L_2_main;
-	t_12 <= n;
-	goto L_3_main;
-L_2_main:
-	t_14 <= n;
-L_3_main:
-	n <= t_15;
-	t_15 = phi t_12, n, t_14;
-	addparam t_15;
+	t_2 <= result;
+	t_2 = 100;
+	addparam t_2;
 	call print_int; 
 L_1_main:
-	n <= t_16;
-	t_16 = phi t_15;
-	result <= t_17;
-	t_17 = phi t_2, result, t_9;
-	addparam t_16;
+	result <= t_3;
+	t_3 = phi t_1, result, t_2;
+	t_4 = t_3 + 1000;
+	t_5 <= n;
+	t_5 = t_4;
+	t_6 = t_3 + 1000;
+	t_7 <= n;
+	t_7 = t_6;
+	addparam t_7;
 	call print_int; 
 	return 0;
 
