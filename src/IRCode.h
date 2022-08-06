@@ -462,8 +462,10 @@ public:
 
 class IRPhi : public IRCode {
 private:
-    std::vector<IROperand *> args;
+    ;
+
 public:
+    std::vector<IROperand *> args;
     IRPhi(IROperand *newResult, std::vector<IROperand *>newArg1);
 
     std::vector<IROperand *> getArgs() const override { return args; };

@@ -15,11 +15,9 @@ t_4:= symbol type: TEMP VAR; data type: 2
 t_0:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	t_2 <= result;
-	addparam 100;
-	call print_int; 
+	t_1 <= result;
 	result <= t_3;
-	t_3 = phi t_1, result, t_2;
+	t_3 = phi t_1, result;
 	t_4 = t_3 + 1000;
 	t_5 <= n;
 	t_5 = t_4;

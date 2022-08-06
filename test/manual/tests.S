@@ -3,10 +3,6 @@
 .globl	main
 .type	main, @function
 main:
-	addi	a0, zero, 100
-	addi	sp, sp, -32
-	call	print_int
-	addi	sp, sp, 32
 	lw	t1, -12(sp)
 	addi	t0, t1, 1000
 	sw	t0, -24(sp)
