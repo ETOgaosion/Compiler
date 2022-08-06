@@ -236,7 +236,7 @@ public:
     bool withType;
     std::vector<std::size_t> shape;
     bool isArray;
-    IRValue* value;
+    IROperand* value;
     VarDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
