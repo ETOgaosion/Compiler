@@ -269,16 +269,28 @@ int IRFunction::Replacewith(IRCode* I, IROperand* val){
             int in = -1;
             if (UI->getOperation() == IROperation::BEQZ)
             {
-                in = dynamic_cast<IRBeqz *>(UI)->whicn_bb;     
+                in = dynamic_cast<IRBeqz *>(UI)->which_bb;     
             }else if(UI->getResult()){
                 in = UI->getResult()->which_bb;
+            }else if(!UI->getResult()){
+                in = UI->which_bb;
             }
 
             if(in >= 0)
                 for(auto k : loop){
-                    if(k.start == in || k.end == in){
-                        sign = 0;
-                        break;
+                    if(k.start <= in && k.end >= in){
+                        if(!k.loopsym.empty()){
+                            auto pos = find(k.loopsym.begin(), k.loopsym.end(), res);
+                            if(pos != k.loopsym.end()){
+                                sign = 0;
+                                break;
+                            }
+                            pos = find(k.loopsym.begin(), k.loopsym.end(), res);
+                            if(pos != k.loopsym.end()){
+                                sign = 0;
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -309,9 +321,9 @@ void IRFunction::constFolding() {
         }
     }
 
-    updateloop(0, cycleNum.size(), 0);
-
     def_use_list();
+
+    updateloop(0, cycleNum.size(), 0);
 
     for(int bnum = 0; bnum < basicBlocks.size(); bnum++) {
         auto block = basicBlocks[bnum]; 
@@ -504,7 +516,7 @@ void IRFunction::constFolding() {
                     for (auto j : code->use)
                     {
                         if(j->getOperation() == IROperation::BEQZ){
-                            int in = dynamic_cast<IRBeqz *>(j)->whicn_bb;
+                            int in = dynamic_cast<IRBeqz *>(j)->which_bb;
                             for(auto k : loop){
                                 if(k.start == in || k.end == in){
                                     sign = 0;
@@ -665,6 +677,8 @@ void IRFunction::CSE(){
         for(int j = 0;j < basicBlocks[i].size();j ++){
             if(basicBlocks[i][j]->getResult() && basicBlocks[i][j]->getOperation() != IROperation::REPLACE){
                 basicBlocks[i][j]->getResult()->which_bb = i;
+            }else if(!basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->which_bb = i;
             }
         }
     }
@@ -1404,7 +1418,7 @@ void IRFunction::basicBlockDivision() {
         {
             if (j->getOperation() == IROperation::BEQZ || j->getOperation() == IROperation::GOTO) {
                 if(j->getOperation() == IROperation::BEQZ)
-                    dynamic_cast<IRBeqz *>(j)->whicn_bb = i;
+                    dynamic_cast<IRBeqz *>(j)->which_bb = i;
                 for (int k = 0; k < entrances.size(); k++)
                 {
                     if (codes[entrances[k]]->getOperation() != IROperation::ADD_LABEL) {
@@ -1453,7 +1467,8 @@ int IRFunction::updateloop(int first, int end, int base){
             in.cyclelayer = cycleNum[i];
             in.handled = 0;
             in.start = i;
-            for (int j = i; j < end; j++){
+            for (int j = i; j < end; j++)
+            {
                 if(cycleNum[j] > now){
                     int sub = updateloop(j, end, now);
                     in.subloop.push_back(sub);
@@ -1466,6 +1481,12 @@ int IRFunction::updateloop(int first, int end, int base){
                 }
                 else if (j == end - 1)
                     in.end = j;
+            }
+
+            for(auto j :basicBlocks[in.end]){
+                if(j->getOperation() == IROperation::REPLACE){
+                    in.loopsym.emplace_back(j->getArg1());
+                }
             }
 
             in.pred = Pred[i];
@@ -2217,6 +2238,8 @@ void IRFunction::LICM(){
         for(int j = 0;j < basicBlocks[i].size();j ++){
             if(basicBlocks[i][j]->getResult() && basicBlocks[i][j]->getOperation() != IROperation::REPLACE){
                 basicBlocks[i][j]->getResult()->which_bb = i;
+            }else if(!basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->which_bb = i;
             }
         }
     }

@@ -10,6 +10,7 @@ struct loopinfo{
     int end;
     std::vector<int> subloop;
     std::vector<int> pred;
+    std::vector<IROperand *> loopsym;
 };
 
 class IRProgram;

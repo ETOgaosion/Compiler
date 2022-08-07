@@ -52,6 +52,7 @@ public:
     std::vector<IRCode *> def;
 
     bool islive;
+    int which_bb;
 
     IROperation getOperation() const { return operation; };
 
@@ -447,7 +448,7 @@ public:
 
 class IRBeqz : public IRCode {
 public:
-    int whicn_bb;
+    int which_bb;
 
     IRBeqz(IROperand *newArg1, IROperand *newLabel);
 

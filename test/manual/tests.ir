@@ -12,35 +12,71 @@ j := symbol type: 1; data type: 2; initValue: 0
 i := symbol type: 1; data type: 2; initValue: 0
 
 ----------- tempVars ------------
-t_7:= symbol type: TEMP VAR; data type: 2
-t_3:= symbol type: TEMP VAR; data type: 2
-t_1:= symbol type: TEMP VAR; data type: 1
 t_0:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 2
+t_1:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 2
+t_4:= symbol type: TEMP VAR; data type: 2
 ----------- Codes ------------
 main:
+	i = 0;
+	j = 0;
+	b = 0;
 L_1_main:
 	t_0 = i < 10;
-	beqz t_0 L_0_main;
-L_3_main:
-	t_1 = j < 5;
-	beqz t_1 L_2_main;
-	t_2 <= b;
-	t_2 = i;
-	t_3 = j + 1;
-	t_4 <= j;
-	t_4 = t_3;
+	t_1 = j < 1;
+	t_2 = t_0 && t_1;
+	beqz t_2 L_0_main;
+	t_3 = i < 5;
+	beqz t_3 L_2_main;
+	addparam i;
+	addparam j;
+	call add_int; 
+	t_4 =  return ;
+	t_5 <= b;
+	t_5 = t_4;
 	goto L_3_main;
 L_2_main:
-	b <= t_5;
-	t_5 = phi t_2, b;
-	t_7 = i + 2;
-	t_8 <= i;
-	t_8 = t_7;
+	t_6 <= b;
+	t_6 = 0;
+L_3_main:
+	b <= t_7;
+	t_7 = phi t_5, b, t_6;
+	t_8 = i + 2;
+	t_9 <= i;
+	t_9 = t_8;
+	t_10 = j + 1;
+	t_11 <= j;
+	t_11 = t_10;
 	goto L_1_main;
 L_0_main:
-	b <= t_10;
-	t_10 = phi t_5;
-	addparam t_10;
-	call print_int; 
+	j <= t_12;
+	t_12 = phi t_11, j;
+	i <= t_13;
+	t_13 = phi t_9, i;
+	b <= t_14;
+	t_14 = phi t_7;
 	return 0;
+
+----------- funcDef -----------
+add_int(2,2) => 2:
+----------- paramVars -----------
+b := symbol type: 0; data type: 2
+a := symbol type: 0; data type: 2
+----------- localVars -----------
+c := symbol type: 1; data type: 2; initValue: 0
+
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 2
+----------- Codes ------------
+add_int:
+	a =  param 0;
+	b =  param 0;
+	c = 0;
+	t_0 = a + b;
+	t_1 <= c;
+	t_1 = t_0;
+	return t_1;
 
