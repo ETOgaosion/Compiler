@@ -1232,6 +1232,125 @@ void IRFunction::delDeadCode() {
     }
 }
 
+bool IRFunction::haveEffection(IROperation op){
+    if(op == IROperation::BEQZ || op == IROperation::GOTO || op == IROperation::FETCH_ARRAY_ELEM ||
+       op == IROperation::ADD_LABEL || op == IROperation::ADD_PARAM || op == IROperation::ASSIGN_ARRAY_ELEM ||
+       op == IROperation::GET_PARAM || op == IROperation::GET_RETURN || op == IROperation::CALL ||
+       op == IROperation::RETURN || op == IROperation::READ || op == IROperation::PRINT )
+    {
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+void IRFunction::FindLiveInst(IRCode* code, std::vector<IRCode *>& replaceinst){
+    code->islive = true;
+    /*recurve*/
+
+    for(int i = 0;i < code->def.size();i ++){
+        if(!code->def[i]->islive){
+            FindLiveInst(code->def[i],replaceinst);
+        }
+    }
+    if(code->getOperation() == IROperation::PHI){
+        for(int i = 0;i < code->getArgs().size();i ++){
+            for(int j = 0;j < replaceinst.size();j ++){
+                if(replaceinst[j]->islive == 0 && code->getArgs()[i] == replaceinst[j]->getArg1()){
+                    FindLiveInst(replaceinst[j],replaceinst);
+                    for(int k = 0;k < codes.size();k ++){
+                        if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                            FindLiveInst(codes[k],replaceinst);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }else if(code->isTwoArgAssignmentOperation(code->getOperation()) ||
+             code->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
+             code->getOperation() == IROperation::ASSIGN_ARRAY_ELEM ||
+             code->getOperation() == IROperation::CALL ||
+             code->getOperation() == IROperation::RETURN)
+    {
+        for(int j = 0;j < replaceinst.size();j ++){
+            if(replaceinst[j]->islive == 0 && (code->getArg1() == replaceinst[j]->getArg1() || code->getArg2() == replaceinst[j]->getArg1())){
+                FindLiveInst(replaceinst[j],replaceinst);
+                for(int k = 0;k < codes.size();k ++){
+                    if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                        FindLiveInst(codes[k],replaceinst);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else if(code->getOperation() == IROperation::BEQZ ||
+            code->getOperation() == IROperation::REPLACE ||
+            code->getOperation() == IROperation::ASSIGN ||
+            code->getOperation() == IROperation::ADD_PARAM ||
+            code->getOperation() == IROperation::GET_PARAM ||
+            code->getOperation() == IROperation::PRINT)
+    {
+        for(int j = 0;j < replaceinst.size();j ++){
+            if(replaceinst[j]->islive == 0 && code->getArg1() == replaceinst[j]->getArg1()){
+                FindLiveInst(replaceinst[j],replaceinst);
+                for(int k = 0;k < codes.size();k ++){
+                    if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                        FindLiveInst(codes[k],replaceinst);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void IRFunction::ADCE(){
+    def_use_list();
+    std::vector<IRCode *> replaceinst;
+
+    for(int i = 0;i < codes.size();i ++){
+        codes[i]->islive = false;
+        if(codes[i]->getOperation() == IROperation::REPLACE){
+            replaceinst.push_back(codes[i]);
+        }
+    }
+
+    for(int i = codes.size() - 1;i >= 0;i --){
+        if(codes[i]->islive == false && haveEffection(codes[i]->getOperation())){
+           FindLiveInst(codes[i],replaceinst);
+        }
+    }
+    int i = 0; 
+    while(i < codes.size()){
+        if(codes[i]->islive == false){
+            int bnum;
+            for(bnum = 0;bnum < entrances.size();bnum ++){
+                if(entrances[bnum] == i){
+                    break;
+                }else if(entrances[bnum] > i){
+                    bnum --;
+                    break;
+                }
+            }
+            int cnum = i - bnum;
+            for(int j = bnum + 1;j < entrances.size();j ++){
+                entrances[bnum] --;
+            }
+
+            basicBlocks[bnum].erase(basicBlocks[bnum].begin() + cnum);
+
+            codes.erase(codes.begin() + i);
+        }else{
+            i++;
+        }
+    }
+    
+}
+
 void IRFunction::basicBlockDivision() {
     entrances.clear();
     entrances.push_back(0);
@@ -2682,8 +2801,9 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         break;
     case 4:
         basicBlockDivision();
-        liveVarAnalysis();
-        delDeadCode();
+        ADCE();
+        // liveVarAnalysis();
+        // delDeadCode();
         //LICM();
         break;
     }

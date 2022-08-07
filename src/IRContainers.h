@@ -108,6 +108,9 @@ public:
 
     /* dead code deletion */
     void delDeadCode() ;
+    void ADCE();
+    bool haveEffection(IROperation op);
+    void FindLiveInst(IRCode* code,std::vector<IRCode *>& replaceinst);
 
     /* bind registers */
     /* calculate active regions of each var */

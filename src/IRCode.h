@@ -51,6 +51,8 @@ public:
     std::vector<IRCode *> use;
     std::vector<IRCode *> def;
 
+    bool islive;
+
     IROperation getOperation() const { return operation; };
 
     IROperand *getArg1() const { return arg1; };
