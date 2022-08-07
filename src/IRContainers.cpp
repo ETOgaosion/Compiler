@@ -211,13 +211,35 @@ void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp
 }
 
 void IRFunction::def_use_list(){
-    for (int i = 0; i < codes.size(); i++) {
-            IRCode *code = codes[i];
-            code->use.clear();
-            IROperand *res = code->getResult();
-            for (int j = i + 1; j < codes.size(); j++)
-                if(codes[j]->getArg1() == res || codes[j]->getArg2() == res)
+    for(int i = 0; i < codes.size(); i++)
+        codes[i]->def.clear();
+    for (int i = 0; i < codes.size(); i++)
+    {
+        IRCode *code = codes[i];
+        code->use.clear();
+        IROperand *res = (code->getOperation()== IROperation::REPLACE)? code->getArg1() : code->getResult();
+        if(!res)
+            continue;
+        for (int j = 0; j < codes.size(); j++)
+            if(codes[j]->getOperation()== IROperation::PHI){
+                IRPhi* p = dynamic_cast<IRPhi*>(codes[j]);
+                for (auto k : codes[j]->getArgs()){
+                    if(k == res){
+                        code->use.push_back(codes[j]);
+                        codes[j]->def.emplace_back(code);
+                        break;
+                    }
+                }
+            }else if(codes[j]->getOperation()== IROperation::REPLACE){
+                if(codes[j]->getResult() == res){
                     code->use.push_back(codes[j]);
+                    codes[j]->def.emplace_back(code);
+                }
+            }
+            else if(codes[j]->getArg1() == res || codes[j]->getArg2() == res){
+                code->use.push_back(codes[j]);
+                codes[j]->def.emplace_back(code);
+            }
     }
 }
 
@@ -232,6 +254,7 @@ int IRFunction::Replacewith(IRCode* I, IROperand* val){
         IROperand *res = I->getResult();
         for (int i = 0; i < I->use.size(); i++)
         {
+            int sign = 1;
             IRCode* UI = I->use[i];
             if(UI->getOperation() == IROperation::CALL)
                 continue;
@@ -242,16 +265,65 @@ int IRFunction::Replacewith(IRCode* I, IROperand* val){
                 continue;
             }
 
-            if(UI->getArg1() == res)
-                UI->setArg1(val);
-            if(UI->getArg2() == res)
-                UI->setArg2(val);
+            int in = -1;
+            if (UI->getOperation() == IROperation::BEQZ)
+            {
+                in = dynamic_cast<IRBeqz *>(UI)->which_bb;     
+            }else if(UI->getResult()){
+                in = UI->getResult()->which_bb;
+            }else if(!UI->getResult()){
+                in = UI->which_bb;
+            }
+
+            if(in >= 0)
+                for(auto k : loop){
+                    if(k.start <= in && k.end >= in){
+                        if(!k.loopsym.empty()){
+                            auto pos = find(k.loopsym.begin(), k.loopsym.end(), res);
+                            if(pos != k.loopsym.end()){
+                                sign = 0;
+                                break;
+                            }
+                            pos = find(k.loopsym.begin(), k.loopsym.end(), res);
+                            if(pos != k.loopsym.end()){
+                                sign = 0;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+            if(sign){
+                if(UI->getArg1() == res)
+                    UI->setArg1(val);
+                if(UI->getArg2() == res)
+                    UI->setArg2(val);
+            }
         }
     }
     return 0;
 }
 
 void IRFunction::constFolding() {
+    loop.clear();
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }           
+            }
+        }
+    }
+
+    def_use_list();
+
+    updateloop(0, cycleNum.size(), 0);
+
     for(int bnum = 0; bnum < basicBlocks.size(); bnum++) {
         auto block = basicBlocks[bnum]; 
         for(int i = 0; i < block.size(); i++){
@@ -285,6 +357,7 @@ void IRFunction::constFolding() {
                 }*/
                 Replacewith(code, arg1);
                 block.erase(block.begin() + i);
+                basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                 codes.erase(codes.begin() + entrances[bnum] + i);
                 for(int k = bnum + 1; k < basicBlocks.size(); k++)
                     entrances[k]--;
@@ -320,6 +393,7 @@ void IRFunction::constFolding() {
                 if(new_value){
                     Replacewith(code, new_value);
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -364,6 +438,7 @@ void IRFunction::constFolding() {
                 if(new_value){
                     Replacewith(code, new_value);
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
@@ -381,13 +456,23 @@ void IRFunction::constFolding() {
                     block[i] = code;
                     basicBlocks[bnum][i] = code;
                     codes[entrances[bnum] + i] = code;
+                    auto pos = std::find(Pred[controlFlow[bnum][0]].begin(),Pred[controlFlow[bnum][0]].end(), bnum);
+                    if(pos != Pred[controlFlow[bnum][0]].end())
+                        Pred[controlFlow[bnum][0]].erase(pos);
+                    controlFlow[bnum].erase(controlFlow[bnum].begin());
+                    //delete code;
                 }
                 else {
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
-                    delete code;
+                    auto pos = std::find(Pred[controlFlow[bnum][1]].begin(),Pred[controlFlow[bnum][1]].end(), bnum);
+                    if(pos != Pred[controlFlow[bnum][1]].end())
+                        Pred[controlFlow[bnum][1]].erase(pos);
+                    controlFlow[bnum].erase(controlFlow[bnum].begin() + 1);
+
                 }
             }
 
@@ -426,7 +511,23 @@ void IRFunction::constFolding() {
                     else   
                         new_value = new IRValue(MetaDataType::INT, "0", {}, false);
                 } else {
-                    new_value = immCmp(arg1, arg2, op);
+                    int sign = 1;
+                    for (auto j : code->use)
+                    {
+                        if(j->getOperation() == IROperation::BEQZ){
+                            int in = dynamic_cast<IRBeqz *>(j)->which_bb;
+                            for(auto k : loop){
+                                if(k.start == in || k.end == in){
+                                    sign = 0;
+                                    break;
+                                }
+                            }
+                            if(!sign)
+                                break;
+                        }
+                    }
+                    if(sign)
+                        new_value = immCmp(arg1, arg2, op);
                 }
 
                 if(new_value){
@@ -456,10 +557,11 @@ void IRFunction::constFolding() {
                     
                     Replacewith(code, new_value);
                     block.erase(block.begin() + i);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin() + i);
                     codes.erase(codes.begin() + entrances[bnum] + i);
                     for(int k = bnum + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
-                    // delete code;
+                    //delete code;
                     i--;
                 
                 }
@@ -565,11 +667,17 @@ void IRFunction::constFolding() {
 }
 
 void IRFunction::CSE(){
+    loop.clear();
+
+    updateloop(0, cycleNum.size(), 0);
+
     def_use_list();
     for(int i = 0;i < basicBlocks.size();i ++){
         for(int j = 0;j < basicBlocks[i].size();j ++){
-            if(basicBlocks[i][j]->getResult()){
+            if(basicBlocks[i][j]->getResult() && basicBlocks[i][j]->getOperation() != IROperation::REPLACE){
                 basicBlocks[i][j]->getResult()->which_bb = i;
+            }else if(!basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->which_bb = i;
             }
         }
     }
@@ -592,7 +700,7 @@ void IRFunction::CSE(){
         {
             if (Pred[i].size() == 1)
             {
-                dom[i].clear();
+                //dom[i].clear();
                 std::vector<int> tmp = vector<int>(1, i);
                 std::vector<int> res;
                 set_union(dom[Pred[i][0]].begin(), dom[Pred[i][0]].end(), tmp.begin(), tmp.end(), back_inserter(res));
@@ -639,7 +747,7 @@ void IRFunction::CSE(){
         IROperand* op2 = I->getArg2();
         IROperand *re = I->getResult();
         IROperation op = I->getOperation();
-        if (record.empty())
+        if (record.empty() || !re)
             ;
         else
             for (int j = 0; j < record.size(); j++)
@@ -652,9 +760,11 @@ void IRFunction::CSE(){
                 if(pos == dom[re->which_bb].end())
                     continue;
                 if (op == opr && IRCode::isTwoArgAssignmentOperation(op))
-                    if(op1 == ar1 && op2 == ar2)
+                    if((op1 == ar1 || (op1->getOperandType() == OperandType::VALUE && ar1->getOperandType() == OperandType::VALUE && op1->getValue() == ar1->getValue())) 
+                    && (op2 == ar2 || (op2->getOperandType() == OperandType::VALUE && ar2->getOperandType() == OperandType::VALUE && op2->getValue() == ar2->getValue())) )
                         match = 1;
-                    else if(IRCode::isOrderIndependentOperation(op) && op1 == ar2 && op2 == ar1)
+                    else if(IRCode::isOrderIndependentOperation(op) && (op1 == ar1 || (op1->getOperandType() == OperandType::VALUE && ar1->getOperandType() == OperandType::VALUE && op1->getValue() == ar1->getValue())) 
+                    && (op2 == ar2 || (op2->getOperandType() == OperandType::VALUE && ar2->getOperandType() == OperandType::VALUE && op2->getValue() == ar2->getValue())))
                         match = 1;
                 if(match){
                     toRep = record[j];
@@ -669,7 +779,8 @@ void IRFunction::CSE(){
                 if(entrances[bnum]> i){
                     bnum--;
                     break;
-                }
+                }else if(bnum == basicBlocks.size() - 1)
+                    break;
             auto block = basicBlocks[bnum];
             block.erase(block.begin() + i - entrances[bnum]);
             codes.erase(codes.begin() + i);
@@ -842,13 +953,43 @@ void IRFunction::liveVarAnalysis() {
 
 // algorithm only works in Basic Block
 void IRFunction::delDeadCode() {
+    
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }               
+            }
+        }
+    }
+    
     for(int i = basicBlocks.size() - 1; i >= 0; i--){
         for (int i = 0; i < basicBlocks.size(); i++) {
             if (basicBlocks[i].empty()) {
                 basicBlocks.erase(basicBlocks.begin() + i);
                 controlFlow.erase(controlFlow.begin() + i);
+                Pred.erase(Pred.begin() + i);
                 entrances.erase(entrances.begin() + i);
                 cycleNum.erase(cycleNum.begin() + i);
+                for(int j;j < controlFlow.size();j ++){
+                    for(int k;k < controlFlow[j].size();k ++){
+                        if(controlFlow[j][k] > i){
+                            controlFlow[j][k] --;
+                        }
+                    }
+                }
+                for(int j;j < Pred.size();j ++){
+                    for(int k;k < Pred[j].size();k ++){
+                        if(Pred[j][k] >= i){
+                            Pred[j][k] --;
+                        }
+                    }
+                }
             }
         }
         auto block = basicBlocks[i];
@@ -1109,37 +1250,164 @@ void IRFunction::delDeadCode() {
     }
 }
 
+bool IRFunction::haveEffection(IROperation op){
+    if(op == IROperation::BEQZ || op == IROperation::GOTO || op == IROperation::FETCH_ARRAY_ELEM ||
+       op == IROperation::ADD_LABEL || op == IROperation::ADD_PARAM || op == IROperation::ASSIGN_ARRAY_ELEM ||
+       op == IROperation::GET_PARAM || op == IROperation::GET_RETURN || op == IROperation::CALL ||
+       op == IROperation::RETURN )
+    {
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+void IRFunction::FindLiveInst(IRCode* code, std::vector<IRCode *>& replaceinst){
+    code->islive = true;
+    /*recurve*/
+
+    for(int i = 0;i < code->def.size();i ++){
+        if(!code->def[i]->islive){
+            FindLiveInst(code->def[i],replaceinst);
+        }
+    }
+    if(code->getOperation() == IROperation::PHI){
+        for(int i = 0;i < code->getArgs().size();i ++){
+            for(int j = 0;j < replaceinst.size();j ++){
+                if(replaceinst[j]->islive == 0 && code->getArgs()[i] == replaceinst[j]->getArg1()){
+                    FindLiveInst(replaceinst[j],replaceinst);
+                    for(int k = 0;k < codes.size();k ++){
+                        if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                            FindLiveInst(codes[k],replaceinst);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }else if(code->isTwoArgAssignmentOperation(code->getOperation()) ||
+             code->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
+             code->getOperation() == IROperation::ASSIGN_ARRAY_ELEM ||
+             code->getOperation() == IROperation::CALL ||
+             code->getOperation() == IROperation::RETURN)
+    {
+        for(int j = 0;j < replaceinst.size();j ++){
+            if(replaceinst[j]->islive == 0 && (code->getArg1() == replaceinst[j]->getArg1() || code->getArg2() == replaceinst[j]->getArg1())){
+                FindLiveInst(replaceinst[j],replaceinst);
+                for(int k = 0;k < codes.size();k ++){
+                    if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                        FindLiveInst(codes[k],replaceinst);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else if(code->getOperation() == IROperation::BEQZ ||
+            code->getOperation() == IROperation::REPLACE ||
+            code->getOperation() == IROperation::ASSIGN ||
+            code->getOperation() == IROperation::ADD_PARAM ||
+            code->getOperation() == IROperation::GET_PARAM)
+    {
+        for(int j = 0;j < replaceinst.size();j ++){
+            if(replaceinst[j]->islive == 0 && code->getArg1() == replaceinst[j]->getArg1()){
+                FindLiveInst(replaceinst[j],replaceinst);
+                for(int k = 0;k < codes.size();k ++){
+                    if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                        FindLiveInst(codes[k],replaceinst);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void IRFunction::ADCE(){
+    def_use_list();
+    std::vector<IRCode *> replaceinst;
+
+    for(int i = 0;i < codes.size();i ++){
+        codes[i]->islive = false;
+        if(codes[i]->getOperation() == IROperation::REPLACE){
+            replaceinst.push_back(codes[i]);
+        }
+    }
+
+    for(int i = codes.size() - 1;i >= 0;i --){
+        if(codes[i]->islive == false && haveEffection(codes[i]->getOperation())){
+           FindLiveInst(codes[i],replaceinst);
+        }
+    }
+    int i = 0; 
+    while(i < codes.size()){
+        if(codes[i]->islive == false){
+            int bnum;
+            for(bnum = 0;bnum < entrances.size();bnum ++){
+                if(entrances[bnum] == i){
+                    break;
+                }else if(entrances[bnum] > i){
+                    bnum --;
+                    break;
+                }else if(bnum == entrances.size() - 1){
+                    break;
+                }
+            }
+            int cnum = i - entrances[bnum];
+            for(int j = bnum + 1;j < entrances.size();j ++){
+                entrances[j] --;
+            }
+
+            for(auto j:codes[i]->def){
+                if(!j->use.empty()){
+                    auto pos = find(j->use.begin(), j->use.end(), codes[i]);
+                    if(pos != j->use.end())
+                        j->use.erase(pos);
+                }
+            }
+
+            basicBlocks[bnum].erase(basicBlocks[bnum].begin() + cnum);
+
+            codes.erase(codes.begin() + i);
+        }else{
+            i++;
+        }
+    }
+}
+
 void IRFunction::basicBlockDivision() {
     entrances.clear();
     entrances.push_back(0);
     for (int i = 0; i < codes.size(); i++) {
+        if (codes[i]->getOperation() == IROperation::BEQZ || codes[i]->getOperation() == IROperation::GOTO) {
+            entrances.push_back(i + 1);
+        }
         if (find(entrances.begin(), entrances.end(), i) != entrances.end()) {
             continue;
         }
         if (codes[i]->getOperation() == IROperation::ADD_LABEL) {
             entrances.push_back(i);
         }
-        if (codes[i]->getOperation() == IROperation::BEQZ || codes[i]->getOperation() == IROperation::GOTO) {
-            entrances.push_back(i + 1);
-        }
+        
     }
     entrances.push_back(codes.size());
     for (int i = 0; i < entrances.size() - 1; i++) {
-        /*
-        for(int j = entrances[i];j < entrances[i+1];j++){
-            codes[j]->getResult()->which_bb = i;
-        }
-        */
         basicBlocks.emplace_back(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
     }
     entrances.pop_back();
 
-    for(int i = 0; i < basicBlocks.size(); i++)
-        Pred.push_back(vector<int>());
+    for(int i = 0; i < basicBlocks.size(); i++){
+        if(i > 0 && codes[entrances[i] - 1]->getOperation() != IROperation::GOTO )
+            Pred.emplace_back(1, i - 1);
+        else
+            Pred.push_back(vector<int>());
+    }
 
     for (int i = 0; i < basicBlocks.size(); i++)
     {
-        if(codes[entrances[i+1]-1]->getOperation() != IROperation::GOTO)
+        if(i < basicBlocks.size() - 1 && codes[entrances[i+1]-1]->getOperation() != IROperation::GOTO)
             controlFlow.emplace_back(1, i + 1);
         else
             controlFlow.push_back(vector<int>());
@@ -1147,7 +1415,10 @@ void IRFunction::basicBlockDivision() {
         for (auto &j : basicBlocks[i])
         {
             if (j->getOperation() == IROperation::BEQZ || j->getOperation() == IROperation::GOTO) {
-                for (int k = 0; k < entrances.size(); k++) {
+                if(j->getOperation() == IROperation::BEQZ)
+                    dynamic_cast<IRBeqz *>(j)->which_bb = i;
+                for (int k = 0; k < entrances.size(); k++)
+                {
                     if (codes[entrances[k]]->getOperation() != IROperation::ADD_LABEL) {
                         continue;
                     }
@@ -1163,18 +1434,7 @@ void IRFunction::basicBlockDivision() {
             }
         }
     }
-    cycleNum = vector<int>(entrances.size(), 0);
-    for (int i = 0; i < controlFlow.size(); i++) {
-        for (int j : controlFlow[i]) {
-            if (j <= i) {
-                for (int k = j; k <= i; k++)
-                {
-                    cycleNum[k]++;
-                }               
-            }
-        }
-    }
-
+    
     /*sure.clear();
     for (int i = 0; i < controlFlow.size(); i++)
         sure.push_back(0);
@@ -1192,7 +1452,7 @@ void IRFunction::basicBlockDivision() {
     }*/
 }
 
-struct loopinfo* IRFunction::updateloop(int first, int end, int base){
+int IRFunction::updateloop(int first, int end, int base){
     int now = base;
     for (int i = first; i < end; i++)
     {
@@ -1205,9 +1465,13 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
             in.cyclelayer = cycleNum[i];
             in.handled = 0;
             in.start = i;
-            for (int j = i; j < end; j++){
-                if(cycleNum[j] > now)
-                    in.subloop.push_back(updateloop(j, end, now));
+            for (int j = i; j < end; j++)
+            {
+                if(cycleNum[j] > now){
+                    int sub = updateloop(j, end, now);
+                    in.subloop.push_back(sub);
+                    j = loop[sub].end + 1;
+                }
                 else if (cycleNum[j] < now)
                 {
                     in.end = j - 1;
@@ -1215,6 +1479,12 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
                 }
                 else if (j == end - 1)
                     in.end = j;
+            }
+
+            for(auto j :basicBlocks[in.end]){
+                if(j->getOperation() == IROperation::REPLACE){
+                    in.loopsym.emplace_back(j->getArg1());
+                }
             }
 
             in.pred = Pred[i];
@@ -1232,14 +1502,15 @@ struct loopinfo* IRFunction::updateloop(int first, int end, int base){
         else if(layer < now)
             now = layer;
     }
-    if(!loop.empty())
-        return &loop.back();
-    else
-        return nullptr;
+
+    return loop.size() - 1;
 }
 
 bool IRFunction::BBisinvalid(int i){
-    for(auto &j: basicBlocks[i]){
+    if(basicBlocks[i].empty())
+        return true;
+    for (auto &j : basicBlocks[i])
+    {
         IROperation op = j->getOperation();
         if (op != IROperation::ADD_LABEL && op != IROperation::GOTO && op != IROperation::BEQZ)
             return false;
@@ -1248,9 +1519,120 @@ bool IRFunction::BBisinvalid(int i){
     return true;
 }
 
+void IRFunction::EraseBB(int i){
+    def_use_list();
+    for (int j = entrances[i]; j < entrances[i+1]; j++){
+        IRCode *I = codes[j];
+        for (int k = 0; k < I->use.size(); k++){
+            IRCode *tmp = I->use[k];
+            IROperand *res = tmp->getResult();
+            IROperation op = tmp->getOperation();
+            if (op == IROperation::PHI)
+                if(res->which_bb > i){
+                    auto pos = std::find(codes.begin(), codes.end(), tmp);
+                    IRPhi *t = dynamic_cast<IRPhi*>(codes[pos - codes.begin()]);
+                    vector<IROperand *> arg = t->getArgs();
+                    if(arg.size() == 1){
+                        //auto pos = std::find(codes.begin(), codes.end(), tmp);
+                        if(pos != codes.end()){
+                            codes.erase(pos);
+                            basicBlocks[res->which_bb].erase(pos - codes.begin() - entrances[i] + basicBlocks[res->which_bb].begin());
+                        }
+                        for (int a = res->which_bb + 1; a < basicBlocks.size(); a++)
+                            entrances[a]--;
+                    }else if(arg.size() > 1){
+                        
+                        auto p = std::find(arg.begin(), arg.end(), I->getResult());
+                        if(p != arg.end()){
+                            arg.erase(p);
+                            t->args.assign(arg.begin(), arg.end());
+                        }
+                        /*IRCode *newcode = new IRAssign(res, arg);
+                        if(pos != codes.end()){
+                            codes.erase(pos);
+                            codes.insert(pos, newcode);
+                            basicBlocks[res->which_bb].erase(pos - codes.begin() - entrances[i] + basicBlocks[res->which_bb].begin());
+                            basicBlocks[res->which_bb].insert(pos - codes.begin() - entrances[i] + basicBlocks[res->which_bb].begin(), newcode);
+                        }*/
+                    }
+                }
+        }
+    }
+
+    codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i + 1]);
+    for (int j = i + 1; j < entrances.size(); j++)
+        entrances[j] -= basicBlocks[i].size();
+    entrances.erase(entrances.begin() + i);
+
+    for(int j = 0; j < controlFlow.size(); j++){
+        if(j == i)
+            continue;
+        for(int k = 0; k < controlFlow[j].size(); k++)
+            if(controlFlow[j][k] > i)
+                controlFlow[j][k]--;
+            else if(controlFlow[j][k] == i){
+                controlFlow[j].erase(controlFlow[j].begin() + k);
+                k--;
+            }
+    }
+
+    for (int j = 0; j < Pred.size(); j++){
+        if(j == i)
+            continue;
+        for(int k = 0; k < Pred[j].size(); k++)
+            if(Pred[j][k] > i)
+                Pred[j][k]--;
+            else if(Pred[j][k] == i){
+                Pred[j].erase(Pred[j].begin() + k);
+                k--;
+            }
+    }
+
+    controlFlow.erase(controlFlow.begin() + i);
+    Pred.erase(Pred.begin() + i);
+
+    basicBlocks.erase(basicBlocks.begin() + i);
+}
+
 void IRFunction::JumpThreading(){
-    for (int i = 0; i < basicBlocks.size() - 1; i++) {
-        IRCode * I = basicBlocks[i].back();
+    for (int i = 0; i < basicBlocks.size(); i++) {
+        if(basicBlocks[i].size() == 0){
+            EraseBB(i);
+            i -= 2;
+            if(i < 0)
+                i = 0;
+            continue;
+        }
+        IRCode *I = basicBlocks[i].back();
+        if(i > 0 && codes[entrances[i] - 1]->getOperation() == IROperation::GOTO ){
+            if(codes[entrances[i]]->getOperation() != IROperation::ADD_LABEL || Pred[i].size() == 0){
+                EraseBB(i);
+                i-=2;
+                if(i < 0)
+                    i = 0;
+                continue;
+            }
+        }
+
+        if(codes[entrances[i]]->getOperation() == IROperation::ADD_LABEL && Pred[i].size() == 1){
+            if(i > 0 && Pred[i][0] == i - 1){
+                if((i == 1 || basicBlocks[i - 1].size() > 1) && codes[entrances[i] - 1]->getOperation() == IROperation::GOTO && codes[entrances[i] - 1]->getArg1()->getSymbolName() == codes[entrances[i]]->getArg1()->getSymbolName()){
+                    basicBlocks[i - 1].erase(basicBlocks[i - 1].end() - 1);
+                    codes.erase(codes.begin() + entrances[i] - 1);
+                    for(int k = i; k < basicBlocks.size(); k++)
+                        entrances[k]--;
+                    if(BBisinvalid(i - 1)){
+                        EraseBB(i - 1);
+                        i--;
+                    }
+                }
+                basicBlocks[i].erase(basicBlocks[i].begin());
+                codes.erase(codes.begin() + entrances[i]);
+                for(int k = i; k < basicBlocks.size(); k++)
+                    entrances[k]--;
+            }
+        }
+
         if(I->getOperation() == IROperation::BEQZ && codes[entrances[i + 1]]->getArg1()->getSymbolName() == I->getArg2()->getSymbolName()){
             basicBlocks[i].erase(basicBlocks[i].end() - 1);
             codes.erase(codes.begin() + entrances[i + 1] - 1);
@@ -1265,6 +1647,7 @@ void IRFunction::JumpThreading(){
                 codes.erase(codes.begin() + entrances[i + 1] - 1);
                 basicBlocks[i].push_back(newcode);
                 codes.insert(codes.begin() + entrances[i + 1] - 1, newcode);
+                delete newcode;
 
                 auto pos = std::find(controlFlow[i].begin(),controlFlow[i].end(), i + 1);
                 while( pos  != controlFlow[i].end()){
@@ -1309,7 +1692,7 @@ void IRFunction::JumpThreading(){
             }
         }
 
-        if(I->getOperation() != IROperation::GOTO && I->getOperation() != IROperation::BEQZ){
+        if(I->getOperation() != IROperation::GOTO && I->getOperation() != IROperation::BEQZ && I->getOperation() != IROperation::RETURN){
             
             if(Pred[i + 1].size() == 1 && Pred[i+1].back() == i){
                 if(codes[entrances[i + 1]]->getOperation() == IROperation::ADD_LABEL){
@@ -1340,39 +1723,26 @@ void IRFunction::JumpThreading(){
                 tar = tmp;
             }
 
-            if(tar >= 0 && Pred[tar].size() == 1 && Pred[tar].back() == i){
+            if(tar >= 0 && Pred[tar].size() == 1 && Pred[tar].back() == i && basicBlocks[tar].back()->getOperation() == IROperation::GOTO){
                 if(codes[entrances[tar]]->getOperation() == IROperation::ADD_LABEL){
                     basicBlocks[tar].erase(basicBlocks[tar].begin());
                     codes.erase(codes.begin() + entrances[tar]);
-                    for(int k = i + 1; k < basicBlocks.size(); k++)
+                    for(int k = tar + 1; k < basicBlocks.size(); k++)
                         entrances[k]--;
                 }
-                //delete GOTO
-                basicBlocks[i].erase(basicBlocks[i].begin() + basicBlocks[i].size() - 1);
+                //delete GOTO 
                 codes.erase(codes.begin() + entrances[i] + basicBlocks[i].size() - 1);
+                basicBlocks[i].erase(basicBlocks[i].end() - 1);
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k]--;
                 //move code
-                /*
-                for(int k = 0; k < basicBlocks[tar].size(); k++)
-                {
-                    if(basicBlocks[tar][k]->getResult()){
-                        basicBlocks[tar][k]->getResult()->which_bb = i;
-                    }
-                }
-                for(int k = entrances[tar + 1];k < codes.size();k ++){
-                    if(codes[k]->getResult()){
-                        codes[k]->getResult()->which_bb --;
-                    }
-                }
-                */
                 codes.insert(codes.begin() + entrances[i + 1], basicBlocks[tar].begin(), basicBlocks[tar].end());
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k] += basicBlocks[tar].size();
                 codes.erase(codes.begin() + entrances[tar], codes.begin() + entrances[tar] + basicBlocks[tar].size());
                 for(int k = tar + 1; k < basicBlocks.size(); k++)
                     entrances[k] -= basicBlocks[tar].size();
-                
+
                 basicBlocks[i].insert(basicBlocks[i].end(), basicBlocks[tar].begin(), basicBlocks[tar].end());
                 basicBlocks.erase(basicBlocks.begin() + tar);
                 entrances.erase(entrances.begin() + tar);
@@ -1411,29 +1781,7 @@ void IRFunction::JumpThreading(){
                             break;
                         pos = std::find(controlFlow[tmp].begin(),controlFlow[tmp].end(), i);
                     }
-                    /*for (int a = 0; a < controlFlow[tmp].size(); a++)
-                    {
-                        int j = controlFlow[tmp][a];
-                        if (j == i){
-                            controlFlow[tmp][a] = tar;
-                            j = tar;
-                        }
-
-                        if(j == tar && !sign)
-                            sign = 1;
-                        else if(j == tar && sign){
-                            controlFlow[tmp].erase(controlFlow[tmp].begin() + a);
-                            a--;
-                        }
-                    }*/
                 }
-                /*
-                for(int k = entrances[i + 1];k < codes.size();k ++){
-                    if(codes[k]->getResult()){
-                        codes[k]->getResult()->which_bb --;
-                    }
-                }
-                */
                 codes.erase(codes.begin() + entrances[i], codes.begin() + entrances[i] + basicBlocks[i].size());
                 for(int k = i + 1; k < basicBlocks.size(); k++)
                     entrances[k] -= basicBlocks[i].size();
@@ -1450,51 +1798,113 @@ void IRFunction::JumpThreading(){
     }
 }
 
-struct loopinfo* IRFunction::loopchoose(int i){
-    int first, end;
-    for (first = i; first < basicBlocks.size(); first++)
-        if(cycleNum[first] > 0){
-            int layer = cycleNum[first];
-            for (int k = 0;k < loop.size();k++ )
-            {
-                loopinfo* j = &loop[k];
-                if(j->cyclelayer == layer && j->start == first && !j->handled){
-                    struct loopinfo * tmp = j;
-                    while(!tmp->subloop.empty()){
-                        int pos = 1;
-                        if (!tmp->subloop.front()->handled){
-                            tmp = tmp->subloop.front();
-                            continue;
+bool IRFunction::CanBeHoist(loopinfo * currentloop, IRCode * code_pos){
+    bool res = false ,res1 = false, res2 = false;
+    int start = currentloop->start;
+    int end = currentloop->end;
+    
+    if((IRCode::isTwoArgAssignmentOperation(code_pos->getOperation()) ||
+       code_pos->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
+       code_pos->getOperation() == IROperation::ASSIGN_ARRAY_ELEM))
+    {
+        if(code_pos->getArg1()){
+            if(code_pos->getArg1()->getOperandType() == OperandType::VALUE)
+                res1 = true;
+            else if(code_pos->getArg1()->which_bb < currentloop->start){
+                res1 = true;
+                for(int i = entrances[start]; i < entrances[end + 1]; i++){
+                    if(codes[i]->getOperation() == IROperation::REPLACE && codes[i]->getArg1() == code_pos->getArg1()){
+                        for(int j = i + 1;j < entrances[end + 1];j ++){
+                            if(codes[j]->getResult() == codes[i]->getResult()){
+                                res1 = CanBeHoist(currentloop,codes[j]);
+                                if(!res1)
+                                    return false;
+                            }
                         }
-                        while(tmp->subloop[pos]->handled)
-                        {
-                            pos++;
-                            if(pos >= tmp->subloop.size())
-                                break;
-                        }
-
-                        if(pos >= tmp->subloop.size())
-                            break;
-                        if(!tmp->subloop[pos]->handled){
-                            tmp = tmp->subloop[pos];
-                            continue;
+                    }else if(codes[i]->getOperation() == IROperation::PHI){
+                        for(int j = 0;j < codes[i]->getArgs().size();j ++){
+                            IROperand* tmp = codes[i]->getArgs()[j];
+                            if(tmp == code_pos->getResult())
+                                return false;
                         }
                     }
-
-                    tmp->handled = 1;
-                    return tmp;
                 }
+            }else{
+                res1 = false;
             }
         }
 
-    return nullptr;
+        if(code_pos->getArg2()){
+            if(code_pos->getArg2()->getOperandType() == OperandType::VALUE)
+                res2 = true;
+            else if(code_pos->getArg2()->which_bb < currentloop->start){
+                res2 = true;
+                for(int i = entrances[start]; i < entrances[end + 1]; i++){
+                    if(codes[i]->getOperation() == IROperation::REPLACE && codes[i]->getArg1() == code_pos->getArg2()){
+                        for(int j = i + 1;j < entrances[end + 1];j ++){
+                            if(codes[j]->getResult() == codes[i]->getResult()){
+                                res2 = CanBeHoist(currentloop,codes[j]);
+                                if(!res2)
+                                    return false;
+                            }
+                        }
+                    }else if(codes[i]->getOperation() == IROperation::PHI){
+                        for(int j = 0;j < codes[i]->getArgs().size();j ++){
+                            IROperand* tmp = codes[i]->getArgs()[j];
+                            if(tmp == code_pos->getResult())
+                                return false;
+                        }
+                    }
+                }
+            }else{
+                res2 = false;
+            }
+        }
+
+        res = res1 && res2;
+        return res;
+    }
+
+    else if(code_pos->getOperation() == IROperation::ASSIGN){
+        if(code_pos->getArg1()){
+            if(code_pos->getArg1()->getOperandType() == OperandType::VALUE)
+                res1 = true;
+            else if(code_pos->getArg1()->which_bb < currentloop->start){
+                res1 = true;
+                for(int i = entrances[start]; i < entrances[end + 1]; i++){
+                    if(codes[i]->getOperation() == IROperation::REPLACE && codes[i]->getArg1() == code_pos->getArg1()){
+                        for(int j = i + 1;j < entrances[end + 1];j ++){
+                            if(codes[j]->getResult() == codes[i]->getResult()){
+                                res1 = CanBeHoist(currentloop,codes[j]);
+                                if(!res1)
+                                    return false;
+                            }
+                        }
+                    }else if(codes[i]->getOperation() == IROperation::PHI){
+                        for(int j = 0;j < codes[i]->getArgs().size();j ++){
+                            IROperand* tmp = codes[i]->getArgs()[j];
+                            if(tmp == code_pos->getResult())
+                                return false;
+                        }
+                    }
+                }
+            }else{
+                res1 = false;
+            }
+        }
+
+        return res1;
+    }
+
+    else
+        return false;
 }
 
 void IRFunction:: HoistOnLoop(loopinfo * currentloop){
     /*use recursing to process sub loop*/
     if(currentloop->subloop.size() > 0){
         for(int i = 0;i < currentloop->subloop.size();i ++)
-            HoistOnLoop(currentloop->subloop[i]);
+            HoistOnLoop(&loop[currentloop->subloop[i]]);
     }
     /*process this loop*/
     if(currentloop->pred.size() == 0){
@@ -1547,7 +1957,10 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
         /*create new bb, process as one prevous bb*/
     
     }
-    else if(currentloop->pred.size() == 1){
+else if(currentloop->pred.size() == 1 &&
+            (basicBlocks[currentloop->pred[0]].back()->getOperation() != IROperation::BEQZ &&
+             basicBlocks[currentloop->pred[0]].back()->getOperation() != IROperation::GOTO))
+    {
         /*one prevous basic block, use this bb*/
         ;
     }
@@ -1556,7 +1969,8 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
         /*create a new basic block*/
         entrances.insert(entrances.begin()+currentloop->start,entrances[currentloop->start]);
 
-        basicBlocks.insert(basicBlocks.begin() + currentloop->start,{});
+        std::vector<IRCode *> nulbas = {};
+        basicBlocks.insert(basicBlocks.begin() + currentloop->start,nulbas);
 
         for(int i = 0;i < Pred.size();i++){
             for(int j = 0;j < Pred[i].size();j ++){
@@ -1566,7 +1980,8 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
             }
         }
         //Pred[currentloop->start].push_back(currentloop->start);
-        Pred.insert(Pred.begin() + currentloop->start,{});
+        std::vector<int> prednull = {};
+        Pred.insert(Pred.begin() + currentloop->start,prednull);
         Pred[currentloop->start].insert(Pred[currentloop->start].end(),currentloop->pred.begin(),currentloop->pred.end());
         Pred[currentloop->start + 1].push_back(currentloop->start);
         for(int i = 0;i < Pred[currentloop->start].size();i ++){
@@ -1602,7 +2017,8 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
             }
         }
 
-        controlFlow.insert(controlFlow.begin() + prev_start,{});
+        std::vector<int> connull = {};
+        controlFlow.insert(controlFlow.begin() + prev_start,connull);
         controlFlow[prev_start].push_back(prev_start+1);
         for(int i = 0;i < currentloop->pred.size();i ++){
             for(int j = 0;j < controlFlow[currentloop->pred[i]].size();j ++){
@@ -1621,7 +2037,8 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
         currentloop->pred.push_back(prev_start);
 
         for(int i = entrances[prev_start+1];i < codes.size();i ++){
-            codes[i]->getResult()->which_bb++;
+            if(codes[i]->getOperation() != IROperation::REPLACE && codes[i]->getResult())
+                codes[i]->getResult()->which_bb++;
         }
 
         /*add label in new bb */
@@ -1656,8 +2073,11 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
     for(int bnum = currentloop->start;bnum <= currentloop->end;bnum ++){
         if(cycleNum[bnum] == currentloop->cyclelayer){
             for(int cnum = 0; cnum < basicBlocks[bnum].size();cnum ++){
-                if((basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
+                /*
+                if(basicBlocks[bnum][cnum]->getArg1() &&
+                   (basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
                    basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start) &&
+                   basicBlocks[bnum][cnum]->getArg2() &&
                    (basicBlocks[bnum][cnum]->getArg2()->getOperandType() == OperandType::VALUE ||
                    basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start) &&
                    (IRCode::isTwoArgAssignmentOperation(basicBlocks[bnum][cnum]->getOperation()) ||
@@ -1672,6 +2092,111 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
                     for(int k = bnum+1;k < basicBlocks.size();k++)
                         entrances[k] --;
                 }
+
+                else if(basicBlocks[bnum][cnum]->getArg1() &&
+                        (basicBlocks[bnum][cnum]->getArg1()->getOperandType() == OperandType::VALUE ||
+                        basicBlocks[bnum][cnum]->getArg1()->which_bb < currentloop->start) &&
+                        basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN ){
+                    IRCode* tmp = basicBlocks[bnum][cnum];
+                    tmp->getResult()->which_bb = currentloop->pred[0];
+                    Hoist(currentloop,tmp,currentloop->pred[0]);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
+                    codes.erase(codes.begin() + entrances[bnum] + cnum);
+                    for(int k = bnum+1;k < basicBlocks.size();k++)
+                        entrances[k] --;
+                }
+                */
+                if(CanBeHoist(currentloop,basicBlocks[bnum][cnum])){
+                    int i;
+                    for(i = entrances[bnum] + cnum;i >= entrances[currentloop->start];i --){
+                        if(codes[i]->getOperation() == IROperation::REPLACE && codes[i]->getResult() == basicBlocks[bnum][cnum]->getResult())
+                            break;
+                    }
+
+                    if(i >= entrances[currentloop->start]){
+                        /*hoist replace*/
+                        int bb,cc;
+                        for(bb=currentloop->start;bb<currentloop->end;bb++){
+                            if(entrances[bb]==i)
+                                break;
+                            else if(entrances[bb]>i){
+                                bb--;
+                                break;
+                            }
+                        }
+                        cc = i - entrances[bb];
+                        IRCode* tmp = codes[i];
+                        //IRReplace* tmpre = new IRReplace(codes[i]->getResult(),codes[i]->getArg1());
+                        tmp->getResult()->which_bb = currentloop->pred[0];
+                        Hoist(currentloop,tmp,currentloop->pred[0]);
+                        basicBlocks[bb].erase(basicBlocks[bb].begin()+cc);
+                        codes.erase(codes.begin() + i + 1);
+                        for(int k = bb+1;k < basicBlocks.size();k++)
+                            entrances[k] --;
+                        
+                        if(bb == bnum && cc < cnum)
+                            cnum --;
+                        IRCode* tmpre = basicBlocks[currentloop->pred[0]].back();
+                        /*change phi to assign*/
+                        int j;
+                        if(currentloop->end + 1 < entrances.size()){
+                        for(j = entrances[currentloop->end + 1];j < codes.size();j ++){
+                            if(codes[j]->getOperation() == IROperation::PHI && 
+                              (codes[j]->getArgs().size() == 2 &&
+                              ((codes[j]->getArgs()[0] == tmpre->getArg1() && codes[j]->getArgs()[1] == tmpre->getResult()) ||
+                              (codes[j]->getArgs()[1] == tmpre->getArg1() && codes[j]->getArgs()[0] == tmpre->getResult()))) ||
+                              (codes[j]->getArgs().size() == 1 && codes[j]->getArgs()[0] == tmpre->getResult()))
+                            {
+                                IRAssign * tmpcode = new IRAssign(codes[j]->getResult(),tmpre->getResult());
+                                codes.erase(codes.begin() + j);
+                                codes.insert(codes.begin() + j,tmpcode);
+                                int bb,cc;
+                                for(bb=0;bb<entrances.size();bb++){
+                                    if(entrances[bb]==j)
+                                        break;
+                                    else if(entrances[bb]>j){
+                                        bb--;
+                                        break;
+                                    }
+                                }
+                                cc = j - entrances[bb];
+                                basicBlocks[bb].erase(basicBlocks[bb].begin() + cc);
+                                basicBlocks[bb].insert(basicBlocks[bb].begin() + cc,tmpcode);
+
+                                //delete tmpcode;
+                                break;
+                            }
+                        }
+                        }
+
+                        if(j < codes.size()){
+                            int k;
+                            if(currentloop->end + 1 < entrances.size()){
+                                for(k = j - 1;k >= entrances[currentloop->end + 1];k --){
+                                    if(codes[k]->getOperation() == IROperation::REPLACE &&
+                                        codes[k]->getArg1() == codes[j]->getResult() &&
+                                        codes[k]->getResult() == tmpre->getArg1())
+                                    {
+                                        IROperand* optmp = codes[k]->getArg1();
+                                        codes[k]->setArg1(codes[k]->getResult());
+                                        codes[k]->setResult(optmp);
+                                    }
+                                }
+                            }
+                        }
+
+                        //delete tmpre;
+                    }
+
+                    IRCode* tmp = basicBlocks[bnum][cnum];
+                    tmp->getResult()->which_bb = currentloop->pred[0];
+                    Hoist(currentloop,tmp,currentloop->pred[0]);
+                    basicBlocks[bnum].erase(basicBlocks[bnum].begin()+cnum);
+                    codes.erase(codes.begin() + entrances[bnum] + cnum);
+                    for(int k = bnum+1;k < basicBlocks.size();k++)
+                        entrances[k] --;
+                }
+
             }
         }
     }
@@ -1681,6 +2206,7 @@ void IRFunction:: HoistOnLoop(loopinfo * currentloop){
 void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance){
     int bnum;
     int boff;
+
     for(int i = entrance+1; i < entrances.size();i ++){
         entrances[i] ++;
     }
@@ -1691,12 +2217,28 @@ void IRFunction:: Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance)
 
 void IRFunction::LICM(){
     loop.clear();
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }           
+            }
+        }
+    }
+
     updateloop(0, cycleNum.size(), 0);
     
     for(int i = 0;i < basicBlocks.size();i ++){
         for(int j = 0;j < basicBlocks[i].size();j ++){
-            if(basicBlocks[i][j]->getResult()){
+            if(basicBlocks[i][j]->getResult() && basicBlocks[i][j]->getOperation() != IROperation::REPLACE){
                 basicBlocks[i][j]->getResult()->which_bb = i;
+            }else if(!basicBlocks[i][j]->getResult()){
+                basicBlocks[i][j]->which_bb = i;
             }
         }
     }
@@ -1748,6 +2290,7 @@ void IRFunction::LICM(){
         }
     }
 }
+
 
 void IRFunction::calVarActiveRegions() {
     unordered_map<IROperand *, vector<int>> definitions;
@@ -2149,6 +2692,20 @@ unordered_map<IROperand *, int> IRFunction::calVarCosts() {
 }
 
 void IRFunction::varBindRegisters(TargetCodes *t) {
+    if(!cycleNum.empty())
+        cycleNum.clear();
+    cycleNum = vector<int>(entrances.size(), 0);
+    for (int i = 0; i < controlFlow.size(); i++) {
+        for (int j : controlFlow[i]) {
+            if (j <= i) {
+                for (int k = j; k <= i; k++)
+                {
+                    cycleNum[k]++;
+                }               
+            }
+        }
+    }
+
     calVarActiveRegions();
     unordered_map<IROperand *, vector<IROperand *>> conflictVar = calConflictVarRelations();
     vector<vector<IROperand *>> registerGraph = calRegisterGraph(conflictVar);
@@ -2259,9 +2816,10 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         break;
     case 2:
         basicBlockDivision();
+        CSE();
         constFolding();
-        liveVarAnalysis();
-        delDeadCode();
+        JumpThreading();
+        ADCE();
         break;
     case 3:
         basicBlockDivision();

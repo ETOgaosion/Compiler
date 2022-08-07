@@ -8,8 +8,9 @@ struct loopinfo{
     int handled;
     int start;
     int end;
-    std::vector<loopinfo*> subloop;
+    std::vector<int> subloop;
     std::vector<int> pred;
+    std::vector<IROperand *> loopsym;
 };
 
 class IRProgram;
@@ -78,6 +79,7 @@ public:
     /*Constant propagation*/
     void def_use_list();
     int Replacewith(IRCode *I, IROperand *val);
+    void EraseBB(int i);
     void constFolding();
     /*Common subexpression extraction*/
     void CSE();
@@ -85,11 +87,11 @@ public:
     bool BBisinvalid(int i);
     void JumpThreading();
     /*Loop invariant*/
-    struct loopinfo* updateloop(int first, int end, int base);
-    struct loopinfo* loopchoose(int i);
+    int updateloop(int first, int end, int base);
     void LICM();
     void HoistOnLoop(loopinfo * currentloop);
     void Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance);
+    bool CanBeHoist(loopinfo * currentloop, IRCode * code_pos);
 
     /* tool functions */
     /* find and delete op in vector */
@@ -107,6 +109,9 @@ public:
 
     /* dead code deletion */
     void delDeadCode() ;
+    void ADCE();
+    bool haveEffection(IROperation op);
+    void FindLiveInst(IRCode* code,std::vector<IRCode *>& replaceinst);
 
     /* bind registers */
     /* calculate active regions of each var */
