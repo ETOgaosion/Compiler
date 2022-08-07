@@ -87,10 +87,10 @@ public:
     void JumpThreading();
     /*Loop invariant*/
     int updateloop(int first, int end, int base);
-    struct loopinfo* loopchoose(int i);
     void LICM();
     void HoistOnLoop(loopinfo * currentloop);
     void Hoist(loopinfo * currentloop, IRCode * code_pos, int entrance);
+    bool CanBeHoist(loopinfo * currentloop, IRCode * code_pos);
 
     /* tool functions */
     /* find and delete op in vector */
