@@ -80,15 +80,15 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
     Register *retRegister = nullptr;
     if (valueLabel.empty()) {
         Register *zero = t->getNextFreeRegister(true, false, hasFreeRegister);
-        t->addCodeEor(zero, zero, zero);
         if (dataType == MetaDataType::INT) {
             freeRegister =
                     t->getNextFreeRegister(true, false, hasFreeRegister);
             if (values.front() == "0") {
+                t->addCodeEor(zero, zero, zero);
                 t->addCodeMv(freeRegister, nullptr, zero, 0);
             }
             else {
-                t->addCodeLdr(freeRegister, values.front());
+                t->addCodeLdr(freeRegister, stoi(values.front()));
             }
         }
         else {
@@ -96,6 +96,7 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                     t->getNextFreeRegister(false, false, hasFreeRegister);
             if (values.front() == "0") {
                 if (dataType == MetaDataType::FLOAT) {
+                    t->addCodeEor(zero, zero, zero);
                     t->addCodeMv(freeRegister, zero, nullptr, 0);
                 }
             }
@@ -136,17 +137,12 @@ Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralP
         targetRegister =
                 t->tryGetCertainRegister(true, regName, hasFreeRegister);
         Register *zero = t->getNextFreeRegister(true, false, hasFreeRegister);
-        t->addCodeEor(zero, zero, zero);
         if (values.front() == "0") {
+            t->addCodeEor(zero, zero, zero);
             t->addCodeMv(targetRegister, nullptr, zero, 0);
         }
         else {
-            if (stoi(values.front()) > -2048 && stoi(values.front()) < 2048) {
-                t->addCodeAdd(targetRegister, zero, stoi(values.front()));
-            }
-            else {
-                t->addCodeLdr(targetRegister, values.front());
-            }
+            t->addCodeLdr(targetRegister, stoi(values.front()));
         }
         t->setRegisterFree(zero);
         return targetRegister;
@@ -179,16 +175,17 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
     Register *freeRegister = nullptr;
     if (valueLabel.empty()) {
         Register *zero = t->getNextFreeRegister(true, false, hasFreeRegister);
-        t->addCodeEor(zero, zero, zero);
         if (values.front() == "0") {
+            t->addCodeEor(zero, zero, zero);
             t->addCodeMv(inReg, nullptr, zero, 0);
         }
         else {
             if (stoi(values.front()) > -2048 && stoi(values.front()) < 2048) {
+                t->addCodeEor(zero, zero, zero);
                 t->addCodeAdd(inReg, zero, stoi(values.front()));
             }
             else {
-                t->addCodeLdr(inReg, values.front());
+                t->addCodeLdr(inReg, stoi(values.front()));
             }
         }
         t->setRegisterFree(zero);

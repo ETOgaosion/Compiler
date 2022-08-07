@@ -205,8 +205,11 @@ public:
 };
 
 class IRDivI : public IRDiv {
+private:
+    IROperand *curFunc;
+
 public:
-    IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+    IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2, IROperand *newFunc);
 
     void genTargetCode(TargetCodes *t) override;
 };

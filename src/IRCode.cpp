@@ -128,8 +128,10 @@ IRMulF::IRMulF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
 IRDiv::IRDiv(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : IRCode(IROperation::DIV, newResult, newArg1, newArg2) {}
 
-IRDivI::IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
-        : IRDiv(newResult, newArg1, newArg2) {}
+IRDivI::IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2, IROperand *newFunc)
+        : IRDiv(newResult, newArg1, newArg2) {
+            curFunc = newFunc;
+        }
 
 IRDivF::IRDivF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : IRDiv(newResult, newArg1, newArg2) {}
@@ -484,16 +486,8 @@ void IRAddI::genTargetCode(TargetCodes *t) {
         t->setRegisterFree(arg1Reg);
     }
     else if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
-        Register *zero = t->getNextFreeRegister(true, false, hasFreeRegister);
-        t->addCodeEor(zero, zero, zero);
         int val = stoi(arg2->getValue()) + stoi(arg2->getValue());
-        if (val > 2048 || val < -2048) {
-            t->addCodeLdr(resultReg, stoi(arg1->getValue()));
-        }
-        else {
-            t->addCodeAdd(resultReg, zero, val);
-        }
-        t->setRegisterFree(zero);
+        t->addCodeLdr(resultReg, stoi(arg1->getValue()));
     }
     else {
         Register *arg1Reg = arg1->load(t, true);
@@ -631,8 +625,8 @@ void IRMulF::genTargetCode(TargetCodes *t) {
 
 void IRDivI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t, true);
-    Register *arg2Reg = arg2->load(t, true);
+    Register *arg1Reg = arg1->loadTo(t, "a1", hasFreeRegister);
+    Register *arg2Reg = arg2->loadTo(t, "a2", hasFreeRegister);
     Register *resultReg;
     if (result->getBindRegister()) {
         resultReg = result->getTargetBindRegister();
@@ -640,11 +634,15 @@ void IRDivI::genTargetCode(TargetCodes *t) {
     else {
         resultReg = t->getNextFreeRegister(true, false, hasFreeRegister);
     }
-    t->addCodeDiv(resultReg, arg1Reg, arg2Reg);
-    result->storeFrom(t, resultReg);
+    Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
+    t->addCodeSub(sp, sp, curFunc->getFrameSize());
+    t->addCodeBl("__aeabi_idiv");
+    t->addCodeAdd(sp, sp, curFunc->getFrameSize());
+    t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
     t->setRegisterFree(resultReg);
+    t->setRegisterFree(sp);
 }
 
 void IRDivF::genTargetCode(TargetCodes *t) {
@@ -679,6 +677,7 @@ void IRMod::genTargetCode(TargetCodes *t) {
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     t->addCodeSub(sp, sp, curFunc->getFrameSize());
     t->addCodeBl("__aeabi_idivmod");
+    t->addCodeAdd(sp, sp, curFunc->getFrameSize());
     t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
     result->storeFrom(t, resultReg);
     t->setRegisterFree(arg1Reg);
@@ -1198,10 +1197,8 @@ void IRReturn::genTargetCode(TargetCodes *t) {
     }
     // t->addCodeLd(ra, sp, -8);
     Register *pc = t->tryGetCertainRegister(true, "pc", hasFreeRegister);
-    Register *lr = t->tryGetCertainRegister(true, "lr", hasFreeRegister);
-    t->addCodeMv(pc, nullptr, lr, 0);
+    t->addCodePop({}, vector<Register *>(1, pc));
     t->setRegisterFree(pc);
-    t->setRegisterFree(lr);
     t->setRegisterFree(sp);
     // t->setRegisterFree(ra);
 }

@@ -1647,7 +1647,7 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
     else if (ctx->mulOp()->getText() == "/"){
         switch (ctx->mulExp()->operand->getMetaDataType()) {
             case MetaDataType::INT:
-                code = new IRDivI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
+                code = new IRDivI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand, irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName()));
                 break;
             case MetaDataType::FLOAT:
                 code = new IRDivF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
