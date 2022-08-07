@@ -163,7 +163,7 @@ public:
     bool addCodeVldr(Register *rd, Register *rn, int offset, bool postIndexed);
     bool addCodeStr(Register *rd, Register *rn, int offset, bool postIndexed);
     bool addCodeVstr(Register *rd, Register *rn, int offset, bool postIndexed);
-    bool addCodeMv(Register *rd, Register *rn);
+    bool addCodeMv(Register *rd, Register *rn, Register *rm, int offset);
     bool addCodeLabel(const std::string &inLabel);
     bool addCodeBl(std::string label);
     bool addCodeDirectives(const std::string &directives);

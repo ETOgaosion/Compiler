@@ -323,7 +323,9 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
     ctx->withType = false;
     ctx->shape = {};
     ctx->isArray = false;
-    ctx->initVal()->outside = true;
+    if (ctx->initVal()) {
+        ctx->initVal()->outside = true;
+    }
     if (ctx->constExp().size() > 0) {
         if (ctx->initVal()) {
             for (auto val : ctx->constExp()) {
@@ -489,9 +491,8 @@ void SemanticAnalysis::exitFuncFParams(SysYParser::FuncFParamsContext * ctx)
 {
     curSymbolTable->setParamNum();
     curSymbolTable->setParamDataTypeList();
-
+    int gr = 0, fr = 0;
     for(auto & param : ctx->funcFParam()){
-        int gr = 0, fr = 0;
         IRValue* g_index = nullptr;
         IRValue* f_index = nullptr;
         // add ParamVariable
@@ -527,7 +528,13 @@ void SemanticAnalysis::enterFuncFParam(SysYParser::FuncFParamContext * ctx)
 void SemanticAnalysis::exitFuncFParam(SysYParser::FuncFParamContext * ctx)
 {
     SymbolFactory symbolFactory;
-    AbstractSymbol *funcParamSymbol = SymbolFactory::createSymbol(ctx->Ident()->getText(), SymbolType::PARAM, ctx->bType()->bMetaDataType, ctx->brackets(), {});
+    AbstractSymbol *funcParamSymbol = nullptr;
+    if (ctx->brackets()) {
+        funcParamSymbol = SymbolFactory::createSymbol(ctx->Ident()->getText(), SymbolType::PARAM, ctx->bType()->bMetaDataType, true, ctx->brackets()->shape);
+    }
+    else {
+        funcParamSymbol = SymbolFactory::createSymbol(ctx->Ident()->getText(), SymbolType::PARAM, ctx->bType()->bMetaDataType, false, {});
+    }
     if (!curSymbolTable->insertParamSymbolSafely(funcParamSymbol)) {
         throw std::runtime_error("[ERROR] > Redefine Function ParamSymbol.\n");
     }
@@ -541,7 +548,11 @@ void SemanticAnalysis::exitFuncFParam(SysYParser::FuncFParamContext * ctx)
 
 void SemanticAnalysis::enterBrackets(SysYParser::BracketsContext * ctx) {}
 
-void SemanticAnalysis::exitBrackets(SysYParser::BracketsContext * ctx) {}
+void SemanticAnalysis::exitBrackets(SysYParser::BracketsContext * ctx) {
+    for (auto it : ctx->exp()) {
+        ctx->shape.push_back(stoi(it->operand->getValue()));
+    }
+}
 
 void SemanticAnalysis::enterFuncBlock(SysYParser::FuncBlockContext * ctx)
 {
@@ -1292,7 +1303,7 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
     }
     if (searchLVal->getIsArray() && !ctx->exp().empty()) {
         ctx->isArray = true;
-        ctx->shape = searchLVal->getShape();
+        ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
     }
     else if (searchLVal->getIsArray()) {
         throw std::runtime_error("[ERROR] > cannot directly use array as lVal");

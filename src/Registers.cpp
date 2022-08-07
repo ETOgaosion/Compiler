@@ -154,7 +154,7 @@ bool GeneralPurposeRegisters::setRegisterFree(const std::string &reg) {
     string regPrefix = reg.substr(0, charLen);
     if (charLen < reg.size()) {
         int regNum = stoi(reg.substr(charLen));
-        registerAllocBitmap[regPrefix] &= ~(0x1 << regNum);
+        registerAllocBitmap[regPrefix] &= ~(0x1 << (regNum - 1));
         generalPurposeRegisterList[regPrefix + to_string(regNum)]->setFree();
     }
     else {
@@ -177,7 +177,7 @@ bool GeneralPurposeRegisters::setRegisterAvailable(const std::string &reg) {
     string regPrefix = reg.substr(0, charLen);
     if (charLen < reg.size()) {
         int regNum = stoi(reg.substr(charLen));
-        registerOccupiedBitmap[regPrefix] &= ~(0x1 << regNum);
+        registerOccupiedBitmap[regPrefix] &= ~(0x1 << (regNum - 1));
         generalPurposeRegisterList[regPrefix + to_string(regNum)]->setAvailable();
     }
     else {
@@ -200,7 +200,7 @@ bool GeneralPurposeRegisters::setRegisterAllocated(const std::string &reg) {
     string regPrefix = reg.substr(0, charLen);
     if (charLen < reg.size()) {
         int regNum = stoi(reg.substr(charLen));
-        registerAllocBitmap[regPrefix] |= (0x1 << regNum);
+        registerAllocBitmap[regPrefix] |= (0x1 << (regNum - 1));
         generalPurposeRegisterList[regPrefix + to_string(regNum)]->setAllocated();
     }
     else {
@@ -223,7 +223,7 @@ bool GeneralPurposeRegisters::setRegisterOccupied(const std::string &reg) {
     string regPrefix = reg.substr(0, charLen);
     if (charLen < reg.size()) {
         int regNum = stoi(reg.substr(charLen));
-        registerOccupiedBitmap[regPrefix] |= (0x1 << regNum);
+        registerOccupiedBitmap[regPrefix] |= (0x1 << (regNum - 1));
         generalPurposeRegisterList[regPrefix + to_string(regNum)]->setOccupied();
     }
     else {

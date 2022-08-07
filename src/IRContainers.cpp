@@ -2410,10 +2410,12 @@ void IRFunction::print(SymbolTable *globalSymbolTable) const {
     cout << functionTable->getFuncName() << "(";
     auto paramTypeList = functionTable->getParamDataTypeList();
     if (!paramTypeList.empty()) {
-        for (auto param : vector<tuple<MetaDataType, bool, size_t>>(paramTypeList.begin(), paramTypeList.end() - 1)) {
+        for (auto param : vector<tuple<MetaDataType, bool, vector<size_t>>>(paramTypeList.begin(), paramTypeList.end() - 1)) {
             cout << static_cast<int>(get<0>(param));
             if (get<1>(param)) {
-                cout << "[" << get<2>(param) << "]";
+                for (auto it : get<2>(param)) {
+                    cout << "[" << it << "]";
+                }
             }
             cout << ",";
         }
@@ -2450,7 +2452,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     t->addCodeDirectives(".text");
     t->addCodeDirectives(".align 1");
     t->addCodeDirectives(".globl\t" + functionName);
-    t->addCodeDirectives(".type\t" + functionName + ", @function");
+    t->addCodeDirectives(".type\t" + functionName + ", \%function");
     t->addCodeLabel(functionName);
     bool hasFreeRegister;
     // Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
@@ -2483,7 +2485,7 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
         // t->addCodeLd(ra, sp, -8);
         Register *pc = t->tryGetCertainRegister(true, "pc", hasFreeRegister);
         Register *lr = t->tryGetCertainRegister(true, "lr", hasFreeRegister);
-        t->addCodeMv(pc, lr);
+        t->addCodeMv(pc, nullptr, lr, 0);
         t->setRegisterFree(pc);
         t->setRegisterFree(lr);
         t->setRegisterFree(sp);
@@ -2640,7 +2642,7 @@ void IRProgram::targetGen(TargetCodes *t, int inOptimizeLevel) {
     for (auto &globalVar : globalVariables) {
         t->addCodeDirectives(".data");
         t->addCodeDirectives(".globl\t" + globalVar.first);
-        t->addCodeDirectives(".type\t" + globalVar.first + ", @object");
+        t->addCodeDirectives(".type\t" + globalVar.first + ", \%object");
         globalVar.second->genTargetGlobalValue(t);
     }
     for (auto &imm : immValues) {

@@ -679,7 +679,7 @@ void IRMod::genTargetCode(TargetCodes *t) {
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     t->addCodeSub(sp, sp, curFunc->getFrameSize());
     t->addCodeBl("__aeabi_idivmod");
-    t->addCodeMv(resultReg, arg1Reg);
+    t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
     result->storeFrom(t, resultReg);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
@@ -1134,14 +1134,14 @@ void IRAddParamA::genTargetCode(TargetCodes *t) {
 
 void IRGetParamI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *resultArg = t->tryGetCertainRegister(true, "a" + arg1->getValue(), hasFreeRegister);
+    Register *resultArg = t->tryGetCertainRegister(true, "a" + to_string(stoi(arg1->getValue()) + 1), hasFreeRegister);
     result->storeFrom(t, resultArg);
     t->setRegisterFree(resultArg);
 }
 
 void IRGetParamF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *resultArg = t->tryGetCertainRegister(false, "fa" + arg1->getValue(), hasFreeRegister);
+    Register *resultArg = t->tryGetCertainRegister(false, "fa" + to_string(stoi(arg1->getValue()) + 1), hasFreeRegister);
     result->storeFrom(t, resultArg);
     t->setRegisterFree(resultArg);
 }
@@ -1199,7 +1199,7 @@ void IRReturn::genTargetCode(TargetCodes *t) {
     // t->addCodeLd(ra, sp, -8);
     Register *pc = t->tryGetCertainRegister(true, "pc", hasFreeRegister);
     Register *lr = t->tryGetCertainRegister(true, "lr", hasFreeRegister);
-    t->addCodeMv(pc, lr);
+    t->addCodeMv(pc, nullptr, lr, 0);
     t->setRegisterFree(pc);
     t->setRegisterFree(lr);
     t->setRegisterFree(sp);
@@ -1212,7 +1212,7 @@ void IRReturnV::genTargetCode(TargetCodes *t) {
 
 void IRReturnI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
+    Register *retReg = t->tryGetCertainRegister(true, "a1", hasFreeRegister);
     if (retReg->getOccupied()) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         t->addCodeStr(sp, retReg, -retReg->getTmpStoreOffset(), false);

@@ -2,23 +2,23 @@
 ============ imm value ================
 ============ functions ================
 ----------- funcDef -----------
-main() => 2:
+main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
-result := symbol type: 1; data type: 2; initValue: 0
+result := symbol type: 1; data type: 1; initValue: 0
 
-n := symbol type: 1; data type: 2; initValue: 0
+n := symbol type: 1; data type: 1; initValue: 0
 
 ----------- tempVars ------------
-t_3:= symbol type: TEMP VAR; data type: 2
-t_8:= symbol type: TEMP VAR; data type: 2
-t_1:= symbol type: TEMP VAR; data type: 2
-t_4:= symbol type: TEMP VAR; data type: 2
-t_10:= symbol type: TEMP VAR; data type: 2
-t_6:= symbol type: TEMP VAR; data type: 2
-t_7:= symbol type: TEMP VAR; data type: 2
 t_0:= symbol type: TEMP VAR; data type: 1
-t_5:= symbol type: TEMP VAR; data type: 2
+t_8:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
 	n = 0;
@@ -47,4 +47,76 @@ L_1_main:
 	result <= t_13;
 	t_13 = phi t_2, result, t_9;
 	return 0;
+
+----------- funcDef -----------
+getfarray() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+getfarray:
+	return ;
+
+----------- funcDef -----------
+getarray() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+getarray:
+	return ;
+
+----------- funcDef -----------
+getint() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+getint:
+	return ;
+
+----------- funcDef -----------
+putfarray(2) => 0:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+putfarray:
+	return ;
+
+----------- funcDef -----------
+putarray(1) => 0:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+putarray:
+	return ;
+
+----------- funcDef -----------
+putfloat(2) => 0:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+putfloat:
+	return ;
+
+----------- funcDef -----------
+getfloat() => 2:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+getfloat:
+	return ;
+
+----------- funcDef -----------
+putint(1) => 0:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+putint:
+	return ;
 

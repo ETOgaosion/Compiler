@@ -124,7 +124,7 @@ void Code::print() const {
                 }
             }
             else {
-                cout << "\trsb\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << offset << endl;
+                cout << "\trsb\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", #" << offset << endl;
             }
             break;
         case ASMOperation::MUL:
@@ -886,8 +886,8 @@ bool TargetCodes::addCodeVstr(Register *rd, Register *rn, int offset, bool postI
     return true;
 }
 
-bool TargetCodes::addCodeMv(Register *rd, Register *rn) {
-    Code *newCode = new Code(ASMOperation::MV, rd, rn, nullptr);
+bool TargetCodes::addCodeMv(Register *rd, Register *rn, Register *rm, int offset) {
+    Code *newCode = new Code(ASMOperation::MV, {}, rd, rn, rm, {}, nullptr, offset, {}, {});
     addCode(newCode);
     return true;
 }

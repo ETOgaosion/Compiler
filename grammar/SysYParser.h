@@ -339,6 +339,7 @@ public:
     IRSymbolVariable* symbolVar;
     bool isArray;
     MetaDataType paramType;
+    std::vector<size_t> shape;
     FuncFParamContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     BTypeContext *bType();
@@ -354,6 +355,7 @@ public:
 
   class  BracketsContext : public antlr4::ParserRuleContext {
   public:
+    std::vector<size_t> shape;
     BracketsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<ExpContext *> exp();

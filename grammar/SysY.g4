@@ -113,12 +113,16 @@ funcFParam
     locals [
         IRSymbolVariable* symbolVar,
         bool isArray,
-        MetaDataType paramType
+        MetaDataType paramType,
+        std::vector<size_t> shape
     ]
     : bType Ident (brackets)?
     ;
 
 brackets
+    locals [
+        std::vector<size_t> shape
+    ]
     :'[' ']' ('[' exp ']')*
     ;
 
