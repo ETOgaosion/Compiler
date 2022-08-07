@@ -17,8 +17,6 @@ L_3_main:
 	sb	t2, -32(sp)
 	lb	t0, -32(sp)
 	beqz	t0, L_2_main
-	lw	t0, -20(sp)
-	sw	t0, -12(sp)
 	lw	t1, -16(sp)
 	addi	t0, t1, 1
 	sw	t0, -28(sp)

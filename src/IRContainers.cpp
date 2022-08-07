@@ -1334,11 +1334,13 @@ void IRFunction::ADCE(){
                 }else if(entrances[bnum] > i){
                     bnum --;
                     break;
+                }else if(bnum == entrances.size() - 1){
+                    break;
                 }
             }
             int cnum = i - entrances[bnum];
             for(int j = bnum + 1;j < entrances.size();j ++){
-                entrances[bnum] --;
+                entrances[j] --;
             }
 
             basicBlocks[bnum].erase(basicBlocks[bnum].begin() + cnum);

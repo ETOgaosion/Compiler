@@ -24,15 +24,11 @@ L_1_main:
 L_3_main:
 	t_1 = j < 5;
 	beqz t_1 L_2_main;
-	t_2 <= b;
-	t_2 = i;
 	t_3 = j + 1;
 	t_4 <= j;
 	t_4 = t_3;
 	goto L_3_main;
 L_2_main:
-	b <= t_5;
-	t_5 = phi t_2, b;
 	j <= t_6;
 	t_6 = phi t_4, j;
 	t_7 = i + 2;
@@ -42,8 +38,6 @@ L_2_main:
 L_0_main:
 	i <= t_9;
 	t_9 = phi t_8, i;
-	b <= t_10;
-	t_10 = phi t_5;
 	j <= t_11;
 	t_11 = phi t_6;
 	return 0;
