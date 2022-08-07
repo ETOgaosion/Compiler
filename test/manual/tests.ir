@@ -5,26 +5,46 @@
 main() => 2:
 ----------- paramVars -----------
 ----------- localVars -----------
-result := symbol type: 1; data type: 2; initValue: 0
+b := symbol type: 1; data type: 2; initValue: 0
 
-n := symbol type: 1; data type: 2; initValue: 0
+j := symbol type: 1; data type: 2; initValue: 0
+
+i := symbol type: 1; data type: 2; initValue: 0
 
 ----------- tempVars ------------
-t_1:= symbol type: TEMP VAR; data type: 2
+t_7:= symbol type: TEMP VAR; data type: 2
+t_3:= symbol type: TEMP VAR; data type: 2
+t_1:= symbol type: TEMP VAR; data type: 1
 t_0:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
 L_1_main:
-	t_0 = n < 10;
+	t_0 = i < 10;
 	beqz t_0 L_0_main;
-	t_1 = n + 1;
-	t_2 <= n;
-	t_2 = t_1;
+L_3_main:
+	t_1 = j < 5;
+	beqz t_1 L_2_main;
+	t_2 <= b;
+	t_2 = i;
+	t_3 = j + 1;
+	t_4 <= j;
+	t_4 = t_3;
+	goto L_3_main;
+L_2_main:
+	b <= t_5;
+	t_5 = phi t_2, b;
+	j <= t_6;
+	t_6 = phi t_4, j;
+	t_7 = i + 2;
+	t_8 <= i;
+	t_8 = t_7;
 	goto L_1_main;
 L_0_main:
-	n <= t_3;
-	t_3 = phi t_2, n;
-	addparam t_3;
-	call print_int; 
+	i <= t_9;
+	t_9 = phi t_8, i;
+	b <= t_10;
+	t_10 = phi t_5;
+	j <= t_11;
+	t_11 = phi t_6;
 	return 0;
 

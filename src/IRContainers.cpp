@@ -212,24 +212,30 @@ void IRFunction::substituteUseOp(IRCode* code, IROperand* dst_op, IROperand* cmp
 }
 
 void IRFunction::def_use_list(){
-    for (int i = 0; i < codes.size(); i++) {
-            IRCode *code = codes[i];
-            code->use.clear();
-            IROperand *res = code->getResult();
-            if(!res)
-                continue;
-            for (int j = i + 1; j < codes.size(); j++)
-                if(codes[j]->getOperation()== IROperation::PHI){
-                    IRPhi* p = dynamic_cast<IRPhi*>(codes[j]);
-                    for (auto k : codes[j]->getArgs()){
-                        if(k == res){
-                            code->use.push_back(codes[j]);
-                            break;
-                        }
+    for(int i = 0; i < codes.size(); i++)
+        codes[i]->def.clear();
+    for (int i = 0; i < codes.size(); i++)
+    {
+        IRCode *code = codes[i];
+        code->use.clear();
+        IROperand *res = code->getResult();
+        if(!res)
+            continue;
+        for (int j = 0; j < codes.size(); j++)
+            if(codes[j]->getOperation()== IROperation::PHI){
+                IRPhi* p = dynamic_cast<IRPhi*>(codes[j]);
+                for (auto k : codes[j]->getArgs()){
+                    if(k == res){
+                        code->use.push_back(codes[j]);
+                        codes[j]->def.emplace_back(code);
+                        break;
                     }
                 }
-                else if(codes[j]->getArg1() == res || codes[j]->getArg2() == res)
-                    code->use.push_back(codes[j]);
+            }
+            else if(codes[j]->getArg1() == res || codes[j]->getArg2() == res){
+                code->use.push_back(codes[j]);
+                codes[j]->def.emplace_back(code);
+            }
     }
 }
 

@@ -1,8 +1,14 @@
 int main()
 {
-    int n, result;
-    while(n < 10)
-        n = n + 1;
-    print_int(n);
+    int i = 0;
+    int j = 0;
+    int b;
+    while(i < 10){
+        while(j < 5){
+            b = i;
+            j = j + 1;
+        } 
+        i = i + 2;
+    }
     return 0;
 }

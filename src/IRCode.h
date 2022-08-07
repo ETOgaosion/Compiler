@@ -49,6 +49,7 @@ public:
     IRCode(IROperation newOp, IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
 
     std::vector<IRCode *> use;
+    std::vector<IRCode *> def;
 
     IROperation getOperation() const { return operation; };
 
@@ -445,7 +446,7 @@ public:
 class IRBeqz : public IRCode {
 public:
     int whicn_bb;
-    
+
     IRBeqz(IROperand *newArg1, IROperand *newLabel);
 
     void genTargetCode(TargetCodes *t) override;
