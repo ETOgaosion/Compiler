@@ -218,7 +218,7 @@ void IRFunction::def_use_list(){
     {
         IRCode *code = codes[i];
         code->use.clear();
-        IROperand *res = code->getResult();
+        IROperand *res = (code->getOperation()== IROperation::REPLACE)? code->getArg1() : code->getResult();
         if(!res)
             continue;
         for (int j = 0; j < codes.size(); j++)
@@ -230,6 +230,11 @@ void IRFunction::def_use_list(){
                         codes[j]->def.emplace_back(code);
                         break;
                     }
+                }
+            }else if(codes[j]->getOperation()== IROperation::REPLACE){
+                if(codes[j]->getResult() == res){
+                    code->use.push_back(codes[j]);
+                    codes[j]->def.emplace_back(code);
                 }
             }
             else if(codes[j]->getArg1() == res || codes[j]->getArg2() == res){
@@ -1343,6 +1348,14 @@ void IRFunction::ADCE(){
                 entrances[j] --;
             }
 
+            for(auto j:codes[i]->def){
+                if(!j->use.empty()){
+                    auto pos = find(j->use.begin(), j->use.end(), codes[i]);
+                    if(pos != j->use.end())
+                        j->use.erase(pos);
+                }
+            }
+
             basicBlocks[bnum].erase(basicBlocks[bnum].begin() + cnum);
 
             codes.erase(codes.begin() + i);
@@ -1350,7 +1363,6 @@ void IRFunction::ADCE(){
             i++;
         }
     }
-    
 }
 
 void IRFunction::basicBlockDivision() {

@@ -17,6 +17,8 @@ L_3_main:
 	sb	t2, -32(sp)
 	lb	t0, -32(sp)
 	beqz	t0, L_2_main
+	lw	t0, -20(sp)
+	sw	t0, -12(sp)
 	lw	t1, -16(sp)
 	addi	t0, t1, 1
 	sw	t0, -28(sp)
@@ -33,5 +35,9 @@ L_2_main:
 	lla	t0, L_1_main
 	jr	t0
 L_0_main:
+	lw	a0, -12(sp)
+	addi	sp, sp, -40
+	call	print_int
+	addi	sp, sp, 40
 	mv	a0, zero
 	ret
