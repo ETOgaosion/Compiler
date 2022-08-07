@@ -444,6 +444,8 @@ public:
 
 class IRBeqz : public IRCode {
 public:
+    int whicn_bb;
+    
     IRBeqz(IROperand *newArg1, IROperand *newLabel);
 
     void genTargetCode(TargetCodes *t) override;
