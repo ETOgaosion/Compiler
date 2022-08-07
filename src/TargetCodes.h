@@ -14,63 +14,77 @@
 enum class ASMOperation {
     ADD,
     SUB,
-    ADDI,
-    NEG,
+    // ADDI,
+    // NEG,
     MUL,
-    REM,
+    // REM,
     DIV,
-    SLL,
-    SLR,
-    SLLI,
-    SLRI,
-    NOT,
-    OR,
+    LSL,
+    ASR,
+    // SLLI,
+    // SLRI,
+    // NOT,
+    ORR,
     AND,
-    XOR,
-    SEQZ,
-    SNEZ,
-    SLTZ,
-    SGTZ,
-    SLT,
-    FEQ,
-    FLT,
-    FLE,
-    BEQZ,
-    JR,
-    LLA,
-    LI,
-    LB,
-    LW,
-    LD,
-    FLW,
-    FLD,
-    SB,
-    SW,
-    SD,
-    FSW,
-    FSD,
+    EOR,
+    TST,
+    TEQ,
+    CMP,
+    CMN,
+    VCMP,
+    CBZ,
+    CBNZ,
+    B,
+    BEQ,
+    BNE,
+    BGE,
+    BLE,
+    BGT,
+    BLT,
+    LDR,
+    // LI,
+    // LW,
+    VLDR,
+    STR,
+    VSTR,
     MV,
     LABEL,
-    CALL,
-    RET,
-    DIRECTIVE,
-    ECALL
+    BL,
+    // RET,
+    DIRECTIVE
+};
+
+enum class ShiftWay {
+    NONE,
+    LSL,
+    LSR,
+    ASR,
+    ROR
+};
+
+enum class Options {
+    NONE,
+    POST_INDEX_OFFSET,
+    RM_NEGATIVE
 };
 
 class Code {
 public:
     ASMOperation op;
-    FloatPointType rdFloatPointType;
-    FloatPointType srcFloatPointType;
     Register *rd;
-    Register *rs1;
-    Register *rs2;
+    Register *rn;
+    Register *rm;
+    ShiftWay shiftWay;
+    Register *rs;
     int offset;
     std::string label;
     std::string directives;
+    std::vector<Options> extraOptions;
 
-    Code(ASMOperation newOp, FloatPointType newRdFloatPointType, FloatPointType newSrcFloatPointType, Register *newRd, Register *newRs1, Register *newRs2, int newOffset, std::string newLabel);
-    Code(ASMOperation newOp, std::string newDirectives);
+    Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm, ShiftWay newShiftWay, Register *newRs, int newOffset, std::string newLabel, std::vector<Options> newOptions);
+    Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm);
+    Code(ASMOperation newOp, Register *newRd, Register *newRn, int newOffset);
+    Code(ASMOperation newOp, std::string newLabel, std::string newDirectives);
     void print() const;
 };
 
@@ -88,56 +102,58 @@ public:
     bool addCode(Code *newCode);
     bool addCodes(const std::vector<Code *>& newCodes);
 
-    bool addCodeAdd(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeSub(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeAddi(Register *rd, Register *rs1, int offset);
-    bool addCodeNeg(Register *rd, Register *rs1, FloatPointType inFloatPointType);
-    bool addCodeMul(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeDiv(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeSll(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeSlr(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeSlli(Register *rd, Register *rs1, int shamt);
-    bool addCodeSlri(Register *rd, Register *rs1, int shamt);
-    bool addCodeRem(Register *rd, Register *rs1, Register *rs2);
-    bool addCodeNot(Register *rd, Register *rs1);
-    bool addCodeXor(Register *rd, Register *rs1, Register *rs2);
-    bool addCodeOr(Register *rd, Register *rs1, Register *rs2);
-    bool addCodeAnd(Register *rd, Register *rs1, Register *rs2);
-    bool addCodeSeqz(Register *rd, Register *rs1);
-    bool addCodeSnez(Register *rd, Register *rs1);
-    bool addCodeSltz(Register *rd, Register *rs1);
-    bool addCodeSgtz(Register *rd, Register *rs1);
-    bool addCodeSlt(Register *rd, Register *rs1, Register *rs2);
-    bool addCodeFeq(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeFlt(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeFle(Register *rd, Register *rs1, Register *rs2, FloatPointType inFloatPointType);
-    bool addCodeBeqz(Register *rs1, const std::string &targetLabel);
-    bool addCodeJr(Register *rs1);
-    bool addCodeLla(Register *rd, const std::string &targetLabel);
-    bool addCodeLi(Register *rd, const std::string &targetLabel);
-    bool addCodeLi(Register *rd, int imm);
-    bool addCodeLb(Register *rd, Register *rs1, int offset);
-    bool addCodeLw(Register *rd, Register *rs1, int offset);
-    bool addCodeLd(Register *rd, Register *rs1, int offset);
-    bool addCodeFlw(Register *rd, Register *rs1, int offset);
-    bool addCodeFld(Register *rd, Register *rs1, int offset);
-    bool addCodeSb(Register *rs1, Register *rs2, int offset);
-    bool addCodeSw(Register *rs1, Register *rs2, int offset);
-    bool addCodeSd(Register *rs1, Register *rs2, int offset);
-    bool addCodeFsw(Register *rs1, Register *rs2, int offset);
-    bool addCodeFsd(Register *rs1, Register *rs2, int offset);
-    bool addCodeMv(Register *rd, Register *rs1, FloatPointType rdFloatPointType, FloatPointType rs1FloatPointType);
+    bool addCodeAdd(Register *rd, Register *rn, Register *rm);
+    bool addCodeAdd(Register *rd, Register *rn, int imm);
+    bool addCodeSub(Register *rd, Register *rn, Register *rm);
+    bool addCodeSub(Register *rd, Register *rn, int imm);
+    bool addCodeMul(Register *rd, Register *rn, Register *rm);
+    bool addCodeDiv(Register *rd, Register *rn, Register *rm);
+    bool addCodeLsl(Register *rd, Register *rn, Register *rm);
+    bool addCodeLsl(Register *rd, Register *rn, int imm);
+    bool addCodeAsr(Register *rd, Register *rn, Register *rm);
+    bool addCodeAsr(Register *rd, Register *rn, int imm);
+    bool addCodeEor(Register *rd, Register *rn, Register *rm);
+    bool addCodeEor(Register *rd, Register *rn, int imm);
+    bool addCodeOrr(Register *rd, Register *rn, Register *rm);
+    bool addCodeOrr(Register *rd, Register *rn, int imm);
+    bool addCodeAnd(Register *rd, Register *rn, Register *rm);
+    bool addCodeAnd(Register *rd, Register *rn, int imm);
+    bool addCodeTst(Register *rn, Register *rm);
+    bool addCodeTst(Register *rn, int imm);
+    bool addCodeTeq(Register *rn, Register *rm);
+    bool addCodeTeq(Register *rn, int imm);
+    bool addCodeCmp(Register *rn, Register *rm);
+    bool addCodeCmp(Register *rn, int imm);
+    bool addCodeCmn(Register *rn, Register *rm);
+    bool addCodeCmn(Register *rn, int imm);
+    bool addCodeVcmp(Register *rd, Register *rm);
+    bool addCodeCbz(Register *rn, std::string label);
+    bool addCodeCbnz(Register *rn, std::string label);
+    bool addCodeB(std::string label);
+    bool addCodeBeq(std::string label);
+    bool addCodeBne(std::string label);
+    bool addCodeBge(std::string label);
+    bool addCodeBle(std::string label);
+    bool addCodeBgt(std::string label);
+    bool addCodeBlt(std::string label);
+    bool addCodeLdr(Register *rd, Register *rn);
+    bool addCodeLdr(Register *rd, Register *rn, Register *rm);
+    bool addCodeLdr(Register *rd, Register *rn, Register *rm, bool rmNegative);
+    bool addCodeLdr(Register *rd, Register *rn, int offset);
+    bool addCodeLdr(Register *rd, Register *rn, int offset, bool postIndexed);
+    bool addCodeVldr(Register *rd, Register *rn, int offset, bool postIndexed);
+    bool addCodeStr(Register *rd, Register *rn, int offset, bool postIndexed);
+    bool addCodeVstr(Register *rd, Register *rn, int offset, bool postIndexed);
+    bool addCodeMv(Register *rd, Register *rn);
     bool addCodeLabel(const std::string &inLabel);
-    bool addCodeCall(const std::string &targetLabel);
-    bool addCodeRet();
+    bool addCodeBl(std::string label);
     bool addCodeDirectives(const std::string &directives);
-    bool addCodeEcall();
 
     void printCode() const;
     void codeWrite(std::string path) const;
 
-    Register *getNextFreeRegister(bool isGeneralPurposeRegister, bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister);
-    Register *getNextAvailableRegister(bool isGeneralPurposeRegister, bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister);
+    Register *getNextFreeRegister(bool isGeneralPurposeRegister, bool isParam, bool &hasFreeRegister);
+    Register *getNextAvailableRegister(bool isGeneralPurposeRegister, bool isParam, bool &hasFreeRegister);
 
     Register *tryGetCertainRegister(bool isGeneralPurposeRegister, const std::string &regName, bool &isFreeRegister);
 

@@ -14,16 +14,9 @@ enum class RegisterType {
     FLOAT_POINT
 };
 
-enum class FloatPointType {
-    NONE,
-    SINGLE,
-    DOUBLE
-};
-
 class Register {
 private:
     RegisterType registerType;
-    FloatPointType floatPointType;
     int number;
     std::string abiAliasName;
     long long value;
@@ -33,10 +26,9 @@ private:
     int tmpStoreOffset;
 
 public:
-    Register(RegisterType inRegisterType, FloatPointType inFloatPointType, int inNumber, const std::string &inAliasName);
+    Register(RegisterType inRegisterType, int inNumber, const std::string &inAliasName);
     
     RegisterType getRegisterType() const { return registerType; };
-    FloatPointType getFloatPointType() const { return floatPointType; };
     int getNumber() const { return number; };
     std::string getAliasName() const { return abiAliasName; }
     long long getValue() const { return value; };
@@ -45,7 +37,6 @@ public:
     bool getTmpStored() const { return tmpStored; };
     int getTmpStoreOffset() const { return tmpStoreOffset; };
 
-    void setFloatPointType(FloatPointType inFloatPointType) { floatPointType = inFloatPointType; };
     void setValue(long long newValue) { value = newValue; }
     void setAllocated() { allocated = true; }
     void setOccupied() { occupied = true; }
@@ -62,8 +53,8 @@ private:
 public:
     explicit Registers(bool isGeneralRegisterSet);
 
-    virtual Register *getNextFreeRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) = 0;
-    virtual Register *getNextAvailableRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) = 0;
+    virtual Register *getNextFreeRegister(bool isParam, bool &hasFreeRegister) = 0;
+    virtual Register *getNextAvailableRegister(bool isParam, bool &hasFreeRegister) = 0;
 
     virtual Register *tryGetCertainRegister(const std::string &regName, bool &isFreeRegister) = 0;
 
@@ -92,8 +83,8 @@ private:
 public:
     GeneralPurposeRegisters();
 
-    Register *getNextFreeRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) override;
-    Register *getNextAvailableRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) override;
+    Register *getNextFreeRegister(bool isParam, bool &hasFreeRegister) override;
+    Register *getNextAvailableRegister(bool isParam, bool &hasFreeRegister) override;
 
     Register *tryGetCertainRegister(const std::string &regName, bool &isFreeRegister) override;
 
@@ -122,8 +113,8 @@ private:
 public:
     FloatPointRegisters();
 
-    Register *getNextFreeRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) override;
-    Register *getNextAvailableRegister(bool isParam, FloatPointType inFloatPointType, bool &hasFreeRegister) override;
+    Register *getNextFreeRegister(bool isParam, bool &hasFreeRegister) override;
+    Register *getNextAvailableRegister(bool isParam, bool &hasFreeRegister) override;
 
     Register *tryGetCertainRegister(const std::string &regName, bool &isFreeRegister) override;
 
