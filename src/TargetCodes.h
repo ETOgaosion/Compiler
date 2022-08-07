@@ -41,6 +41,7 @@ enum class ASMOperation {
     BLE,
     BGT,
     BLT,
+    ADR,
     LDR,
     // LI,
     // LW,
@@ -62,15 +63,27 @@ enum class ShiftWay {
     ROR
 };
 
+enum class Cond {
+    NONE,
+    EQ,
+    NE,
+    GE,
+    LE,
+    GT,
+    LT
+};
+
 enum class Options {
     NONE,
     POST_INDEX_OFFSET,
-    RM_NEGATIVE
+    RM_NEGATIVE,
+    REVERSE_OP
 };
 
 class Code {
 public:
     ASMOperation op;
+    Cond cond;
     Register *rd;
     Register *rn;
     Register *rm;
@@ -81,11 +94,12 @@ public:
     std::string directives;
     std::vector<Options> extraOptions;
 
-    Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm, ShiftWay newShiftWay, Register *newRs, int newOffset, std::string newLabel, std::vector<Options> newOptions);
+    Code(ASMOperation newOp, Cond newCond, Register *newRd, Register *newRn, Register *newRm, ShiftWay newShiftWay, Register *newRs, int newOffset, std::string newLabel, std::vector<Options> newOptions);
     Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm);
     Code(ASMOperation newOp, Register *newRd, Register *newRn, int newOffset);
     Code(ASMOperation newOp, std::string newLabel, std::string newDirectives);
     void print() const;
+    static std::string condToString(Cond inCond);
 };
 
 class TargetCodes {
@@ -106,6 +120,7 @@ public:
     bool addCodeAdd(Register *rd, Register *rn, int imm);
     bool addCodeSub(Register *rd, Register *rn, Register *rm);
     bool addCodeSub(Register *rd, Register *rn, int imm);
+    bool addCodeSub(Register *rd, Register *rn, int imm, bool reverse);
     bool addCodeMul(Register *rd, Register *rn, Register *rm);
     bool addCodeDiv(Register *rd, Register *rn, Register *rm);
     bool addCodeLsl(Register *rd, Register *rn, Register *rm);
@@ -136,6 +151,10 @@ public:
     bool addCodeBle(std::string label);
     bool addCodeBgt(std::string label);
     bool addCodeBlt(std::string label);
+    bool addCodeAdr(Register *rd, std::string label);
+    bool addCodeLdr(Register *rd, std::string label);
+    bool addCodeLdr(Register *rd, int offset);
+    bool addCodeLdr(Register *rd, int offset, Cond inCond);
     bool addCodeLdr(Register *rd, Register *rn);
     bool addCodeLdr(Register *rd, Register *rn, Register *rm);
     bool addCodeLdr(Register *rd, Register *rn, Register *rm, bool rmNegative);

@@ -10,8 +10,9 @@
 
 using namespace std;
 
-Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm, ShiftWay newShiftWay, Register *newRs, int newOffset, std::string newLabel, vector<Options> newOptions) {
+Code::Code(ASMOperation newOp, Cond newCond, Register *newRd, Register *newRn, Register *newRm, ShiftWay newShiftWay, Register *newRs, int newOffset, std::string newLabel, vector<Options> newOptions) {
     op = newOp;
+    cond = newCond;
     rd = newRd;
     rn = newRn;
     rm = newRm;
@@ -25,6 +26,7 @@ Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm
 
 Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm) {
     op = newOp;
+    cond = Cond::NONE;
     rd = newRd;
     rn = newRn;
     rm = newRm;
@@ -38,6 +40,7 @@ Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm
 
 Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, int newOffset) {
     op = newOp;
+    cond = Cond::NONE;
     rd = newRd;
     rn = newRn;
     rm = nullptr;
@@ -51,6 +54,7 @@ Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, int newOffset) 
 
 Code::Code(ASMOperation newOp, std::string newLabel, string newDirectives) {
     op = newOp;
+    cond = Cond::NONE;
     rd = nullptr;
     rn = nullptr;
     rm = nullptr;
@@ -62,17 +66,37 @@ Code::Code(ASMOperation newOp, std::string newLabel, string newDirectives) {
     extraOptions.clear();
 }
 
+string Code::condToString(Cond inCond) {
+    switch (inCond) {
+        case Cond::EQ:
+            return "eq";
+        case Cond::NE:
+            return "ne";
+        case Cond::GE:
+            return "ge";
+        case Cond::LE:
+            return "le";
+        case Cond::GT:
+            return "gt";
+        case Cond::LT:
+            return "lt";
+        default:
+            return "";
+    }
+}
+
 void Code::print() const {
     switch (op) {
         case ASMOperation::ADD:
             switch (rd->getRegisterType()) {
                 case RegisterType::GENERAL_PURPOSE:
-                    cout << "\tadd\t";
+                    cout << "\tadd";
                     break;
                 case RegisterType::FLOAT_POINT:
-                    cout << "\tvadd\t";
+                    cout << "\tvadd";
                     break;
             }
+            cout << Code::condToString(cond) << "\t";
             cout << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
             if (rm) {
                 cout << rm->getAliasName() << endl;
@@ -82,20 +106,25 @@ void Code::print() const {
             }
             break;
         case ASMOperation::SUB:
-            switch (rd->getRegisterType()) {
-                case RegisterType::GENERAL_PURPOSE:
-                    cout << "\tsub\t";
-                    break;
-                case RegisterType::FLOAT_POINT:
-                    cout << "\tvsub\t";
-                    break;
-            }
-            cout << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
-            if (rm) {
-                cout << rm->getAliasName() << endl;
+            if (find(extraOptions.begin(), extraOptions.end(), Options::REVERSE_OP) != extraOptions.end()) {
+                switch (rd->getRegisterType()) {
+                    case RegisterType::GENERAL_PURPOSE:
+                        cout << "\tsub";
+                        break;
+                    case RegisterType::FLOAT_POINT:
+                        cout << "\tvsub";
+                        break;
+                }
+                cout << Code::condToString(cond) << "\t";
+                cout << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
+                if (rm) {
+                    cout << rm->getAliasName() << endl;
+                } else {
+                    cout << "#" << offset << endl;  // 0~4095
+                }
             }
             else {
-                cout << "#" << offset << endl;  // 0~4095
+                cout << "\trsb\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << offset << endl;
             }
             break;
         case ASMOperation::MUL:
@@ -231,8 +260,11 @@ void Code::print() const {
         case ASMOperation::BLT:
             cout << "\tblt\t" << label << endl;
             break;
+        case ASMOperation::ADR:
+            cout << "\tadr" << Code::condToString(cond) << "\t" << rd->getAliasName() << ", " << label << endl;
+            break;
         case ASMOperation::LDR:
-            cout << "\tldr\t" << rd->getAliasName() << ", ";
+            cout << "\tldr" << Code::condToString(cond) << "\t" << rd->getAliasName() << ", ";
             if (rn) {
                 if (!rm) {
                     if (offset) {
@@ -263,6 +295,9 @@ void Code::print() const {
             }
             else if (!label.empty()) {
                 cout << label << endl;
+            }
+            else {
+                cout << "=" << offset << endl;
             }
             break;
         case ASMOperation::VLDR:
@@ -558,6 +593,18 @@ bool TargetCodes::addCodeSub(Register *rd, Register *rn, int imm) {
     return true;
 }
 
+bool TargetCodes::addCodeSub(Register *rd, Register *rn, int imm, bool reverse) {
+    Code *newCode;
+    if (reverse) {
+        newCode = new Code(ASMOperation::SUB, Cond::NONE, rd, rn, nullptr, {}, nullptr, imm, {}, vector<Options>(1, Options::REVERSE_OP));
+    }
+    else {
+        newCode = new Code(ASMOperation::SUB, rd, rn, imm);
+    }
+    addCode(newCode);
+    return true;
+}
+
 bool TargetCodes::addCodeMul(Register *rd, Register *rn, Register *rm) {
     Code *newCode = new Code(ASMOperation::MUL, rd, rn, rm);
     addCode(newCode);
@@ -685,13 +732,13 @@ bool TargetCodes::addCodeVcmp(Register *rd, Register *rm) {
 }
 
 bool TargetCodes::addCodeCbz(Register *rn, std::string label) {
-    Code *newCode = new Code(ASMOperation::CBZ, nullptr, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
+    Code *newCode = new Code(ASMOperation::CBZ, Cond::NONE, nullptr, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
     addCode(newCode);
     return true;
 }
 
 bool TargetCodes::addCodeCbnz(Register *rn, std::string label) {
-    Code *newCode = new Code(ASMOperation::CBNZ, nullptr, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
+    Code *newCode = new Code(ASMOperation::CBNZ, Cond::NONE, nullptr, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
     addCode(newCode);
     return true;
 }
@@ -738,11 +785,36 @@ bool TargetCodes::addCodeBlt(std::string label) {
     return true;
 }
 
+bool TargetCodes::addCodeAdr(Register *rd, std::string label) {
+    Code *newCode = new Code(ASMOperation::ADR, {}, rd, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodeLdr(Register *rd, std::string label) {
+    Code *newCode = new Code(ASMOperation::LDR, {}, rd, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodeLdr(Register *rd, int offset) {
+    Code *newCode = new Code(ASMOperation::LDR, rd, nullptr, offset);
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodeLdr(Register *rd, int offset, Cond inCond) {
+    Code *newCode = new Code(ASMOperation::LDR, inCond, rd, nullptr, nullptr, {}, nullptr, offset, {}, {});
+    addCode(newCode);
+    return true;
+}
+
 bool TargetCodes::addCodeLdr(Register *rd, Register *rn) {
     Code *newCode = new Code(ASMOperation::LDR, rd, rn, nullptr);
     addCode(newCode);
     return true;
 }
+
 bool TargetCodes::addCodeLdr(Register *rd, Register *rn, Register *rm) {
     Code *newCode = new Code(ASMOperation::LDR, rd, rn, rm);
     addCode(newCode);
@@ -752,7 +824,7 @@ bool TargetCodes::addCodeLdr(Register *rd, Register *rn, Register *rm) {
 bool TargetCodes::addCodeLdr(Register *rd, Register *rn, Register *rm, bool rmNegative) {
     Code *newCode = nullptr;
     if (rmNegative) {
-        newCode = new Code(ASMOperation::LDR, rd, rn, rm, {}, nullptr, 0, {}, vector<Options>(1, Options::RM_NEGATIVE));
+        newCode = new Code(ASMOperation::LDR, Cond::NONE, rd, rn, rm, {}, nullptr, 0, {}, vector<Options>(1, Options::RM_NEGATIVE));
     }
     else {
         newCode = new Code(ASMOperation::LDR, rd, rn, rm);
@@ -769,7 +841,7 @@ bool TargetCodes::addCodeLdr(Register *rd, Register *rn, int offset) {
 bool TargetCodes::addCodeLdr(Register *rd, Register *rn, int offset, bool postIndexed) {
     Code *newCode = nullptr;
     if (postIndexed) {
-        newCode = new Code(ASMOperation::LDR, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
+        newCode = new Code(ASMOperation::LDR, Cond::NONE, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
     }
     else {
         newCode = new Code(ASMOperation::LDR, rd, rn, offset);
@@ -781,7 +853,7 @@ bool TargetCodes::addCodeLdr(Register *rd, Register *rn, int offset, bool postIn
 bool TargetCodes::addCodeVldr(Register *rd, Register *rn, int offset, bool postIndexed) {
     Code *newCode = nullptr;
     if (postIndexed) {
-        newCode = new Code(ASMOperation::VLDR, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
+        newCode = new Code(ASMOperation::VLDR, Cond::NONE, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
     }
     else {
         newCode = new Code(ASMOperation::VLDR, rd, rn, offset);
@@ -793,7 +865,7 @@ bool TargetCodes::addCodeVldr(Register *rd, Register *rn, int offset, bool postI
 bool TargetCodes::addCodeStr(Register *rd, Register *rn, int offset, bool postIndexed) {
     Code *newCode = nullptr;
     if (postIndexed) {
-        newCode = new Code(ASMOperation::STR, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
+        newCode = new Code(ASMOperation::STR, Cond::NONE, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
     }
     else {
         newCode = new Code(ASMOperation::STR, rd, rn, offset);
@@ -805,7 +877,7 @@ bool TargetCodes::addCodeStr(Register *rd, Register *rn, int offset, bool postIn
 bool TargetCodes::addCodeVstr(Register *rd, Register *rn, int offset, bool postIndexed) {
     Code *newCode = nullptr;
     if (postIndexed) {
-        newCode = new Code(ASMOperation::VSTR, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
+        newCode = new Code(ASMOperation::VSTR, Cond::NONE, rd, rn, nullptr, {}, nullptr, offset, {}, vector<Options>(1, Options::POST_INDEX_OFFSET));
     }
     else {
         newCode = new Code(ASMOperation::VSTR, rd, rn, offset);

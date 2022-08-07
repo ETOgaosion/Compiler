@@ -223,8 +223,10 @@ public:
 /* @initialize: mod is equal to modI, directly initialize this */
 /*              like any other operation apparently only support integer */
 class IRMod : public IRCode {
+private:
+    IROperand *curFunc;
 public:
-    IRMod(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+    IRMod(IROperand *newResult, IROperand *newArg1, IROperand *newArg2, IROperand *newCurFunc);
 
     void print() const override;
 

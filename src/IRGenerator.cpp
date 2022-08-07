@@ -1,7 +1,5 @@
 #include "IRGenerator.h"
 
-#include <stdio.h>
-
 using namespace std;
 
 IRGenerator::IRGenerator() {}

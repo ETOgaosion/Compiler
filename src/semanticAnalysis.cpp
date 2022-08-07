@@ -164,7 +164,7 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->shape = {};
     ctx->isArray = false;
     ctx->constInitVal()->outside = true;
-    if (ctx->constExp().size() > 0) {
+    if (!ctx->constExp().empty()) {
         if (ctx->constInitVal()) {
             for (auto val : ctx->constExp()) {
                 ctx->constInitVal()->shape.push_back(std::stoi(val->val));
@@ -1644,7 +1644,7 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
         }
     }
     else if (ctx->mulOp()->getText() == "%"){
-        code = new IRMod(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
+        code = new IRMod(result, ctx->mulExp()->operand, ctx->unaryExp()->operand, irGenerator->ir->getSymbolFunction(curSymbolTable->getFuncName()));
     }
     else
         throw std::runtime_error("[ERROR] > mulop illegal.\n");

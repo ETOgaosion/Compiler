@@ -13,6 +13,7 @@ Register::Register(RegisterType inRegisterType, int inNumber, const std::string 
     value = 0;
     allocated = false;
     occupied = false;
+    tmpStored = false;
     tmpStoreOffset = 0;
 }
 
@@ -31,22 +32,22 @@ GeneralPurposeRegisters::GeneralPurposeRegisters() : Registers(true) {
     registerAllocBitmap = {{"v", 0}, {"a", 0}, {"ip", 0}, {"sp", 0}, {"lr", 0}, {"pc", 0}};
     registerOccupiedBitmap = {{"v", 0}, {"a", 0}, {"ip", 0}, {"sp", 0}, {"lr", 0}, {"pc", 0}};
     generalPurposeRegisterList = {
-            {"a1", new Register(RegisterType::GENERAL_PURPOSE, 1, "a1")},
-            {"a2", new Register(RegisterType::GENERAL_PURPOSE, 2, "a2")},
-            {"a3", new Register(RegisterType::GENERAL_PURPOSE, 3, "a3")},
-            {"a4", new Register(RegisterType::GENERAL_PURPOSE, 4, "a4")},
-            {"v1", new Register(RegisterType::GENERAL_PURPOSE, 5, "v1")},
-            {"v2", new Register(RegisterType::GENERAL_PURPOSE, 6, "v2")},
-            {"v3", new Register(RegisterType::GENERAL_PURPOSE, 7, "v3")},
-            {"v4", new Register(RegisterType::GENERAL_PURPOSE, 8, "v4")},
-            {"v5", new Register(RegisterType::GENERAL_PURPOSE, 9, "v5")},
-            {"v6", new Register(RegisterType::GENERAL_PURPOSE, 10, "v6")},
-            {"v7", new Register(RegisterType::GENERAL_PURPOSE, 11, "v7")},
-            {"v8", new Register(RegisterType::GENERAL_PURPOSE, 12, "v8")},
-            {"ip", new Register(RegisterType::GENERAL_PURPOSE, 13, "ip")},
-            {"sp", new Register(RegisterType::GENERAL_PURPOSE, 14, "sp")},
-            {"lr", new Register(RegisterType::GENERAL_PURPOSE, 15, "lr")},
-            {"pc", new Register(RegisterType::GENERAL_PURPOSE, 16, "pc")}
+            {"a1", new Register(RegisterType::GENERAL_PURPOSE, 0, "a1")},
+            {"a2", new Register(RegisterType::GENERAL_PURPOSE, 1, "a2")},
+            {"a3", new Register(RegisterType::GENERAL_PURPOSE, 2, "a3")},
+            {"a4", new Register(RegisterType::GENERAL_PURPOSE, 3, "a4")},
+            {"v1", new Register(RegisterType::GENERAL_PURPOSE, 4, "v1")},
+            {"v2", new Register(RegisterType::GENERAL_PURPOSE, 5, "v2")},
+            {"v3", new Register(RegisterType::GENERAL_PURPOSE, 6, "v3")},
+            {"v4", new Register(RegisterType::GENERAL_PURPOSE, 7, "v4")},
+            {"v5", new Register(RegisterType::GENERAL_PURPOSE, 8, "v5")},
+            {"v6", new Register(RegisterType::GENERAL_PURPOSE, 9, "v6")},
+            {"v7", new Register(RegisterType::GENERAL_PURPOSE, 10, "v7")},
+            {"v8", new Register(RegisterType::GENERAL_PURPOSE, 11, "v8")},
+            {"ip", new Register(RegisterType::GENERAL_PURPOSE, 12, "ip")},
+            {"sp", new Register(RegisterType::GENERAL_PURPOSE, 13, "sp")},
+            {"lr", new Register(RegisterType::GENERAL_PURPOSE, 14, "lr")},
+            {"pc", new Register(RegisterType::GENERAL_PURPOSE, 15, "pc")}
     };
 }
 
