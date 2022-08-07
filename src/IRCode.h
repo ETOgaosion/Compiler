@@ -45,12 +45,16 @@ protected:
     IROperand *arg2;
 
 public:
-    std::vector<IRCode *> use;
     /* @initialize: never use these directly, use child's initialize functions */
     IRCode();
 
     IRCode(IROperation newOp, IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
 
+    std::vector<IRCode *> use;
+    std::vector<IRCode *> def;
+
+    bool islive;
+    int which_bb;
     /* @return: IROperation */
     IROperation getOperation() const { return operation; };
 
@@ -404,6 +408,8 @@ public:
 /* @form: beqz arg1, newLabel(arg2) */
 class IRBeqz : public IRCode {
 public:
+    int which_bb;
+
     IRBeqz(IROperand *newArg1, IROperand *newLabel);
 
     void genTargetCode(TargetCodes *t) override;
@@ -433,9 +439,8 @@ public:
 /* ``` */
 /* @form: res = PHI(args) */
 class IRPhi : public IRCode {
-private:
-    std::vector<IROperand *> args;
 public:
+    std::vector<IROperand *> args;
     /* @initialize: this operation is special, we allow it to have multiple args */
     IRPhi(IROperand *newResult, std::vector<IROperand *>newArg1);
 
