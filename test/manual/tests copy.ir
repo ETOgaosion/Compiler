@@ -46,7 +46,5 @@ L_0_main:
 	t_10 = phi t_5;
 	j <= t_11;
 	t_11 = phi t_6;
-	addparam t_10;
-	call print_int; 
 	return 0;
 

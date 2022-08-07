@@ -1336,7 +1336,7 @@ void IRFunction::ADCE(){
                     break;
                 }
             }
-            int cnum = i - bnum;
+            int cnum = i - entrances[bnum];
             for(int j = bnum + 1;j < entrances.size();j ++){
                 entrances[bnum] --;
             }
@@ -2786,6 +2786,7 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         CSE();
         constFolding();
         JumpThreading();
+        ADCE();
         break;
     case 2:
         basicBlockDivision();
