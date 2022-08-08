@@ -36,6 +36,8 @@ bool IRCode::isTwoArgAssignmentOperation(IROperation inOperation) {
         case IROperation::MUL:
         case IROperation::DIV:
         case IROperation::MOD:
+        case IROperation::LSL:
+        case IROperation::ASR:
         case IROperation::OR:
         case IROperation::AND:
         case IROperation::SEQ:
