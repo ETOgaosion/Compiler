@@ -241,26 +241,23 @@ void IRFunction::def_use_list(){
     {
         IRCode *code = codes[i];
         code->use.clear();
-        IROperand *res = (code->getOperation()== IROperation::REPLACE)? code->getArg1() : code->getResult();
+        IROperand *res = code->getResult();
         if(!res)
             continue;
         for (int j = 0; j < codes.size(); j++)
             if(codes[j]->getOperation()== IROperation::PHI){
                 IRPhi* p = dynamic_cast<IRPhi*>(codes[j]);
                 for (auto k : codes[j]->getArgs()){
-                    if(k == res){
+                    if(k == res && i != j){
                         code->use.push_back(codes[j]);
                         codes[j]->def.emplace_back(code);
                         break;
                     }
                 }
-            }else if(codes[j]->getOperation()== IROperation::REPLACE){
-                if(codes[j]->getResult() == res){
-                    code->use.push_back(codes[j]);
-                    codes[j]->def.emplace_back(code);
-                }
             }
-            else if(codes[j]->getArg1() == res || codes[j]->getArg2() == res){
+            else if((codes[j]->getArg1() == res || codes[j]->getArg2() == res || 
+            (codes[j]->getArg1() && codes[j]->getArg1()->getParentVariable() && codes[j]->getArg1()->getParentVariable() == res )|| 
+            (codes[j]->getArg2() && codes[j]->getArg2()->getParentVariable() && codes[j]->getArg2()->getParentVariable() == res )) && i != j){
                 code->use.push_back(codes[j]);
                 codes[j]->def.emplace_back(code);
             }
@@ -281,6 +278,8 @@ int IRFunction::Replacewith(IRCode* I, IROperand* val){
             int sign = 1;
             IRCode* UI = I->use[i];
             if(UI->getOperation() == IROperation::CALL)
+                continue;
+            if(UI->getOperation() == IROperation::PHI)
                 continue;
             if(UI->getOperation() == IROperation::ASSIGN_ARRAY_ELEM && res == UI->getArg1())
                 continue;
@@ -323,9 +322,9 @@ int IRFunction::Replacewith(IRCode* I, IROperand* val){
                 }
 
             if(sign){
-                if(UI->getArg1() == res)
+                if (UI->getArg1() == res || (UI->getArg1() && UI->getArg1()->getParentVariable() && UI->getArg1()->getParentVariable() == res ))
                     UI->setArg1(val);
-                if(UI->getArg2() == res)
+                if(UI->getArg2() == res || (UI->getArg2() && UI->getArg2()->getParentVariable() && UI->getArg2()->getParentVariable() == res ))
                     UI->setArg2(val);
 
                 auto pos = find(I->use.begin(), I->use.end(), UI);
@@ -629,12 +628,12 @@ void IRFunction::constFolding() {
                     
                     if(!IRCode::isAssignmentOperation(new_op) || new_op == IROperation::PHI)
                         continue;
-                    if(new_op == IROperation::NEG || new_op == IROperation::NOT || new_op == IROperation::ASSIGN)
+                    if(new_op != IROperation::ADD && new_op != IROperation::SUB && new_op != IROperation::MUL)
                         continue;
                     
                     if(new_code->getArg1() == res && new_code->getArg2()->getOperandType() == OperandType::VALUE){
                     // new_code: arg1 is Var, arg2 is immVal
-                        if(op == IROperation::ADD){
+                        if(op == IROperation::ADD && new_op != IROperation::MUL){
                             IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
                             switch(var_arg->getMetaDataType()){
                                 case MetaDataType::INT:
@@ -645,7 +644,7 @@ void IRFunction::constFolding() {
                                     break;
                             }
                             
-                        } else if (op == IROperation::SUB) {
+                        } else if (op == IROperation::SUB && new_op != IROperation::MUL) {
                             if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
                                 IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
                                 switch(var_arg->getMetaDataType()){
@@ -676,11 +675,11 @@ void IRFunction::constFolding() {
                         }
                     } else if (new_code->getArg1()->getOperandType() == OperandType::VALUE && new_code->getArg2() == res) {
                         // new_code: arg2 is Var, arg1 is immVal
-                        if (op == IROperation::ADD) {
+                        if (op == IROperation::ADD && new_op != IROperation::MUL) {
                             IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op);
                             new_code->setArg1(new_value);
                             new_code->setArg2(var_arg);
-                        } else if (op == IROperation::SUB) {
+                        } else if (op == IROperation::SUB && new_op != IROperation::MUL) {
                             if(arg2->getOperandType() == OperandType::VALUE){ // origin code: arg1 is var
                                 new_code->setArg2(var_arg);
                                 IRValue* new_value = immAddSub(new_code->getArg1(), imm_arg, new_op == IROperation::ADD ? IROperation::SUB : IROperation::ADD);
@@ -1345,10 +1344,10 @@ void IRFunction::FindLiveInst(IRCode* code, std::vector<IRCode *>& replaceinst){
              code->getOperation() == IROperation::RETURN)
     {
         for(int j = 0;j < replaceinst.size();j ++){
-            if(replaceinst[j]->islive == 0 && (code->getArg1() == replaceinst[j]->getArg1() || code->getArg2() == replaceinst[j]->getArg1())){
+            if(replaceinst[j]->islive == 0 && (code->getArg1() == replaceinst[j]->getResult() || code->getArg2() == replaceinst[j]->getResult())){
                 FindLiveInst(replaceinst[j],replaceinst);
                 for(int k = 0;k < codes.size();k ++){
-                    if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                    if(codes[k]->getResult() == replaceinst[j]->getArg1()){
                         FindLiveInst(codes[k],replaceinst);
                         break;
                     }
@@ -1363,10 +1362,10 @@ void IRFunction::FindLiveInst(IRCode* code, std::vector<IRCode *>& replaceinst){
             code->getOperation() == IROperation::GET_PARAM)
     {
         for(int j = 0;j < replaceinst.size();j ++){
-            if(replaceinst[j]->islive == 0 && code->getArg1() == replaceinst[j]->getArg1()){
+            if(replaceinst[j]->islive == 0 && code->getArg1() == replaceinst[j]->getResult()){
                 FindLiveInst(replaceinst[j],replaceinst);
                 for(int k = 0;k < codes.size();k ++){
-                    if(codes[k]->getResult() == replaceinst[j]->getResult()){
+                    if(codes[k]->getResult() == replaceinst[j]->getArg1()){
                         FindLiveInst(codes[k],replaceinst);
                         break;
                     }
@@ -1533,9 +1532,12 @@ int IRFunction::updateloop(int first, int end, int base){
                     in.end = j;
             }
 
-            for(auto j :basicBlocks[in.end]){
-                if(j->getOperation() == IROperation::REPLACE){
-                    in.loopsym.emplace_back(j->getArg1());
+            for(auto j :basicBlocks[in.start]){
+                if(j->getOperation() == IROperation::PHI){
+                    in.loopsym.emplace_back(j->getResult());
+                    for(auto k: j->getArgs())
+                        if(k->getOperandType() == OperandType::SYMBOLVAR)
+                            in.loopsym.emplace_back(k);
                 }
             }
 
