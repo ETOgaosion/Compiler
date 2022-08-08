@@ -165,6 +165,8 @@ Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralP
                 else {
                     return freeRegister;
                 }
+            default:
+                break;
         }
     }
 }
@@ -201,6 +203,8 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
                 t->addCodeLdr(freeRegister, valueLabel, true);
                 t->addCodeMv(inReg, freeRegister, nullptr, 0);
                 return inReg;
+            default:
+                break;
         }
     }
 }
@@ -253,6 +257,8 @@ void IRValue::genTargetValue(TargetCodes *t) const {
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
                 break;
+            default:
+                break;
         }
         stream << endl;
     }
@@ -265,6 +271,8 @@ void IRValue::genTargetValue(TargetCodes *t) const {
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
+                    break;
+                default:
                     break;
             }
             stream << endl;
@@ -303,6 +311,8 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
                     return freeRegister;
                 }
                 break;
+            default:
+                break;
         }
     }
     if (!isGlobalSymbolVar) {
@@ -322,6 +332,8 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
                         freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
                         t->addCodeLdr(freeRegister, sp, -symbol->getOffset());
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -354,6 +366,8 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
                         t->addCodeVldr(freeRegister,  tmpRegister,  0, false);
                     }
                     t->setRegisterFree(tmpRegister);
+                    break;
+                default:
                     break;
             }
         }
@@ -392,6 +406,8 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
                     return targetRegister;
                 }
                 break;
+            default:
+                break;
         }
     }
     if (!isGlobalSymbolVar) {
@@ -411,6 +427,8 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
                         targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
                         t->addCodeLdr(targetRegister, sp, -symbol->getOffset());
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -444,6 +462,8 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
                     }
                     t->setRegisterFree(tmpRegister);
                     break;
+                default:
+                    break;
             }
         }
         else {
@@ -475,6 +495,8 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
                     return inReg;
                 }
                 break;
+            default:
+                break;
         }
     }
     if (!isGlobalSymbolVar) {
@@ -485,6 +507,8 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
                 break;
             case MetaDataType::FLOAT:
                 t->addCodeVldr(inReg, sp, -symbol->getOffset(), false);
+                break;
+            default:
                 break;
         }
         t->setRegisterFree(sp);
@@ -499,6 +523,8 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
                 t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
                 t->addCodeMv(inReg, tmpRegister, nullptr, 0);
                 t->setRegisterFree(tmpRegister);
+                break;
+            default:
                 break;
         }
     }
@@ -526,6 +552,8 @@ void IRSymbolVariable::storeFrom(TargetCodes *t, Register *reg) {
                     return;
                 }
                 break;
+            default:
+                break;
         }
     }
     if (!isGlobalSymbolVar) {
@@ -541,6 +569,8 @@ void IRSymbolVariable::storeFrom(TargetCodes *t, Register *reg) {
                 else {
                     t->addCodeVstr(sp, reg, -symbol->getOffset(), false);
                 }
+                break;
+            default:
                 break;
         }
         t->setRegisterFree(sp);
@@ -560,6 +590,8 @@ void IRSymbolVariable::storeFrom(TargetCodes *t, Register *reg) {
                 else {
                     t->addCodeVstr(freeReg, reg, 0, false);
                 }
+                break;
+            default:
                 break;
         }
         t->setRegisterFree(freeReg);
@@ -591,6 +623,8 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
                 break;
+            default:
+                break;
         }
         stream << endl;
     }
@@ -603,6 +637,8 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
+                    break;
+                default:
                     break;
             }
             stream << endl;
@@ -624,6 +660,8 @@ void IRSymbolVariable::genTargetGlobalValue(TargetCodes *t) const {
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
                 break;
+            default:
+                break;
         }
         stream << endl;
     }
@@ -636,6 +674,8 @@ void IRSymbolVariable::genTargetGlobalValue(TargetCodes *t) const {
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
+                    break;
+                default:
                     break;
             }
             stream << endl;
@@ -761,6 +801,8 @@ Register *IRTempVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                         return freeRegister;
                     }
                     break;
+                default:
+                    break;
             }
         }
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
@@ -778,6 +820,8 @@ Register *IRTempVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                     freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
                     t->addCodeLdr(freeRegister, sp, -offset);
                 }
+                break;
+            default:
                 break;
         }
         t->setRegisterFree(sp);
@@ -816,6 +860,8 @@ Register *IRTempVariable::loadTo(TargetCodes *t, const string &regName, bool isG
                         return targetRegister;
                     }
                     break;
+                default:
+                    break;
             }
         }
         switch(metaDataType) {
@@ -832,6 +878,8 @@ Register *IRTempVariable::loadTo(TargetCodes *t, const string &regName, bool isG
                     targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
                     t->addCodeLdr(targetRegister, sp, -offset);
                 }
+                break;
+            default:
                 break;
         }
         t->setRegisterFree(sp);
@@ -863,6 +911,8 @@ Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
                         return inReg;
                     }
                     break;
+                default:
+                    break;
             }
         }
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
@@ -872,6 +922,9 @@ Register *IRTempVariable::loadTo(TargetCodes *t, Register *inReg) {
                 break;
             case MetaDataType::FLOAT:
                 t->addCodeVldr(inReg, sp, -offset, false);
+                break;
+            default:
+                break;
         }
         t->setRegisterFree(sp);
         return inReg;
@@ -902,6 +955,8 @@ void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
                         return;
                     }
                     break;
+                default:
+                    break;
             }
         }
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
@@ -916,6 +971,8 @@ void IRTempVariable::storeFrom(TargetCodes *t, Register *reg) {
                 else {
                     t->addCodeVstr(sp, reg, -offset, false);
                 }
+                break;
+            default:
                 break;
         }
         t->setRegisterFree(sp);

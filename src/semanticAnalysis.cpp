@@ -142,6 +142,8 @@ void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
                     case MetaDataType::FLOAT:
                         code = new IRAssignF(newConst, const_def->value);
                         break;
+                    default:
+                        break;
                 }
                 irGenerator->addCode(code);
             }
@@ -322,6 +324,8 @@ void SemanticAnalysis::exitVarDecl(SysYParser::VarDeclContext * ctx)
                         break;
                     case MetaDataType::FLOAT:
                         code = new IRAssignF(newVar, var_def->value);
+                        break;
+                    default:
                         break;
                 }
             }
@@ -528,6 +532,8 @@ void SemanticAnalysis::exitFuncFParams(SysYParser::FuncFParamsContext * ctx)
                     f_index = new IRValue(MetaDataType::INT, std::to_string(fr), {}, false);
                     code = new IRGetParamF(param->symbolVar, f_index);
                     fr++;
+                    break;
+                default:
                     break;
             }
         }
@@ -736,6 +742,8 @@ void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ct
                 assignCode = new IRAssignArrayElemF(ctx->exp()->operand, ctx->lVal()->identOperand,
                                                     ctx->lVal()->indexOperand);
                 break;
+            default:
+                break;
         }
         irGenerator->addCode(assignCode);
     } else { // value_a = value_b
@@ -776,6 +784,8 @@ void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ct
                 break;
             case MetaDataType::FLOAT:
                 assignCode = new IRAssignF(operand, ctx->exp()->operand);
+                break;
+            default:
                 break;
         }
         irGenerator->addCode(assignCode);
@@ -1063,6 +1073,8 @@ void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContex
             case MetaDataType::FLOAT:
                 assignCode = new IRAssignArrayElemF(ctx->exp()->operand, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
                 break;
+            default:
+                break;
         }
         irGenerator->addCode(assignCode);
     } else { // value_a = value_b
@@ -1103,6 +1115,8 @@ void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContex
                 break;
             case MetaDataType::FLOAT:
                 assignCode = new IRAssignF(operand, ctx->exp()->operand);
+                break;
+            default:
                 break;
         }
         irGenerator->addCode(assignCode);
@@ -1540,6 +1554,8 @@ void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ct
             case MetaDataType::FLOAT:
                 fetchCode = new IRFetchArrayElemF(tmp, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
                 break;
+            default:
+                break;
         }
         irGenerator->addCode(fetchCode);
         ctx->operand = tmp;
@@ -1679,6 +1695,8 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExp
             case MetaDataType::FLOAT:
                 code = new IRNegF(result, ctx->unaryExp()->operand);
                 break;
+            default:
+                break;
         }
     }
     else if(ctx->unaryOp()->getText() == "!"){
@@ -1801,6 +1819,8 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
             case MetaDataType::FLOAT:
                 code = new IRMulF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
                 break;
+            default:
+                break;
         }
     }
     else if (ctx->mulOp()->getText() == "/"){
@@ -1810,6 +1830,8 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
                 break;
             case MetaDataType::FLOAT:
                 code = new IRDivF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
+                break;
+            default:
                 break;
         }
     }
@@ -1888,6 +1910,8 @@ void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
             case MetaDataType::FLOAT:
                 code = new IRAddF(result, ctx->addExp()->operand, ctx->mulExp()->operand);
                 break;
+            default:
+                break;
         }
     }
     else if (ctx->addOp()->getText() == "-"){
@@ -1897,6 +1921,8 @@ void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
                 break;
             case MetaDataType::FLOAT:
                 code = new IRSubF(result, ctx->addExp()->operand, ctx->mulExp()->operand);
+                break;
+            default:
                 break;
         }
     }
@@ -1953,6 +1979,8 @@ void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
             case MetaDataType::FLOAT:
                 code = new IRSltF(result, ctx->relExp()->operand, ctx->addExp()->operand);
                 break;
+            default:
+                break;
         }
     }
     else if (ctx->relOp()->getText() == ">"){
@@ -1962,6 +1990,8 @@ void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
                 break;
             case MetaDataType::FLOAT:
                 code = new IRSgtF(result, ctx->relExp()->operand, ctx->addExp()->operand);
+                break;
+            default:
                 break;
         }
     }
@@ -1973,6 +2003,8 @@ void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
             case MetaDataType::FLOAT:
                 code = new IRSleqF(result, ctx->relExp()->operand, ctx->addExp()->operand);
                 break;
+            default:
+                break;
         }
     }
     else if (ctx->relOp()->getText() == ">="){
@@ -1982,6 +2014,8 @@ void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
                 break;
             case MetaDataType::FLOAT:
                 code = new IRSgeqF(result, ctx->relExp()->operand, ctx->addExp()->operand);
+                break;
+            default:
                 break;
         }
     }
@@ -2042,6 +2076,8 @@ void SemanticAnalysis::exitEqExpEqExp(SysYParser::EqExpEqExpContext * ctx)
             case MetaDataType::FLOAT:
                 code = new IRSeqF(result, ctx->eqExp()->operand, ctx->relExp()->operand);
                 break;
+            default:
+                break;
         }
     } else if(ctx->eqOp()->getText() == "!=") {
         switch (ctx->eqExp()->metaDataType) {
@@ -2050,6 +2086,8 @@ void SemanticAnalysis::exitEqExpEqExp(SysYParser::EqExpEqExpContext * ctx)
                 break;
             case MetaDataType::FLOAT:
                 code = new IRSneF(result, ctx->eqExp()->operand, ctx->relExp()->operand);
+                break;
+            default:
                 break;
         }
     }

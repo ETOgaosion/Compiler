@@ -105,6 +105,8 @@ void Code::print() const {
                 case RegisterType::FLOAT_POINT:
                     cout << "\tvadd";
                     break;
+                default:
+                    break;
             }
             cout << Code::condToString(cond) << "\t";
             cout << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
@@ -423,6 +425,8 @@ void Code::print() const {
             break;
         case ASMOperation::DIRECTIVE:
             cout << directives << endl;
+            break;
+        default:
             break;
     }
 }

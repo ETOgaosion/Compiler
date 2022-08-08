@@ -461,6 +461,8 @@ void IRFunction::constFolding() {
                         new_value = ir->addImmValue(MetaDataType::FLOAT, std::to_string(0 - val));
                         break;
                     }
+                    default:
+                        break;
                 }
 
                 /*if(new_value){
@@ -602,6 +604,8 @@ void IRFunction::constFolding() {
                         case MetaDataType::FLOAT:
                             codes[entrances[bnum] + i] = new IRAssignF(res, new_value);
                             break;
+                    default:
+                        break;
                     }*/
                     
                     Replacewith(code, new_value);
@@ -644,6 +648,8 @@ void IRFunction::constFolding() {
                                 case MetaDataType::FLOAT:
                                     codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), var_arg, new_value);
                                     break;
+                                default:
+                                    break;
                             }
                             
                         } else if (op == IROperation::SUB && new_op != IROperation::MUL) {
@@ -656,6 +662,8 @@ void IRFunction::constFolding() {
                                 case MetaDataType::FLOAT:
                                     codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), var_arg, new_value);
                                     break;
+                                default:
+                                    break;
                                 }
                             } else { // origin code: arg2 is var
                                 IRValue* new_value = immAddSub(imm_arg, new_code->getArg2(), new_op);
@@ -665,6 +673,8 @@ void IRFunction::constFolding() {
                                     break;
                                 case MetaDataType::FLOAT:
                                     codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                default:
                                     break;
                                 }                          
                             }
@@ -700,6 +710,8 @@ void IRFunction::constFolding() {
                                         codes[entrances[bnum] + j] = new IRSubF(new_code->getResult(), new_value, var_arg);
                                     else
                                         codes[entrances[bnum] + j] = new IRAddF(new_code->getResult(), new_value, var_arg);
+                                    break;
+                                default:
                                     break;
                                 } 
                             }
@@ -2888,6 +2900,8 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         varBindRegisters(t);
         break;
     }
+    default:
+        break;
 }
 
 

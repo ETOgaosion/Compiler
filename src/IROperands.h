@@ -237,7 +237,7 @@ public:
     bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); return true; };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
     bool setTargetBindRegister(Register *inTargetBindRegister) override { targetBindRegister = inTargetBindRegister; return true; };
-    bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
+    bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); return false; };
 
     Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
     Register *loadTo(TargetCodes * t, const std::string &regName, bool isGeneralPurposeRegister) override;
@@ -265,7 +265,7 @@ public:
     std::vector<Register *> getBindRegisters()  const override { return functionTable->getBindRegisters(); };
 
     bool setFunctionSymbolTable(SymbolTable *inFunctionTable) override { functionTable = inFunctionTable; return true; };
-    bool setFrameSize(int inSize) { return functionTable->setFrameSize(inSize); return true; };
+    bool setFrameSize(int inSize) override { return functionTable->setFrameSize(inSize); return true; };
 
     void print() const override;
     std::string getVal() const override;
@@ -329,7 +329,7 @@ public:
     bool setIsArray(bool newIsArray) { isArray = newIsArray; return true; };
     bool setAliasToVar() override { aliasToVar = true; return true; };
     bool setParentVariable(IROperand *inParentVariable) override { aliasToVar = true; parentVariable = inParentVariable; return true; };
-    bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
+    bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); return true; };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
     bool setTargetBindRegister(Register *inTargetBindRegister) override { targetBindRegister = inTargetBindRegister; return true; };
 
