@@ -312,10 +312,12 @@ int IRFunction::Replacewith(IRCode* I, IROperand* val){
                                 sign = 0;
                                 break;
                             }
-                            pos = find(k.loopsym.begin(), k.loopsym.end(), res);
-                            if(pos != k.loopsym.end()){
-                                sign = 0;
-                                break;
+                            if(res->getParentVariable()){
+                                pos = find(k.loopsym.begin(), k.loopsym.end(), res->getParentVariable());
+                                if(pos != k.loopsym.end()){
+                                    sign = 0;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -2876,6 +2878,7 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         constFolding();
         JumpThreading();
         ADCE();
+        //varBindRegisters(t);
         break;
     case 3:
         basicBlockDivision();
