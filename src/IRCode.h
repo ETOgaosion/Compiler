@@ -10,6 +10,8 @@ enum class IROperation {
     MUL,
     DIV,
     MOD,
+    LSL,
+    ASR,
     NOT,
     OR,
     AND,
@@ -234,6 +236,24 @@ private:
     IROperand *curFunc;
 public:
     IRMod(IROperand *newResult, IROperand *newArg1, IROperand *newArg2, IROperand *newCurFunc);
+
+    void print() const override;
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRLsl : public IRCode {
+public:
+    IRLsl(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
+
+    void print() const override;
+
+    void genTargetCode(TargetCodes *t) override;
+};
+
+class IRAsr : public IRCode {
+public:
+    IRAsr(IROperand *newResult, IROperand *newArg1, IROperand *newArg2);
 
     void print() const override;
 

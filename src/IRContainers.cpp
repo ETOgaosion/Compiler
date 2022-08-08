@@ -2880,7 +2880,9 @@ int IRFunction::calFrameSize() {
     for (const auto& it : localVariables) {
         varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
         if (it.second->getIsArray()) {
-            varSize *= it.second->getArraySize();
+            for(auto in_it : it.second->getArrayShape()) {
+                varSize *= in_it;
+            }
         }
         it.second->setMemOffset(frameSize + varSize);
         frameSize += varSize;
@@ -2888,9 +2890,6 @@ int IRFunction::calFrameSize() {
     for (const auto& it : tempVariables) {
         if (!it.second->getAliasToVar()) {
             varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
-            if (it.second->getIsArray()) {
-                varSize *= it.second->getArraySize();
-            }
             it.second->setMemOffset(frameSize + varSize);
             frameSize += varSize;
         }

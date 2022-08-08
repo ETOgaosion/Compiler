@@ -680,6 +680,8 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType) : I
     symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
+    historySymbols.clear();
+    historySymbols.push_back(this);
     alive = false;
     aliasToVar = false;
     parentVariable = nullptr;
@@ -696,6 +698,8 @@ IRTempVariable::IRTempVariable(std::string newName, MetaDataType newMetaDataType
     arrayShape = std::move(newShape);
     isArray = newIsArray;
     assigned = false;
+    historySymbols.clear();
+    historySymbols.push_back(this);
     alive = false;
     aliasToVar = false;
     parentVariable = nullptr;
@@ -709,6 +713,8 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IRO
     symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
+    historySymbols.clear();
+    historySymbols.push_back(this);
     aliasToVar = true;
     parentVariable = newParentVariable;
     offset = 0;
@@ -724,6 +730,8 @@ IRTempVariable::IRTempVariable(string newName, MetaDataType newMetaDataType, IRV
     symbolName = move(newName);
     metaDataType = newMetaDataType;
     assigned = false;
+    historySymbols.clear();
+    historySymbols.push_back(this);
     aliasToVar = false;
     parentVariable = nullptr;
     offset = 0;
