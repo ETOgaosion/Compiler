@@ -412,6 +412,7 @@ public:
     IRLabel* beginWhileLabel;
     bool docLVal;
     std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
+    std::unordered_map<IROperand *, IROperand *> latestSymbolList;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     StmtContext() = default;
@@ -518,6 +519,7 @@ public:
     IRLabel* beginWhileLabel;
     bool docLVal;
     std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
+    std::unordered_map<IROperand *, IROperand *> latestSymbolList;
     SubStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     SubStmtContext() = default;

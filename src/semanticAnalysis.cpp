@@ -815,7 +815,6 @@ void SemanticAnalysis::enterStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
 {
     ctx->hasReturn = false;
 
-
     IRLabel* falseLabel = irGenerator->addLabel();
     ctx->cond()->falseLabel = falseLabel;
     std::vector<IRCode *> codes;
@@ -838,6 +837,24 @@ void SemanticAnalysis::enterStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
         whileFalse.push_back(falseLabel);
         whileBegin.push_back(beginLabel);
         ctx->beginWhileLabel = beginLabel;
+        std::unordered_map<std::string, IRSymbolVariable *> localVars = irGenerator->currentIRFunc->getLocalVariables();
+        std::unordered_map<std::string, IRSymbolVariable *> paramVars = irGenerator->currentIRFunc->getParamVariables();
+        std::unordered_map<std::string, IRTempVariable *> tempVars = irGenerator->currentIRFunc->getTempVariables();
+        for (auto it : localVars) {
+            if (it.second->getLatestVersionSymbol() != it.second) {
+                ctx->latestSymbolList.emplace(it.second, it.second->getLatestVersionSymbol());
+            }
+        }
+        for (auto it : paramVars) {
+            if (it.second->getLatestVersionSymbol() != it.second) {
+                ctx->latestSymbolList.emplace(it.second, it.second->getLatestVersionSymbol());
+            }
+        }
+        for (auto it : tempVars) {
+            if (!it.second->getAliasToVar() && it.second->getLatestVersionSymbol() != it.second) {
+                ctx->latestSymbolList.emplace(it.second, it.second->getLatestVersionSymbol());
+            }
+        }
     } else {
         throw std::runtime_error("[ERROR] > not if or while stmt\n");
     }
@@ -927,20 +944,38 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
             it.first->addHistorySymbol(newTempFront);
             std::vector<IROperand *> phiNodes(it.second.begin(), it.second.end());
             if (std::find(it.second.begin(), it.second.end(), it.second.front()->getParentVariable()) == it.second.end()) {
-                phiNodes.push_back(it.second.front()->getParentVariable());
+                if (ctx->latestSymbolList.find(it.first) != ctx->latestSymbolList.end()) {
+                    phiNodes.push_back(ctx->latestSymbolList[it.first]);
+                }
+                else {
+                    phiNodes.push_back(it.first);
+                }
             }
             irGenerator->currentIRFunc->insertCode(new IRPhi(newTempFront, phiNodes), insertPoint);
             insertPoint++;
             codes = irGenerator->currentIRFunc->getCodes();
             for (int i = insertPoint; i < codes.size(); i++) {
                 if (codes[i]->getOperation() != IROperation::PHI) {
-                    if (codes[i]->getArg1() == it.first) {
-                        codes[i]->setArg1(newTempFront);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                    if (ctx->latestSymbolList.find(it.first) != ctx->latestSymbolList.end()) {
+                        IROperand *toReplace = ctx->latestSymbolList[it.first];
+                        if (codes[i]->getArg1() == toReplace) {
+                            codes[i]->setArg1(newTempFront);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
+                        if (codes[i]->getArg2() == toReplace) {
+                            codes[i]->setArg2(it.first);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
                     }
-                    if (codes[i]->getArg2() == it.first) {
-                        codes[i]->setArg2(it.first);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                    else {
+                        if (codes[i]->getArg1() == it.first) {
+                            codes[i]->setArg1(newTempFront);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
+                        if (codes[i]->getArg2() == it.first) {
+                            codes[i]->setArg2(it.first);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
                     }
                 }
             }
@@ -1135,6 +1170,24 @@ void SemanticAnalysis::enterSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * c
             whileFalse.push_back(falseLabel);
             whileBegin.push_back(beginLabel);
             ctx->beginWhileLabel = beginLabel;
+            std::unordered_map<std::string, IRSymbolVariable *> localVars = irGenerator->currentIRFunc->getLocalVariables();
+            std::unordered_map<std::string, IRSymbolVariable *> paramVars = irGenerator->currentIRFunc->getParamVariables();
+            std::unordered_map<std::string, IRTempVariable *> tempVars = irGenerator->currentIRFunc->getTempVariables();
+            for (auto it : localVars) {
+                if (it.second->getLatestVersionSymbol() != it.second) {
+                    ctx->latestSymbolList.emplace(it.second, it.second->getLatestVersionSymbol());
+                }
+            }
+            for (auto it : paramVars) {
+                if (it.second->getLatestVersionSymbol() != it.second) {
+                    ctx->latestSymbolList.emplace(it.second, it.second->getLatestVersionSymbol());
+                }
+            }
+            for (auto it : tempVars) {
+                if (!it.second->getAliasToVar() && it.second->getLatestVersionSymbol() != it.second) {
+                    ctx->latestSymbolList.emplace(it.second, it.second->getLatestVersionSymbol());
+                }
+            }
         }
     }
 
@@ -1225,20 +1278,38 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
             it.first->addHistorySymbol(newTempFront);
             std::vector<IROperand *> phiNodes(it.second.begin(), it.second.end());
             if (std::find(it.second.begin(), it.second.end(), it.second.front()->getParentVariable()) == it.second.end()) {
-                phiNodes.push_back(it.second.front()->getParentVariable());
+                if (ctx->latestSymbolList.find(it.first) != ctx->latestSymbolList.end()) {
+                    phiNodes.push_back(ctx->latestSymbolList[it.first]);
+                }
+                else {
+                    phiNodes.push_back(it.first);
+                }
             }
             irGenerator->currentIRFunc->insertCode(new IRPhi(newTempFront, phiNodes), insertPoint);
             insertPoint++;
             codes = irGenerator->currentIRFunc->getCodes();
             for (int i = insertPoint; i < codes.size(); i++) {
                 if (codes[i]->getOperation() != IROperation::PHI) {
-                    if (codes[i]->getArg1() == it.first) {
-                        codes[i]->setArg1(newTempFront);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                    if (ctx->latestSymbolList.find(it.first) != ctx->latestSymbolList.end()) {
+                        IROperand *toReplace = ctx->latestSymbolList[it.first];
+                        if (codes[i]->getArg1() == toReplace) {
+                            codes[i]->setArg1(newTempFront);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
+                        if (codes[i]->getArg2() == toReplace) {
+                            codes[i]->setArg2(it.first);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
                     }
-                    if (codes[i]->getArg2() == it.first) {
-                        codes[i]->setArg2(it.first);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                    else {
+                        if (codes[i]->getArg1() == it.first) {
+                            codes[i]->setArg1(newTempFront);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
+                        if (codes[i]->getArg2() == it.first) {
+                            codes[i]->setArg2(it.first);
+                            irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        }
                     }
                 }
             }

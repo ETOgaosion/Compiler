@@ -154,7 +154,8 @@ stmt
         std::vector<IRCode *> codes,
         IRLabel* beginWhileLabel,
         bool docLVal,
-        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc,
+        std::unordered_map<IROperand *, IROperand *> latestSymbolList
     ]
     : lVal '=' exp ';'                                  #stmtAssignment
     | (exp)? ';'                                        #stmtExpression
@@ -192,7 +193,8 @@ subStmt
         std::vector<IRCode *> codes,
         IRLabel* beginWhileLabel,
         bool docLVal,
-        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
+        std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc,
+        std::unordered_map<IROperand *, IROperand *> latestSymbolList
     ]
     : lVal '=' exp ';'                              #subStmtAssignment
     | (exp)? ';'                                    #subStmtExpression
