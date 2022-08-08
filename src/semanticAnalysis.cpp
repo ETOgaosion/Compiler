@@ -1400,15 +1400,15 @@ void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ct
     ctx->shape = ctx->lVal()->shape;
     ctx->metaDataType = ctx->lVal()->lValMetaDataType;
 
-    if (ctx->lVal()->isArray && ctx->indexOperand) {
+    if (ctx->lVal()->isArray && ctx->lVal()->indexOperand) {
         IRTempVariable* tmp = irGenerator->addTempVariable(ctx->metaDataType);
         IRCode* fetchCode = nullptr;
         switch (ctx->lVal()->lValMetaDataType) {
             case MetaDataType::INT:
-                fetchCode = new IRFetchArrayElemI(tmp, ctx->lVal()->identOperand, ctx->indexOperand);
+                fetchCode = new IRFetchArrayElemI(tmp, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
                 break;
             case MetaDataType::FLOAT:
-                fetchCode = new IRFetchArrayElemF(tmp, ctx->lVal()->identOperand, ctx->indexOperand);
+                fetchCode = new IRFetchArrayElemF(tmp, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
                 break;
         }
         irGenerator->addCode(fetchCode);

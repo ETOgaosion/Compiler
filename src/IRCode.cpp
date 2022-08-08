@@ -1190,13 +1190,13 @@ void IRCall::genTargetCode(TargetCodes *t) {
     t->addCodeAdd(sp, sp, arg2->getFrameSize());
     for (auto it : arg2->getBindRegisters()) {
         if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] != 's') {
-            if (arg1->getReturnType() != MetaDataType::VOID && it->getAliasName() == "a0") {
+            if (arg1->getReturnType() != MetaDataType::VOID && it->getAliasName() == "a1") {
                 continue;
             }
             t->addCodeLdr(it, sp, -it->getTmpStoreOffset());
         }
         else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] != 'fs') {
-            if (arg1->getReturnType() != MetaDataType::VOID && it->getAliasName() == "fa0") {
+            if (arg1->getReturnType() != MetaDataType::VOID && it->getAliasName() == "s0") {
                 continue;
             }
             t->addCodeLdr(it, sp, -it->getTmpStoreOffset());
@@ -1244,7 +1244,7 @@ void IRReturnI::genTargetCode(TargetCodes *t) {
 
 void IRReturnF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
+    Register *retReg = t->tryGetCertainRegister(false, "s0", hasFreeRegister);
     if (retReg->getOccupied()) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         t->addCodeVstr(sp, retReg, -retReg->getTmpStoreOffset(), false);
@@ -1257,7 +1257,7 @@ void IRReturnF::genTargetCode(TargetCodes *t) {
 
 void IRGetReturnI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *retReg = t->tryGetCertainRegister(true, "a0", hasFreeRegister);
+    Register *retReg = t->tryGetCertainRegister(true, "a1", hasFreeRegister);
     result->storeFrom(t, retReg);
     if (retReg->getOccupied()) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
@@ -1269,7 +1269,7 @@ void IRGetReturnI::genTargetCode(TargetCodes *t) {
 
 void IRGetReturnF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *retReg = t->tryGetCertainRegister(false, "fa0", hasFreeRegister);
+    Register *retReg = t->tryGetCertainRegister(false, "s0", hasFreeRegister);
     result->storeFrom(t, retReg);
     if (retReg->getOccupied()) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
