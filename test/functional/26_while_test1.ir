@@ -1,0 +1,59 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	call doubleWhile; 
+	t_0 =  return ;
+	return t_0;
+
+----------- funcDef -----------
+doubleWhile() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+j := symbol type: 1; data type: 1; initValue: 0
+
+i := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_2:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+doubleWhile:
+	i = 0;
+	t_0 = 5;
+	j = 0;
+	t_1 = 7;
+L_1_doubleWhile:
+	t_13 = phi t_8, t_11, j;
+	t_15 = phi t_4, i;
+	t_2 = t_15 < 100;
+	beqz t_2 L_0_doubleWhile;
+	t_3 = t_15 + 30;
+	t_4 = t_3;
+L_3_doubleWhile:
+	t_9 = phi t_7, j;
+	t_5 = t_9 < 100;
+	beqz t_5 L_2_doubleWhile;
+	t_6 = t_9 + 6;
+	t_7 = t_6;
+	goto L_3_doubleWhile;
+L_2_doubleWhile:
+	t_8 = phi t_7, j;
+	t_10 = t_9 - 100;
+	t_11 = t_10;
+	goto L_1_doubleWhile;
+L_0_doubleWhile:
+	t_12 = phi t_8, t_11, j;
+	t_14 = phi t_4, i;
+	return t_13;
+

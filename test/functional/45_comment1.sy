@@ -8,5 +8,6 @@ int main(){
         b = 1;
         // b = 2
     */
-    return a;
+    putint(a);
+    return 0;
 }

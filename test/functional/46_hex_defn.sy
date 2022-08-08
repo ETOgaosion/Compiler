@@ -2,5 +2,6 @@
 int main(){
     int a;
     a = 0xf;
-    return a;
+    putint(a);
+    return 0;
 }

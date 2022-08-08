@@ -18,5 +18,6 @@ int main() {
     i = i - 1;
     sum = sum + arr[i];
   }
-  return sum % 79;
+  putint(sum % 79);
+  return 0;
 }

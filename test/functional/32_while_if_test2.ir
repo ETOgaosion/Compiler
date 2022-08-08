@@ -1,0 +1,70 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	call ifWhile; 
+	t_0 =  return ;
+	return t_0;
+
+----------- funcDef -----------
+ifWhile() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+b := symbol type: 1; data type: 1; initValue: 0
+
+a := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_13:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+ifWhile:
+	a = 0;
+	t_0 = 0;
+	b = 0;
+	t_1 = 3;
+	t_2 = t_0 == 5;
+	beqz t_2 L_0_ifWhile;
+L_3_ifWhile:
+	t_7 = phi t_5, b;
+	t_3 = t_7 == 2;
+	beqz t_3 L_2_ifWhile;
+	t_4 = t_7 + 2;
+	t_5 = t_4;
+	goto L_3_ifWhile;
+L_2_ifWhile:
+	t_6 = phi t_5, b;
+	t_8 = t_7 + 25;
+	t_9 = t_8;
+	goto L_1_ifWhile;
+L_0_ifWhile:
+L_5_ifWhile:
+	t_16 = phi t_14, a;
+	t_18 = phi t_12, b;
+	t_10 = t_16 < 5;
+	beqz t_10 L_4_ifWhile;
+	t_11 = t_18 * 2;
+	t_12 = t_11;
+	t_13 = t_16 + 1;
+	t_14 = t_13;
+	goto L_5_ifWhile;
+L_4_ifWhile:
+L_1_ifWhile:
+	t_15 = phi t_14, a;
+	t_17 = phi t_12, b;
+	t_19 = phi t_15;
+	t_20 = phi t_6, t_9, b, t_17;
+	return t_20;
+

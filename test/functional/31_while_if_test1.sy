@@ -21,5 +21,6 @@ int whileIf() {
 
 
 int main(){
-  return (whileIf());
+  putint(whileIf());
+  return 0;
 }

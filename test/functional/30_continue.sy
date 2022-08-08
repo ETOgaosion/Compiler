@@ -12,5 +12,6 @@ int main(){
         sum = sum + i;
         i = i + 1;
     }
-    return sum;
+    putint(sum);
+    return 0;
 }

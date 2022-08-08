@@ -1,0 +1,67 @@
+============ global var ================
+k := symbol type: 1; data type: 1; initValue: k: 0
+
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+l := symbol type: 1; data type: 1; initValue: 11
+
+g := symbol type: 1; data type: 1; initValue: 9
+
+g := symbol type: 1; data type: 1; initValue: 11
+
+k := symbol type: 1; data type: 1; initValue: 112
+
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	k = 3389;
+	t_0 = k < 10000;
+	beqz t_0 L_0_main;
+	t_1 = k + 1;
+	t_2 = t_1;
+	k = 112;
+L_2_main:
+	t_16 = phi t_13, g;
+	t_18 = phi t_5, k, t_14;
+	t_3 = t_18 > 10;
+	beqz t_3 L_1_main;
+	t_4 = t_18 - 88;
+	t_5 = t_4;
+	t_6 = t_5 < 1000;
+	beqz t_6 L_3_main;
+	g = 9;
+	l = 11;
+	t_7 = 10;
+	t_8 = t_5 - t_7;
+	t_9 = t_8;
+	g = 11;
+	t_10 = t_9 + g;
+	t_11 = t_10 + l;
+	t_12 = t_11;
+L_3_main:
+	t_13 = phi t_7, g;
+	t_14 = phi t_9, k, t_12, k;
+	goto L_2_main;
+L_1_main:
+	t_15 = phi t_13;
+	t_17 = phi t_5, k, t_14;
+	addparam t_18,1;
+	call putint; 
+L_0_main:
+	t_19 = phi t_2, k;
+	t_20 = phi t_17;
+	t_21 = phi t_15;
+	return t_20;
+

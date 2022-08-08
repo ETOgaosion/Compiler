@@ -1,0 +1,104 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+p := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_1:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	p = 0;
+	t_0 = 2;
+	addparam t_0,1;
+	addparam t_0,2;
+	call deepWhileBr; 
+	t_1 =  return ;
+	t_2 = t_1;
+	addparam t_2,1;
+	call putint; 
+	return 0;
+	return ;
+
+----------- funcDef -----------
+deepWhileBr(1,1) => 1:
+----------- paramVars -----------
+b := symbol type: 0; data type: 1
+a := symbol type: 0; data type: 1
+----------- localVars -----------
+e := symbol type: 1; data type: 1; initValue: 0
+
+d := symbol type: 1; data type: 1; initValue: 0
+
+c := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+deepWhileBr:
+	a =  param 1;
+	b =  param 2;
+	c = 0;
+	t_0 = a + b;
+	t_1 = t_0;
+L_1_deepWhileBr:
+	t_20 = phi t_17, t_1;
+	t_22 = phi t_18, e;
+	t_24 = phi t_3, d;
+	t_2 = t_20 < 75;
+	beqz t_2 L_0_deepWhileBr;
+	d = 0;
+	t_3 = 42;
+	t_4 = t_20 < 100;
+	beqz t_4 L_2_deepWhileBr;
+	t_5 = t_20 + t_3;
+	t_6 = t_5;
+	t_7 = t_6 > 99;
+	beqz t_7 L_3_deepWhileBr;
+	e = 0;
+	t_8 = t_3 * 2;
+	t_9 = t_8;
+	addparam 0,1;
+	call get_one; 
+	t_10 =  return ;
+	t_11 = t_10 == 1;
+	beqz t_11 L_4_deepWhileBr;
+	t_12 = t_9 * 2;
+	t_13 = t_12;
+L_4_deepWhileBr:
+	t_14 = phi t_13, c;
+L_3_deepWhileBr:
+	t_15 = phi t_9, e;
+	t_16 = phi t_14;
+L_2_deepWhileBr:
+	t_17 = phi t_6, c, t_16;
+	t_18 = phi t_15;
+	goto L_1_deepWhileBr;
+L_0_deepWhileBr:
+	t_19 = phi t_17;
+	t_21 = phi t_18;
+	t_23 = phi t_3, d;
+	return t_20;
+
+----------- funcDef -----------
+get_one(1) => 1:
+----------- paramVars -----------
+a := symbol type: 0; data type: 1
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+get_one:
+	a =  param 1;
+	return 1;
+

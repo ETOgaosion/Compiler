@@ -1,0 +1,48 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	call if_if_Else; 
+	t_0 =  return ;
+	return t_0;
+
+----------- funcDef -----------
+if_if_Else() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+b := symbol type: 1; data type: 1; initValue: 0
+
+a := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_6:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+if_if_Else:
+	a = 0;
+	t_0 = 5;
+	b = 0;
+	t_1 = 10;
+	t_2 = t_0 == 5;
+	beqz t_2 L_0_if_if_Else;
+	t_3 = t_1 == 10;
+	beqz t_3 L_2_if_if_Else;
+	t_4 = 25;
+L_2_if_if_Else:
+	t_5 = phi t_4, a;
+	goto L_1_if_if_Else;
+L_0_if_if_Else:
+	t_6 = t_5 + 15;
+	t_7 = t_6;
+L_1_if_if_Else:
+	t_8 = phi t_5, t_7, a;
+	return t_8;
+

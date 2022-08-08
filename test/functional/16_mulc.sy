@@ -1,5 +1,6 @@
 //test mulc
 const int a = 5;
 int main(){
-    return a * 5;
+    putint(a * 5);
+    return 0;
 }

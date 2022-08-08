@@ -2968,10 +2968,12 @@ string IRFunction::getFunctionName() const {
 }
 
 bool IRFunction::getFunctionInLib() const {
-    if (functionName == "getint" ||
+    if (functionName == "getch" ||
+        functionName == "getint" ||
         functionName == "getfloat" ||
         functionName == "getarray" ||
         functionName == "getfarray" ||
+        functionName == "putch" ||
         functionName == "putint" ||
         functionName == "putfloat" ||
         functionName == "putfarray" ||

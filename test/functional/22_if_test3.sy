@@ -14,5 +14,6 @@ int ififElse() {
 }
 
 int main(){
-  return (ififElse());
+    putint(ififElse());
+    return 0;
 }

@@ -1,0 +1,81 @@
+============ global var ================
+a := symbol type: 1; data type: 1; initValue: a: 7
+
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+i := symbol type: 1; data type: 1; initValue: 0
+
+result := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_6:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	result = 0;
+	i = 0;
+L_1_main:
+	t_9 = phi t_7, i;
+	t_11 = phi t_5, result;
+	t_0 = t_9 < 100;
+	beqz t_0 L_0_main;
+	call func; 
+	t_1 =  return ;
+	t_2 = t_1 == 1;
+	beqz t_2 L_2_main;
+	t_3 = t_11 + 1;
+	t_4 = t_3;
+L_2_main:
+	t_5 = phi t_4, result;
+	t_6 = t_9 + 1;
+	t_7 = t_6;
+	goto L_1_main;
+L_0_main:
+	t_8 = phi t_7, i;
+	t_10 = phi t_5;
+	t_12 = t_11 < 100;
+	beqz t_12 L_3_main;
+	addparam 1,1;
+	call putint; 
+	goto L_4_main;
+L_3_main:
+	addparam 0,1;
+	call putint; 
+L_4_main:
+	return 0;
+
+----------- funcDef -----------
+func() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+a := symbol type: 1; data type: 1; initValue: 1
+
+b := symbol type: 1; data type: 1; initValue: a := symbol type: 1; data type: 1; initValue: a: 7
+
+
+----------- tempVars ------------
+t_1:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+func:
+	b = a;
+	a = 1;
+	t_0 = a == b;
+	beqz t_0 L_0_func;
+	t_1 = a + 1;
+	t_2 = t_1;
+	return 1;
+	goto L_1_func;
+L_0_func:
+	return 0;
+L_1_func:
+	t_3 = phi t_2, a;
+

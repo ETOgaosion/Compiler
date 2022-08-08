@@ -6,7 +6,15 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     block = 0;
     curSymbolTable = SymbolTable::getGlobalSymbolTable();
     irGenerator = IRGenerator::getIRGenerator(IRProgram::getIRProgram(programName, curSymbolTable));
-    SymbolTable *funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putint", MetaDataType::VOID, curSymbolTable);
+    SymbolTable *funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putch", MetaDataType::VOID, curSymbolTable);
+    funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, {});
+    funcSymbolTable->setParamDataTypeList();
+    funcSymbolTable->setParamNum();
+    irGenerator->enterFunction(funcSymbolTable);
+    irGenerator->exitFunction();
+    irGenerator->currentIRFunc->calFrameSize();
+
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putint", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, {});
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
@@ -34,6 +42,11 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, true, {});
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
+    irGenerator->enterFunction(funcSymbolTable);
+    irGenerator->exitFunction();
+    irGenerator->currentIRFunc->calFrameSize();
+
+    funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getch", MetaDataType::INT, curSymbolTable);
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
     irGenerator->currentIRFunc->calFrameSize();

@@ -1,0 +1,34 @@
+.data
+.globl	a
+.type	a, %object
+a:
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+	.word	0x0
+
+.text
+.align 1
+.globl	main
+.type	main, %function
+main:
+	push	{lr}
+	eor	v1, v1, v1
+	mov	a1, v1
+	pop	{pc}

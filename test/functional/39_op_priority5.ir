@@ -1,0 +1,63 @@
+============ global var ================
+e := symbol type: 1; data type: 1; initValue: e: 4
+
+c := symbol type: 1; data type: 1; initValue: c: 1
+
+b := symbol type: 1; data type: 1; initValue: b: 0
+
+d := symbol type: 1; data type: 1; initValue: d: 2
+
+a := symbol type: 1; data type: 1; initValue: a: 1
+
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+flag := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_15:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_9:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	flag = 0;
+	t_0 = a * b;
+	t_1 = t_0 / c;
+	t_2 = e + d;
+	t_3 = t_1 == t_2;
+	t_4 = a + b;
+	t_5 = a * t_4;
+	t_6 = t_5 + c;
+	t_7 = d + e;
+	t_8 = t_6 <= t_7;
+	t_9 = t_3 && t_8;
+	t_10 = b * c;
+	t_11 = a - t_10;
+	t_12 = a / c;
+	t_13 = d - t_12;
+	t_14 = t_11 == t_13;
+	t_15 = t_9 || t_14;
+	beqz t_15 L_0_main;
+	t_16 = 1;
+L_0_main:
+	t_17 = phi t_16, flag;
+	addparam t_17,1;
+	call putint; 
+	return t_17;
+

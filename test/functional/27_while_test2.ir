@@ -1,0 +1,111 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	call FourWhile; 
+	t_0 =  return ;
+	return t_0;
+
+----------- funcDef -----------
+FourWhile() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+d := symbol type: 1; data type: 1; initValue: 0
+
+c := symbol type: 1; data type: 1; initValue: 0
+
+b := symbol type: 1; data type: 1; initValue: 0
+
+a := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_43:= symbol type: TEMP VAR; data type: 1
+t_42:= symbol type: TEMP VAR; data type: 1
+t_32:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_18:= symbol type: TEMP VAR; data type: 1
+t_24:= symbol type: TEMP VAR; data type: 1
+t_44:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+FourWhile:
+	a = 0;
+	t_0 = 5;
+	b = 0;
+	c = 0;
+	t_1 = 6;
+	t_2 = 7;
+	d = 0;
+	t_3 = 10;
+L_1_FourWhile:
+	t_35 = phi t_26, t_33, b;
+	t_37 = phi t_28, t_3;
+	t_39 = phi t_30, t_2;
+	t_41 = phi t_6, a;
+	t_4 = t_41 < 20;
+	beqz t_4 L_0_FourWhile;
+	t_5 = t_41 + 3;
+	t_6 = t_5;
+L_3_FourWhile:
+	t_27 = phi t_9, b;
+	t_29 = phi t_22, t_3;
+	t_31 = phi t_20, t_25, c;
+	t_7 = t_27 < 10;
+	beqz t_7 L_2_FourWhile;
+	t_8 = t_27 + 1;
+	t_9 = t_8;
+L_5_FourWhile:
+	t_21 = phi t_12, c;
+	t_23 = phi t_16, t_19, d;
+	t_10 = t_21 == 7;
+	beqz t_10 L_4_FourWhile;
+	t_11 = t_21 - 1;
+	t_12 = t_11;
+L_7_FourWhile:
+	t_17 = phi t_15, d;
+	t_13 = t_17 < 20;
+	beqz t_13 L_6_FourWhile;
+	t_14 = t_17 + 3;
+	t_15 = t_14;
+	goto L_7_FourWhile;
+L_6_FourWhile:
+	t_16 = phi t_15, d;
+	t_18 = t_17 - 1;
+	t_19 = t_18;
+	goto L_5_FourWhile;
+L_4_FourWhile:
+	t_20 = phi t_12, c;
+	t_22 = phi t_16, t_19, d;
+	t_24 = t_21 + 1;
+	t_25 = t_24;
+	goto L_3_FourWhile;
+L_2_FourWhile:
+	t_26 = phi t_9, b;
+	t_28 = phi t_22;
+	t_30 = phi t_20, t_25, c;
+	t_32 = t_27 - 2;
+	t_33 = t_32;
+	goto L_1_FourWhile;
+L_0_FourWhile:
+	t_34 = phi t_26, t_33, b;
+	t_36 = phi t_28;
+	t_38 = phi t_30;
+	t_40 = phi t_6, a;
+	t_42 = t_35 + t_37;
+	t_43 = t_41 + t_42;
+	t_44 = t_43 + t_39;
+	return t_44;
+

@@ -1,0 +1,53 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+i := symbol type: 1; data type: 1; initValue: 200
+
+----------- tempVars ------------
+----------- Codes ------------
+main:
+	i = 200;
+	addparam i,1;
+	call reverse; 
+	return 0;
+
+----------- funcDef -----------
+reverse(1) => 0:
+----------- paramVars -----------
+n := symbol type: 0; data type: 1
+----------- localVars -----------
+next := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_5:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+reverse:
+	n =  param 1;
+	next = 0;
+	t_0 = n <= 1;
+	beqz t_0 L_0_reverse;
+	call getint; 
+	t_1 =  return ;
+	t_2 = t_1;
+	addparam t_2,1;
+	call putint; 
+	goto L_1_reverse;
+L_0_reverse:
+	call getint; 
+	t_3 =  return ;
+	t_4 = t_3;
+	t_5 = n - 1;
+	addparam t_5,1;
+	call reverse; 
+	addparam t_4,1;
+	call putint; 
+L_1_reverse:
+	t_6 = phi t_2, next, t_4;
+

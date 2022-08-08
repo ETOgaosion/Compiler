@@ -2,5 +2,6 @@
 int main(){
     int a;
     a = 10;
-    return a - 2;
+    putint(a - 2);
+    return 0;
 }

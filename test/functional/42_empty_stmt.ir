@@ -1,0 +1,19 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+a := symbol type: 1; data type: 1; initValue: 10
+
+----------- tempVars ------------
+t_1:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	a = 10;
+	t_0 = a * 2;
+	t_1 = t_0 + 1;
+	return t_1;
+

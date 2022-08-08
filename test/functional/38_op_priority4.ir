@@ -1,0 +1,79 @@
+============ global var ================
+e := symbol type: 1; data type: 1; initValue: e: 0
+
+c := symbol type: 1; data type: 1; initValue: c: 0
+
+b := symbol type: 1; data type: 1; initValue: b: 0
+
+d := symbol type: 1; data type: 1; initValue: d: 0
+
+a := symbol type: 1; data type: 1; initValue: a: 0
+
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+flag := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_18:= symbol type: TEMP VAR; data type: 1
+t_17:= symbol type: TEMP VAR; data type: 1
+t_15:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_9:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_16:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_19:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	call getint; 
+	t_0 =  return ;
+	a = t_0;
+	call getint; 
+	t_1 =  return ;
+	b = t_1;
+	call getint; 
+	t_2 =  return ;
+	c = t_2;
+	call getint; 
+	t_3 =  return ;
+	d = t_3;
+	call getint; 
+	t_4 =  return ;
+	e = t_4;
+	flag = 0;
+	t_5 = b * c;
+	t_6 = a - t_5;
+	t_7 = a / c;
+	t_8 = d - t_7;
+	t_9 = t_6 != t_8;
+	t_10 = a * b;
+	t_11 = t_10 / c;
+	t_12 = e + d;
+	t_13 = t_11 == t_12;
+	t_14 = t_9 || t_13;
+	t_15 = a + b;
+	t_16 = t_15 + c;
+	t_17 = d + e;
+	t_18 = t_16 == t_17;
+	t_19 = t_14 || t_18;
+	beqz t_19 L_0_main;
+	t_20 = 1;
+L_0_main:
+	t_21 = phi t_20, flag;
+	return t_21;
+

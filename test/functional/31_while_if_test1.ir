@@ -1,0 +1,64 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	call whileIf; 
+	t_0 =  return ;
+	return t_0;
+
+----------- funcDef -----------
+whileIf() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+b := symbol type: 1; data type: 1; initValue: 0
+
+a := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_11:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+whileIf:
+	a = 0;
+	t_0 = 0;
+	b = 0;
+	t_1 = 0;
+L_1_whileIf:
+	t_14 = phi t_12, a;
+	t_16 = phi t_10, t_1;
+	t_2 = t_14 < 100;
+	beqz t_2 L_0_whileIf;
+	t_3 = t_14 == 5;
+	beqz t_3 L_2_whileIf;
+	t_4 = 25;
+	goto L_3_whileIf;
+L_2_whileIf:
+	t_5 = t_14 == 10;
+	beqz t_5 L_4_whileIf;
+	t_6 = 42;
+	goto L_5_whileIf;
+L_4_whileIf:
+	t_7 = t_14 * 2;
+	t_8 = t_7;
+L_5_whileIf:
+L_3_whileIf:
+	t_9 = phi t_6, b, t_8;
+	t_10 = phi t_4, b, t_9;
+	t_11 = t_14 + 1;
+	t_12 = t_11;
+	goto L_1_whileIf;
+L_0_whileIf:
+	t_13 = phi t_12, a;
+	t_15 = phi t_10;
+	return t_16;
+
