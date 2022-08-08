@@ -9,13 +9,19 @@ dir=`ls test/samples_codegen/*.S`
 for test_file in $dir
 do
     echo "Generate ${test_file:0:-2}"
-    riscv64-unknown-elf-gcc -g $test_file -L./ -lcact -static -o ${test_file:0:-2}
-    riscv64-unknown-elf-objdump -S ${test_file:0:-2} > "${test_file:0:-2}.obj"
+    arm-linux-gnueabihf-gcc -g $test_file -L./ -lcact -static -o ${test_file:0:-2}
+    arm-linux-gnueabihf-objdump -S ${test_file:0:-2} > "${test_file:0:-2}.obj"
 done
 dir=`ls test/samples_codegen/*.S`
 for test_file in $dir
 do
     echo "Test ${test_file:0:-2}"
-    spike pk ${test_file:0:-2} > "${test_file:0:-2}.output"
+    file ${test_file:0:-2}
+    FILE="${test_file:0:-2}.in"
+    if [ -f "$FILE" ]; then
+        ./${test_file:0:-2} > "${test_file:0:-2}.output"
+    else
+        ./${test_file:0:-2} > "${test_file:0:-2}.output"
+    fi
     echo "!!!!!!!!!!!!!!!!!!!"
 done
