@@ -1,8 +1,5 @@
-int main()
-{
-    int a = 0;
-    while (a < 3) {
-        a = a + 1;
-    }
-    putint(a);
+const int a[1] = {1};
+int main() {
+    int c = 1.5;
+    return c;
 }

@@ -304,6 +304,9 @@ void Code::print() const {
                 }
             }
             else if (!label.empty()) {
+                if (find(extraOptions.begin(), extraOptions.end(), Options::LABEL_AS_VAL) != extraOptions.end()) {
+                    cout << "=";
+                }
                 cout << label << endl;
             }
             else {
@@ -818,6 +821,18 @@ bool TargetCodes::addCodeAdr(Register *rd, std::string label) {
 
 bool TargetCodes::addCodeLdr(Register *rd, std::string label) {
     Code *newCode = new Code(ASMOperation::LDR, {}, rd, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodeLdr(Register *rd, std::string label, bool labelAsVal) {
+    Code *newCode = nullptr;
+    if (labelAsVal) {
+        newCode = new Code(ASMOperation::LDR, {}, rd, nullptr, nullptr, {}, nullptr, 0, std::move(label), vector<Options>(1, Options::LABEL_AS_VAL));
+    }
+    else {
+        newCode = new Code(ASMOperation::LDR, {}, rd, nullptr, nullptr, {}, nullptr, 0, std::move(label), {});
+    }
     addCode(newCode);
     return true;
 }

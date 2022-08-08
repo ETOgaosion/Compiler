@@ -108,11 +108,11 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
         switch(dataType) {
             case MetaDataType::INT:
                 freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                t->addCodeLdr(freeRegister, valueLabel);
+                t->addCodeLdr(freeRegister, valueLabel, true);
                 return freeRegister;
             case MetaDataType::FLOAT:
                 freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                t->addCodeLdr(freeRegister, valueLabel);
+                t->addCodeLdr(freeRegister, valueLabel, true);
                 if (!isGeneralPurposeRegister) {
                     retRegister = t->getNextFreeRegister(false, false, hasFreeRegister);
                     t->addCodeMv(retRegister, freeRegister, nullptr, 0);
@@ -151,11 +151,11 @@ Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralP
         switch(dataType) {
             case MetaDataType::INT:
                 targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
-                t->addCodeLdr(targetRegister, valueLabel);
+                t->addCodeLdr(targetRegister, valueLabel, true);
                 return targetRegister;
             case MetaDataType::FLOAT:
                 freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                t->addCodeLdr(freeRegister, valueLabel);
+                t->addCodeLdr(freeRegister, valueLabel, true);
                 if (!isGeneralPurposeRegister) {
                     targetRegister = t->tryGetCertainRegister(false, regName, hasFreeRegister);
                     t->addCodeMv(targetRegister, freeRegister, nullptr, 0);
@@ -194,11 +194,11 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
     else {
         switch(dataType) {
             case MetaDataType::INT:
-                t->addCodeLdr(inReg, valueLabel);
+                t->addCodeLdr(inReg, valueLabel, true);
                 return inReg;
             case MetaDataType::FLOAT:
                 freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                t->addCodeLdr(freeRegister, valueLabel);
+                t->addCodeLdr(freeRegister, valueLabel, true);
                 t->addCodeMv(inReg, freeRegister, nullptr, 0);
                 return inReg;
         }

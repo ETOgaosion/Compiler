@@ -79,7 +79,8 @@ enum class Options {
     NONE,
     POST_INDEX_OFFSET,
     RM_NEGATIVE,
-    REVERSE_OP
+    REVERSE_OP,
+    LABEL_AS_VAL
 };
 
 class Code {
@@ -157,6 +158,7 @@ public:
     bool addCodeBlt(std::string label);
     bool addCodeAdr(Register *rd, std::string label);
     bool addCodeLdr(Register *rd, std::string label);
+    bool addCodeLdr(Register *rd, std::string label, bool labelAsVal);
     bool addCodeLdr(Register *rd, int offset);
     bool addCodeLdr(Register *rd, int offset, Cond inCond);
     bool addCodeLdr(Register *rd, Register *rn);

@@ -167,7 +167,7 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     if (!ctx->constExp().empty()) {
         if (ctx->constInitVal()) {
             for (auto val : ctx->constExp()) {
-                ctx->constInitVal()->shape.push_back(std::stoi(val->val));
+                ctx->constInitVal()->shape.push_back(std::stoi(val->getText()));
             }
         }
     }
@@ -215,7 +215,7 @@ void SemanticAnalysis::exitConstInitValOfVar(SysYParser::ConstInitValOfVarContex
 {
     ctx->type = ctx->constExp()->metaDataType;
     ctx->isArray = false;
-    if (ctx->shape.empty()) {
+    if (ctx->outside && ctx->shape.empty()) {
         if (ctx->constExp()->metaDataType == MetaDataType::FLOAT) {
             ctx->value = irGenerator->addImmValue(ctx->constExp()->metaDataType, ctx->constExp()->val);
         } else {
@@ -234,6 +234,7 @@ void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayC
     ctx->isArray = true;
     ctx->value = nullptr;
     for (auto it : ctx->constInitVal()) {
+        it->outside = false;
         it->shape = std::vector<std::size_t>(ctx->shape.begin() + 1, ctx->shape.end());
     }
 }

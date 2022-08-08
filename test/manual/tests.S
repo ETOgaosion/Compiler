@@ -1,31 +1,18 @@
+.data
+.globl	a
+.type	a, %object
+a:
+	.word	0x1
+
+	.equ	ImmValue_1, 0x1
+
 .text
 .align 1
 .globl	main
 .type	main, %function
 main:
 	push	{lr}
-	eor	v1, v1, v1
-	mov	v2, v1
-	str	v2, [sp, #-12]
-L_1_main:
-	ldr	v1, [sp, #-12]
-	ldr	v3, =3
-	cmp	v1, v3
-	ldrlt	v2, =1
-	ldrge	v2, =0
-	str	v2, [sp, #-20]
-	ldr	v1, [sp, #-20]
-	cmp	v1, #0
-	beq	L_0_main
-	ldr	v2, [sp, #-12]
-	add	v1, v2, #1
-	str	v1, [sp, #-16]
-	ldr	v1, [sp, #-16]
+	ldr	v1, =ImmValue_1
 	str	v1, [sp, #-12]
-	b	L_1_main
-L_0_main:
 	ldr	a1, [sp, #-12]
-	add	sp, sp, #-24
-	bl	putint
-	add	sp, sp, #24
 	pop	{pc}
