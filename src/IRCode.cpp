@@ -252,16 +252,16 @@ IRAssignArrayElemF::IRAssignArrayElemF(IROperand *newSource, IROperand *newArg1,
 IRAddLabel::IRAddLabel(IROperand *newArg1)
         : IRCode(IROperation::ADD_LABEL, nullptr, newArg1, nullptr) {}
 
-IRAddParam::IRAddParam(IROperand *newArg1)
-        : IRCode(IROperation::ADD_PARAM, nullptr, newArg1, nullptr) {}
+IRAddParam::IRAddParam(IROperand *newArg1, IROperand *newArg2)
+        : IRCode(IROperation::ADD_PARAM, nullptr, newArg1, newArg2) {}
 
-IRAddParamI::IRAddParamI(IROperand *newArg1)
-        : IRAddParam(newArg1) {}
+IRAddParamI::IRAddParamI(IROperand *newArg1, IROperand *newArg2)
+        : IRAddParam(newArg1, newArg2) {}
 
-IRAddParamF::IRAddParamF(IROperand *newArg1)
-        : IRAddParam(newArg1) {}
+IRAddParamF::IRAddParamF(IROperand *newArg1, IROperand *newArg2)
+        : IRAddParam(newArg1, newArg2) {}
 
-IRAddParamA::IRAddParamA(IROperand *newArg1) : IRAddParam(newArg1) {}
+IRAddParamA::IRAddParamA(IROperand *newArg1, IROperand *newArg2) : IRAddParam(newArg1, newArg2) {}
 
 IRGetParam::IRGetParam(IROperand *newResult, IROperand *newArg1)
         : IRCode(IROperation::GET_PARAM, newResult, newArg1, nullptr) {}
@@ -433,7 +433,7 @@ void IRAddLabel::print() const {
 }
 
 void IRAddParam::print() const {
-    cout << "\t" << "addparam " << arg1->getVal() << ";" << endl;
+    cout << "\t" << "addparam " << arg1->getVal() << "," << arg2->getVal() << ";" << endl;
 }
 
 void IRGetParam::print() const {
@@ -1110,7 +1110,7 @@ void IRAddLabel::genTargetCode(TargetCodes *t) {
 
 void IRAddParamI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, true, hasFreeRegister);
+    Register *arg1Reg = t->tryGetCertainRegister(true, "a" + arg2->getValue(), hasFreeRegister);
     if (arg1Reg->getOccupied()) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         arg1Reg->setTmpStored(true);
@@ -1123,7 +1123,7 @@ void IRAddParamI::genTargetCode(TargetCodes *t) {
 
 void IRAddParamF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(false, true, hasFreeRegister);
+    Register *arg1Reg = t->tryGetCertainRegister(false, "s" + arg2->getValue(), hasFreeRegister);
     if (arg1Reg->getOccupied()) {
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
         arg1Reg->setTmpStored(true);
@@ -1136,7 +1136,7 @@ void IRAddParamF::genTargetCode(TargetCodes *t) {
 
 void IRAddParamA::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = t->getNextFreeRegister(true, true, hasFreeRegister);
+    Register *arg1Reg = t->tryGetCertainRegister(true, "a" + arg2->getValue(), hasFreeRegister);
     t->addCodeAdr(arg1Reg, arg1->getSymbolName());
     t->setRegisterFree(arg1Reg);
 }
