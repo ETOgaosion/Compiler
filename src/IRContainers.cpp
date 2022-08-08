@@ -2081,7 +2081,6 @@ else if(currentloop->pred.size() == 1 &&
                    (basicBlocks[bnum][cnum]->getArg2()->getOperandType() == OperandType::VALUE ||
                    basicBlocks[bnum][cnum]->getArg2()->which_bb < currentloop->start) &&
                    (IRCode::isTwoArgAssignmentOperation(basicBlocks[bnum][cnum]->getOperation()) ||
-                   basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::FETCH_ARRAY_ELEM ||
                    basicBlocks[bnum][cnum]->getOperation() == IROperation::ASSIGN_ARRAY_ELEM)){
                     IRCode* tmp = basicBlocks[bnum][cnum];
