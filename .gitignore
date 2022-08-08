@@ -8,3 +8,5 @@ res
 .idea/*
 *.in
 *.out
+*.obj
+*.output
