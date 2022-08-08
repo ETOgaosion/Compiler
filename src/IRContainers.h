@@ -139,8 +139,11 @@ public:
     bool getFunctionInLib() const;
     SymbolTable *getFuncSymbolTable() const { return functionTable; };
     IRSymbolVariable *getLocalVariable(int block, const std::string& varName);
+    std::unordered_map<std::string, IRSymbolVariable *> getLocalVariables() { return localVariables; };
     IRSymbolVariable *getParamVariable(const std::string& varName);
+    std::unordered_map<std::string, IRSymbolVariable *> getParamVariables() { return paramVariables; };
     IRTempVariable *getTempVariable(const std::string& varName);
+    std::unordered_map<std::string, IRTempVariable *> getTempVariables() { return tempVariables; };
     IRCode *getCode(int cnt);
     std::vector<IRCode *> &getCodes();
     IRLabel *getLabel(const std::string& labelName);

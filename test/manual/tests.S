@@ -35,6 +35,11 @@ L_3_main:
 	ldr	v1, [sp, #-32]
 	cmp	v1, #0
 	beq	L_2_main
+	ldr	v2, [sp, #-16]
+	add	v1, v2, #1
+	str	v1, [sp, #-36]
+	ldr	v1, [sp, #-36]
+	str	v1, [sp, #-16]
 	ldr	v2, [sp, #-12]
 	add	v1, v2, #1
 	str	v1, [sp, #-40]

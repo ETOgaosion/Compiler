@@ -22,17 +22,22 @@ main:
 	b = 0;
 	t_1 = 1;
 L_1_main:
-	t_2 = t_1 + 1;
+	t_14 = phi t_9, t_1;
+	t_2 = t_14 + 1;
 	t_3 = t_2 < 3;
 	beqz t_3 L_0_main;
 L_3_main:
+	t_10 = phi t_6, a;
 	t_12 = phi t_8, b;
 	t_4 = t_12 < 3;
 	beqz t_4 L_2_main;
+	t_5 = t_10 + 1;
+	t_6 = t_5;
 	t_7 = t_12 + 1;
 	t_8 = t_7;
 	goto L_3_main;
 L_2_main:
+	t_9 = phi t_6, a;
 	goto L_1_main;
 L_0_main:
 	addparam 0,1;

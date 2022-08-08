@@ -1544,6 +1544,8 @@ int IRFunction::updateloop(int first, int end, int base){
                     for(auto k: j->getArgs())
                         if(k->getOperandType() == OperandType::SYMBOLVAR)
                             in.loopsym.emplace_back(k);
+                        else if(k->getParentVariable())
+                            in.loopsym.emplace_back(k->getParentVariable());
                 }
             }
 
@@ -2878,7 +2880,6 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         constFolding();
         JumpThreading();
         ADCE();
-        //varBindRegisters(t);
         break;
     case 3:
         basicBlockDivision();

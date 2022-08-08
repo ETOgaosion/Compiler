@@ -1371,6 +1371,7 @@ void SysYParser::StmtContext::copyFrom(StmtContext *ctx) {
   this->beginWhileLabel = ctx->beginWhileLabel;
   this->docLVal = ctx->docLVal;
   this->lValDoc = ctx->lValDoc;
+  this->latestSymbolList = ctx->latestSymbolList;
 }
 
 //----------------- StmtBlockContext ------------------------------------------------------------------
@@ -1805,6 +1806,7 @@ void SysYParser::SubStmtContext::copyFrom(SubStmtContext *ctx) {
   this->beginWhileLabel = ctx->beginWhileLabel;
   this->docLVal = ctx->docLVal;
   this->lValDoc = ctx->lValDoc;
+  this->latestSymbolList = ctx->latestSymbolList;
 }
 
 //----------------- SubStmtExpressionContext ------------------------------------------------------------------
