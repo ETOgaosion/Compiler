@@ -248,7 +248,7 @@ void IRFunction::def_use_list(){
             if(codes[j]->getOperation()== IROperation::PHI){
                 IRPhi* p = dynamic_cast<IRPhi*>(codes[j]);
                 for (auto k : codes[j]->getArgs()){
-                    if(k == res && i != j){
+                    if((k == res || (k->getParentVariable() && k->getParentVariable() == res) ) && i != j){
                         code->use.push_back(codes[j]);
                         codes[j]->def.emplace_back(code);
                         break;
@@ -809,11 +809,15 @@ void IRFunction::CSE(){
                 if(pos == dom[re->which_bb].end())
                     continue;
                 if (op == opr && IRCode::isTwoArgAssignmentOperation(op))
-                    if((op1 == ar1 || (op1->getOperandType() == OperandType::VALUE && ar1->getOperandType() == OperandType::VALUE && op1->getValue() == ar1->getValue())) 
-                    && (op2 == ar2 || (op2->getOperandType() == OperandType::VALUE && ar2->getOperandType() == OperandType::VALUE && op2->getValue() == ar2->getValue())) )
+                    if((op1 == ar1 || (op1->getOperandType() == OperandType::VALUE && ar1->getOperandType() == OperandType::VALUE && op1->getValue() == ar1->getValue())/*||
+                    (op1 && ar1 && op1->getParentVariable() && op1->getParentVariable() == ar1->getParentVariable()) || (op1 && ar1 && op1->getParentVariable() == ar1) || (ar1 && op1 && op1 == ar1->getParentVariable())*/)
+                    && (op2 == ar2 || (op2->getOperandType() == OperandType::VALUE && ar2->getOperandType() == OperandType::VALUE && op2->getValue() == ar2->getValue())/*||
+                    (op2 && ar2 && op2->getParentVariable() && op2->getParentVariable() == ar2->getParentVariable()) || (op2 && ar2 && op2->getParentVariable() == ar2) || (ar2 && op2 && op2 == ar2->getParentVariable())*/) )
                         match = 1;
-                    else if(IRCode::isOrderIndependentOperation(op) && (op1 == ar1 || (op1->getOperandType() == OperandType::VALUE && ar1->getOperandType() == OperandType::VALUE && op1->getValue() == ar1->getValue())) 
-                    && (op2 == ar2 || (op2->getOperandType() == OperandType::VALUE && ar2->getOperandType() == OperandType::VALUE && op2->getValue() == ar2->getValue())))
+                    else if(IRCode::isOrderIndependentOperation(op) && (op1 == ar1 || (op1->getOperandType() == OperandType::VALUE && ar1->getOperandType() == OperandType::VALUE && op1->getValue() == ar1->getValue())/*||
+                    (op1 && ar1 && op1->getParentVariable() && op1->getParentVariable() == ar1->getParentVariable()) || (op1 && ar1 && op1->getParentVariable() == ar1) || (ar1 && op1 && op1 == ar1->getParentVariable())*/)
+                    && (op2 == ar2 || (op2->getOperandType() == OperandType::VALUE && ar2->getOperandType() == OperandType::VALUE && op2->getValue() == ar2->getValue())/*||
+                    (op2 && ar2 && op2->getParentVariable() && op2->getParentVariable() == ar2->getParentVariable()) || (op2 && ar2 && op2->getParentVariable() == ar2) || (ar2 && op2 && op2 == ar2->getParentVariable())*/))
                         match = 1;
                 if(match){
                     toRep = record[j];
