@@ -917,7 +917,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
                     if (codes[j]->getOperation() == IROperation::ADD_LABEL) {
                         if (codes[j]->getArg1() == codes[i]->getArg1()) {
                             insertPoint = j + 1;
-                            replacePoint = insertPoint + 1;
+                            replacePoint = insertPoint;
                             found = true;
                             break;
                         }
@@ -941,11 +941,11 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
                 if (codes[i]->getOperation() != IROperation::PHI) {
                     if (codes[i]->getArg1() == it.first) {
                         codes[i]->setArg1(newTempFront);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        irGenerator->currentIRFunc->replaceCode(codes[i], i + 1);
                     }
                     if (codes[i]->getArg2() == it.first) {
                         codes[i]->setArg2(it.first);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        irGenerator->currentIRFunc->replaceCode(codes[i], i + 1);
                     }
                 }
             }
@@ -1228,7 +1228,7 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
                     if (codes[j]->getOperation() == IROperation::ADD_LABEL) {
                         if (codes[j]->getArg1() == codes[i]->getArg1()) {
                             insertPoint = j + 1;
-                            replacePoint = insertPoint + 1;
+                            replacePoint = insertPoint;
                             found = true;
                             break;
                         }
@@ -1256,11 +1256,11 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
                 if (codes[i]->getOperation() != IROperation::PHI) {
                     if (codes[i]->getArg1() == it.first) {
                         codes[i]->setArg1(newTempFront);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        irGenerator->currentIRFunc->replaceCode(codes[i], i + 1);
                     }
                     if (codes[i]->getArg2() == it.first) {
                         codes[i]->setArg2(it.first);
-                        irGenerator->currentIRFunc->replaceCode(codes[i], i);
+                        irGenerator->currentIRFunc->replaceCode(codes[i], i + 1);
                     }
                 }
             }
