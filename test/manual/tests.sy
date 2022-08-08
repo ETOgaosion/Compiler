@@ -1,5 +1,14 @@
-const int a[1] = {1};
-int main() {
-    int c = 1.5;
-    return c;
+int main()
+{
+    int a = 0;
+    int b = 0;
+    while (a < 3) {
+        while (b < 3) {
+            a = a + 1;
+            b = b + 1;
+        }
+    }
+    putint(a);
+    putint(b);
+    return 0;
 }

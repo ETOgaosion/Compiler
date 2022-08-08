@@ -152,7 +152,7 @@ stmt
         bool hasReturn,
         MetaDataType returnType,
         std::vector<IRCode *> codes,
-        IRLabel* beginArray,
+        IRLabel* beginWhileLabel,
         bool docLVal,
         std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]
@@ -190,7 +190,7 @@ subStmt
         bool hasReturn,
         MetaDataType returnType,
         std::vector<IRCode *> codes,
-        IRLabel* beginArray,
+        IRLabel* beginWhileLabel,
         bool docLVal,
         std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc
     ]

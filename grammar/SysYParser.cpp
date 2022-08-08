@@ -1368,7 +1368,7 @@ void SysYParser::StmtContext::copyFrom(StmtContext *ctx) {
   this->hasReturn = ctx->hasReturn;
   this->returnType = ctx->returnType;
   this->codes = ctx->codes;
-  this->beginArray = ctx->beginArray;
+  this->beginWhileLabel = ctx->beginWhileLabel;
   this->docLVal = ctx->docLVal;
   this->lValDoc = ctx->lValDoc;
 }
@@ -1802,7 +1802,7 @@ void SysYParser::SubStmtContext::copyFrom(SubStmtContext *ctx) {
   this->hasReturn = ctx->hasReturn;
   this->returnType = ctx->returnType;
   this->codes = ctx->codes;
-  this->beginArray = ctx->beginArray;
+  this->beginWhileLabel = ctx->beginWhileLabel;
   this->docLVal = ctx->docLVal;
   this->lValDoc = ctx->lValDoc;
 }

@@ -409,7 +409,7 @@ public:
     bool hasReturn;
     MetaDataType returnType;
     std::vector<IRCode *> codes;
-    IRLabel* beginArray;
+    IRLabel* beginWhileLabel;
     bool docLVal;
     std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     StmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -515,7 +515,7 @@ public:
     bool hasReturn;
     MetaDataType returnType;
     std::vector<IRCode *> codes;
-    IRLabel* beginArray;
+    IRLabel* beginWhileLabel;
     bool docLVal;
     std::unordered_map<IROperand *, std::vector<IROperand *>> lValDoc;
     SubStmtContext(antlr4::ParserRuleContext *parent, size_t invokingState);

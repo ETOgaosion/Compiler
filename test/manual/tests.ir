@@ -1,18 +1,48 @@
 ============ global var ================
-a := symbol type: 2; data type: 1; initValue: a: 1
-
 ============ imm value ================
-ImmValue_1: 1.5
 ============ functions ================
 ----------- funcDef -----------
 main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
-c := symbol type: 1; data type: 1; initValue: ImmValue_1: 1.5
+b := symbol type: 1; data type: 1; initValue: 0
+
+a := symbol type: 1; data type: 1; initValue: 0
 
 ----------- tempVars ------------
+t_0:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	c = ImmValue_1: 1.5;
-	return c;
+	a = 0;
+	b = 0;
+L_1_main:
+	t_11 = phi t_6, a;
+	t_13 = phi t_8, b;
+	t_0 = t_11 < 3;
+	beqz t_0 L_0_main;
+L_3_main:
+	t_7 = phi t_3, a;
+	t_9 = phi t_5, b;
+	t_1 = t_9 < 3;
+	beqz t_1 L_2_main;
+	t_2 = t_7 + 1;
+	t_3 = t_2;
+	t_4 = t_9 + 1;
+	t_5 = t_4;
+	goto L_3_main;
+L_2_main:
+	t_6 = phi t_3, a;
+	t_8 = phi t_5, b;
+	goto L_1_main;
+L_0_main:
+	t_10 = phi t_6;
+	t_12 = phi t_8;
+	addparam t_11;
+	call putint; 
+	addparam t_13;
+	call putint; 
+	return 0;
 
