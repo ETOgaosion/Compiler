@@ -18,25 +18,8 @@ t_11:= symbol type: TEMP VAR; data type: 1
 t_0:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	n = ImmValue_0: {1, 2, 3, 4};
-	t_0 = 1;
-	t_2 <= t_0;
-	t_2 = t_2 << 2;
-	t_1 = 4;
-	t_3 <= t_0;
-	t_3 = 1 * 8;
-	t_4 <= t_1;
-	t_1 = t_3 + t_1;
-	t_5 = n[t_4];
-	t_6 = 0;
-	t_8 <= t_6;
-	t_8 = t_8 << 2;
-	t_7 = 0;
-	t_9 <= t_6;
-	t_9 = 1 * 8;
-	t_10 <= t_7;
-	t_7 = t_9 + t_7;
-	t_11 = n[t_10];
+	t_5 = ImmValue_0: {1, 2, 3, 4}[t_4];
+	t_11 = ImmValue_0: {1, 2, 3, 4}[t_10];
 	addparam t_5;
 	addparam t_11;
 	call a; 
