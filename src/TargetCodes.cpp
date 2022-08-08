@@ -10,6 +10,12 @@
 
 using namespace std;
 
+Code::Code(ASMOperation newOp, Cond newCond, std::vector<Register *> newRegList) {
+    op = newOp;
+    cond = newCond;
+    regList = move(newRegList);
+}
+
 Code::Code(ASMOperation newOp, Cond newCond, Register *newRd, Register *newRn, Register *newRm, ShiftWay newShiftWay, Register *newRs, int newOffset, std::string newLabel, vector<Options> newOptions) {
     op = newOp;
     cond = newCond;
@@ -18,6 +24,7 @@ Code::Code(ASMOperation newOp, Cond newCond, Register *newRd, Register *newRn, R
     rm = newRm;
     shiftWay = newShiftWay;
     rs = newRs;
+    regList.clear();
     offset = newOffset;
     label = move(newLabel);
     directives = {};
@@ -32,6 +39,7 @@ Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm
     rm = newRm;
     shiftWay = ShiftWay::NONE;
     rs = nullptr;
+    regList.clear();
     offset = 0;
     label = {};
     directives = {};
@@ -46,6 +54,7 @@ Code::Code(ASMOperation newOp, Register *newRd, Register *newRn, int newOffset) 
     rm = nullptr;
     shiftWay = ShiftWay::NONE;
     rs = nullptr;
+    regList.clear();
     offset = newOffset;
     label = {};
     directives = {};
@@ -60,6 +69,7 @@ Code::Code(ASMOperation newOp, std::string newLabel, string newDirectives) {
     rm = nullptr;
     shiftWay = ShiftWay::NONE;
     rs = nullptr;
+    regList.clear();
     offset = 0;
     label = move(newLabel);
     directives = move(newDirectives);
@@ -106,7 +116,7 @@ void Code::print() const {
             }
             break;
         case ASMOperation::SUB:
-            if (find(extraOptions.begin(), extraOptions.end(), Options::REVERSE_OP) != extraOptions.end()) {
+            if (find(extraOptions.begin(), extraOptions.end(), Options::REVERSE_OP) == extraOptions.end()) {
                 switch (rd->getRegisterType()) {
                     case RegisterType::GENERAL_PURPOSE:
                         cout << "\tsub";
@@ -144,7 +154,7 @@ void Code::print() const {
                     cout << "\tsdiv\t";
                     break;
                 case RegisterType::FLOAT_POINT:
-                    cout << "\tvdiv\t";
+                    cout << "\tvdiv.f32\t";
                     break;
             }
             cout << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rm->getAliasName() << endl;
@@ -319,17 +329,17 @@ void Code::print() const {
             }
             break;
         case ASMOperation::STR:
-            cout << "\tstr\t" << rd->getAliasName() << ", ";
-            if (rn) {
+            cout << "\tstr\t" << rn->getAliasName() << ", ";
+            if (rd) {
                 if (offset) {
                     if (find(extraOptions.begin(), extraOptions.end(), Options::POST_INDEX_OFFSET) == extraOptions.end()) {
-                        cout << "[" << rn->getAliasName() << ", #" << offset << "]" << endl;
+                        cout << "[" << rd->getAliasName() << ", #" << offset << "]" << endl;
                     } else {
-                        cout << "[" << rn->getAliasName() << "], #" << offset << endl;
+                        cout << "[" << rd->getAliasName() << "], #" << offset << endl;
                     }
                 }
                 else {
-                    cout << "[" << rn->getAliasName() << "]" <<endl;
+                    cout << "[" << rd->getAliasName() << "]" <<endl;
                 }
             }
             else if (!label.empty()) {
@@ -393,6 +403,21 @@ void Code::print() const {
             break;
         case ASMOperation::BL:
             cout << "\tbl\t" << label << endl;
+            break;
+        case ASMOperation::PUSH:
+            cout << "\tpush\t{";
+            for (int i = 0; i < regList.size() - 1; i++) {
+                cout << regList[i]->getAliasName() << ",";
+            }
+            cout << regList.back()->getAliasName() << "}" << endl;
+            break;
+        case ASMOperation::POP:
+            cout << "\tpop\t{";
+            for (int i = 0; i < regList.size() - 1; i++) {
+                cout << regList[i]->getAliasName() << ",";
+            }
+            cout << regList.back()->getAliasName() << "}" << endl;
+            break;
         case ASMOperation::DIRECTIVE:
             cout << directives << endl;
             break;
@@ -900,6 +925,18 @@ bool TargetCodes::addCodeLabel(const string &inLabel) {
 
 bool TargetCodes::addCodeBl(string targetLabel) {
     Code *newCode = new Code(ASMOperation::BL, targetLabel, {});
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodePush(Cond inCond, std::vector<Register *> inRegList) {
+    Code *newCode = new Code(ASMOperation::PUSH, inCond, inRegList);
+    addCode(newCode);
+    return true;
+}
+
+bool TargetCodes::addCodePop(Cond inCond, std::vector<Register *> inRegList){
+    Code *newCode = new Code(ASMOperation::POP, inCond, inRegList);
     addCode(newCode);
     return true;
 }

@@ -16,6 +16,6 @@ dir=`ls test/samples_codegen/*.S`
 for test_file in $dir
 do
     echo "Test ${test_file:0:-2}"
-    spike pk ${test_file:0:-2} > "${test_file:0:-2}.out"
+    spike pk ${test_file:0:-2} > "${test_file:0:-2}.output"
     echo "!!!!!!!!!!!!!!!!!!!"
 done

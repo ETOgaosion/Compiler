@@ -329,7 +329,7 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
     if (ctx->constExp().size() > 0) {
         if (ctx->initVal()) {
             for (auto val : ctx->constExp()) {
-                ctx->initVal()->shape.push_back(std::stoi(val->val));
+                ctx->initVal()->shape.push_back(std::stoi(val->getText()));
             }
         }
     }
@@ -1301,12 +1301,22 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
     if (!searchLVal){
         throw std::runtime_error("[ERROR] > var symbol used before defined. " + ctx->Ident()->getText() + " "  + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
     }
-    if (searchLVal->getIsArray() && !ctx->exp().empty()) {
+    if (searchLVal->getIsArray() && ctx->exp().empty()) {
         ctx->isArray = true;
         ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
     }
     else if (searchLVal->getIsArray()) {
-        throw std::runtime_error("[ERROR] > cannot directly use array as lVal");
+        if (ctx->exp().size() < searchLVal->getShape().size()) {
+            ctx->isArray = true;
+            ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
+        }
+        else if (ctx->exp().size() == searchLVal->getShape().size()) {
+            ctx->isArray = true;
+            ctx->shape = {};
+        }
+        else {
+            throw std::runtime_error("[ERROR] > array shape not match\n");
+        }
     }
     else {
         ctx->isArray = false;
@@ -1332,14 +1342,19 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
         IRTempVariable *addTemp = irGenerator->addTempVariable(MetaDataType::INT);
         irGenerator->addCode(new IRAssignI(mulTemp, ctx->exp().back()->operand));
         mulTemp->setAssigned();
-        irGenerator->addCode(new IRAssignI(addTemp, new IRValue(MetaDataType::INT, "0", {}, false)));
+        IRTempVariable *replaceTemp = irGenerator->addTempVariable(mulTemp);
+        mulTemp->addHistorySymbol(replaceTemp);
+        irGenerator->addCode(new IRReplace(replaceTemp, mulTemp));
+        irGenerator->addCode(new IRLsl(replaceTemp, replaceTemp,
+                                            new IRValue(MetaDataType::INT, std::to_string(width), {}, false)));
+        irGenerator->addCode(new IRAssignI(addTemp, new IRValue(MetaDataType::INT, std::to_string(4 * std::stoi(ctx->exp().back()->getText())), {}, false)));
         addTemp->setAssigned();
         for (int i = ctx->exp().size() - 2; i >= 0; i--) {
             IRTempVariable *replaceTemp = irGenerator->addTempVariable(mulTemp);
             mulTemp->addHistorySymbol(replaceTemp);
             irGenerator->addCode(new IRReplace(replaceTemp, mulTemp));
             irGenerator->addCode(new IRMulI(replaceTemp, ctx->exp(i)->operand,
-                                            new IRValue(MetaDataType::INT, std::to_string(width), {}, false)));
+                                            new IRValue(MetaDataType::INT, std::to_string(width * 4), {}, false)));
             IRTempVariable *replaceAddTemp = irGenerator->addTempVariable(addTemp);
             irGenerator->addCode(new IRReplace(replaceAddTemp, addTemp));
             irGenerator->addCode(new IRAddI(addTemp, mulTemp->getLatestVersionSymbol(), addTemp->getLatestVersionSymbol()));
@@ -1376,7 +1391,12 @@ void SemanticAnalysis::enterPrimaryExplVal(SysYParser::PrimaryExplValContext * c
 
 void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ctx)
 {
-    ctx->isArray = ctx->lVal()->isArray;
+    if (ctx->lVal()->shape.empty()) {
+        ctx->isArray = false;
+    }
+    else {
+        ctx->isArray = true;
+    }
     ctx->shape = ctx->lVal()->shape;
     ctx->metaDataType = ctx->lVal()->lValMetaDataType;
 
@@ -1647,7 +1667,7 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
     else if (ctx->mulOp()->getText() == "/"){
         switch (ctx->mulExp()->operand->getMetaDataType()) {
             case MetaDataType::INT:
-                code = new IRDivI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
+                code = new IRDivI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand, irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName()));
                 break;
             case MetaDataType::FLOAT:
                 code = new IRDivF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);

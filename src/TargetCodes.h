@@ -52,6 +52,8 @@ enum class ASMOperation {
     LABEL,
     BL,
     // RET,
+    PUSH,
+    POP,
     DIRECTIVE
 };
 
@@ -89,11 +91,13 @@ public:
     Register *rm;
     ShiftWay shiftWay;
     Register *rs;
+    std::vector<Register *> regList;
     int offset;
     std::string label;
     std::string directives;
     std::vector<Options> extraOptions;
 
+    Code(ASMOperation newOp, Cond newCond, std::vector<Register *> newRegList);
     Code(ASMOperation newOp, Cond newCond, Register *newRd, Register *newRn, Register *newRm, ShiftWay newShiftWay, Register *newRs, int newOffset, std::string newLabel, std::vector<Options> newOptions);
     Code(ASMOperation newOp, Register *newRd, Register *newRn, Register *newRm);
     Code(ASMOperation newOp, Register *newRd, Register *newRn, int newOffset);
@@ -166,6 +170,8 @@ public:
     bool addCodeMv(Register *rd, Register *rn, Register *rm, int offset);
     bool addCodeLabel(const std::string &inLabel);
     bool addCodeBl(std::string label);
+    bool addCodePush(Cond inCond, std::vector<Register *> inRegList);
+    bool addCodePop(Cond inCond, std::vector<Register *> inRegList);
     bool addCodeDirectives(const std::string &directives);
 
     void printCode() const;

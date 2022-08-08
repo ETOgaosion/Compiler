@@ -2879,7 +2879,9 @@ int IRFunction::calFrameSize() {
     for (const auto& it : localVariables) {
         varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
         if (it.second->getIsArray()) {
-            varSize *= it.second->getArraySize();
+            for(auto in_it : it.second->getArrayShape()) {
+                varSize *= in_it;
+            }
         }
         it.second->setMemOffset(frameSize + varSize);
         frameSize += varSize;
@@ -2887,9 +2889,6 @@ int IRFunction::calFrameSize() {
     for (const auto& it : tempVariables) {
         if (!it.second->getAliasToVar()) {
             varSize = AbstractSymbol::getOffsetFromDataType(it.second->getMetaDataType());
-            if (it.second->getIsArray()) {
-                varSize *= it.second->getArraySize();
-            }
             it.second->setMemOffset(frameSize + varSize);
             frameSize += varSize;
         }
@@ -2908,13 +2907,14 @@ string IRFunction::getFunctionName() const {
 }
 
 bool IRFunction::getFunctionInLib() const {
-    if (functionName == "get_int" ||
-        functionName == "get_float" ||
-        functionName == "get_double" ||
-        functionName == "print_bool" ||
-        functionName == "print_int" ||
-        functionName == "print_float" ||
-        functionName == "print_double") {
+    if (functionName == "getint" ||
+        functionName == "getfloat" ||
+        functionName == "getarray" ||
+        functionName == "getfarray" ||
+        functionName == "putint" ||
+        functionName == "putfloat" ||
+        functionName == "putfarray" ||
+        functionName == "putarray") {
         return true;
     }
     else {
@@ -3012,10 +3012,10 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
     t->addCodeDirectives(".type\t" + functionName + ", \%function");
     t->addCodeLabel(functionName);
     bool hasFreeRegister;
-    // Register *ra = t->tryGetCertainRegister(true, "ra", hasFreeRegister);
+    Register *lr = t->tryGetCertainRegister(true, "lr", hasFreeRegister);
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-    // t->addCodeSd(sp, ra, -8);
-    // t->setRegisterFree(ra);
+    t->addCodePush({}, vector<Register *>(1, lr));
+    t->setRegisterFree(lr);
     for (auto it : getBindRegisters()) {
         if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] == 's') {
             t->addCodeStr(sp, it, -it->getTmpStoreOffset(), false);
@@ -3041,10 +3041,8 @@ void IRFunction::targetCodeGen(TargetCodes *t) {
         }
         // t->addCodeLd(ra, sp, -8);
         Register *pc = t->tryGetCertainRegister(true, "pc", hasFreeRegister);
-        Register *lr = t->tryGetCertainRegister(true, "lr", hasFreeRegister);
-        t->addCodeMv(pc, nullptr, lr, 0);
+        t->addCodePop({}, std::vector<Register *>(1, pc));
         t->setRegisterFree(pc);
-        t->setRegisterFree(lr);
         t->setRegisterFree(sp);
         // t->setRegisterFree(ra);
     }

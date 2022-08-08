@@ -128,8 +128,10 @@ IRMulF::IRMulF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
 IRDiv::IRDiv(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : IRCode(IROperation::DIV, newResult, newArg1, newArg2) {}
 
-IRDivI::IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
-        : IRDiv(newResult, newArg1, newArg2) {}
+IRDivI::IRDivI(IROperand *newResult, IROperand *newArg1, IROperand *newArg2, IROperand *newFunc)
+        : IRDiv(newResult, newArg1, newArg2) {
+            curFunc = newFunc;
+        }
 
 IRDivF::IRDivF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : IRDiv(newResult, newArg1, newArg2) {}
@@ -138,6 +140,10 @@ IRMod::IRMod(IROperand *newResult, IROperand *newArg1, IROperand *newArg2, IROpe
         : IRCode(IROperation::DIV, newResult, newArg1, newArg2) {
     curFunc = newCurFunc;
 }
+
+IRLsl::IRLsl(IROperand *newResult, IROperand *newArg1, IROperand *newArg2) : IRCode(IROperation::LSL, newResult, newArg1, newArg2) {}
+
+IRAsr::IRAsr(IROperand *newResult, IROperand *newArg1, IROperand *newArg2) : IRCode(IROperation::ASR, newResult, newArg1, newArg2) {}
 
 IRNot::IRNot(IROperand *newResult, IROperand *newArg1)
         : IRCode(IROperation::DIV, newResult, newArg1, nullptr) {}
@@ -330,6 +336,18 @@ void IRMod::print() const {
          << arg2->getVal() << ";" << endl;
 }
 
+void IRLsl::print() const {
+    cout << "\t" << result->getVal() << " = "
+         << arg1->getVal() << " << "
+         << arg2->getVal() << ";" <<endl;
+}
+
+void IRAsr::print() const {
+    cout << "\t" << result->getVal() << " = "
+         << arg1->getVal() << " >> "
+         << arg2->getVal() << ";" <<endl;
+}
+
 void IRNot::print() const {
     cout << "\t" << result->getVal() << " = not"
          << arg1->getVal() << ";" << endl;
@@ -484,16 +502,8 @@ void IRAddI::genTargetCode(TargetCodes *t) {
         t->setRegisterFree(arg1Reg);
     }
     else if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
-        Register *zero = t->getNextFreeRegister(true, false, hasFreeRegister);
-        t->addCodeEor(zero, zero, zero);
         int val = stoi(arg2->getValue()) + stoi(arg2->getValue());
-        if (val > 2048 || val < -2048) {
-            t->addCodeLdr(resultReg, stoi(arg1->getValue()));
-        }
-        else {
-            t->addCodeAdd(resultReg, zero, val);
-        }
-        t->setRegisterFree(zero);
+        t->addCodeLdr(resultReg, stoi(arg1->getValue()));
     }
     else {
         Register *arg1Reg = arg1->load(t, true);
@@ -631,8 +641,8 @@ void IRMulF::genTargetCode(TargetCodes *t) {
 
 void IRDivI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    Register *arg1Reg = arg1->load(t, true);
-    Register *arg2Reg = arg2->load(t, true);
+    Register *arg1Reg = arg1->loadTo(t, "a1", hasFreeRegister);
+    Register *arg2Reg = arg2->loadTo(t, "a2", hasFreeRegister);
     Register *resultReg;
     if (result->getBindRegister()) {
         resultReg = result->getTargetBindRegister();
@@ -640,11 +650,15 @@ void IRDivI::genTargetCode(TargetCodes *t) {
     else {
         resultReg = t->getNextFreeRegister(true, false, hasFreeRegister);
     }
-    t->addCodeDiv(resultReg, arg1Reg, arg2Reg);
-    result->storeFrom(t, resultReg);
+    Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
+    t->addCodeSub(sp, sp, curFunc->getFrameSize());
+    t->addCodeBl("__aeabi_idiv");
+    t->addCodeAdd(sp, sp, curFunc->getFrameSize());
+    t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
     t->setRegisterFree(resultReg);
+    t->setRegisterFree(sp);
 }
 
 void IRDivF::genTargetCode(TargetCodes *t) {
@@ -679,12 +693,49 @@ void IRMod::genTargetCode(TargetCodes *t) {
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     t->addCodeSub(sp, sp, curFunc->getFrameSize());
     t->addCodeBl("__aeabi_idivmod");
+    t->addCodeAdd(sp, sp, curFunc->getFrameSize());
     t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
     result->storeFrom(t, resultReg);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
     t->setRegisterFree(resultReg);
     t->setRegisterFree(sp);
+}
+
+void IRLsl::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
+    Register *resultReg;
+    if (result->getBindRegister()) {
+        resultReg = result->getTargetBindRegister();
+    }
+    else {
+        resultReg = t->getNextFreeRegister(true, false, hasFreeRegister);
+    }
+    t->addCodeLsl(resultReg, arg1Reg, arg2Reg);
+    result->storeFrom(t, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
+}
+
+void IRAsr::genTargetCode(TargetCodes *t) {
+    bool hasFreeRegister;
+    Register *arg1Reg = arg1->load(t, true);
+    Register *arg2Reg = arg2->load(t, true);
+    Register *resultReg;
+    if (result->getBindRegister()) {
+        resultReg = result->getTargetBindRegister();
+    }
+    else {
+        resultReg = t->getNextFreeRegister(true, false, hasFreeRegister);
+    }
+    t->addCodeAsr(resultReg, arg1Reg, arg2Reg);
+    result->storeFrom(t, resultReg);
+    t->setRegisterFree(arg1Reg);
+    t->setRegisterFree(arg2Reg);
+    t->setRegisterFree(resultReg);
 }
 
 void IRNot::genTargetCode(TargetCodes *t) {
@@ -1001,48 +1052,16 @@ void IRReplace::genTargetCode(TargetCodes *t) {
 
 void IRAssignI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    if (result->getIsArray()) {
-        Register *tmpr = t->getNextFreeRegister(true, false, hasFreeRegister);
-        t->addCodeAdr(tmpr, arg1->getValueLabel());
-        Register *arg1Reg = t->getNextFreeRegister(true, false, hasFreeRegister);
-        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-        t->addCodeAdd(arg1Reg, sp, -result->getMemOffset());
-        for (int i = 0; i < result->getArraySize(); ++i) {
-            t->addCodeStr(arg1Reg, tmpr, 0, false);
-            t->addCodeAdd(arg1Reg, arg1Reg, 4);
-        }
-        t->setRegisterFree(arg1Reg);
-        t->setRegisterFree(tmpr);
-        t->setRegisterFree(sp);
-    }
-    else {
-        Register *arg1Reg = arg1->load(t, true);
-        result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(arg1Reg);
-    }
+    Register *arg1Reg = arg1->load(t, true);
+    result->storeFrom(t, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRAssignF::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    if (result->getIsArray()) {
-        Register *tmpr = t->getNextFreeRegister(true, false, hasFreeRegister);
-        t->addCodeAdr(tmpr, arg1->getValueLabel());
-        Register *arg1Reg = t->getNextFreeRegister(true, false, hasFreeRegister);
-        Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-        t->addCodeAdd(arg1Reg, sp, -result->getMemOffset());
-        for (int i = 0; i < result->getArraySize(); ++i) {
-            t->addCodeStr(arg1Reg, tmpr, 0, false);
-            t->addCodeAdd(arg1Reg, arg1Reg, 4);
-        }
-        t->setRegisterFree(arg1Reg);
-        t->setRegisterFree(tmpr);
-        t->setRegisterFree(sp);
-    }
-    else {
-        Register *arg1Reg = arg1->load(t, true);
-        result->storeFrom(t, arg1Reg);
-        t->setRegisterFree(arg1Reg);
-    }
+    Register *arg1Reg = arg1->load(t, true);
+    result->storeFrom(t, arg1Reg);
+    t->setRegisterFree(arg1Reg);
 }
 
 void IRFetchArrayElemI::genTargetCode(TargetCodes *t) {
@@ -1198,10 +1217,8 @@ void IRReturn::genTargetCode(TargetCodes *t) {
     }
     // t->addCodeLd(ra, sp, -8);
     Register *pc = t->tryGetCertainRegister(true, "pc", hasFreeRegister);
-    Register *lr = t->tryGetCertainRegister(true, "lr", hasFreeRegister);
-    t->addCodeMv(pc, nullptr, lr, 0);
+    t->addCodePop({}, vector<Register *>(1, pc));
     t->setRegisterFree(pc);
-    t->setRegisterFree(lr);
     t->setRegisterFree(sp);
     // t->setRegisterFree(ra);
 }
