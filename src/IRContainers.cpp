@@ -2913,12 +2913,14 @@ IRSymbolVariable* IRFunction::addSymbolVariable(int block, AbstractSymbol *newSy
 
 bool IRFunction::addCode(IRCode *newCode) {
     codes.emplace_back(newCode);
+    return true;
 }
 
 bool IRFunction::addCodes(const vector<IRCode *>& newCodes){
     for (auto code : newCodes){
         codes.emplace_back(code);
     }
+    return true;
 }
 
 
@@ -3148,10 +3150,12 @@ IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IROperand
 
 bool IRProgram::addFunction(IRFunction *newFunction) {
     functions.emplace(newFunction->getFunctionName(), newFunction);
+    return true;
 }
 
 bool IRProgram::addSymbolFunction(IRSymbolFunction *funcSymbol) {
     funcSymbols.emplace(funcSymbol->getFunctionName(), funcSymbol);
+    return true;
 }
 
 IRValue *IRProgram::addImmValue(MetaDataType inMetaDataType, const string &inValue) {

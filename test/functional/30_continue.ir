@@ -41,5 +41,7 @@ L_2_main:
 L_0_main:
 	t_11 = phi t_8, sum;
 	t_13 = phi t_6, t_10, i;
-	return t_12;
+	addparam t_12,1;
+	call putint; 
+	return 0;
 

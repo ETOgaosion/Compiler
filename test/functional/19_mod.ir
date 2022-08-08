@@ -14,5 +14,7 @@ main:
 	a = 0;
 	t_0 = 10;
 	t_1 = t_0 / 3;
-	return t_1;
+	addparam t_1,1;
+	call putint; 
+	return 0;
 

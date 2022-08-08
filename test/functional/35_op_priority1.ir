@@ -30,5 +30,7 @@ main:
 	t_4 = t_0 * t_1;
 	t_5 = t_2 + t_4;
 	t_6 = t_5 - t_3;
-	return t_6;
+	addparam t_6,1;
+	call putint; 
+	return 0;
 

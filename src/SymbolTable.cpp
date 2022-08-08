@@ -67,6 +67,7 @@ bool AbstractSymbol::setAttributes(string inSymbolName, SymbolType inSymbolType,
     metaDataType = inMetaDataType;
     isArray = inIsArray;
     shape = move(inShape);
+    return true;
 }
 
 bool AbstractSymbol::setOffset(int inOffset) {

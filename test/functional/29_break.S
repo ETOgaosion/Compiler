@@ -51,4 +51,9 @@ L_2_main:
 	b	L_1_main
 L_0_main:
 	ldr	a1, [sp, #-12]
+	add	sp, sp, #-32
+	bl	putint
+	add	sp, sp, #32
+	eor	v1, v1, v1
+	mov	a1, v1
 	pop	{pc}

@@ -12,5 +12,7 @@ main() => 1:
 ----------- tempVars ------------
 ----------- Codes ------------
 main:
-	return b;
+	addparam b,1;
+	call putint; 
+	return 0;
 

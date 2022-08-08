@@ -14,5 +14,7 @@ a := symbol type: 2; data type: 1; initValue: 10
 main:
 	a = 10;
 	b = 5;
-	return b;
+	addparam b,1;
+	call putint; 
+	return 0;
 

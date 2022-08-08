@@ -24,4 +24,9 @@ main:
 	add	v1, v2, v3
 	str	v1, [sp, #-16]
 	ldr	a1, [sp, #-16]
+	add	sp, sp, #-16
+	bl	putint
+	add	sp, sp, #16
+	eor	v1, v1, v1
+	mov	a1, v1
 	pop	{pc}

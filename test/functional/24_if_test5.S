@@ -9,6 +9,11 @@ main:
 	add	sp, sp, #16
 	str	a1, [sp, #-12]
 	ldr	a1, [sp, #-12]
+	add	sp, sp, #-16
+	bl	putint
+	add	sp, sp, #16
+	eor	v1, v1, v1
+	mov	a1, v1
 	pop	{pc}
 .text
 .align 1

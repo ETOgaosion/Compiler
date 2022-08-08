@@ -1,0 +1,103 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+n := symbol type: 1; data type: 1; initValue: t_0:= symbol type: TEMP VAR; data type: 1
+
+----------- tempVars ------------
+t_3:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	call getint; 
+	t_0 =  return ;
+	n = t_0;
+L_1_main:
+	t_6 = phi t_4, n;
+	t_1 = t_6 > 0;
+	beqz t_1 L_0_main;
+	call getint; 
+	t_2 =  return ;
+	addparam t_2,1;
+	addparam 1,2;
+	addparam 2,3;
+	addparam 3,4;
+	call hanoi; 
+	addparam 10,1;
+	call putch; 
+	t_3 = t_6 - 1;
+	t_4 = t_3;
+	goto L_1_main;
+L_0_main:
+	t_5 = phi t_4, n;
+	return 0;
+
+----------- funcDef -----------
+move(1,1) => 0:
+----------- paramVars -----------
+y := symbol type: 0; data type: 1
+x := symbol type: 0; data type: 1
+----------- localVars -----------
+----------- tempVars ------------
+----------- Codes ------------
+move:
+	x =  param 1;
+	y =  param 2;
+	addparam x,1;
+	call putint; 
+	addparam 32,1;
+	call putch; 
+	addparam y,1;
+	call putint; 
+	addparam 44,1;
+	call putch; 
+	addparam 32,1;
+	call putch; 
+
+----------- funcDef -----------
+hanoi(1,1,1,1) => 0:
+----------- paramVars -----------
+three := symbol type: 0; data type: 1
+two := symbol type: 0; data type: 1
+one := symbol type: 0; data type: 1
+n := symbol type: 0; data type: 1
+----------- localVars -----------
+----------- tempVars ------------
+t_2:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+hanoi:
+	n =  param 1;
+	one =  param 2;
+	two =  param 3;
+	three =  param 4;
+	t_0 = n == 1;
+	beqz t_0 L_0_hanoi;
+	addparam one,1;
+	addparam three,2;
+	call move; 
+	goto L_1_hanoi;
+L_0_hanoi:
+	t_1 = n - 1;
+	addparam t_1,1;
+	addparam one,2;
+	addparam three,3;
+	addparam two,4;
+	call hanoi; 
+	addparam one,1;
+	addparam three,2;
+	call move; 
+	t_2 = n - 1;
+	addparam t_2,1;
+	addparam two,2;
+	addparam one,3;
+	addparam three,4;
+	call hanoi; 
+L_1_hanoi:
+

@@ -8,5 +8,7 @@ main() => 1:
 ----------- tempVars ------------
 ----------- Codes ------------
 main:
-	return 3;
+	addparam 3,1;
+	call putint; 
+	return 0;
 

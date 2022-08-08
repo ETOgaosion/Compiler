@@ -1,0 +1,283 @@
+============ global var ================
+n := symbol type: 1; data type: 1; initValue: n: 0
+
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+t := symbol type: 1; data type: 1; initValue: 0
+
+a29 := symbol type: 1; data type: 1; initValue: 0
+
+a10 := symbol type: 1; data type: 1; initValue: 0
+
+a1 := symbol type: 1; data type: 1; initValue: 0
+
+a14 := symbol type: 1; data type: 1; initValue: 0
+
+a22 := symbol type: 1; data type: 1; initValue: 0
+
+a9 := symbol type: 1; data type: 1; initValue: 0
+
+a7 := symbol type: 1; data type: 1; initValue: 0
+
+a21 := symbol type: 1; data type: 1; initValue: 0
+
+a8 := symbol type: 1; data type: 1; initValue: 0
+
+a23 := symbol type: 1; data type: 1; initValue: 0
+
+a12 := symbol type: 1; data type: 1; initValue: 0
+
+a6 := symbol type: 1; data type: 1; initValue: 0
+
+a4 := symbol type: 1; data type: 1; initValue: 0
+
+a28 := symbol type: 1; data type: 1; initValue: 0
+
+a3 := symbol type: 1; data type: 1; initValue: 0
+
+a11 := symbol type: 1; data type: 1; initValue: 0
+
+a5 := symbol type: 1; data type: 1; initValue: 0
+
+b := symbol type: 1; data type: 1; initValue: 0
+
+a26 := symbol type: 1; data type: 1; initValue: 0
+
+a0 := symbol type: 1; data type: 1; initValue: 0
+
+a16 := symbol type: 1; data type: 1; initValue: 0
+
+a20 := symbol type: 1; data type: 1; initValue: 0
+
+a13 := symbol type: 1; data type: 1; initValue: 0
+
+a2 := symbol type: 1; data type: 1; initValue: 0
+
+a15 := symbol type: 1; data type: 1; initValue: 0
+
+a19 := symbol type: 1; data type: 1; initValue: 0
+
+a24 := symbol type: 1; data type: 1; initValue: 0
+
+a17 := symbol type: 1; data type: 1; initValue: 0
+
+a18 := symbol type: 1; data type: 1; initValue: 0
+
+newline := symbol type: 1; data type: 1; initValue: 0
+
+a25 := symbol type: 1; data type: 1; initValue: 0
+
+a27 := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_64:= symbol type: TEMP VAR; data type: 1
+t_62:= symbol type: TEMP VAR; data type: 1
+t_60:= symbol type: TEMP VAR; data type: 1
+t_26:= symbol type: TEMP VAR; data type: 1
+t_48:= symbol type: TEMP VAR; data type: 1
+t_20:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_24:= symbol type: TEMP VAR; data type: 1
+t_18:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_56:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_22:= symbol type: TEMP VAR; data type: 1
+t_30:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_16:= symbol type: TEMP VAR; data type: 1
+t_46:= symbol type: TEMP VAR; data type: 1
+t_28:= symbol type: TEMP VAR; data type: 1
+t_40:= symbol type: TEMP VAR; data type: 1
+t_54:= symbol type: TEMP VAR; data type: 1
+t_44:= symbol type: TEMP VAR; data type: 1
+t_32:= symbol type: TEMP VAR; data type: 1
+t_36:= symbol type: TEMP VAR; data type: 1
+t_34:= symbol type: TEMP VAR; data type: 1
+t_38:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_52:= symbol type: TEMP VAR; data type: 1
+t_42:= symbol type: TEMP VAR; data type: 1
+t_50:= symbol type: TEMP VAR; data type: 1
+t_58:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	a0 = 0;
+	a1 = 0;
+	a2 = 0;
+	a3 = 0;
+	a4 = 0;
+	a5 = 0;
+	a6 = 0;
+	a7 = 0;
+	a8 = 0;
+	a9 = 0;
+	a10 = 0;
+	a11 = 0;
+	a12 = 0;
+	a13 = 0;
+	a14 = 0;
+	a15 = 0;
+	a16 = 0;
+	a17 = 0;
+	a18 = 0;
+	a19 = 0;
+	a20 = 0;
+	a21 = 0;
+	a22 = 0;
+	a23 = 0;
+	a24 = 0;
+	a25 = 0;
+	a26 = 0;
+	a27 = 0;
+	a28 = 0;
+	a29 = 0;
+	b = 0;
+	call getint; 
+	t_0 =  return ;
+	t_1 = t_0;
+L_1_main:
+	t_6 = phi t_4, b;
+	t_2 = t_6 == 5;
+	beqz t_2 L_0_main;
+	t_3 = t_6 + 1;
+	t_4 = t_3;
+	goto L_1_main;
+L_0_main:
+	t_5 = phi t_4, b;
+	t_7 = 0;
+	t_8 = t_7 + 1;
+	t_9 = t_8;
+	t_10 = t_9 + 1;
+	t_11 = t_10;
+	t_12 = t_11 + 1;
+	t_13 = t_12;
+	t_14 = t_13 + 1;
+	t_15 = t_14;
+	t_16 = t_15 + 1;
+	t_17 = t_16;
+	t_18 = t_17 + 1;
+	t_19 = t_18;
+	t_20 = t_19 + 1;
+	t_21 = t_20;
+	t_22 = t_21 + 1;
+	t_23 = t_22;
+	t_24 = t_23 + 1;
+	t_25 = t_24;
+	t_26 = t_25 + 1;
+	t_27 = t_26;
+	t_28 = t_27 + 1;
+	t_29 = t_28;
+	t_30 = t_29 + 1;
+	t_31 = t_30;
+	t_32 = t_31 + 1;
+	t_33 = t_32;
+	t_34 = t_33 + 1;
+	t_35 = t_34;
+	t_36 = t_35 + 1;
+	t_37 = t_36;
+	t_38 = t_37 + 1;
+	t_39 = t_38;
+	t_40 = t_39 + 1;
+	t_41 = t_40;
+	t_42 = t_41 + 1;
+	t_43 = t_42;
+	t_44 = t_43 + 1;
+	t_45 = t_44;
+	t_46 = t_45 + 1;
+	t_47 = t_46;
+	t_48 = t_47 + 1;
+	t_49 = t_48;
+	t_50 = t_49 + 1;
+	t_51 = t_50;
+	t_52 = t_51 + 1;
+	t_53 = t_52;
+	t_54 = t_53 + 1;
+	t_55 = t_54;
+	t_56 = t_55 + 1;
+	t_57 = t_56;
+	t_58 = t_57 + 1;
+	t_59 = t_58;
+	t_60 = t_59 + 1;
+	t_61 = t_60;
+	t_62 = t_61 + 1;
+	t_63 = t_62;
+	t_64 = t_63 + 1;
+	t_65 = t_64;
+	t = 0;
+	addparam t_7,1;
+	call putint; 
+	addparam t_9,1;
+	call putint; 
+	addparam t_11,1;
+	call putint; 
+	addparam t_13,1;
+	call putint; 
+	addparam t_15,1;
+	call putint; 
+	addparam t_17,1;
+	call putint; 
+	addparam t_19,1;
+	call putint; 
+	addparam t_21,1;
+	call putint; 
+	addparam t_23,1;
+	call putint; 
+	addparam t_25,1;
+	call putint; 
+	addparam t_27,1;
+	call putint; 
+	addparam t_29,1;
+	call putint; 
+	addparam t_31,1;
+	call putint; 
+	addparam t_33,1;
+	call putint; 
+	addparam t_35,1;
+	call putint; 
+	addparam t_37,1;
+	call putint; 
+	addparam t_39,1;
+	call putint; 
+	addparam t_41,1;
+	call putint; 
+	addparam t_43,1;
+	call putint; 
+	addparam t_45,1;
+	call putint; 
+	addparam t_47,1;
+	call putint; 
+	addparam t_49,1;
+	call putint; 
+	addparam t_51,1;
+	call putint; 
+	addparam t_53,1;
+	call putint; 
+	addparam t_55,1;
+	call putint; 
+	addparam t_57,1;
+	call putint; 
+	addparam t_59,1;
+	call putint; 
+	addparam t_61,1;
+	call putint; 
+	addparam t_63,1;
+	call putint; 
+	addparam t_65,1;
+	call putint; 
+	newline = 0;
+	t_66 = 10;
+	addparam t_66,1;
+	call putch; 
+	addparam t_6,1;
+	call putint; 
+	addparam t_66,1;
+	call putch; 
+	return t_57;
+

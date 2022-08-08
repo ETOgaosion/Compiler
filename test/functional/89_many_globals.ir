@@ -1,0 +1,452 @@
+============ global var ================
+a36 := symbol type: 1; data type: 1; initValue: a36: 0
+
+a32 := symbol type: 1; data type: 1; initValue: a32: 0
+
+a31 := symbol type: 1; data type: 1; initValue: a31: 0
+
+a30 := symbol type: 1; data type: 1; initValue: a30: 0
+
+a39 := symbol type: 1; data type: 1; initValue: a39: 0
+
+a29 := symbol type: 1; data type: 1; initValue: a29: 0
+
+a5 := symbol type: 1; data type: 1; initValue: a5: 0
+
+a4 := symbol type: 1; data type: 1; initValue: a4: 0
+
+a38 := symbol type: 1; data type: 1; initValue: a38: 0
+
+a6 := symbol type: 1; data type: 1; initValue: a6: 0
+
+a0 := symbol type: 1; data type: 1; initValue: a0: 0
+
+a3 := symbol type: 1; data type: 1; initValue: a3: 0
+
+a33 := symbol type: 1; data type: 1; initValue: a33: 0
+
+a2 := symbol type: 1; data type: 1; initValue: a2: 0
+
+a12 := symbol type: 1; data type: 1; initValue: a12: 0
+
+a11 := symbol type: 1; data type: 1; initValue: a11: 0
+
+a26 := symbol type: 1; data type: 1; initValue: a26: 0
+
+a10 := symbol type: 1; data type: 1; initValue: a10: 0
+
+a37 := symbol type: 1; data type: 1; initValue: a37: 0
+
+a1 := symbol type: 1; data type: 1; initValue: a1: 0
+
+a8 := symbol type: 1; data type: 1; initValue: a8: 0
+
+a17 := symbol type: 1; data type: 1; initValue: a17: 0
+
+a35 := symbol type: 1; data type: 1; initValue: a35: 0
+
+a24 := symbol type: 1; data type: 1; initValue: a24: 0
+
+a13 := symbol type: 1; data type: 1; initValue: a13: 0
+
+a9 := symbol type: 1; data type: 1; initValue: a9: 0
+
+a14 := symbol type: 1; data type: 1; initValue: a14: 0
+
+a16 := symbol type: 1; data type: 1; initValue: a16: 0
+
+a34 := symbol type: 1; data type: 1; initValue: a34: 0
+
+a7 := symbol type: 1; data type: 1; initValue: a7: 0
+
+a15 := symbol type: 1; data type: 1; initValue: a15: 0
+
+a25 := symbol type: 1; data type: 1; initValue: a25: 0
+
+a21 := symbol type: 1; data type: 1; initValue: a21: 0
+
+a18 := symbol type: 1; data type: 1; initValue: a18: 0
+
+a19 := symbol type: 1; data type: 1; initValue: a19: 0
+
+a27 := symbol type: 1; data type: 1; initValue: a27: 0
+
+a20 := symbol type: 1; data type: 1; initValue: a20: 0
+
+a22 := symbol type: 1; data type: 1; initValue: a22: 0
+
+a23 := symbol type: 1; data type: 1; initValue: a23: 0
+
+a28 := symbol type: 1; data type: 1; initValue: a28: 0
+
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+----------- tempVars ------------
+t_4:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	a0 = 0;
+	a1 = 1;
+	a2 = 2;
+	a3 = 3;
+	a4 = 4;
+	a5 = 5;
+	a6 = 6;
+	a7 = 7;
+	a8 = 8;
+	a9 = 9;
+	a10 = 0;
+	a11 = 1;
+	a12 = 2;
+	a13 = 3;
+	a14 = 4;
+	a15 = 5;
+	a16 = 6;
+	a17 = 7;
+	a18 = 8;
+	a19 = 9;
+	a20 = 0;
+	a21 = 1;
+	a22 = 2;
+	a23 = 3;
+	a24 = 4;
+	a25 = 5;
+	a26 = 6;
+	a27 = 7;
+	a28 = 8;
+	a29 = 9;
+	a30 = 0;
+	a31 = 1;
+	a32 = 4;
+	a33 = 5;
+	a34 = 6;
+	a35 = 7;
+	a36 = 8;
+	a37 = 9;
+	a38 = 0;
+	a39 = 1;
+	addparam a0,1;
+	addparam a1,2;
+	addparam a2,3;
+	addparam a3,4;
+	addparam a4,5;
+	addparam a5,6;
+	addparam a6,7;
+	addparam a7,8;
+	call testParam8; 
+	t_0 =  return ;
+	t_1 = t_0;
+	addparam t_1,1;
+	call putint; 
+	addparam a32,1;
+	addparam a33,2;
+	addparam a34,3;
+	addparam a35,4;
+	addparam a36,5;
+	addparam a37,6;
+	addparam a38,7;
+	addparam a39,8;
+	addparam a8,9;
+	addparam a9,10;
+	addparam a10,11;
+	addparam a11,12;
+	addparam a12,13;
+	addparam a13,14;
+	addparam a14,15;
+	addparam a15,16;
+	call testParam16; 
+	t_2 =  return ;
+	t_3 = t_2;
+	addparam t_3,1;
+	call putint; 
+	addparam t_3,1;
+	addparam a1,2;
+	addparam a2,3;
+	addparam a3,4;
+	addparam a4,5;
+	addparam a5,6;
+	addparam a6,7;
+	addparam a7,8;
+	addparam a8,9;
+	addparam a9,10;
+	addparam a10,11;
+	addparam a11,12;
+	addparam a12,13;
+	addparam a13,14;
+	addparam a14,15;
+	addparam a15,16;
+	addparam a16,17;
+	addparam a17,18;
+	addparam a18,19;
+	addparam a19,20;
+	addparam a20,21;
+	addparam a21,22;
+	addparam a22,23;
+	addparam a23,24;
+	addparam a24,25;
+	addparam a25,26;
+	addparam a26,27;
+	addparam a27,28;
+	addparam a28,29;
+	addparam a29,30;
+	addparam a30,31;
+	addparam a31,32;
+	call testParam32; 
+	t_4 =  return ;
+	t_5 = t_4;
+	addparam t_5,1;
+	call putint; 
+	return 0;
+
+----------- funcDef -----------
+testParam16(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1) => 1:
+----------- paramVars -----------
+a15 := symbol type: 0; data type: 1
+a14 := symbol type: 0; data type: 1
+a13 := symbol type: 0; data type: 1
+a7 := symbol type: 0; data type: 1
+a1 := symbol type: 0; data type: 1
+a10 := symbol type: 0; data type: 1
+a12 := symbol type: 0; data type: 1
+a2 := symbol type: 0; data type: 1
+a3 := symbol type: 0; data type: 1
+a0 := symbol type: 0; data type: 1
+a8 := symbol type: 0; data type: 1
+a6 := symbol type: 0; data type: 1
+a4 := symbol type: 0; data type: 1
+a11 := symbol type: 0; data type: 1
+a5 := symbol type: 0; data type: 1
+a9 := symbol type: 0; data type: 1
+----------- localVars -----------
+----------- tempVars ------------
+t_14:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_9:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+testParam16:
+	a0 =  param 1;
+	a1 =  param 2;
+	a2 =  param 3;
+	a3 =  param 4;
+	a4 =  param 5;
+	a5 =  param 6;
+	a6 =  param 7;
+	a7 =  param 8;
+	a8 =  param 9;
+	a9 =  param 10;
+	a10 =  param 11;
+	a11 =  param 12;
+	a12 =  param 13;
+	a13 =  param 14;
+	a14 =  param 15;
+	a15 =  param 16;
+	t_0 = a0 + a1;
+	t_1 = t_0 + a2;
+	t_2 = t_1 - a3;
+	t_3 = t_2 - a4;
+	t_4 = t_3 - a5;
+	t_5 = t_4 - a6;
+	t_6 = t_5 - a7;
+	t_7 = t_6 + a8;
+	t_8 = t_7 + a9;
+	t_9 = t_8 + a10;
+	t_10 = t_9 + a11;
+	t_11 = t_10 + a12;
+	t_12 = t_11 + a13;
+	t_13 = t_12 + a14;
+	t_14 = t_13 + a15;
+	return t_14;
+
+----------- funcDef -----------
+testParam8(1,1,1,1,1,1,1,1) => 1:
+----------- paramVars -----------
+a5 := symbol type: 0; data type: 1
+a4 := symbol type: 0; data type: 1
+a3 := symbol type: 0; data type: 1
+a6 := symbol type: 0; data type: 1
+a2 := symbol type: 0; data type: 1
+a1 := symbol type: 0; data type: 1
+a7 := symbol type: 0; data type: 1
+a0 := symbol type: 0; data type: 1
+----------- localVars -----------
+----------- tempVars ------------
+t_6:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+testParam8:
+	a0 =  param 1;
+	a1 =  param 2;
+	a2 =  param 3;
+	a3 =  param 4;
+	a4 =  param 5;
+	a5 =  param 6;
+	a6 =  param 7;
+	a7 =  param 8;
+	t_0 = a0 + a1;
+	t_1 = t_0 + a2;
+	t_2 = t_1 + a3;
+	t_3 = t_2 + a4;
+	t_4 = t_3 + a5;
+	t_5 = t_4 + a6;
+	t_6 = t_5 + a7;
+	return t_6;
+	return ;
+
+----------- funcDef -----------
+testParam32(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1) => 1:
+----------- paramVars -----------
+a31 := symbol type: 0; data type: 1
+a30 := symbol type: 0; data type: 1
+a29 := symbol type: 0; data type: 1
+a5 := symbol type: 0; data type: 1
+a4 := symbol type: 0; data type: 1
+a6 := symbol type: 0; data type: 1
+a0 := symbol type: 0; data type: 1
+a3 := symbol type: 0; data type: 1
+a2 := symbol type: 0; data type: 1
+a12 := symbol type: 0; data type: 1
+a11 := symbol type: 0; data type: 1
+a26 := symbol type: 0; data type: 1
+a10 := symbol type: 0; data type: 1
+a1 := symbol type: 0; data type: 1
+a8 := symbol type: 0; data type: 1
+a17 := symbol type: 0; data type: 1
+a24 := symbol type: 0; data type: 1
+a13 := symbol type: 0; data type: 1
+a9 := symbol type: 0; data type: 1
+a14 := symbol type: 0; data type: 1
+a16 := symbol type: 0; data type: 1
+a7 := symbol type: 0; data type: 1
+a15 := symbol type: 0; data type: 1
+a25 := symbol type: 0; data type: 1
+a21 := symbol type: 0; data type: 1
+a18 := symbol type: 0; data type: 1
+a19 := symbol type: 0; data type: 1
+a27 := symbol type: 0; data type: 1
+a20 := symbol type: 0; data type: 1
+a22 := symbol type: 0; data type: 1
+a23 := symbol type: 0; data type: 1
+a28 := symbol type: 0; data type: 1
+----------- localVars -----------
+----------- tempVars ------------
+t_19:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_28:= symbol type: TEMP VAR; data type: 1
+t_29:= symbol type: TEMP VAR; data type: 1
+t_16:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_23:= symbol type: TEMP VAR; data type: 1
+t_9:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_30:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+t_22:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_15:= symbol type: TEMP VAR; data type: 1
+t_17:= symbol type: TEMP VAR; data type: 1
+t_18:= symbol type: TEMP VAR; data type: 1
+t_24:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_20:= symbol type: TEMP VAR; data type: 1
+t_21:= symbol type: TEMP VAR; data type: 1
+t_25:= symbol type: TEMP VAR; data type: 1
+t_27:= symbol type: TEMP VAR; data type: 1
+t_26:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+testParam32:
+	a0 =  param 1;
+	a1 =  param 2;
+	a2 =  param 3;
+	a3 =  param 4;
+	a4 =  param 5;
+	a5 =  param 6;
+	a6 =  param 7;
+	a7 =  param 8;
+	a8 =  param 9;
+	a9 =  param 10;
+	a10 =  param 11;
+	a11 =  param 12;
+	a12 =  param 13;
+	a13 =  param 14;
+	a14 =  param 15;
+	a15 =  param 16;
+	a16 =  param 17;
+	a17 =  param 18;
+	a18 =  param 19;
+	a19 =  param 20;
+	a20 =  param 21;
+	a21 =  param 22;
+	a22 =  param 23;
+	a23 =  param 24;
+	a24 =  param 25;
+	a25 =  param 26;
+	a26 =  param 27;
+	a27 =  param 28;
+	a28 =  param 29;
+	a29 =  param 30;
+	a30 =  param 31;
+	a31 =  param 32;
+	t_0 = a0 + a1;
+	t_1 = t_0 + a2;
+	t_2 = t_1 + a3;
+	t_3 = t_2 + a4;
+	t_4 = t_3 + a5;
+	t_5 = t_4 + a6;
+	t_6 = t_5 + a7;
+	t_7 = t_6 + a8;
+	t_8 = t_7 + a9;
+	t_9 = t_8 + a10;
+	t_10 = t_9 + a11;
+	t_11 = t_10 + a12;
+	t_12 = t_11 + a13;
+	t_13 = t_12 + a14;
+	t_14 = t_13 + a15;
+	t_15 = t_14 + a16;
+	t_16 = t_15 + a17;
+	t_17 = t_16 - a18;
+	t_18 = t_17 - a19;
+	t_19 = t_18 - a20;
+	t_20 = t_19 - a21;
+	t_21 = t_20 - a22;
+	t_22 = t_21 + a23;
+	t_23 = t_22 + a24;
+	t_24 = t_23 + a25;
+	t_25 = t_24 + a26;
+	t_26 = t_25 + a27;
+	t_27 = t_26 + a28;
+	t_28 = t_27 + a29;
+	t_29 = t_28 + a30;
+	t_30 = t_29 + a31;
+	return t_30;
+

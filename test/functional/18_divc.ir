@@ -12,5 +12,7 @@ t_0:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
 	t_0 = a / 5;
-	return t_0;
+	addparam t_0,1;
+	call putint; 
+	return 0;
 

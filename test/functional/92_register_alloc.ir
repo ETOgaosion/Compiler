@@ -1,0 +1,724 @@
+============ global var ================
+a32 := symbol type: 1; data type: 1; initValue: a32: 16
+
+a31 := symbol type: 1; data type: 1; initValue: a31: 15
+
+a30 := symbol type: 1; data type: 1; initValue: a30: 14
+
+a5 := symbol type: 1; data type: 1; initValue: a5: 5
+
+a4 := symbol type: 1; data type: 1; initValue: a4: 4
+
+a6 := symbol type: 1; data type: 1; initValue: a6: 6
+
+a3 := symbol type: 1; data type: 1; initValue: a3: 3
+
+a2 := symbol type: 1; data type: 1; initValue: a2: 2
+
+a12 := symbol type: 1; data type: 1; initValue: a12: 12
+
+a13 := symbol type: 1; data type: 1; initValue: a13: 13
+
+a24 := symbol type: 1; data type: 1; initValue: a24: 8
+
+a11 := symbol type: 1; data type: 1; initValue: a11: 11
+
+a26 := symbol type: 1; data type: 1; initValue: a26: 10
+
+a10 := symbol type: 1; data type: 1; initValue: a10: 10
+
+a1 := symbol type: 1; data type: 1; initValue: a1: 1
+
+a8 := symbol type: 1; data type: 1; initValue: a8: 8
+
+a17 := symbol type: 1; data type: 1; initValue: a17: 1
+
+a9 := symbol type: 1; data type: 1; initValue: a9: 9
+
+a14 := symbol type: 1; data type: 1; initValue: a14: 14
+
+a16 := symbol type: 1; data type: 1; initValue: a16: 16
+
+a7 := symbol type: 1; data type: 1; initValue: a7: 7
+
+a15 := symbol type: 1; data type: 1; initValue: a15: 15
+
+a25 := symbol type: 1; data type: 1; initValue: a25: 9
+
+a21 := symbol type: 1; data type: 1; initValue: a21: 5
+
+a18 := symbol type: 1; data type: 1; initValue: a18: 2
+
+a19 := symbol type: 1; data type: 1; initValue: a19: 3
+
+a27 := symbol type: 1; data type: 1; initValue: a27: 11
+
+a20 := symbol type: 1; data type: 1; initValue: a20: 4
+
+a22 := symbol type: 1; data type: 1; initValue: a22: 6
+
+a29 := symbol type: 1; data type: 1; initValue: a29: 13
+
+a23 := symbol type: 1; data type: 1; initValue: a23: 7
+
+a28 := symbol type: 1; data type: 1; initValue: a28: 12
+
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+b := symbol type: 1; data type: 1; initValue: 0
+
+a := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_5:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	a = 0;
+	b = 0;
+	call getint; 
+	t_0 =  return ;
+	t_1 = t_0;
+	t_2 = 2 * 9;
+	t_3 = t_1 + t_2;
+	t_4 = t_3;
+	addparam t_1,1;
+	addparam t_4,2;
+	call func; 
+	t_5 =  return ;
+	t_6 = t_5;
+	addparam t_6,1;
+	call putint; 
+	return t_6;
+
+----------- funcDef -----------
+func(1,1) => 1:
+----------- paramVars -----------
+b := symbol type: 0; data type: 1
+a := symbol type: 0; data type: 1
+----------- localVars -----------
+k3 := symbol type: 1; data type: 1; initValue: 0
+
+k1 := symbol type: 1; data type: 1; initValue: 0
+
+j4 := symbol type: 1; data type: 1; initValue: 0
+
+j2 := symbol type: 1; data type: 1; initValue: 0
+
+j1 := symbol type: 1; data type: 1; initValue: 0
+
+e4 := symbol type: 1; data type: 1; initValue: 0
+
+e3 := symbol type: 1; data type: 1; initValue: 0
+
+d1 := symbol type: 1; data type: 1; initValue: 0
+
+d2 := symbol type: 1; data type: 1; initValue: 0
+
+h4 := symbol type: 1; data type: 1; initValue: 0
+
+f4 := symbol type: 1; data type: 1; initValue: 0
+
+d3 := symbol type: 1; data type: 1; initValue: 0
+
+i2 := symbol type: 1; data type: 1; initValue: 0
+
+c4 := symbol type: 1; data type: 1; initValue: 0
+
+c3 := symbol type: 1; data type: 1; initValue: 0
+
+i4 := symbol type: 1; data type: 1; initValue: 0
+
+f1 := symbol type: 1; data type: 1; initValue: 0
+
+c2 := symbol type: 1; data type: 1; initValue: 0
+
+c1 := symbol type: 1; data type: 1; initValue: 0
+
+i := symbol type: 1; data type: 1; initValue: 0
+
+k4 := symbol type: 1; data type: 1; initValue: 0
+
+f2 := symbol type: 1; data type: 1; initValue: 0
+
+g1 := symbol type: 1; data type: 1; initValue: 0
+
+h3 := symbol type: 1; data type: 1; initValue: 0
+
+k2 := symbol type: 1; data type: 1; initValue: 0
+
+f3 := symbol type: 1; data type: 1; initValue: 0
+
+e2 := symbol type: 1; data type: 1; initValue: 0
+
+g2 := symbol type: 1; data type: 1; initValue: 0
+
+h2 := symbol type: 1; data type: 1; initValue: 0
+
+g3 := symbol type: 1; data type: 1; initValue: 0
+
+j3 := symbol type: 1; data type: 1; initValue: 0
+
+g4 := symbol type: 1; data type: 1; initValue: 0
+
+h1 := symbol type: 1; data type: 1; initValue: 0
+
+e1 := symbol type: 1; data type: 1; initValue: 0
+
+i1 := symbol type: 1; data type: 1; initValue: 0
+
+d4 := symbol type: 1; data type: 1; initValue: 0
+
+i3 := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_283:= symbol type: TEMP VAR; data type: 1
+t_281:= symbol type: TEMP VAR; data type: 1
+t_280:= symbol type: TEMP VAR; data type: 1
+t_277:= symbol type: TEMP VAR; data type: 1
+t_276:= symbol type: TEMP VAR; data type: 1
+t_275:= symbol type: TEMP VAR; data type: 1
+t_271:= symbol type: TEMP VAR; data type: 1
+t_269:= symbol type: TEMP VAR; data type: 1
+t_268:= symbol type: TEMP VAR; data type: 1
+t_266:= symbol type: TEMP VAR; data type: 1
+t_265:= symbol type: TEMP VAR; data type: 1
+t_263:= symbol type: TEMP VAR; data type: 1
+t_262:= symbol type: TEMP VAR; data type: 1
+t_261:= symbol type: TEMP VAR; data type: 1
+t_260:= symbol type: TEMP VAR; data type: 1
+t_279:= symbol type: TEMP VAR; data type: 1
+t_259:= symbol type: TEMP VAR; data type: 1
+t_258:= symbol type: TEMP VAR; data type: 1
+t_122:= symbol type: TEMP VAR; data type: 1
+t_119:= symbol type: TEMP VAR; data type: 1
+t_220:= symbol type: TEMP VAR; data type: 1
+t_116:= symbol type: TEMP VAR; data type: 1
+t_113:= symbol type: TEMP VAR; data type: 1
+t_196:= symbol type: TEMP VAR; data type: 1
+t_161:= symbol type: TEMP VAR; data type: 1
+t_104:= symbol type: TEMP VAR; data type: 1
+t_164:= symbol type: TEMP VAR; data type: 1
+t_274:= symbol type: TEMP VAR; data type: 1
+t_103:= symbol type: TEMP VAR; data type: 1
+t_197:= symbol type: TEMP VAR; data type: 1
+t_95:= symbol type: TEMP VAR; data type: 1
+t_92:= symbol type: TEMP VAR; data type: 1
+t_86:= symbol type: TEMP VAR; data type: 1
+t_38:= symbol type: TEMP VAR; data type: 1
+t_52:= symbol type: TEMP VAR; data type: 1
+t_217:= symbol type: TEMP VAR; data type: 1
+t_82:= symbol type: TEMP VAR; data type: 1
+t_118:= symbol type: TEMP VAR; data type: 1
+t_225:= symbol type: TEMP VAR; data type: 1
+t_100:= symbol type: TEMP VAR; data type: 1
+t_73:= symbol type: TEMP VAR; data type: 1
+t_267:= symbol type: TEMP VAR; data type: 1
+t_240:= symbol type: TEMP VAR; data type: 1
+t_76:= symbol type: TEMP VAR; data type: 1
+t_77:= symbol type: TEMP VAR; data type: 1
+t_98:= symbol type: TEMP VAR; data type: 1
+t_249:= symbol type: TEMP VAR; data type: 1
+t_94:= symbol type: TEMP VAR; data type: 1
+t_79:= symbol type: TEMP VAR; data type: 1
+t_80:= symbol type: TEMP VAR; data type: 1
+t_175:= symbol type: TEMP VAR; data type: 1
+t_248:= symbol type: TEMP VAR; data type: 1
+t_115:= symbol type: TEMP VAR; data type: 1
+t_68:= symbol type: TEMP VAR; data type: 1
+t_67:= symbol type: TEMP VAR; data type: 1
+t_130:= symbol type: TEMP VAR; data type: 1
+t_62:= symbol type: TEMP VAR; data type: 1
+t_209:= symbol type: TEMP VAR; data type: 1
+t_219:= symbol type: TEMP VAR; data type: 1
+t_125:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_149:= symbol type: TEMP VAR; data type: 1
+t_56:= symbol type: TEMP VAR; data type: 1
+t_272:= symbol type: TEMP VAR; data type: 1
+t_25:= symbol type: TEMP VAR; data type: 1
+t_58:= symbol type: TEMP VAR; data type: 1
+t_187:= symbol type: TEMP VAR; data type: 1
+t_65:= symbol type: TEMP VAR; data type: 1
+t_85:= symbol type: TEMP VAR; data type: 1
+t_257:= symbol type: TEMP VAR; data type: 1
+t_29:= symbol type: TEMP VAR; data type: 1
+t_20:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_228:= symbol type: TEMP VAR; data type: 1
+t_218:= symbol type: TEMP VAR; data type: 1
+t_181:= symbol type: TEMP VAR; data type: 1
+t_35:= symbol type: TEMP VAR; data type: 1
+t_194:= symbol type: TEMP VAR; data type: 1
+t_206:= symbol type: TEMP VAR; data type: 1
+t_61:= symbol type: TEMP VAR; data type: 1
+t_22:= symbol type: TEMP VAR; data type: 1
+t_74:= symbol type: TEMP VAR; data type: 1
+t_255:= symbol type: TEMP VAR; data type: 1
+t_152:= symbol type: TEMP VAR; data type: 1
+t_173:= symbol type: TEMP VAR; data type: 1
+t_107:= symbol type: TEMP VAR; data type: 1
+t_59:= symbol type: TEMP VAR; data type: 1
+t_282:= symbol type: TEMP VAR; data type: 1
+t_26:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_176:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_205:= symbol type: TEMP VAR; data type: 1
+t_233:= symbol type: TEMP VAR; data type: 1
+t_256:= symbol type: TEMP VAR; data type: 1
+t_264:= symbol type: TEMP VAR; data type: 1
+t_184:= symbol type: TEMP VAR; data type: 1
+t_137:= symbol type: TEMP VAR; data type: 1
+t_121:= symbol type: TEMP VAR; data type: 1
+t_110:= symbol type: TEMP VAR; data type: 1
+t_91:= symbol type: TEMP VAR; data type: 1
+t_16:= symbol type: TEMP VAR; data type: 1
+t_46:= symbol type: TEMP VAR; data type: 1
+t_247:= symbol type: TEMP VAR; data type: 1
+t_28:= symbol type: TEMP VAR; data type: 1
+t_134:= symbol type: TEMP VAR; data type: 1
+t_40:= symbol type: TEMP VAR; data type: 1
+t_253:= symbol type: TEMP VAR; data type: 1
+t_44:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_47:= symbol type: TEMP VAR; data type: 1
+t_19:= symbol type: TEMP VAR; data type: 1
+t_55:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_254:= symbol type: TEMP VAR; data type: 1
+t_32:= symbol type: TEMP VAR; data type: 1
+t_71:= symbol type: TEMP VAR; data type: 1
+t_151:= symbol type: TEMP VAR; data type: 1
+t_270:= symbol type: TEMP VAR; data type: 1
+t_31:= symbol type: TEMP VAR; data type: 1
+t_112:= symbol type: TEMP VAR; data type: 1
+t_17:= symbol type: TEMP VAR; data type: 1
+t_154:= symbol type: TEMP VAR; data type: 1
+t_242:= symbol type: TEMP VAR; data type: 1
+t_97:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_236:= symbol type: TEMP VAR; data type: 1
+t_41:= symbol type: TEMP VAR; data type: 1
+t_172:= symbol type: TEMP VAR; data type: 1
+t_43:= symbol type: TEMP VAR; data type: 1
+t_49:= symbol type: TEMP VAR; data type: 1
+t_53:= symbol type: TEMP VAR; data type: 1
+t_23:= symbol type: TEMP VAR; data type: 1
+t_234:= symbol type: TEMP VAR; data type: 1
+t_127:= symbol type: TEMP VAR; data type: 1
+t_202:= symbol type: TEMP VAR; data type: 1
+t_231:= symbol type: TEMP VAR; data type: 1
+t_106:= symbol type: TEMP VAR; data type: 1
+t_131:= symbol type: TEMP VAR; data type: 1
+t_145:= symbol type: TEMP VAR; data type: 1
+t_133:= symbol type: TEMP VAR; data type: 1
+t_101:= symbol type: TEMP VAR; data type: 1
+t_136:= symbol type: TEMP VAR; data type: 1
+t_179:= symbol type: TEMP VAR; data type: 1
+t_139:= symbol type: TEMP VAR; data type: 1
+t_83:= symbol type: TEMP VAR; data type: 1
+t_142:= symbol type: TEMP VAR; data type: 1
+t_158:= symbol type: TEMP VAR; data type: 1
+t_140:= symbol type: TEMP VAR; data type: 1
+t_124:= symbol type: TEMP VAR; data type: 1
+t_143:= symbol type: TEMP VAR; data type: 1
+t_88:= symbol type: TEMP VAR; data type: 1
+t_230:= symbol type: TEMP VAR; data type: 1
+t_146:= symbol type: TEMP VAR; data type: 1
+t_273:= symbol type: TEMP VAR; data type: 1
+t_37:= symbol type: TEMP VAR; data type: 1
+t_251:= symbol type: TEMP VAR; data type: 1
+t_148:= symbol type: TEMP VAR; data type: 1
+t_155:= symbol type: TEMP VAR; data type: 1
+t_191:= symbol type: TEMP VAR; data type: 1
+t_157:= symbol type: TEMP VAR; data type: 1
+t_160:= symbol type: TEMP VAR; data type: 1
+t_199:= symbol type: TEMP VAR; data type: 1
+t_128:= symbol type: TEMP VAR; data type: 1
+t_163:= symbol type: TEMP VAR; data type: 1
+t_166:= symbol type: TEMP VAR; data type: 1
+t_167:= symbol type: TEMP VAR; data type: 1
+t_169:= symbol type: TEMP VAR; data type: 1
+t_170:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_203:= symbol type: TEMP VAR; data type: 1
+t_193:= symbol type: TEMP VAR; data type: 1
+t_178:= symbol type: TEMP VAR; data type: 1
+t_109:= symbol type: TEMP VAR; data type: 1
+t_182:= symbol type: TEMP VAR; data type: 1
+t_64:= symbol type: TEMP VAR; data type: 1
+t_190:= symbol type: TEMP VAR; data type: 1
+t_89:= symbol type: TEMP VAR; data type: 1
+t_208:= symbol type: TEMP VAR; data type: 1
+t_222:= symbol type: TEMP VAR; data type: 1
+t_200:= symbol type: TEMP VAR; data type: 1
+t_188:= symbol type: TEMP VAR; data type: 1
+t_185:= symbol type: TEMP VAR; data type: 1
+t_211:= symbol type: TEMP VAR; data type: 1
+t_246:= symbol type: TEMP VAR; data type: 1
+t_284:= symbol type: TEMP VAR; data type: 1
+t_214:= symbol type: TEMP VAR; data type: 1
+t_70:= symbol type: TEMP VAR; data type: 1
+t_215:= symbol type: TEMP VAR; data type: 1
+t_221:= symbol type: TEMP VAR; data type: 1
+t_223:= symbol type: TEMP VAR; data type: 1
+t_224:= symbol type: TEMP VAR; data type: 1
+t_278:= symbol type: TEMP VAR; data type: 1
+t_226:= symbol type: TEMP VAR; data type: 1
+t_227:= symbol type: TEMP VAR; data type: 1
+t_229:= symbol type: TEMP VAR; data type: 1
+t_50:= symbol type: TEMP VAR; data type: 1
+t_232:= symbol type: TEMP VAR; data type: 1
+t_235:= symbol type: TEMP VAR; data type: 1
+t_237:= symbol type: TEMP VAR; data type: 1
+t_238:= symbol type: TEMP VAR; data type: 1
+t_239:= symbol type: TEMP VAR; data type: 1
+t_34:= symbol type: TEMP VAR; data type: 1
+t_212:= symbol type: TEMP VAR; data type: 1
+t_241:= symbol type: TEMP VAR; data type: 1
+t_243:= symbol type: TEMP VAR; data type: 1
+t_244:= symbol type: TEMP VAR; data type: 1
+t_245:= symbol type: TEMP VAR; data type: 1
+t_250:= symbol type: TEMP VAR; data type: 1
+t_252:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+func:
+	a =  param 1;
+	b =  param 2;
+	i = 0;
+	t_0 = a + b;
+	t_1 = t_0;
+	c1 = 0;
+	c2 = 0;
+	c3 = 0;
+	c4 = 0;
+	d1 = 0;
+	d2 = 0;
+	d3 = 0;
+	d4 = 0;
+	e1 = 0;
+	e2 = 0;
+	e3 = 0;
+	e4 = 0;
+	f1 = 0;
+	f2 = 0;
+	f3 = 0;
+	f4 = 0;
+	g1 = 0;
+	g2 = 0;
+	g3 = 0;
+	g4 = 0;
+	h1 = 0;
+	h2 = 0;
+	h3 = 0;
+	h4 = 0;
+	i1 = 0;
+	i2 = 0;
+	i3 = 0;
+	i4 = 0;
+	j1 = 0;
+	j2 = 0;
+	j3 = 0;
+	j4 = 0;
+	k1 = 0;
+	k2 = 0;
+	k3 = 0;
+	k4 = 0;
+	call getint; 
+	t_2 =  return ;
+	t_3 = t_2;
+	call getint; 
+	t_4 =  return ;
+	t_5 = t_4;
+	call getint; 
+	t_6 =  return ;
+	t_7 = t_6;
+	call getint; 
+	t_8 =  return ;
+	t_9 = t_8;
+	t_10 = 1 + t_3;
+	t_11 = t_10 + a1;
+	t_12 = t_11;
+	t_13 = 2 + t_5;
+	t_14 = t_13 + a2;
+	t_15 = t_14;
+	t_16 = 3 + t_7;
+	t_17 = t_16 + a3;
+	t_18 = t_17;
+	t_19 = 4 + t_9;
+	t_20 = t_19 + a4;
+	t_21 = t_20;
+	t_22 = 1 + t_12;
+	t_23 = t_22 + a5;
+	t_24 = t_23;
+	t_25 = 2 + t_15;
+	t_26 = t_25 + a6;
+	t_27 = t_26;
+	t_28 = 3 + t_18;
+	t_29 = t_28 + a7;
+	t_30 = t_29;
+	t_31 = 4 + t_21;
+	t_32 = t_31 + a8;
+	t_33 = t_32;
+	t_34 = 1 + t_24;
+	t_35 = t_34 + a9;
+	t_36 = t_35;
+	t_37 = 2 + t_27;
+	t_38 = t_37 + a10;
+	t_39 = t_38;
+	t_40 = 3 + t_30;
+	t_41 = t_40 + a11;
+	t_42 = t_41;
+	t_43 = 4 + t_33;
+	t_44 = t_43 + a12;
+	t_45 = t_44;
+	t_46 = 1 + t_36;
+	t_47 = t_46 + a13;
+	t_48 = t_47;
+	t_49 = 2 + t_39;
+	t_50 = t_49 + a14;
+	t_51 = t_50;
+	t_52 = 3 + t_42;
+	t_53 = t_52 + a15;
+	t_54 = t_53;
+	t_55 = 4 + t_45;
+	t_56 = t_55 + a16;
+	t_57 = t_56;
+	t_58 = 1 + t_48;
+	t_59 = t_58 + a17;
+	t_60 = t_59;
+	t_61 = 2 + t_51;
+	t_62 = t_61 + a18;
+	t_63 = t_62;
+	t_64 = 3 + t_54;
+	t_65 = t_64 + a19;
+	t_66 = t_65;
+	t_67 = 4 + t_57;
+	t_68 = t_67 + a20;
+	t_69 = t_68;
+	t_70 = 1 + t_60;
+	t_71 = t_70 + a21;
+	t_72 = t_71;
+	t_73 = 2 + t_63;
+	t_74 = t_73 + a22;
+	t_75 = t_74;
+	t_76 = 3 + t_66;
+	t_77 = t_76 + a23;
+	t_78 = t_77;
+	t_79 = 4 + t_69;
+	t_80 = t_79 + a24;
+	t_81 = t_80;
+	t_82 = 1 + t_72;
+	t_83 = t_82 + a25;
+	t_84 = t_83;
+	t_85 = 2 + t_75;
+	t_86 = t_85 + a26;
+	t_87 = t_86;
+	t_88 = 3 + t_78;
+	t_89 = t_88 + a27;
+	t_90 = t_89;
+	t_91 = 4 + t_81;
+	t_92 = t_91 + a28;
+	t_93 = t_92;
+	t_94 = 1 + t_84;
+	t_95 = t_94 + a29;
+	t_96 = t_95;
+	t_97 = 2 + t_87;
+	t_98 = t_97 + a30;
+	t_99 = t_98;
+	t_100 = 3 + t_90;
+	t_101 = t_100 + a31;
+	t_102 = t_101;
+	t_103 = 4 + t_93;
+	t_104 = t_103 + a32;
+	t_105 = t_104;
+	t_106 = a - b;
+	t_107 = t_106 + 10;
+	t_108 = t_107;
+	t_109 = 1 + t_84;
+	t_110 = t_109 + a29;
+	t_111 = t_110;
+	t_112 = 2 + t_87;
+	t_113 = t_112 + a30;
+	t_114 = t_113;
+	t_115 = 3 + t_90;
+	t_116 = t_115 + a31;
+	t_117 = t_116;
+	t_118 = 4 + t_93;
+	t_119 = t_118 + a32;
+	t_120 = t_119;
+	t_121 = 1 + t_72;
+	t_122 = t_121 + a25;
+	t_123 = t_122;
+	t_124 = 2 + t_75;
+	t_125 = t_124 + a26;
+	t_126 = t_125;
+	t_127 = 3 + t_78;
+	t_128 = t_127 + a27;
+	t_129 = t_128;
+	t_130 = 4 + t_81;
+	t_131 = t_130 + a28;
+	t_132 = t_131;
+	t_133 = 1 + t_60;
+	t_134 = t_133 + a21;
+	t_135 = t_134;
+	t_136 = 2 + t_63;
+	t_137 = t_136 + a22;
+	t_138 = t_137;
+	t_139 = 3 + t_66;
+	t_140 = t_139 + a23;
+	t_141 = t_140;
+	t_142 = 4 + t_69;
+	t_143 = t_142 + a24;
+	t_144 = t_143;
+	t_145 = 1 + t_48;
+	t_146 = t_145 + a17;
+	t_147 = t_146;
+	t_148 = 2 + t_51;
+	t_149 = t_148 + a18;
+	t_150 = t_149;
+	t_151 = 3 + t_54;
+	t_152 = t_151 + a19;
+	t_153 = t_152;
+	t_154 = 4 + t_57;
+	t_155 = t_154 + a20;
+	t_156 = t_155;
+	t_157 = 1 + t_36;
+	t_158 = t_157 + a13;
+	t_159 = t_158;
+	t_160 = 2 + t_39;
+	t_161 = t_160 + a14;
+	t_162 = t_161;
+	t_163 = 3 + t_42;
+	t_164 = t_163 + a15;
+	t_165 = t_164;
+	t_166 = 4 + t_45;
+	t_167 = t_166 + a16;
+	t_168 = t_167;
+	t_169 = 1 + t_24;
+	t_170 = t_169 + a9;
+	t_171 = t_170;
+	t_172 = 2 + t_27;
+	t_173 = t_172 + a10;
+	t_174 = t_173;
+	t_175 = 3 + t_30;
+	t_176 = t_175 + a11;
+	t_177 = t_176;
+	t_178 = 4 + t_33;
+	t_179 = t_178 + a12;
+	t_180 = t_179;
+	t_181 = 1 + t_12;
+	t_182 = t_181 + a5;
+	t_183 = t_182;
+	t_184 = 2 + t_15;
+	t_185 = t_184 + a6;
+	t_186 = t_185;
+	t_187 = 3 + t_18;
+	t_188 = t_187 + a7;
+	t_189 = t_188;
+	t_190 = 4 + t_21;
+	t_191 = t_190 + a8;
+	t_192 = t_191;
+	t_193 = 1 + t_3;
+	t_194 = t_193 + a1;
+	t_195 = t_194;
+	t_196 = 2 + t_5;
+	t_197 = t_196 + a2;
+	t_198 = t_197;
+	t_199 = 3 + t_7;
+	t_200 = t_199 + a3;
+	t_201 = t_200;
+	t_202 = 4 + t_9;
+	t_203 = t_202 + a4;
+	t_204 = t_203;
+	t_205 = 1 + t_3;
+	t_206 = t_205 + a1;
+	t_207 = t_206;
+	t_208 = 2 + t_5;
+	t_209 = t_208 + a2;
+	t_210 = t_209;
+	t_211 = 3 + t_7;
+	t_212 = t_211 + a3;
+	t_213 = t_212;
+	t_214 = 4 + t_9;
+	t_215 = t_214 + a4;
+	t_216 = t_215;
+	t_217 = t_108 + t_3;
+	t_218 = t_217 + t_5;
+	t_219 = t_218 + t_7;
+	t_220 = t_219 + t_9;
+	t_221 = t_220 - t_207;
+	t_222 = t_221 - t_210;
+	t_223 = t_222 - t_213;
+	t_224 = t_223 - t_216;
+	t_225 = t_224 + t_183;
+	t_226 = t_225 + t_186;
+	t_227 = t_226 + t_189;
+	t_228 = t_227 + t_192;
+	t_229 = t_228 - t_171;
+	t_230 = t_229 - t_174;
+	t_231 = t_230 - t_177;
+	t_232 = t_231 - t_180;
+	t_233 = t_232 + t_159;
+	t_234 = t_233 + t_162;
+	t_235 = t_234 + t_165;
+	t_236 = t_235 + t_168;
+	t_237 = t_236 - t_147;
+	t_238 = t_237 - t_150;
+	t_239 = t_238 - t_153;
+	t_240 = t_239 - t_156;
+	t_241 = t_240 + t_135;
+	t_242 = t_241 + t_138;
+	t_243 = t_242 + t_141;
+	t_244 = t_243 + t_144;
+	t_245 = t_244 - t_123;
+	t_246 = t_245 - t_126;
+	t_247 = t_246 - t_129;
+	t_248 = t_247 - t_132;
+	t_249 = t_248 + t_111;
+	t_250 = t_249 + t_114;
+	t_251 = t_250 + t_117;
+	t_252 = t_251 + t_120;
+	t_253 = t_252 + a1;
+	t_254 = t_253 - a2;
+	t_255 = t_254 + a3;
+	t_256 = t_255 - a4;
+	t_257 = t_256 + a5;
+	t_258 = t_257 - a6;
+	t_259 = t_258 + a7;
+	t_260 = t_259 - a8;
+	t_261 = t_260 + a9;
+	t_262 = t_261 - a10;
+	t_263 = t_262 + a11;
+	t_264 = t_263 - a12;
+	t_265 = t_264 + a13;
+	t_266 = t_265 - a14;
+	t_267 = t_266 + a15;
+	t_268 = t_267 - a16;
+	t_269 = t_268 + a17;
+	t_270 = t_269 - a18;
+	t_271 = t_270 + a19;
+	t_272 = t_271 - a20;
+	t_273 = t_272 + a21;
+	t_274 = t_273 - a22;
+	t_275 = t_274 + a23;
+	t_276 = t_275 - a24;
+	t_277 = t_276 + a25;
+	t_278 = t_277 - a26;
+	t_279 = t_278 + a27;
+	t_280 = t_279 - a28;
+	t_281 = t_280 + a29;
+	t_282 = t_281 - a30;
+	t_283 = t_282 + a31;
+	t_284 = t_283 - a32;
+	return t_284;
+	return ;
+

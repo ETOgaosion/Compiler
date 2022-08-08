@@ -1,15 +1,17 @@
-dir=`ls test/functional/*.sy`
-for test_file in $dir
-do
-    echo "!!!!!!!!!!!!!!!!!!!"
-    echo "Compile $test_file"
-    ./build/compiler $test_file
-done
+#!/bin/bash
+# ./build.sh
+# dir=`ls test/functional/*.sy`
+# for test_file in $dir
+# do
+#     echo "!!!!!!!!!!!!!!!!!!!"
+#     echo "Compile $test_file"
+#     ./build/compiler $test_file
+# done
 dir=`ls test/functional/*.S`
 for test_file in $dir
 do
     echo "Generate ${test_file:0:-2}"
-    arm-linux-gnueabihf-gcc -g $test_file -L./ -lcact -static -o ${test_file:0:-2}
+    arm-linux-gnueabihf-gcc -g $test_file -L./ -lsysy -static -o ${test_file:0:-2}
     arm-linux-gnueabihf-objdump -S ${test_file:0:-2} > "${test_file:0:-2}.obj"
 done
 dir=`ls test/functional/*.S`

@@ -11,7 +11,9 @@ t_0:= symbol type: TEMP VAR; data type: 1
 main:
 	call ififElse; 
 	t_0 =  return ;
-	return t_0;
+	addparam t_0,1;
+	call putint; 
+	return 0;
 
 ----------- funcDef -----------
 ififElse() => 1:

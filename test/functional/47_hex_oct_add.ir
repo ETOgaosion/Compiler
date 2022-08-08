@@ -20,5 +20,7 @@ main:
 	t_1 = 0xc;
 	t_2 = t_0 + t_1;
 	t_3 = t_2 + 075;
-	return t_3;
+	addparam t_3,1;
+	call putint; 
+	return 0;
 

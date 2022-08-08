@@ -12,5 +12,7 @@ a := symbol type: 1; data type: 1; initValue: 0
 main:
 	a = 0;
 	t_0 = 5;
-	return t_0;
+	addparam t_0,1;
+	call putint; 
+	return 0;
 

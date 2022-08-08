@@ -51,9 +51,9 @@ FourWhile:
 	d = 0;
 	t_3 = 10;
 L_1_FourWhile:
-	t_35 = phi t_26, t_33, b;
-	t_37 = phi t_28, t_3;
-	t_39 = phi t_30, t_2;
+	t_35 = phi t_30, t_3;
+	t_37 = phi t_26, t_33, b;
+	t_39 = phi t_28, t_2;
 	t_41 = phi t_6, a;
 	t_4 = t_41 < 20;
 	beqz t_4 L_0_FourWhile;
@@ -61,8 +61,8 @@ L_1_FourWhile:
 	t_6 = t_5;
 L_3_FourWhile:
 	t_27 = phi t_9, b;
-	t_29 = phi t_22, t_3;
-	t_31 = phi t_20, t_25, c;
+	t_29 = phi t_20, t_25, c;
+	t_31 = phi t_22, t_3;
 	t_7 = t_27 < 10;
 	beqz t_7 L_2_FourWhile;
 	t_8 = t_27 + 1;
@@ -94,17 +94,17 @@ L_4_FourWhile:
 	goto L_3_FourWhile;
 L_2_FourWhile:
 	t_26 = phi t_9, b;
-	t_28 = phi t_22;
-	t_30 = phi t_20, t_25, c;
+	t_28 = phi t_20, t_25, c;
+	t_30 = phi t_22;
 	t_32 = t_27 - 2;
 	t_33 = t_32;
 	goto L_1_FourWhile;
 L_0_FourWhile:
-	t_34 = phi t_26, t_33, b;
-	t_36 = phi t_28;
-	t_38 = phi t_30;
+	t_34 = phi t_30;
+	t_36 = phi t_26, t_33, b;
+	t_38 = phi t_28;
 	t_40 = phi t_6, a;
-	t_42 = t_35 + t_37;
+	t_42 = t_37 + t_35;
 	t_43 = t_41 + t_42;
 	t_44 = t_43 + t_39;
 	return t_44;
