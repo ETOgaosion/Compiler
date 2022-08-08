@@ -72,6 +72,7 @@ public:
     virtual bool setAliasToVar() { return false; };
     virtual bool setParentVariable(IROperand *inParentVariable) { return false; };
     virtual bool setFunctionSymbolTable(SymbolTable *inFunctionTable) { return false; };
+    virtual bool setFrameSize(int inSize) { return false; };
     virtual void setMemOffset(int offset) {};
     virtual bool setArrayShape(std::vector<std::size_t> newArrayShape) { return false; };
     virtual bool setMemPosition(uint64_t inMemPosition) { return false; };
@@ -264,6 +265,7 @@ public:
     std::vector<Register *> getBindRegisters()  const override { return functionTable->getBindRegisters(); };
 
     bool setFunctionSymbolTable(SymbolTable *inFunctionTable) override { functionTable = inFunctionTable; return true; };
+    bool setFrameSize(int inSize) { return functionTable->setFrameSize(inSize); };
 
     void print() const override;
     std::string getVal() const override;

@@ -491,7 +491,7 @@ void SemanticAnalysis::exitFuncFParams(SysYParser::FuncFParamsContext * ctx)
 {
     curSymbolTable->setParamNum();
     curSymbolTable->setParamDataTypeList();
-    int gr = 0, fr = 0;
+    int gr = 1, fr = 0;
     for(auto & param : ctx->funcFParam()){
         IRValue* g_index = nullptr;
         IRValue* f_index = nullptr;
@@ -1628,14 +1628,14 @@ void SemanticAnalysis::exitFuncRParams(SysYParser::FuncRParamsContext * ctx)
         ctx->shapeList.emplace_back(it->shape);
         ctx->metaDataTypeList.emplace_back(it->metaDataType);
         if (it->isArray) {
-            irGenerator->addCode(new IRAddParamA(it->operand, new IRValue(MetaDataType::INT, std::to_string(ireg), "", false)));
+            irGenerator->addCode(new IRAddParamA(it->operand, new IRValue(MetaDataType::INT, std::to_string(ireg), "", false), irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName()), ctx->exp().size()));
             ireg++;
         }
         else {
             switch (it->metaDataType)
             {
                 case MetaDataType::INT:
-                    irGenerator->addCode(new IRAddParamI(it->operand, new IRValue(MetaDataType::INT, std::to_string(ireg), "", false)));
+                    irGenerator->addCode(new IRAddParamI(it->operand, new IRValue(MetaDataType::INT, std::to_string(ireg), "", false), irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName()), ctx->exp().size()));
                     ireg++;
                     break;
                 case MetaDataType::FLOAT:

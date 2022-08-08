@@ -551,15 +551,19 @@ public:
 /* when you want to call a function, use this to pass its params in */
 /* @form: addparam arg1 */
 class IRAddParam : public IRCode {
+private:
+
 public:
-    explicit IRAddParam(IROperand *newArg1, IROperand *newArg2);
+    IROperand *curFunc;
+    int allParamNum;
+    explicit IRAddParam(IROperand *newArg1, IROperand *newArg2, IROperand *newFunc, int inAllParamNum);
 
     void print() const override;
 };
 
 class IRAddParamI : public IRAddParam {
 public:
-    explicit IRAddParamI(IROperand *newArg1, IROperand *newArg2);
+    explicit IRAddParamI(IROperand *newArg1, IROperand *newArg2, IROperand *newFunc, int inAllParamNum);
 
     void genTargetCode(TargetCodes *t) override;
 };
@@ -573,7 +577,7 @@ public:
 
 class IRAddParamA : public IRAddParam {
 public:
-    explicit IRAddParamA(IROperand *newArg1, IROperand *newArg2);
+    explicit IRAddParamA(IROperand *newArg1, IROperand *newArg2, IROperand *newFunc, int inAllParamNum);
 
     void genTargetCode(TargetCodes *t) override;
 };
