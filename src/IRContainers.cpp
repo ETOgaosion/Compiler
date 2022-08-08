@@ -2869,7 +2869,7 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         CSE();
         constFolding();
         JumpThreading();
-        ADCE();
+        //ADCE();
         break;
     case 3:
         basicBlockDivision();
