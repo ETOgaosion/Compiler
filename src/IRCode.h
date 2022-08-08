@@ -472,28 +472,6 @@ public:
     void print() const override;
 };
 
-/* REPLACE operation only use in SSA-style IR, genTargetCode will do nothing */
-/* if some symbols are defined previously, and this time the definition lVal will be replaced by a temp var, we add a replace operation to describe this process */
-/* you can assume it as the reference to a certain memory(stack) location switched to a new temp var */
-/* @example: */
-/* ``` */
-/* a = 1 */
-/* a = 2 */
-/* ---Turn into--- */
-/* a = 1 */
-/* t1 <= a */
-/* t1 = 2 */
-/* ``` */
-/* @form: res <= arg1 */
-class IRReplace : public IRCode {
-public:
-    IRReplace(IROperand *newResult, IROperand *newArg1);
-
-    void genTargetCode(TargetCodes *t) override;
-
-    void print() const override;
-};
-
 /* @form: res = arg1 */
 class IRAssign : public IRCode {
 public:

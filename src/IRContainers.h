@@ -65,6 +65,9 @@ public:
     IRLabel *addLabel();
     bool addCode(IRCode *newCode);
     bool addCodes(const std::vector<IRCode *>& newCodes);
+    bool insertCode(IRCode *newCode, int pos) { codes.insert(codes.begin() + pos, newCode
+        ); return true; };
+    bool replaceCode(IRCode *newCode, int pos) { codes[pos] = newCode; return true; };
     int calFrameSize();
     int addFrameSize(int inFrameSize) { frameSize += inFrameSize;};
 

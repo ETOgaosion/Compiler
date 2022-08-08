@@ -222,9 +222,6 @@ IRPhi::IRPhi(IROperand *newResult, std::vector<IROperand *>newArg1)
     args = std::move(newArg1);
 }
 
-IRReplace::IRReplace(IROperand *newResult, IROperand *newArg1)
-        : IRCode(IROperation::REPLACE, newResult, newArg1, nullptr) {}
-
 IRAssign::IRAssign(IROperand *newResult, IROperand *newArg1)
         : IRCode(IROperation::ASSIGN, newResult, newArg1, nullptr) {}
 
@@ -412,11 +409,6 @@ void IRPhi::print() const {
     }
     cout << args.back()->getVal() << ";";
     cout << endl;
-}
-
-void IRReplace::print() const {
-    cout << "\t" << result->getVal() << " <= "
-         << arg1->getVal() << ";" << endl;
 }
 
 void IRAssign::print() const {
@@ -1046,10 +1038,6 @@ void IRGoto::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     string label = arg1->getSymbolName();
     t->addCodeB(label);
-}
-
-void IRReplace::genTargetCode(TargetCodes *t) {
-    // do nothing
 }
 
 void IRAssignI::genTargetCode(TargetCodes *t) {

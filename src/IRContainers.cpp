@@ -2177,7 +2177,6 @@ else if(currentloop->pred.size() == 1 &&
                         }
                         cc = i - entrances[bb];
                         IRCode* tmp = codes[i];
-                        //IRReplace* tmpre = new IRReplace(codes[i]->getResult(),codes[i]->getArg1());
                         tmp->getResult()->which_bb = currentloop->pred[0];
                         Hoist(currentloop,tmp,currentloop->pred[0]);
                         basicBlocks[bb].erase(basicBlocks[bb].begin()+cc);
