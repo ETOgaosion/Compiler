@@ -461,7 +461,7 @@ void SemanticAnalysis::enterFuncDef(SysYParser::FuncDefContext * ctx)
         throw std::runtime_error("[ERROR] > Redefine function of same name.\n");
     }
     funcSymbolTable->setParentSymbolTable(curSymbolTable);
-
+    curSymbolTable = funcSymbolTable;
     irGenerator->enterFunction(funcSymbolTable);
 }
 
@@ -1622,21 +1622,30 @@ void SemanticAnalysis::enterFuncRParams(SysYParser::FuncRParamsContext * ctx)
 
 void SemanticAnalysis::exitFuncRParams(SysYParser::FuncRParamsContext * ctx)
 {
+    int ireg = 1, freg = 0;
     for (auto & it : ctx->exp()) {
         ctx->isArrayList.emplace_back(it->isArray);
         ctx->shapeList.emplace_back(it->shape);
         ctx->metaDataTypeList.emplace_back(it->metaDataType);
-        switch (it->metaDataType)
-        {
-            case MetaDataType::INT:
-                irGenerator->addCode(new IRAddParamI(it->operand));
-                break;
-            case MetaDataType::FLOAT:
-                irGenerator->addCode(new IRAddParamF(it->operand));
-                break;
-            default:
-                throw std::runtime_error("[ERROR] > data type fault.\n");
-                break;
+        if (it->isArray) {
+            irGenerator->addCode(new IRAddParamA(it->operand, new IRValue(MetaDataType::INT, std::to_string(ireg), "", false)));
+            ireg++;
+        }
+        else {
+            switch (it->metaDataType)
+            {
+                case MetaDataType::INT:
+                    irGenerator->addCode(new IRAddParamI(it->operand, new IRValue(MetaDataType::INT, std::to_string(ireg), "", false)));
+                    ireg++;
+                    break;
+                case MetaDataType::FLOAT:
+                    irGenerator->addCode(new IRAddParamF(it->operand, new IRValue(MetaDataType::INT, std::to_string(ireg), "", false)));
+                    freg++;
+                    break;
+                default:
+                    throw std::runtime_error("[ERROR] > data type fault.\n");
+                    break;
+            }
         }
     }
 }

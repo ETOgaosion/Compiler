@@ -552,28 +552,28 @@ public:
 /* @form: addparam arg1 */
 class IRAddParam : public IRCode {
 public:
-    explicit IRAddParam(IROperand *newArg1);
+    explicit IRAddParam(IROperand *newArg1, IROperand *newArg2);
 
     void print() const override;
 };
 
 class IRAddParamI : public IRAddParam {
 public:
-    explicit IRAddParamI(IROperand *newArg1);
+    explicit IRAddParamI(IROperand *newArg1, IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAddParamF : public IRAddParam {
 public:
-    explicit IRAddParamF(IROperand *newArg1);
+    explicit IRAddParamF(IROperand *newArg1, IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };
 
 class IRAddParamA : public IRAddParam {
 public:
-    explicit IRAddParamA(IROperand *newArg1);
+    explicit IRAddParamA(IROperand *newArg1, IROperand *newArg2);
 
     void genTargetCode(TargetCodes *t) override;
 };
