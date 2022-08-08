@@ -13,12 +13,36 @@ main:
 	ldr	v1, ImmValue_0
 	str	v1, [sp, #-24]
 	ldr	v2, =1
+	str	v2, [sp, #-52]
+	ldr	v1, [sp, #-52]
+	ldr	v3, =2
+	lsl	v2, v1, v3
+	str	v2, [sp, #-52]
+	ldr	v2, =4
+	str	v2, [sp, #-40]
+	ldr	v2, =1
+	ldr	v3, =8
+	mul	v1, v2, v3
+	str	v1, [sp, #-52]
+	ldr	v2, [sp, #-52]
+	ldr	v3, [sp, #-40]
+	add	v1, v2, v3
+	str	v1, [sp, #-40]
+	add	v1, sp, #-24
+	ldr	v2, [sp, #-40]
+	lsl	v2, v2, #2
+	add	v1, v1, v2
+	ldr	v1, [v1]
+	str	v1, [sp, #-36]
+	eor	v1, v1, v1
+	mov	v2, v1
 	str	v2, [sp, #-32]
 	ldr	v1, [sp, #-32]
 	ldr	v3, =2
 	lsl	v2, v1, v3
 	str	v2, [sp, #-32]
-	ldr	v2, =4
+	eor	v1, v1, v1
+	mov	v2, v1
 	str	v2, [sp, #-28]
 	ldr	v2, =1
 	ldr	v3, =8
@@ -30,10 +54,29 @@ main:
 	str	v1, [sp, #-28]
 	add	v1, sp, #-24
 	ldr	v2, [sp, #-28]
-	ldr	v4, =3
 	lsl	v2, v2, #2
 	add	v1, v1, v2
-	str	v4, [v1]
-	eor	v1, v1, v1
-	mov	a1, v1
+	ldr	v1, [v1]
+	str	v1, [sp, #-48]
+	ldr	a1, [sp, #-36]
+	ldr	a1, [sp, #-48]
+	add	sp, sp, #-56
+	bl	a
+	add	sp, sp, #56
+	str	a1, [sp, #-44]
+	ldr	a1, [sp, #-44]
+	pop	{pc}
+.text
+.align 1
+.globl	a
+.type	a, %function
+a:
+	push	{lr}
+	str	a1, [sp, #-16]
+	str	a2, [sp, #-12]
+	ldr	v1, [sp, #-16]
+	ldr	v2, [sp, #-12]
+	mul	v3, v1, v2
+	str	v3, [sp, #-20]
+	ldr	a1, [sp, #-20]
 	pop	{pc}

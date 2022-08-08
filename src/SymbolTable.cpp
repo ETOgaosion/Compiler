@@ -472,7 +472,9 @@ bool FuncSymbolTable::compareParamSymbolDataType(int index, MetaDataType inMetaD
         ERROR_COMPARE_SIZE_UNMATCH("FuncSymbolTable", index, paramNum);
         return false;
     }
-    inShape.erase(inShape.begin());
+    if (inIsArray) {
+        inShape.erase(inShape.begin());
+    }
     return  get<0>(paramDataTypeList[index]) == inMetaDataType &&
             get<1>(paramDataTypeList[index]) == inIsArray &&
             (!inIsArray || get<2>(paramDataTypeList[index]) == move(inShape));
