@@ -1231,7 +1231,7 @@ void IRCall::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
     Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
     for (auto it : arg2->getBindRegisters()) {
-        if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] != 's') {
+        if (it->getRegisterType() == RegisterType::GENERAL_PURPOSE && it->getAliasName()[0] != 'v') {
             t->addCodeStr(sp, it, -it->getTmpStoreOffset(), false);
         }
         else if (it->getRegisterType() == RegisterType::FLOAT_POINT && it->getAliasName()[0] != 'fs') {

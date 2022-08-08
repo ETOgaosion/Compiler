@@ -69,7 +69,7 @@ public:
         ); return true; };
     bool replaceCode(IRCode *newCode, int pos) { codes[pos] = newCode; return true; };
     int calFrameSize();
-    int addFrameSize(int inFrameSize) { frameSize += inFrameSize;};
+    int addFrameSize(int inFrameSize) { frameSize += inFrameSize; return frameSize; };
 
     /* divide basic blocks */
     void basicBlockDivision();

@@ -123,7 +123,7 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                     return freeRegister;
                 }
             default:
-                break;
+                return nullptr;
         }
     }
 }
@@ -166,7 +166,7 @@ Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralP
                     return freeRegister;
                 }
             default:
-                break;
+                return nullptr;
         }
     }
 }
@@ -204,7 +204,7 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
                 t->addCodeMv(inReg, freeRegister, nullptr, 0);
                 return inReg;
             default:
-                break;
+                return nullptr;
         }
     }
 }
@@ -312,7 +312,7 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
                 }
                 break;
             default:
-                break;
+                return nullptr;
         }
     }
     if (!isGlobalSymbolVar) {
@@ -407,7 +407,7 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
                 }
                 break;
             default:
-                break;
+                return nullptr;
         }
     }
     if (!isGlobalSymbolVar) {
@@ -496,7 +496,7 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
                 }
                 break;
             default:
-                break;
+                return nullptr;
         }
     }
     if (!isGlobalSymbolVar) {
@@ -523,8 +523,6 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
                 t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
                 t->addCodeMv(inReg, tmpRegister, nullptr, 0);
                 t->setRegisterFree(tmpRegister);
-                break;
-            default:
                 break;
         }
     }

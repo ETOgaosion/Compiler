@@ -2899,9 +2899,9 @@ void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
         // delDeadCode();
         varBindRegisters(t);
         break;
-    }
     default:
         break;
+    }
 }
 
 
