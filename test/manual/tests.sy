@@ -1,31 +1,11 @@
-int get_one(int a) {
-  return 1;
-}
-
-int deepWhileBr(int a, int b) {
-  int c;
-  c = a + b;
-  while (c < 75) {
-    int d;
-    d = 42;
-    if (c < 100) {
-      c = c + d;
-      if (c > 99) {
-        int e;
-        e = d * 2;
-        if (get_one(0) == 1) {
-          c = e * 2;
-        }
-      }
-    }
-  }
-  return (c);
+int loop3(int h, int i, int j, int k, int l, int m, int n) {
+  int a, b, c, d, e, f, g;
+  int ans = 0;
+  a = 0;
+  return a;
 }
 
 int main() {
-  int p;
-  p = 2;
-  p = deepWhileBr(p, p);
-  putint(p);
-  return 0;
+    putint(loop3(1, 2, 3, 4, 5, 6, 7));
+    return 0;
 }
