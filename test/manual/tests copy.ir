@@ -46,5 +46,8 @@ L_3_main:
 	t_9 = t_8;
 	goto L_1_main;
 L_0_main:
+	t_10 = phi t_9, j;
+	t_12 = phi t_7, i;
+	t_14 = phi t_5;
 	return 0;
 
