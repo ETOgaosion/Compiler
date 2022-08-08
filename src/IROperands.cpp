@@ -338,13 +338,13 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
                 case MetaDataType::INT:
                     freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
                     tmpRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                    t->addCodeAdr(tmpRegister, symbol->getSymbolName());
+                    t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
                     t->addCodeLdr(freeRegister, tmpRegister, 0);
                     t->setRegisterFree(tmpRegister);
                     break;
                 case MetaDataType::FLOAT:
                     tmpRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                    t->addCodeAdr(tmpRegister, symbol->getSymbolName());
+                    t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
                     if (isGeneralPurposeRegister) {
                         freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
                         t->addCodeLdr(freeRegister, tmpRegister, 0);
@@ -359,7 +359,7 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
         }
         else {
             freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-            t->addCodeAdr(freeRegister, symbol->getSymbolName());
+            t->addCodeLdr(freeRegister, symbol->getSymbolName(), true);
         }
     }
     return freeRegister;
@@ -427,13 +427,13 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
                 case MetaDataType::INT:
                     targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
                     tmpRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                    t->addCodeAdr(tmpRegister, symbol->getSymbolName());
+                    t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
                     t->addCodeLdr(targetRegister, tmpRegister, 0);
                     t->setRegisterFree(tmpRegister);
                     break;
                 case MetaDataType::FLOAT:
                     tmpRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                    t->addCodeAdr(tmpRegister, symbol->getSymbolName());
+                    t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
                     if (isGeneralPurposeRegister) {
                         targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
                         t->addCodeLdr(targetRegister, tmpRegister, 0);
@@ -448,7 +448,7 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
         }
         else {
             targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
-            t->addCodeAdr(targetRegister, symbol->getSymbolName());
+            t->addCodeLdr(targetRegister, symbol->getSymbolName(), true);
         }
     }
     return targetRegister;
@@ -492,11 +492,11 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, Register *inReg) {
     else {
         switch (inReg->getRegisterType()) {
             case RegisterType::GENERAL_PURPOSE:
-                t->addCodeAdr(inReg, symbol->getSymbolName());
+                t->addCodeLdr(inReg, symbol->getSymbolName(), true);
                 break;
             case RegisterType::FLOAT_POINT:
                 Register *tmpRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-                t->addCodeAdr(tmpRegister, symbol->getSymbolName());
+                t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
                 t->addCodeMv(inReg, tmpRegister, nullptr, 0);
                 t->setRegisterFree(tmpRegister);
                 break;
@@ -549,11 +549,11 @@ void IRSymbolVariable::storeFrom(TargetCodes *t, Register *reg) {
         Register *freeReg = t->getNextFreeRegister(true, false, hasFreeRegister);
         switch (reg->getRegisterType()) {
             case RegisterType::GENERAL_PURPOSE:
-                t->addCodeAdr(freeReg, symbol->getSymbolName());
+                t->addCodeLdr(freeReg, symbol->getSymbolName(), true);
                 t->addCodeStr(freeReg, reg, 0, false);
                 break;
             case RegisterType::FLOAT_POINT:
-                t->addCodeAdr(freeReg, symbol->getSymbolName());
+                t->addCodeLdr(freeReg, symbol->getSymbolName(), true);
                 if (reg->getRegisterType() == RegisterType::GENERAL_PURPOSE) {
                     t->addCodeStr(freeReg, reg, 0, false);
                 }
