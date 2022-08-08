@@ -175,7 +175,7 @@ public:
     bool setLabel(const std::string& newLabel) override { valueLabel = newLabel; return true; };
     bool setMetaDataType(MetaDataType newType) override { metaDataType = newType; return true; };
     bool setArrayShape(std::vector<std::size_t> newArrayShape) override { arrayShape = newArrayShape; return true; };
-    bool setValues(std::vector<std::string> inValues) override { values = inValues; };
+    bool setValues(std::vector<std::string> inValues) override { values = inValues; return true; };
 
     /* for target codes translation */
     Register *load(TargetCodes * t, bool isGeneralPurposeRegister) override;
@@ -234,7 +234,7 @@ public:
     bool getIsAlive() const override { return alive; };
     void setAlive(bool set) override { alive = set; };
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
-    bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); };
+    bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); return true; };
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
     bool setTargetBindRegister(Register *inTargetBindRegister) override { targetBindRegister = inTargetBindRegister; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); };
@@ -265,7 +265,7 @@ public:
     std::vector<Register *> getBindRegisters()  const override { return functionTable->getBindRegisters(); };
 
     bool setFunctionSymbolTable(SymbolTable *inFunctionTable) override { functionTable = inFunctionTable; return true; };
-    bool setFrameSize(int inSize) { return functionTable->setFrameSize(inSize); };
+    bool setFrameSize(int inSize) { return functionTable->setFrameSize(inSize); return true; };
 
     void print() const override;
     std::string getVal() const override;

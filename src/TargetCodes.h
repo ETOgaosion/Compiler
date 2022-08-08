@@ -116,7 +116,7 @@ private:
 
 public:
     static TargetCodes *getTargetCodes();
-    bool clear() { codeList.clear(); };
+    bool clear() { codeList.clear(); return true; };
 
     bool addCode(Code *newCode);
     bool addCodes(const std::vector<Code *>& newCodes);
