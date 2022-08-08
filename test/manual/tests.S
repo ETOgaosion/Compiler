@@ -1,46 +1,31 @@
-ImmValue_0:
-	.word	0x1
-	.word	0x2
-	.word	0x3
-	.word	0x4
-
 .text
 .align 1
 .globl	main
 .type	main, %function
 main:
 	push	{lr}
-	ldr	v1, ImmValue_0
-	ldr	v2, [sp, #-40]
-	lsl	v2, v2, #2
-	add	v1, v1, v2
-	ldr	v1, [v1]
-	str	v1, [sp, #-36]
-	ldr	v1, ImmValue_0
-	ldr	v2, [sp, #-28]
-	lsl	v2, v2, #2
-	add	v1, v1, v2
-	ldr	v1, [v1]
-	str	v1, [sp, #-48]
-	ldr	a1, [sp, #-36]
-	ldr	a1, [sp, #-48]
-	add	sp, sp, #-56
-	bl	a
-	add	sp, sp, #56
-	str	a1, [sp, #-44]
-	ldr	a1, [sp, #-44]
-	pop	{pc}
-.text
-.align 1
-.globl	a
-.type	a, %function
-a:
-	push	{lr}
-	str	a1, [sp, #-16]
-	str	a2, [sp, #-12]
-	ldr	v1, [sp, #-16]
+	eor	v1, v1, v1
+	mov	v2, v1
+	str	v2, [sp, #-12]
+L_1_main:
+	ldr	v1, [sp, #-12]
+	ldr	v3, =3
+	cmp	v1, v3
+	ldrlt	v2, =1
+	ldrge	v2, =0
+	str	v2, [sp, #-20]
+	ldr	v1, [sp, #-20]
+	cmp	v1, #0
+	beq	L_0_main
 	ldr	v2, [sp, #-12]
-	mul	v3, v1, v2
-	str	v3, [sp, #-20]
-	ldr	a1, [sp, #-20]
+	add	v1, v2, #1
+	str	v1, [sp, #-16]
+	ldr	v1, [sp, #-16]
+	str	v1, [sp, #-12]
+	b	L_1_main
+L_0_main:
+	ldr	a1, [sp, #-12]
+	add	sp, sp, #-24
+	bl	putint
+	add	sp, sp, #24
 	pop	{pc}

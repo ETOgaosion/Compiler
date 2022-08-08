@@ -1,9 +1,8 @@
-int a(int m, int n) {
-    return m * n;
-}
-
 int main()
 {
-    int n[2][2] = {1, 2, 3, 4};
-    return a(n[1][1], n[1][0]);
+    int a = 0;
+    while (a < 3) {
+        a = a + 1;
+    }
+    putint(a);
 }
