@@ -908,17 +908,24 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
     }
 
     if (ctx->subStmt()) {
-        int insertPoint = 0;
         std::vector<IRCode *> codes = irGenerator->currentIRFunc->getCodes();
+        int insertPoint = 0, replacePoint = 0;
+        bool found = false;
         for (int i = codes.size() - 1; i > 0; i--) {
             if (codes[i]->getOperation() == IROperation::GOTO) {
                 for (int j = i - 1; j >= 0; j--) {
                     if (codes[j]->getOperation() == IROperation::ADD_LABEL) {
                         if (codes[j]->getArg1() == codes[i]->getArg1()) {
                             insertPoint = j + 1;
+                            replacePoint = insertPoint + 1;
+                            found = true;
+                            break;
                         }
                     }
                 }
+            }
+            if (found) {
+                break;
             }
         }
         for (const auto& it: ctx->subStmt()->lValDoc) {
@@ -930,7 +937,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
             IRTempVariable *newTempFront = irGenerator->addTempVariable(it.first);
             it.first->addHistorySymbol(newTempFront);
             irGenerator->currentIRFunc->insertCode(new IRPhi(newTempFront, it.second), insertPoint);
-            for (int i = insertPoint; i < codes.size(); i++) {
+            for (int i = replacePoint; i < codes.size(); i++) {
                 if (codes[i]->getOperation() != IROperation::PHI) {
                     if (codes[i]->getArg1() == it.first) {
                         codes[i]->setArg1(newTempFront);
@@ -942,6 +949,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
                     }
                 }
             }
+            replacePoint++;
         }
 
         if (ctx->docLVal) {
@@ -1211,7 +1219,8 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
     }
 
     std::vector<IRCode *> codes = irGenerator->currentIRFunc->getCodes();
-    int insertPoint = 0;
+    int insertPoint = 0, replacePoint = 0;
+    bool found = false;
     if (ctx->getText().rfind("while", 0) == 0) {
         for (int i = codes.size() - 1; i > 0; i--) {
             if (codes[i]->getOperation() == IROperation::GOTO) {
@@ -1219,9 +1228,15 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
                     if (codes[j]->getOperation() == IROperation::ADD_LABEL) {
                         if (codes[j]->getArg1() == codes[i]->getArg1()) {
                             insertPoint = j + 1;
+                            replacePoint = insertPoint + 1;
+                            found = true;
+                            break;
                         }
                     }
                 }
+            }
+            if (found) {
+                break;
             }
         }
     }
@@ -1237,7 +1252,7 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
             IRTempVariable *newTempFront = irGenerator->addTempVariable(it.first);
             it.first->addHistorySymbol(newTempFront);
             irGenerator->currentIRFunc->insertCode(new IRPhi(newTempFront, it.second), insertPoint);
-            for (int i = insertPoint; i < codes.size(); i++) {
+            for (int i = replacePoint; i < codes.size(); i++) {
                 if (codes[i]->getOperation() != IROperation::PHI) {
                     if (codes[i]->getArg1() == it.first) {
                         codes[i]->setArg1(newTempFront);
@@ -1249,6 +1264,7 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
                     }
                 }
             }
+            replacePoint++;
         }
 
         if (ctx->docLVal) {
