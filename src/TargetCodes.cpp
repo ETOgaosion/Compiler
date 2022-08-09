@@ -112,21 +112,41 @@ bool Code::isImm8(int offset) {
             break;
         }
     }
-    bool midAllZeror = true;
+    bool midAllZero = true;
+    bool outSideAllZero = true;
     for (int i = lowestBit + 1; i < highestBit; i++) {
         if (offset & (scanner << i)) {
-            midAllZeror = false;
+            midAllZero = false;
             break;
         }
     }
-    if (lowestBit == highestBit) {
-        midAllZeror = false;
+    for (int i = 0; i < lowestBit; i++) {
+        if (offset & (scanner << i)) {
+            outSideAllZero = false;
+            break;
+        }
     }
-    if (midAllZeror) {
+    if (!outSideAllZero) {
+        for (int i = highestBit + 1; i < 32; i++) {
+            if (offset & (scanner << i)) {
+                outSideAllZero = false;
+                break;
+            }
+        }
+    }
+    if (lowestBit == highestBit) {
+        midAllZero = false;
+        outSideAllZero = false;
+    }
+
+    if (midAllZero && !outSideAllZero) {
         return 33 - highestBit + lowestBit <= 8;
     }
-    else {
+    else if (!midAllZero && outSideAllZero) {
         return highestBit - lowestBit + 1 <= 8;
+    }
+    else {
+        return min(33 - highestBit + lowestBit,  highestBit - lowestBit + 1) <= 8;
     }
 }
 

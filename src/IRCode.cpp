@@ -436,7 +436,7 @@ void IRAddLabel::print() const {
 }
 
 void IRAddParam::print() const {
-    cout << "\t" << "addparam " << arg1->getVal() << "," << arg2->getVal() << ";" << endl;
+    cout << "\t" << "addparam " << arg1->getVal() << ", " << arg2->getVal() << ";" << endl;
 }
 
 void IRGetParam::print() const {

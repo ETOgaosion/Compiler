@@ -1,5 +1,6 @@
 #include "semanticAnalysis.h"
 #include "tools.h"
+#include <math.h>
 
 void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
 {
@@ -256,18 +257,17 @@ void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayC
 
 void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayContext * ctx)
 {
-    int totalSize = 0, width = 1;
-    for (int i = ctx->shape.size() - 1; i >= 0; i--) {
-        totalSize += ctx->shape[i] * width;
-        width *= ctx->shape[i];
+    int totalSize = 1;
+    for (auto it : ctx->shape) {
+        totalSize *= it;
     }
     std::vector<std::size_t> cur(totalSize, 0);
     if(!ctx->constInitVal().empty()){
         ctx->type = ctx->constInitVal(0)->type;
         for (auto it : ctx->constInitVal()) {
             if (it->isArray) {
-                if (ctx->vals.size() % ctx->shape[0]) {
-                    ctx->vals.insert(ctx->vals.end(), ctx->vals.size() % ctx->shape[0], "0");
+                if (ctx->vals.size() % (totalSize / ctx->shape[0])) {
+                    ctx->vals.insert(ctx->vals.end(), ctx->vals.size() % (totalSize / ctx->shape[0]), "0");
                 }
                 ctx->vals.insert(ctx->vals.end(), it->vals.begin(), it->vals.end());
             }
@@ -420,18 +420,17 @@ void SemanticAnalysis::enterInitValOfArray(SysYParser::InitValOfArrayContext *ct
 }
 
 void SemanticAnalysis::exitInitValOfArray(SysYParser::InitValOfArrayContext *ctx) {
-    int totalSize = 0, width = 1;
-    for (int i = ctx->shape.size() - 1; i >= 0; i--) {
-        totalSize += ctx->shape[i] * width;
-        width *= ctx->shape[i];
+    int totalSize = 1;
+    for (auto it : ctx->shape) {
+        totalSize *= it;
     }
     std::vector<std::size_t> cur(totalSize, 0);
     if(!ctx->initVal().empty()){
         ctx->type = ctx->initVal(0)->type;
         for (auto it : ctx->initVal()) {
             if (it->isArray) {
-                if (ctx->vals.size() % ctx->shape[0]) {
-                    ctx->vals.insert(ctx->vals.end(), ctx->vals.size() % ctx->shape[0], "0");
+                if (ctx->vals.size() % (totalSize / ctx->shape[0])) {
+                    ctx->vals.insert(ctx->vals.end(), ctx->vals.size() % (totalSize / ctx->shape[0]), "0");
                 }
                 ctx->vals.insert(ctx->vals.end(), it->vals.begin(), it->vals.end());
             }
@@ -1518,24 +1517,21 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
         IRTempVariable *addTemp = irGenerator->addTempVariable(MetaDataType::INT);
         irGenerator->addCode(new IRAssignI(mulTemp, ctx->exp().back()->operand));
         mulTemp->setAssigned();
-        IRTempVariable *replaceTemp = irGenerator->addTempVariable(mulTemp);
-        mulTemp->addHistorySymbol(replaceTemp);
-        irGenerator->addCode(new IRLsl(replaceTemp, replaceTemp,
-                                            new IRValue(MetaDataType::INT, std::to_string(width), {}, false)));
         irGenerator->addCode(new IRAssignI(addTemp, ctx->exp().back()->operand));
         addTemp->setAssigned();
         for (int i = ctx->exp().size() - 2; i >= 0; i--) {
             IRTempVariable *replaceTemp = irGenerator->addTempVariable(mulTemp);
             mulTemp->addHistorySymbol(replaceTemp);
             irGenerator->addCode(new IRMulI(replaceTemp, ctx->exp(i)->operand,
-                                            new IRValue(MetaDataType::INT, std::to_string(width * 4), {}, false)));
+                                            new IRValue(MetaDataType::INT, std::to_string(width), {}, false)));
             IRTempVariable *replaceAddTemp = irGenerator->addTempVariable(addTemp);
-            irGenerator->addCode(new IRAddI(addTemp, mulTemp->getLatestVersionSymbol(), addTemp->getLatestVersionSymbol()));
+            irGenerator->addCode(new IRAddI(replaceAddTemp, mulTemp->getLatestVersionSymbol(), addTemp->getLatestVersionSymbol()));
             addTemp->addHistorySymbol(replaceAddTemp);
             width *= shape[i];
         }
         ctx->indexOperand = addTemp->getLatestVersionSymbol();
     }
+    
     IROperand *idInitValue = symVar->getInitialValue();
     if (idInitValue->getIsArray()) {
         std::vector<std::size_t> arrShape = symVar->getArrayShape();

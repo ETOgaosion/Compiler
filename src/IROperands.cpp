@@ -339,7 +339,7 @@ Register *IRSymbolVariable::load(TargetCodes *t, bool isGeneralPurposeRegister) 
         }
         else {
             freeRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
-            t->addCodeAdd(freeRegister, sp, -symbol->getOffset());
+            t->addCodeLdr(freeRegister, sp, -symbol->getOffset());
         }
         t->setRegisterFree(sp);
     }
@@ -434,7 +434,7 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
         }
         else {
             targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
-            t->addCodeAdd(targetRegister, sp, -symbol->getOffset());
+            t->addCodeLdr(targetRegister, sp, -symbol->getOffset());
         }
         t->setRegisterFree(sp);
     }
