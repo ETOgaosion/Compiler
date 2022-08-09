@@ -1522,7 +1522,7 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
         mulTemp->addHistorySymbol(replaceTemp);
         irGenerator->addCode(new IRLsl(replaceTemp, replaceTemp,
                                             new IRValue(MetaDataType::INT, std::to_string(width), {}, false)));
-        irGenerator->addCode(new IRAssignI(addTemp, new IRValue(MetaDataType::INT, std::to_string(4 * std::stoi(ctx->exp().back()->getText())), {}, false)));
+        irGenerator->addCode(new IRAssignI(addTemp, ctx->exp().back()->operand));
         addTemp->setAssigned();
         for (int i = ctx->exp().size() - 2; i >= 0; i--) {
             IRTempVariable *replaceTemp = irGenerator->addTempVariable(mulTemp);
