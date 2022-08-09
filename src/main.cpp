@@ -13,17 +13,17 @@ using namespace antlr4;
 int main(int argc, const char* argv[]) {
     std::ifstream stream;
     int errorNum = 0;
-    stream.open(argv[1]);
+    stream.open(argv[4]);
     ANTLRInputStream input(stream);
     SysYLexer lexer(&input);
     CommonTokenStream tokens(&lexer);
     SysYParser parser(&tokens);
     tree::ParseTree *tree = parser.compUnit();
     SemanticAnalysis listener;
-    listener.programName = std::string(argv[1]).substr(0, std::string(argv[1]).find_last_of("."));
-    if (argc > 2) {
-        if (argv[2][0] == '-' && argv[2][1] == 'O') {
-            listener.optimizationLevel = argv[2][2] - '0';
+    listener.programName = std::string(argv[3]).substr(0, std::string(argv[3]).find_last_of("."));
+    if (argc > 5) {
+        if (argv[5][0] == '-' && argv[5][1] == 'O') {
+            listener.optimizationLevel = argv[5][2] - '0';
         }
     }
     else {

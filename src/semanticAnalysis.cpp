@@ -392,7 +392,7 @@ void SemanticAnalysis::enterInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
 void SemanticAnalysis::exitInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
     ctx->type = ctx->exp()->metaDataType;
     ctx->isArray = false;
-    if (ctx->shape.empty()) {
+    if (ctx->outside && ctx->shape.empty()) {
         ctx->value = ctx->exp()->operand;
     }
     else {
@@ -406,6 +406,7 @@ void SemanticAnalysis::enterInitValOfArray(SysYParser::InitValOfArrayContext *ct
     ctx->isArray = true;
     ctx->value = nullptr;
     for (auto it : ctx->initVal()) {
+        it->outside = false;
         it->shape = std::vector<std::size_t>(ctx->shape.begin() + 1, ctx->shape.end());
     }
 }
