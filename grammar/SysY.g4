@@ -16,9 +16,6 @@ options {
 
 /********** Parser **********/
 compUnit
-    locals [
-        SymbolTable *globalSymbolTable
-    ]
     : (decl | funcDef)+ EOF
     ;
 

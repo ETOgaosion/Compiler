@@ -12,7 +12,6 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putint", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, false, {});
@@ -20,7 +19,6 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putfloat", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, false, {});
@@ -28,7 +26,6 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putarray", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::INT, true, {});
@@ -36,7 +33,6 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("putfarray", MetaDataType::VOID, curSymbolTable);
     funcSymbolTable->insertParamSymbolSafely("", MetaDataType::FLOAT, true, {});
@@ -44,36 +40,30 @@ void SemanticAnalysis::enterCompUnit(SysYParser::CompUnitContext * ctx)
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getch", MetaDataType::INT, curSymbolTable);
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getint", MetaDataType::INT, curSymbolTable);
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getfloat", MetaDataType::FLOAT, curSymbolTable);
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getarray", MetaDataType::INT, curSymbolTable);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 
     funcSymbolTable = curSymbolTable->insertFuncSymbolTableSafely("getfarray", MetaDataType::FLOAT, curSymbolTable);
     funcSymbolTable->setParamDataTypeList();
     funcSymbolTable->setParamNum();
     irGenerator->enterFunction(funcSymbolTable);
     irGenerator->exitFunction();
-    irGenerator->currentIRFunc->calFrameSize();
 }
 
 void SemanticAnalysis::exitCompUnit(SysYParser::CompUnitContext * ctx)
@@ -180,6 +170,7 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->withType = false;
     ctx->shape = {};
     ctx->isArray = false;
+    ctx->value = nullptr;
     ctx->constInitVal()->outside = true;
     if (!ctx->exp().empty()) {
         if (ctx->constInitVal()) {
@@ -228,6 +219,7 @@ void SemanticAnalysis::enterConstInitValOfVar(SysYParser::ConstInitValOfVarConte
     ctx->isArray = false;
     ctx->value = nullptr;
     ctx->exp()->commVal = nullptr;
+    ctx->shape.clear();
 }
 
 void SemanticAnalysis::exitConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
@@ -258,6 +250,7 @@ void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayC
     for (auto it : ctx->constInitVal()) {
         it->outside = false;
         it->shape = std::vector<std::size_t>(ctx->shape.begin() + 1, ctx->shape.end());
+        it->commVal.clear();
     }
 }
 
@@ -350,8 +343,10 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
     ctx->withType = false;
     ctx->shape = {};
     ctx->isArray = false;
+    ctx->value = nullptr;
     if (ctx->initVal()) {
         ctx->initVal()->outside = true;
+        ctx->initVal()->shape.clear();
     }
     if (ctx->exp().size() > 0) {
         if (ctx->initVal()) {
@@ -388,12 +383,13 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
 }
 
 void SemanticAnalysis::enterInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
-    if (ctx->outside && !ctx->shape.empty()) {
+    if (ctx->outside && !ctx->commVal.empty()) {
         throw std::runtime_error("declare array but initialize with number");
     }
     ctx->type = MetaDataType::VOID;
     ctx->isArray = false;
     ctx->value = nullptr;
+    ctx->vals.clear();
     ctx->exp()->fromVarDecl = true;
     ctx->exp()->commVal = nullptr;
 }
