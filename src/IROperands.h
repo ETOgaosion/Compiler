@@ -79,6 +79,7 @@ public:
     virtual void addValue(const std::string& newValue) {};
     virtual void addValues(const std::vector<std::string>& newValues) {};
     virtual bool setValues(std::vector<std::string> inValues) { return false; };
+    virtual bool setInitialValue(IROperand *inInitialValue) { return false; };
     virtual bool setLabel(const std::string& newLabel) { return false; };
     virtual bool setMetaDataType(MetaDataType newType) { return false; };
     virtual bool setActiveRegions(std::vector<int> inActiveRegion) { return false; };
@@ -235,6 +236,7 @@ public:
     void setAlive(bool set) override { alive = set; };
     void setMemOffset(int inOffset) override { symbol->setOffset(inOffset); };
     bool setMemPosition(uint64_t inMemPosition) override { symbol->setOffset(inMemPosition); return true; };
+    bool setInitialValue(IROperand *inInitialValue) override { initialValue = inInitialValue; return true;  }
     bool setBindRegister(bool toBindRegister) override { bindRegister = toBindRegister; return true; };
     bool setTargetBindRegister(Register *inTargetBindRegister) override { targetBindRegister = inTargetBindRegister; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); return false; };
@@ -288,7 +290,7 @@ private:
     bool aliasToVar;                 // whether is type-2
     IROperand *parentVariable;          // if is type-2, point to symbol var
     int offset;                         // memory offset
-    IRValue *initialValue;              // not used
+    IROperand *initialValue;              // not used
     /* Optimization */
     std::vector<int> activeRegions;
     bool bindRegister;
@@ -327,6 +329,7 @@ public:
     bool addHistorySymbol(IROperand *inSymbol) override { historySymbols.push_back(inSymbol); return true; };
     bool setArrayShape(std::vector<std::size_t> newArrayShape) override { arrayShape = newArrayShape; return true; };
     bool setIsArray(bool newIsArray) { isArray = newIsArray; return true; };
+    bool setInitialValue(IROperand *inInitialValue) override { initialValue = inInitialValue; return true;  }
     bool setAliasToVar() override { aliasToVar = true; return true; };
     bool setParentVariable(IROperand *inParentVariable) override { aliasToVar = true; parentVariable = inParentVariable; return true; };
     bool setActiveRegions(std::vector<int> inActiveRegions) override { activeRegions = std::vector<int>(inActiveRegions.begin(), inActiveRegions.end()); return true; };

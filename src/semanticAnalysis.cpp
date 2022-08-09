@@ -138,9 +138,11 @@ void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
                 switch (type) {
                     case MetaDataType::INT:
                         code = new IRAssignI(newConst, const_def->value);
+                        newConst->setInitialValue(const_def->value);
                         break;
                     case MetaDataType::FLOAT:
                         code = new IRAssignF(newConst, const_def->value);
+                        newConst->setInitialValue(const_def->value);
                         break;
                     default:
                         break;
@@ -321,9 +323,11 @@ void SemanticAnalysis::exitVarDecl(SysYParser::VarDeclContext * ctx)
                 switch (type) {
                     case MetaDataType::INT:
                         code = new IRAssignI(newVar, var_def->value);
+                        newVar->setInitialValue(var_def->value);
                         break;
                     case MetaDataType::FLOAT:
                         code = new IRAssignF(newVar, var_def->value);
+                        newVar->setInitialValue(var_def->value);
                         break;
                     default:
                         break;
