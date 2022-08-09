@@ -798,7 +798,7 @@ void IRSeqI::genTargetCode(TargetCodes *t) {
     else {
         resultReg = t->getNextFreeRegister(true, false, hasFreeRegister);
     }
-    t->addCodeCmp( arg1Reg, arg2Reg);
+    t->addCodeCmp(arg1Reg, arg2Reg);
     t->addCodeLdr(resultReg, 1, Cond::EQ);
     t->addCodeLdr(resultReg, 0, Cond::NE);
     result->storeFrom(t, resultReg);

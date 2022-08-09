@@ -51,5 +51,6 @@ int main() {
   h = 2;
   e = 4;
   f = 6;
-  return EightWhile();
+  putint(EightWhile());
+  return 0;
 }

@@ -209,7 +209,7 @@ public:
     virtual bool setParentSymbolTable(SymbolTable *parentSymbolTable);
     virtual bool setFuncName(const std::string &inFuncname) { return false;};
     virtual bool setReturnType(MetaDataType inReturnType) { return false;};
-    virtual int setParamNum() { return false; };
+    virtual int setParamNum() { return 0; };
     virtual bool setParamDataTypeList() { return false; };
     virtual bool setFrameSize(int inSize) { return false; }
 

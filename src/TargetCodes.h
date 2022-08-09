@@ -105,6 +105,7 @@ public:
     Code(ASMOperation newOp, std::string newLabel, std::string newDirectives);
     void print() const;
     static std::string condToString(Cond inCond);
+    static bool isImm8(int offset);
 };
 
 class TargetCodes {

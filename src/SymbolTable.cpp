@@ -466,6 +466,7 @@ bool FuncSymbolTable::setParamDataTypeList() {
 
 bool FuncSymbolTable::setFrameSize(int inSize) {
     frameSize = inSize;
+    return frameSize;
 }
 
 bool FuncSymbolTable::compareParamSymbolDataType(int index, MetaDataType inMetaDataType, bool inIsArray, vector<size_t> inShape) const {

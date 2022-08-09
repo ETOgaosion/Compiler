@@ -95,48 +95,101 @@ string Code::condToString(Cond inCond) {
     }
 }
 
+bool Code::isImm8(int offset) {
+    if (offset < 0) {
+        offset = -offset;
+    }
+    int scanner = 0x1, highestBit = 0, lowestBit = 0;
+    for (int i = 31; i >= 0; i--) {
+        if (offset & (scanner << i)) {
+            highestBit = i;
+            break;
+        }
+    }
+    for (int i = 0; i < 32; i++) {
+        if (offset & (scanner << i)) {
+            lowestBit = i;
+            break;
+        }
+    }
+    bool midAllZeror = true;
+    for (int i = lowestBit + 1; i < highestBit; i++) {
+        if (offset & (scanner << i)) {
+            midAllZeror = false;
+            break;
+        }
+    }
+    if (lowestBit == highestBit) {
+        midAllZeror = false;
+    }
+    if (midAllZeror) {
+        return 33 - highestBit + lowestBit <= 8;
+    }
+    else {
+        return highestBit - lowestBit + 1 <= 8;
+    }
+}
+
 void Code::print() const {
     switch (op) {
         case ASMOperation::ADD:
-            switch (rd->getRegisterType()) {
-                case RegisterType::GENERAL_PURPOSE:
-                    cout << "\tadd";
-                    break;
-                case RegisterType::FLOAT_POINT:
-                    cout << "\tvadd";
-                    break;
-                default:
-                    break;
-            }
-            cout << Code::condToString(cond) << "\t";
-            cout << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
-            if (rm) {
-                cout << rm->getAliasName() << endl;
+            if (!rm && !Code::isImm8(offset)) {
+                cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                cout << "\tadd\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
             }
             else {
-                cout << "#" << offset << endl;  // 0~4095
-            }
-            break;
-        case ASMOperation::SUB:
-            if (find(extraOptions.begin(), extraOptions.end(), Options::REVERSE_OP) == extraOptions.end()) {
                 switch (rd->getRegisterType()) {
                     case RegisterType::GENERAL_PURPOSE:
-                        cout << "\tsub";
+                        cout << "\tadd";
                         break;
                     case RegisterType::FLOAT_POINT:
-                        cout << "\tvsub";
+                        cout << "\tvadd";
+                        break;
+                    default:
                         break;
                 }
                 cout << Code::condToString(cond) << "\t";
                 cout << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
                 if (rm) {
                     cout << rm->getAliasName() << endl;
-                } else {
+                }
+                else {
                     cout << "#" << offset << endl;  // 0~4095
                 }
             }
+            break;
+        case ASMOperation::SUB:
+            if (find(extraOptions.begin(), extraOptions.end(), Options::REVERSE_OP) == extraOptions.end()) {
+                if (!rm && !Code::isImm8(offset)) {
+                    cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                    cout << "\tsub\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
+                }
+                else {
+                    switch (rd->getRegisterType()) {
+                        case RegisterType::GENERAL_PURPOSE:
+                            cout << "\tsub";
+                            break;
+                        case RegisterType::FLOAT_POINT:
+                            cout << "\tvsub";
+                            break;
+                    }
+                    cout << Code::condToString(cond) << "\t";
+                    cout << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
+                    if (rm) {
+                        cout << rm->getAliasName() << endl;
+                    } else {
+                        cout << "#" << offset << endl;  // 0~4095
+                    }
+                }
+            }
             else {
-                cout << "\trsb\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", #" << offset << endl;
+                if (!Code::isImm8(offset)) {
+                    cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                    cout << "\trsb\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
+                }
+                else {
+                    cout << "\trsb\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", #" << offset << endl;
+                }
             }
             break;
         case ASMOperation::MUL:
@@ -162,48 +215,78 @@ void Code::print() const {
             cout << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rm->getAliasName() << endl;
             break;
         case ASMOperation::LSL:
-            cout << "\tlsl\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
-            if (rm) {
-                cout << rm->getAliasName() << endl;
+            if (!rm && !Code::isImm8(offset)) {
+                cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                cout << "\tlsl\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
             }
             else {
-                cout << "#" << offset << endl;  // 0~31
+                cout << "\tlsl\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
+                if (rm) {
+                    cout << rm->getAliasName() << endl;
+                }
+                else {
+                    cout << "#" << offset << endl;  // 0~31
+                }
             }
             break;
         case ASMOperation::ASR:
-            cout << "\tasr\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
-            if (rm) {
-                cout << rm->getAliasName() << endl;
+            if (!rm && !Code::isImm8(offset)) {
+                cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                cout << "\tasr\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
             }
             else {
-                cout << "#" << offset << endl;  // 0~31
+                cout << "\tasr\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
+                if (rm) {
+                    cout << rm->getAliasName() << endl;
+                }
+                else {
+                    cout << "#" << offset << endl;  // 0~31
+                }
             }
             break;
         case ASMOperation::ORR:
-            cout << "\torr\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
-            if (rm) {
-                cout << rm->getAliasName() << endl;
+            if (!rm && !Code::isImm8(offset)) {
+                cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                cout << "\torr\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
             }
             else {
-                cout << "#" << offset << endl;  // 0~4095
+                cout << "\torr\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
+                if (rm) {
+                    cout << rm->getAliasName() << endl;
+                }
+                else {
+                    cout << "#" << offset << endl;  // 0~4095
+                }
             }
             break;
         case ASMOperation::AND:
-            cout << "\tand\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
-            if (rm) {
-                cout << rm->getAliasName() << endl;
+            if (!rm && !Code::isImm8(offset)) {
+                cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                cout << "\tand\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
             }
             else {
-                cout << "#" << offset << endl;  // 0~4095
+                cout << "\tand\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
+                if (rm) {
+                    cout << rm->getAliasName() << endl;
+                }
+                else {
+                    cout << "#" << offset << endl;  // 0~4095
+                }
             }
             break;
         case ASMOperation::EOR:
-            cout << "\teor\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
-            if (rm) {
-                cout << rm->getAliasName() << endl;
+            if (!rm && !Code::isImm8(offset)) {
+                cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                cout << "\teor\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", " << rd->getAliasName() << endl;
             }
             else {
-                cout << "#" << offset << endl;  // 0~4095
+                cout << "\teor\t" << rd->getAliasName() << ", " << rn->getAliasName() << ", ";
+                if (rm) {
+                    cout << rm->getAliasName() << endl;
+                }
+                else {
+                    cout << "#" << offset << endl;  // 0~4095
+                }
             }
             break;
         case ASMOperation::TST:
@@ -382,7 +465,12 @@ void Code::print() const {
                         cout << "\tvcvt.f32.s32\t" << rd->getAliasName() << ", " << rd->getAliasName() << endl;
                     }
                     else {
-                        cout << "\tmov\t" << rd->getAliasName() << ", #" << offset << endl;
+                        if (!Code::isImm8(offset)) {
+                            cout << "\tldr\t" << rd->getAliasName() << ", =" << offset << endl;
+                        }
+                        else {
+                            cout << "\tmov\t" << rd->getAliasName() << ", #" << offset << endl;
+                        }
                     }
                 }
             }
