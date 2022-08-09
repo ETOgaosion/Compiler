@@ -1717,17 +1717,6 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExp
     ctx->isArray = ctx->unaryExp()->isArray;
     ctx->metaDataType = ctx->unaryExp()->metaDataType;
     ctx->shape = ctx->unaryExp()->shape;
-    if (ctx->unaryOp()->getText() == "!") {
-        if (ctx->isArray) {
-            throw std::runtime_error("[ERROR] > use logic operator on non-boolean expression.\n");
-        }
-    }
-    else {
-        if (ctx->metaDataType == MetaDataType::INT) {
-            throw std::runtime_error("[ERROR] > use non-logic operator on boolean expression.\n");
-        }
-    }
-
 
     IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
     IRCode* code = nullptr;
