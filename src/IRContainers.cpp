@@ -2976,6 +2976,7 @@ int IRFunction::calFrameSize() {
         frameSize += (8 - frameSize % 8);
     }
     functionTable->setFrameSize(frameSize);
+    return frameSize;
 }
 
 string IRFunction::getFunctionName() const {
