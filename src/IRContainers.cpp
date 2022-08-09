@@ -2973,7 +2973,7 @@ int IRFunction::calFrameSize() {
         }
     }
     if (frameSize % 8) {
-        frameSize += (frameSize % 8);
+        frameSize += (8 - frameSize % 8);
     }
     functionTable->setFrameSize(frameSize);
 }
