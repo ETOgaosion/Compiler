@@ -2879,7 +2879,6 @@ void IRFunction::varBindRegisters(TargetCodes *t) {
 
 
 void IRFunction::optimize(TargetCodes *t, int inOptimizeLevel) {
-    def_use_list();
     switch (inOptimizeLevel)
     {
     case 1:
