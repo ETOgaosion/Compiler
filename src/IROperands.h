@@ -40,6 +40,7 @@ public:
     virtual std::string getSymbolName() const { return {}; };
     virtual MetaDataType getMetaDataType() const { return MetaDataType::VOID; };
     virtual std::string getValue() const { return {}; };
+    virtual std::string getValue(int off) const { return {}; };
     virtual std::vector<std::string> getValues() const { return {}; };
     virtual std::string getValueLabel() const { return {}; };
     virtual bool getAssigned() const { return false; };
@@ -161,6 +162,7 @@ public:
     MetaDataType getMetaDataType() const override { return metaDataType; };
     /* only return first value, used for single value */
     std::string getValue() const override { return values.front(); };
+    std::string getValue(int off) const override { return values[off]; };
     /* get all value in array */
     std::vector<std::string> getValues() const override { return values; };
     /* return label which can index the value */

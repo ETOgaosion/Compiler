@@ -2260,6 +2260,8 @@ void SysYParser::PrimaryExpContext::copyFrom(PrimaryExpContext *ctx) {
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
+  this->fromVarDecl = ctx->fromVarDecl;
+  this->sizeNum = ctx->sizeNum;
 }
 
 //----------------- PrimaryExpNestExpContext ------------------------------------------------------------------
@@ -2388,6 +2390,8 @@ void SysYParser::UnaryExpContext::copyFrom(UnaryExpContext *ctx) {
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
+  this->fromVarDecl = ctx->fromVarDecl;
+  this->sizeNum = ctx->sizeNum;
 }
 
 //----------------- UnaryExpFuncContext ------------------------------------------------------------------
@@ -2661,6 +2665,8 @@ void SysYParser::MulExpContext::copyFrom(MulExpContext *ctx) {
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
+  this->fromVarDecl = ctx->fromVarDecl;
+  this->sizeNum = ctx->sizeNum;
 }
 
 //----------------- MulExpMulExpContext ------------------------------------------------------------------
@@ -2842,6 +2848,8 @@ void SysYParser::AddExpContext::copyFrom(AddExpContext *ctx) {
   this->metaDataType = ctx->metaDataType;
   this->operand = ctx->operand;
   this->indexOperand = ctx->indexOperand;
+  this->fromVarDecl = ctx->fromVarDecl;
+  this->sizeNum = ctx->sizeNum;
 }
 
 //----------------- AddExpAddExpContext ------------------------------------------------------------------

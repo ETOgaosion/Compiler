@@ -212,7 +212,9 @@ exp
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,
-        IROperand* indexOperand
+        IROperand* indexOperand,
+        bool fromVarDecl,
+        int sizeNum
     ]
     : addExp
     ;
@@ -231,7 +233,9 @@ lVal
         SymbolType symbolType,
         MetaDataType lValMetaDataType,
         IRSymbolVariable* identOperand,
-        IROperand* indexOperand
+        IROperand* indexOperand,
+        bool fromVarDecl,
+        int sizeNum
     ]
     : Ident ('[' exp ']')*
     ;
@@ -242,7 +246,9 @@ primaryExp
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,
-        IROperand* indexOperand
+        IROperand* indexOperand,
+        bool fromVarDecl,
+        int sizeNum
     ]
     : '(' exp ')'   #primaryExpNestExp
     | lVal          #primaryExplVal
@@ -255,7 +261,9 @@ unaryExp
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,
-        IROperand* indexOperand
+        IROperand* indexOperand,
+        bool fromVarDecl,
+        int sizeNum
     ]
     : primaryExp                        #unaryExpPrimaryExp
     | Ident '(' (funcRParams)? ')'      #unaryExpFunc
@@ -284,7 +292,9 @@ mulExp
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,
-        IROperand* indexOperand
+        IROperand* indexOperand,
+        bool fromVarDecl,
+        int sizeNum
     ]
     : unaryExp                              #mulExpUnaryExp
     | mulExp mulOp unaryExp                 #mulExpMulExp
@@ -299,7 +309,9 @@ addExp
         std::vector<std::size_t> shape,
         MetaDataType metaDataType,
         IROperand* operand,
-        IROperand* indexOperand
+        IROperand* indexOperand,
+        bool fromVarDecl,
+        int sizeNum
     ]
     : mulExp                        #addExpMulExp
     | addExp addOp mulExp           #addExpAddExp

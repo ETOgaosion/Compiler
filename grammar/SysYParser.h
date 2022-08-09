@@ -588,6 +588,8 @@ public:
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
+    bool fromVarDecl;
+    int sizeNum;
     ExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AddExpContext *addExp();
@@ -621,6 +623,8 @@ public:
     MetaDataType lValMetaDataType;
     IRSymbolVariable* identOperand;
     IROperand* indexOperand;
+    bool fromVarDecl;
+    int sizeNum;
     LValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
@@ -641,6 +645,8 @@ public:
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
+    bool fromVarDecl;
+    int sizeNum;
     PrimaryExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     PrimaryExpContext() = default;
@@ -688,6 +694,8 @@ public:
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
+    bool fromVarDecl;
+    int sizeNum;
     UnaryExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     UnaryExpContext() = default;
@@ -767,6 +775,8 @@ public:
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
+    bool fromVarDecl;
+    int sizeNum;
     MulExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     MulExpContext() = default;
@@ -819,6 +829,8 @@ public:
     MetaDataType metaDataType;
     IROperand* operand;
     IROperand* indexOperand;
+    bool fromVarDecl;
+    int sizeNum;
     AddExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     AddExpContext() = default;
