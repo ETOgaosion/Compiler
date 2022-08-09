@@ -283,7 +283,7 @@ void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayCo
     ctx->isArray = true;
 
     if (ctx->outside) {
-        if (!ctx->constInitVal().empty()) {
+        if (ctx->isArray) {
             ctx->value = irGenerator->ir->addMulImmValue(ctx->type, ctx->vals);
         } else {
             ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
@@ -429,7 +429,7 @@ void SemanticAnalysis::exitInitValOfArray(SysYParser::InitValOfArrayContext *ctx
         ctx->type = ctx->initVal(0)->type;
         for (auto it : ctx->initVal()) {
             if (it->isArray) {
-                if (ctx->vals.size() % (totalSize / ctx->shape[0])) {
+                if (ctx->vals.size() % (totalSize / ctx->shape[0]) || ctx->vals.size()) {
                     ctx->vals.insert(ctx->vals.end(), ctx->vals.size() % (totalSize / ctx->shape[0]), "0");
                 }
                 ctx->vals.insert(ctx->vals.end(), it->vals.begin(), it->vals.end());
@@ -446,7 +446,7 @@ void SemanticAnalysis::exitInitValOfArray(SysYParser::InitValOfArrayContext *ctx
     ctx->isArray = true;
 
     if (ctx->outside) {
-        if (!ctx->initVal().empty()) {
+        if (ctx->isArray) {
             ctx->value = irGenerator->ir->addMulImmValue(ctx->type, ctx->vals);
         } else {
             ctx->value = new IRValue(MetaDataType::INT, "0", {}, false);
@@ -1467,37 +1467,39 @@ void SemanticAnalysis::enterLVal(SysYParser::LValContext * ctx)
 void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
 {
     // TODO: calculate inside first, then use index to calculate mem position
-    if (!ctx->exp().empty()) {
-        if (ctx->exp(0)->metaDataType != MetaDataType::INT) {
-            throw std::runtime_error("[ERROR] > array index must be int.\n");
-        }
-    }
     AbstractSymbol *searchLVal = curSymbolTable->lookUpAbstractSymbolGlobal(ctx->Ident()->getText());
-    if (!searchLVal){
-        throw std::runtime_error("[ERROR] > var symbol used before defined. " + ctx->Ident()->getText() + " "  + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
-    }
-    if (searchLVal->getIsArray() && ctx->exp().empty()) {
-        ctx->isArray = true;
-        ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
-    }
-    else if (searchLVal->getIsArray()) {
-        if (ctx->exp().size() < searchLVal->getShape().size()) {
+    if (!ctx->fromVarDecl) {
+        if (!ctx->exp().empty()) {
+            if (ctx->exp(0)->metaDataType != MetaDataType::INT) {
+                throw std::runtime_error("[ERROR] > array index must be int.\n");
+            }
+        }
+        if (!searchLVal){
+            throw std::runtime_error("[ERROR] > var symbol used before defined. " + ctx->Ident()->getText() + " "  + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
+        }
+        if (searchLVal->getIsArray() && ctx->exp().empty()) {
             ctx->isArray = true;
             ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
         }
-        else if (ctx->exp().size() == searchLVal->getShape().size()) {
-            ctx->isArray = true;
-            ctx->shape = {};
+        else if (searchLVal->getIsArray()) {
+            if (ctx->exp().size() < searchLVal->getShape().size()) {
+                ctx->isArray = true;
+                ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
+            }
+            else if (ctx->exp().size() == searchLVal->getShape().size()) {
+                ctx->isArray = true;
+                ctx->shape = {};
+            }
+            else {
+                throw std::runtime_error("[ERROR] > array shape not match\n");
+            }
         }
         else {
-            throw std::runtime_error("[ERROR] > array shape not match\n");
+            ctx->isArray = false;
         }
+        ctx->symbolType = searchLVal->getSymbolType();
+        ctx->lValMetaDataType = searchLVal->getMetaDataType();
     }
-    else {
-        ctx->isArray = false;
-    }
-    ctx->symbolType = searchLVal->getSymbolType();
-    ctx->lValMetaDataType = searchLVal->getMetaDataType();
 
     // search lVal IRSymbolVariable
     IRSymbolVariable* symVar = nullptr;
@@ -1510,26 +1512,28 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
     ctx->identOperand = symVar;
 
     // assigned
-    if(!ctx->exp().empty()){
-        std::vector<size_t> shape = symVar->getArrayShape();
-        int width = shape.back();
-        IRTempVariable *mulTemp = irGenerator->addTempVariable(MetaDataType::INT);
-        IRTempVariable *addTemp = irGenerator->addTempVariable(MetaDataType::INT);
-        irGenerator->addCode(new IRAssignI(mulTemp, ctx->exp().back()->operand));
-        mulTemp->setAssigned();
-        irGenerator->addCode(new IRAssignI(addTemp, ctx->exp().back()->operand));
-        addTemp->setAssigned();
-        for (int i = ctx->exp().size() - 2; i >= 0; i--) {
-            IRTempVariable *replaceTemp = irGenerator->addTempVariable(mulTemp);
-            mulTemp->addHistorySymbol(replaceTemp);
-            irGenerator->addCode(new IRMulI(replaceTemp, ctx->exp(i)->operand,
-                                            new IRValue(MetaDataType::INT, std::to_string(width), {}, false)));
-            IRTempVariable *replaceAddTemp = irGenerator->addTempVariable(addTemp);
-            irGenerator->addCode(new IRAddI(replaceAddTemp, mulTemp->getLatestVersionSymbol(), addTemp->getLatestVersionSymbol()));
-            addTemp->addHistorySymbol(replaceAddTemp);
-            width *= shape[i];
+    if (!ctx->fromVarDecl) {
+        if(!ctx->exp().empty()){
+            std::vector<size_t> shape = symVar->getArrayShape();
+            int width = shape.back();
+            IRTempVariable *mulTemp = irGenerator->addTempVariable(MetaDataType::INT);
+            IRTempVariable *addTemp = irGenerator->addTempVariable(MetaDataType::INT);
+            irGenerator->addCode(new IRAssignI(mulTemp, ctx->exp().back()->operand));
+            mulTemp->setAssigned();
+            irGenerator->addCode(new IRAssignI(addTemp, ctx->exp().back()->operand));
+            addTemp->setAssigned();
+            for (int i = ctx->exp().size() - 2; i >= 0; i--) {
+                IRTempVariable *replaceTemp = irGenerator->addTempVariable(mulTemp);
+                mulTemp->addHistorySymbol(replaceTemp);
+                irGenerator->addCode(new IRMulI(replaceTemp, ctx->exp(i)->operand,
+                                                new IRValue(MetaDataType::INT, std::to_string(width), {}, false)));
+                IRTempVariable *replaceAddTemp = irGenerator->addTempVariable(addTemp);
+                irGenerator->addCode(new IRAddI(replaceAddTemp, mulTemp->getLatestVersionSymbol(), addTemp->getLatestVersionSymbol()));
+                addTemp->addHistorySymbol(replaceAddTemp);
+                width *= shape[i];
+            }
+            ctx->indexOperand = addTemp->getLatestVersionSymbol();
         }
-        ctx->indexOperand = addTemp->getLatestVersionSymbol();
     }
     
     IROperand *idInitValue = symVar->getInitialValue();
@@ -1581,32 +1585,34 @@ void SemanticAnalysis::enterPrimaryExplVal(SysYParser::PrimaryExplValContext * c
 
 void SemanticAnalysis::exitPrimaryExplVal(SysYParser::PrimaryExplValContext * ctx)
 {
-    if (ctx->lVal()->shape.empty()) {
-        ctx->isArray = false;
-    }
-    else {
-        ctx->isArray = true;
-    }
-    ctx->shape = ctx->lVal()->shape;
-    ctx->metaDataType = ctx->lVal()->lValMetaDataType;
-
-    if (ctx->lVal()->isArray && ctx->lVal()->indexOperand) {
-        IRTempVariable* tmp = irGenerator->addTempVariable(ctx->metaDataType);
-        IRCode* fetchCode = nullptr;
-        switch (ctx->lVal()->lValMetaDataType) {
-            case MetaDataType::INT:
-                fetchCode = new IRFetchArrayElemI(tmp, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
-                break;
-            case MetaDataType::FLOAT:
-                fetchCode = new IRFetchArrayElemF(tmp, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
-                break;
-            default:
-                break;
+    if (!ctx->fromVarDecl) {
+        if (ctx->lVal()->shape.empty()) {
+            ctx->isArray = false;
         }
-        irGenerator->addCode(fetchCode);
-        ctx->operand = tmp;
-    } else { // normal symbolVar
-        ctx->operand = ctx->lVal()->identOperand->getLatestVersionSymbol();
+        else {
+            ctx->isArray = true;
+        }
+        ctx->shape = ctx->lVal()->shape;
+        ctx->metaDataType = ctx->lVal()->lValMetaDataType;
+
+        if (ctx->lVal()->isArray && ctx->lVal()->indexOperand) {
+            IRTempVariable* tmp = irGenerator->addTempVariable(ctx->metaDataType);
+            IRCode* fetchCode = nullptr;
+            switch (ctx->lVal()->lValMetaDataType) {
+                case MetaDataType::INT:
+                    fetchCode = new IRFetchArrayElemI(tmp, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
+                    break;
+                case MetaDataType::FLOAT:
+                    fetchCode = new IRFetchArrayElemF(tmp, ctx->lVal()->identOperand, ctx->lVal()->indexOperand);
+                    break;
+                default:
+                    break;
+            }
+            irGenerator->addCode(fetchCode);
+            ctx->operand = tmp;
+        } else { // normal symbolVar
+            ctx->operand = ctx->lVal()->identOperand->getLatestVersionSymbol();
+        }
     }
     ctx->sizeNum = ctx->lVal()->sizeNum;
 }
@@ -1620,17 +1626,19 @@ void SemanticAnalysis::enterPrimaryExpNumber(SysYParser::PrimaryExpNumberContext
 
 void SemanticAnalysis::exitPrimaryExpNumber(SysYParser::PrimaryExpNumberContext * ctx)
 {
-    ctx->isArray = false;
-    ctx->metaDataType = ctx->number()->metaDataType;
-    if (ctx->metaDataType == MetaDataType::FLOAT) {
-        ctx->operand = irGenerator->addImmValue(ctx->metaDataType, ctx->getText());
-    }
-    else {
-        if (ctx->metaDataType == MetaDataType::INT) {
-            ctx->operand = new IRValue(ctx->metaDataType, ctx->getText(), {}, false);
+    if (!ctx->fromVarDecl) {
+        ctx->isArray = false;
+        ctx->metaDataType = ctx->number()->metaDataType;
+        if (ctx->metaDataType == MetaDataType::FLOAT) {
+            ctx->operand = irGenerator->addImmValue(ctx->metaDataType, ctx->getText());
         }
         else {
-            ctx->operand = irGenerator->addImmValue(ctx->metaDataType, ctx->getText());
+            if (ctx->metaDataType == MetaDataType::INT) {
+                ctx->operand = new IRValue(ctx->metaDataType, ctx->getText(), {}, false);
+            }
+            else {
+                ctx->operand = irGenerator->addImmValue(ctx->metaDataType, ctx->getText());
+            }
         }
     }
     ctx->sizeNum = stoi(ctx->number()->getText());
@@ -1725,29 +1733,31 @@ void SemanticAnalysis::enterUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryEx
 
 void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExpContext * ctx)
 {
-    ctx->isArray = ctx->unaryExp()->isArray;
-    ctx->metaDataType = ctx->unaryExp()->metaDataType;
-    ctx->shape = ctx->unaryExp()->shape;
+    if (!ctx->fromVarDecl) {
+        ctx->isArray = ctx->unaryExp()->isArray;
+        ctx->metaDataType = ctx->unaryExp()->metaDataType;
+        ctx->shape = ctx->unaryExp()->shape;
 
-    IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
-    IRCode* code = nullptr;
-    if(ctx->unaryOp()->getText() == "-"){
-        switch (ctx->unaryExp()->operand->getMetaDataType()) {
-            case MetaDataType::INT:
-                code = new IRNegI(result, ctx->unaryExp()->operand);
-                break;
-            case MetaDataType::FLOAT:
-                code = new IRNegF(result, ctx->unaryExp()->operand);
-                break;
-            default:
-                break;
+        IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
+        IRCode* code = nullptr;
+        if(ctx->unaryOp()->getText() == "-"){
+            switch (ctx->unaryExp()->operand->getMetaDataType()) {
+                case MetaDataType::INT:
+                    code = new IRNegI(result, ctx->unaryExp()->operand);
+                    break;
+                case MetaDataType::FLOAT:
+                    code = new IRNegF(result, ctx->unaryExp()->operand);
+                    break;
+                default:
+                    break;
+            }
         }
+        else if(ctx->unaryOp()->getText() == "!"){
+            code = new IRNot(result, ctx->unaryExp()->operand);
+        }
+        irGenerator->addCode(code);
+        ctx->operand = result;
     }
-    else if(ctx->unaryOp()->getText() == "!"){
-        code = new IRNot(result, ctx->unaryExp()->operand);
-    }
-    irGenerator->addCode(code);
-    ctx->operand = result;
     
     if (ctx->unaryOp()->getText() == "+") {
         ctx->sizeNum = ctx->unaryExp()->sizeNum;
@@ -1952,58 +1962,60 @@ void SemanticAnalysis::enterAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 
 void SemanticAnalysis::exitAddExpAddExp(SysYParser::AddExpAddExpContext * ctx)
 {
-    ctx->isArray = ctx->addExp()->isArray;
-    ctx->metaDataType = ctx->addExp()->metaDataType;
-    ctx->shape = ctx->addExp()->shape;
-    if (ctx->metaDataType != ctx->mulExp()->metaDataType) {
-        throw std::runtime_error("[ERROR] > add: type mismatch in calculation. " + std::to_string(static_cast<int>(ctx->metaDataType)) + std::to_string(static_cast<int>(ctx->mulExp()->metaDataType)));
-    }
-    if (ctx->isArray) {
-        if (!ctx->mulExp()->isArray) {
-            throw std::runtime_error("[ERROR] > add: array:non-array calculation.\n");
+    if (!ctx->fromVarDecl) {
+        ctx->isArray = ctx->addExp()->isArray;
+        ctx->metaDataType = ctx->addExp()->metaDataType;
+        ctx->shape = ctx->addExp()->shape;
+        if (ctx->metaDataType != ctx->mulExp()->metaDataType) {
+            throw std::runtime_error("[ERROR] > add: type mismatch in calculation. " + std::to_string(static_cast<int>(ctx->metaDataType)) + std::to_string(static_cast<int>(ctx->mulExp()->metaDataType)));
         }
-        if (ctx->shape != ctx->mulExp()->shape) {
-            throw std::runtime_error("[ERROR] > array size mismatch in calculation.\n");
+        if (ctx->isArray) {
+            if (!ctx->mulExp()->isArray) {
+                throw std::runtime_error("[ERROR] > add: array:non-array calculation.\n");
+            }
+            if (ctx->shape != ctx->mulExp()->shape) {
+                throw std::runtime_error("[ERROR] > array size mismatch in calculation.\n");
+            }
         }
-    }
-    else {
-        if (ctx->mulExp()->isArray) {
-            throw std::runtime_error("[ERROR] > add: non-array:array calculation. " + curSymbolTable->getFuncName() + " " + ctx->mulExp()->getText());
+        else {
+            if (ctx->mulExp()->isArray) {
+                throw std::runtime_error("[ERROR] > add: non-array:array calculation. " + curSymbolTable->getFuncName() + " " + ctx->mulExp()->getText());
+            }
         }
-    }
 
-    IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
-    IRCode* code = nullptr;
+        IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
+        IRCode* code = nullptr;
 
-    if (ctx->addOp()->getText() == "+"){
-        switch (ctx->addExp()->metaDataType) {
-            case MetaDataType::INT:
-                code = new IRAddI(result, ctx->addExp()->operand, ctx->mulExp()->operand);
-                break;
-            case MetaDataType::FLOAT:
-                code = new IRAddF(result, ctx->addExp()->operand, ctx->mulExp()->operand);
-                break;
-            default:
-                break;
+        if (ctx->addOp()->getText() == "+"){
+            switch (ctx->addExp()->metaDataType) {
+                case MetaDataType::INT:
+                    code = new IRAddI(result, ctx->addExp()->operand, ctx->mulExp()->operand);
+                    break;
+                case MetaDataType::FLOAT:
+                    code = new IRAddF(result, ctx->addExp()->operand, ctx->mulExp()->operand);
+                    break;
+                default:
+                    break;
+            }
         }
-    }
-    else if (ctx->addOp()->getText() == "-"){
-        switch (ctx->addExp()->metaDataType) {
-            case MetaDataType::INT:
-                code = new IRSubI(result, ctx->addExp()->operand, ctx->mulExp()->operand);
-                break;
-            case MetaDataType::FLOAT:
-                code = new IRSubF(result, ctx->addExp()->operand, ctx->mulExp()->operand);
-                break;
-            default:
-                break;
+        else if (ctx->addOp()->getText() == "-"){
+            switch (ctx->addExp()->metaDataType) {
+                case MetaDataType::INT:
+                    code = new IRSubI(result, ctx->addExp()->operand, ctx->mulExp()->operand);
+                    break;
+                case MetaDataType::FLOAT:
+                    code = new IRSubF(result, ctx->addExp()->operand, ctx->mulExp()->operand);
+                    break;
+                default:
+                    break;
+            }
         }
-    }
-    else
-        throw std::runtime_error("[ERROR] > addop illegal.\n");
+        else
+            throw std::runtime_error("[ERROR] > addop illegal.\n");
 
-    irGenerator->addCode(code);
-    ctx->operand = result;
+        irGenerator->addCode(code);
+        ctx->operand = result;
+    }
     if (ctx->addOp()->getText() == "+") {
         ctx->sizeNum = ctx->addExp()->sizeNum + ctx->mulExp()->sizeNum;
     }

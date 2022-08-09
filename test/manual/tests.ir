@@ -1,26 +1,71 @@
 ============ global var ================
 ============ imm value ================
-ImmValue_0: {0, 4, 3, 4, 5, 6, 7, 8}
+ImmValue_3: {7, 6, 3, 4, 5, 6, 7, 8}
+ImmValue_2: {1, 2, 3, 0, 5, 7, 8}
+ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8}
+ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0}
 ============ functions ================
 ----------- funcDef -----------
 main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
-e := symbol type: 1; data type: 1; initValue: ImmValue_0: {0, 4, 3, 4, 5, 6, 7, 8}
+e := symbol type: 1; data type: 1; initValue: ImmValue_3: {7, 6, 3, 4, 5, 6, 7, 8}
+
+d := symbol type: 1; data type: 1; initValue: ImmValue_2: {1, 2, 3, 0, 5, 7, 8}
+
+c := symbol type: 1; data type: 1; initValue: ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8}
+
+b := symbol type: 1; data type: 1; initValue: ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8}
+
+a := symbol type: 1; data type: 1; initValue: ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0}
 
 ----------- tempVars ------------
-t_4:= symbol type: TEMP VAR; data type: 1
-t_1:= symbol type: TEMP VAR; data type: 1
+t_21:= symbol type: TEMP VAR; data type: 1
+t_18:= symbol type: TEMP VAR; data type: 1
+t_17:= symbol type: TEMP VAR; data type: 1
+t_15:= symbol type: TEMP VAR; data type: 1
 t_0:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_22:= symbol type: TEMP VAR; data type: 1
+t_9:= symbol type: TEMP VAR; data type: 1
+t_16:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	e = ImmValue_0: {0, 4, 3, 4, 5, 6, 7, 8};
+	a = ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0};
+	b = ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8};
+	c = ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8};
+	d = ImmValue_2: {1, 2, 3, 0, 5, 7, 8};
+	e = ImmValue_3: {7, 6, 3, 4, 5, 6, 7, 8};
 	t_0 = 1;
 	t_1 = 1;
 	t_2 = 3 * 2;
 	t_3 = t_2 + t_1;
 	t_4 = e[t_3];
-	addparam t_4, 1;
+	t_5 = 0;
+	t_6 = 0;
+	t_7 = 0 * 2;
+	t_8 = t_7 + t_6;
+	t_9 = e[t_8];
+	t_10 = t_4 + t_9;
+	t_11 = 1;
+	t_12 = 1;
+	t_13 = 0 * 2;
+	t_14 = t_13 + t_12;
+	t_15 = e[t_14];
+	t_16 = t_10 + t_15;
+	t_17 = 0;
+	t_18 = 0;
+	t_19 = 2 * 2;
+	t_20 = t_19 + t_18;
+	t_21 = a[t_20];
+	t_22 = t_16 + t_21;
+	addparam t_22, 1;
 	call putint; 
 	return 0;
 
