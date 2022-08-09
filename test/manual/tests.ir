@@ -1,26 +1,111 @@
 ============ global var ================
 ============ imm value ================
+ImmValue_3: {0, 0, 6, 0, 0, 0, 3, 4, 5, 6, 0, 0, 7, 8}
+ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8}
+ImmValue_2: {1, 2, 0, 0, 3, 0, 5, 0, 8}
+ImmValue_0: {1, 2, 0, 0, 3, 4, 0, 0, 0, 0, 7}
 ============ functions ================
 ----------- funcDef -----------
 main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
+e := symbol type: 1; data type: 1; initValue: ImmValue_3: {0, 0, 6, 0, 0, 0, 3, 4, 5, 6, 0, 0, 7, 8}
+
+d := symbol type: 1; data type: 1; initValue: ImmValue_2: {1, 2, 0, 0, 3, 0, 5, 0, 8}
+
+c := symbol type: 1; data type: 1; initValue: ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8}
+
 b := symbol type: 1; data type: 1; initValue: 0
 
-a := symbol type: 1; data type: 1; initValue: 0
+N := symbol type: 2; data type: 1; initValue: 3
+
+a := symbol type: 2; data type: 1; initValue: ImmValue_0: {1, 2, 0, 0, 3, 4, 0, 0, 0, 0, 7}
 
 ----------- tempVars ------------
-t_3:= symbol type: TEMP VAR; data type: 1
+t_50:= symbol type: TEMP VAR; data type: 1
+t_45:= symbol type: TEMP VAR; data type: 1
+t_43:= symbol type: TEMP VAR; data type: 1
+t_34:= symbol type: TEMP VAR; data type: 1
+t_36:= symbol type: TEMP VAR; data type: 1
+t_19:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_35:= symbol type: TEMP VAR; data type: 1
+t_28:= symbol type: TEMP VAR; data type: 1
+t_46:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
 t_1:= symbol type: TEMP VAR; data type: 1
+t_37:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_51:= symbol type: TEMP VAR; data type: 1
+t_18:= symbol type: TEMP VAR; data type: 1
+t_44:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_20:= symbol type: TEMP VAR; data type: 1
+t_27:= symbol type: TEMP VAR; data type: 1
+t_26:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	a = 0;
+	a = ImmValue_0: {1, 2, 0, 0, 3, 4, 0, 0, 0, 0, 7};
+	N = 3;
 	b = 0;
-	t_0 = 10;
-	t_1 =  - 1;
-	t_2 = t_1;
-	t_3 = t_0 + t_2;
-	addparam t_3,1;
-	call putint; 
-	return 0;
+	c = ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8};
+	t_0 = N + 1;
+	t_1 = 0;
+	t_3 = t_3 << 2;
+	t_2 = 0;
+	t_4 = 3 * 8;
+	t_2 = t_4 + t_2;
+	t_6 = a[t_5];
+	d = ImmValue_2: {1, 2, 0, 0, 3, 0, 5, 0, 8};
+	t_7 = 1;
+	t_9 = t_9 << 2;
+	t_8 = 4;
+	t_10 = 2 * 8;
+	t_8 = t_10 + t_8;
+	t_12 = d[t_11];
+	t_13 = 1;
+	t_15 = t_15 << 2;
+	t_14 = 4;
+	t_16 = 2 * 8;
+	t_14 = t_16 + t_14;
+	t_18 = c[t_17];
+	e = ImmValue_3: {0, 0, 6, 0, 0, 0, 3, 4, 5, 6, 0, 0, 7, 8};
+	t_19 = 0;
+	t_21 = t_21 << 1;
+	t_20 = 0;
+	t_22 = 1 * 4;
+	t_20 = t_22 + t_20;
+	t_24 = 3 * 8;
+	t_20 = t_24 + t_23;
+	t_26 = e[t_25];
+	t_27 = 0;
+	t_29 = t_29 << 1;
+	t_28 = 0;
+	t_30 = 0 * 4;
+	t_28 = t_30 + t_28;
+	t_32 = 0 * 8;
+	t_28 = t_32 + t_31;
+	t_34 = e[t_33];
+	t_35 = t_26 + t_34;
+	t_36 = 0;
+	t_38 = t_38 << 1;
+	t_37 = 0;
+	t_39 = 1 * 4;
+	t_37 = t_39 + t_37;
+	t_41 = 0 * 8;
+	t_37 = t_41 + t_40;
+	t_43 = e[t_42];
+	t_44 = t_35 + t_43;
+	t_45 = 0;
+	t_47 = t_47 << 2;
+	t_46 = 0;
+	t_48 = 3 * 8;
+	t_46 = t_48 + t_46;
+	t_50 = d[t_49];
+	t_51 = t_44 + t_50;
+	return t_51;
 

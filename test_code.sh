@@ -1,4 +1,4 @@
-./build.sh
+# ./build.sh
 # ./run_test.sh > res/code_gen_res.txt
 gdb build/compiler
 arm-linux-gnueabihf-gcc -static -g test/manual/tests.s -L./ -lsysy -o test/manual/tests

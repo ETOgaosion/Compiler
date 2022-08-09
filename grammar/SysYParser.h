@@ -2,6 +2,7 @@
     #include "../src/SymbolTable.h"
     #include "../src/IROperands.h"
     #include "../src/IRCode.h"
+    #include "../src/comm.h"
     #include <vector>
     #include <unordered_map>
 
@@ -38,8 +39,7 @@ public:
     RuleCond = 21, RuleLVal = 22, RulePrimaryExp = 23, RuleUnaryExp = 24, 
     RuleUnaryOp = 25, RuleFuncRParams = 26, RuleMulExp = 27, RuleMulOp = 28, 
     RuleAddExp = 29, RuleAddOp = 30, RuleRelExp = 31, RuleRelOp = 32, RuleEqExp = 33, 
-    RuleEqOp = 34, RuleLAndExp = 35, RuleLOrExp = 36, RuleConstExp = 37, 
-    RuleNumber = 38
+    RuleEqOp = 34, RuleLAndExp = 35, RuleLOrExp = 36, RuleNumber = 37
   };
 
   SysYParser(antlr4::TokenStream *input);
@@ -89,7 +89,6 @@ public:
   class EqOpContext;
   class LAndExpContext;
   class LOrExpContext;
-  class ConstExpContext;
   class NumberContext; 
 
   class  CompUnitContext : public antlr4::ParserRuleContext {
@@ -163,8 +162,8 @@ public:
     ConstDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
-    std::vector<ConstExpContext *> constExp();
-    ConstExpContext* constExp(size_t i);
+    std::vector<ExpContext *> exp();
+    ExpContext* exp(size_t i);
     ConstInitValContext *constInitVal();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -182,6 +181,7 @@ public:
     bool isArray;
     std::vector<std::string> vals;
     IRValue* value;
+    std::vector<Comm *> commVal;
     ConstInitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     ConstInitValContext() = default;
@@ -197,7 +197,7 @@ public:
   public:
     ConstInitValOfVarContext(ConstInitValContext *ctx);
 
-    ConstExpContext *constExp();
+    ExpContext *exp();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };
@@ -240,8 +240,8 @@ public:
     VarDefContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Ident();
-    std::vector<ConstExpContext *> constExp();
-    ConstExpContext* constExp(size_t i);
+    std::vector<ExpContext *> exp();
+    ExpContext* exp(size_t i);
     InitValContext *initVal();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -259,6 +259,7 @@ public:
     bool isArray;
     std::vector<std::string> vals;
     IROperand* value;
+    std::vector<Comm *> commVal;
     InitValContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
     InitValContext() = default;
@@ -590,6 +591,7 @@ public:
     IROperand* indexOperand;
     bool fromVarDecl;
     int sizeNum;
+    Comm * commVal;
     ExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AddExpContext *addExp();
@@ -1046,32 +1048,6 @@ public:
 
   LOrExpContext* lOrExp();
   LOrExpContext* lOrExp(int precedence);
-  class  ConstExpContext : public antlr4::ParserRuleContext {
-  public:
-    MetaDataType metaDataType;
-    std::string val;
-    ConstExpContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-   
-    ConstExpContext() = default;
-    void copyFrom(ConstExpContext *context);
-    using antlr4::ParserRuleContext::copyFrom;
-
-    virtual size_t getRuleIndex() const override;
-
-   
-  };
-
-  class  ConstExpNumberContext : public ConstExpContext {
-  public:
-    ConstExpNumberContext(ConstExpContext *ctx);
-
-    NumberContext *number();
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-  };
-
-  ConstExpContext* constExp();
-
   class  NumberContext : public antlr4::ParserRuleContext {
   public:
     MetaDataType metaDataType;

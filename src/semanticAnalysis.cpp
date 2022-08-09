@@ -181,10 +181,11 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->shape = {};
     ctx->isArray = false;
     ctx->constInitVal()->outside = true;
-    if (!ctx->constExp().empty()) {
+    if (!ctx->exp().empty()) {
         if (ctx->constInitVal()) {
-            for (auto val : ctx->constExp()) {
-                ctx->constInitVal()->shape.push_back(std::stoi(val->getText()));
+            for (auto val : ctx->exp()) {
+                val->commVal = new Comm();
+                ctx->constInitVal()->commVal.push_back(val->commVal);
             }
         }
     }
@@ -193,12 +194,12 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
 void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
-    if(ctx->constExp().empty()){
+    if(ctx->exp().empty()){
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
         ctx->shape.clear();
-        for (auto it : ctx->constExp()) {
+        for (auto it : ctx->exp()) {
             ctx->shape.push_back(std::stoi(it->getText()));
         }
     }
@@ -220,23 +221,24 @@ void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
 // ConstInitVal
 void SemanticAnalysis::enterConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
 {
-    if (ctx->outside && !ctx->shape.empty()) {
+    if (ctx->outside && !ctx->commVal.empty()) {
         throw std::runtime_error("declare array but initialize with number");
     }
     ctx->type = MetaDataType::VOID;
     ctx->isArray = false;
     ctx->value = nullptr;
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitConstInitValOfVar(SysYParser::ConstInitValOfVarContext * ctx)
 {
-    ctx->type = ctx->constExp()->metaDataType;
+    ctx->type = ctx->exp()->metaDataType;
     ctx->isArray = false;
-    if (ctx->outside && ctx->shape.empty()) {
-        if (ctx->constExp()->metaDataType == MetaDataType::FLOAT) {
-            ctx->value = irGenerator->addImmValue(ctx->constExp()->metaDataType, ctx->constExp()->val);
+    if (ctx->outside && ctx->commVal.empty()) {
+        if (ctx->exp()->metaDataType == MetaDataType::FLOAT) {
+            ctx->value = irGenerator->addImmValue(ctx->exp()->metaDataType, std::to_string(ctx->exp()->sizeNum));
         } else {
-            ctx->value = new IRValue(ctx->constExp()->metaDataType, ctx->constExp()->val, {}, false);
+            ctx->value = new IRValue(ctx->exp()->metaDataType, std::to_string(ctx->exp()->sizeNum), {}, false);
         }
     }
     else {
@@ -250,6 +252,9 @@ void SemanticAnalysis::enterConstInitValOfArray(SysYParser::ConstInitValOfArrayC
     ctx->type = MetaDataType::VOID;
     ctx->isArray = true;
     ctx->value = nullptr;
+    for (auto it : ctx->commVal) {
+        ctx->shape.push_back(it->shareValue);
+    }
     for (auto it : ctx->constInitVal()) {
         it->outside = false;
         it->shape = std::vector<std::size_t>(ctx->shape.begin() + 1, ctx->shape.end());
@@ -348,10 +353,11 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
     if (ctx->initVal()) {
         ctx->initVal()->outside = true;
     }
-    if (ctx->constExp().size() > 0) {
+    if (ctx->exp().size() > 0) {
         if (ctx->initVal()) {
-            for (auto val : ctx->constExp()) {
-                ctx->initVal()->shape.push_back(std::stoi(val->getText()));
+            for (auto val : ctx->exp()) {
+                val->commVal = new Comm();
+                ctx->initVal()->commVal.push_back(val->commVal);
             }
         }
     }
@@ -360,14 +366,11 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
 void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
 {
     ctx->symbolName = ctx->Ident()->getText();
-    if(ctx->constExp().empty()){
+    if(ctx->exp().empty()){
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
-        ctx->shape.clear();
-        for (auto it : ctx->constExp()) {
-            ctx->shape.push_back(std::stoi(it->getText()));
-        }
+        ctx->shape = std::move(ctx->initVal()->shape);
     }
     if (ctx->initVal()) {
         ctx->withType = true;
@@ -392,6 +395,7 @@ void SemanticAnalysis::enterInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
     ctx->isArray = false;
     ctx->value = nullptr;
     ctx->exp()->fromVarDecl = true;
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
@@ -410,6 +414,9 @@ void SemanticAnalysis::enterInitValOfArray(SysYParser::InitValOfArrayContext *ct
     ctx->type = MetaDataType::VOID;
     ctx->isArray = true;
     ctx->value = nullptr;
+    for (auto it : ctx->commVal) {
+        ctx->shape.push_back(it->shareValue);
+    }
     for (auto it : ctx->initVal()) {
         it->outside = false;
         it->shape = std::vector<std::size_t>(ctx->shape.begin() + 1, ctx->shape.end());
@@ -576,6 +583,7 @@ void SemanticAnalysis::enterBrackets(SysYParser::BracketsContext * ctx) {}
 void SemanticAnalysis::exitBrackets(SysYParser::BracketsContext * ctx) {
     for (auto it : ctx->exp()) {
         ctx->shape.push_back(stoi(it->operand->getValue()));
+        it->commVal = nullptr;
     }
 }
 
@@ -726,6 +734,7 @@ void SemanticAnalysis::exitBlockItem(SysYParser::BlockItemContext * ctx)
 void SemanticAnalysis::enterStmtAssignment(SysYParser::StmtAssignmentContext * ctx)
 {
     ctx->hasReturn = false;
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ctx)
@@ -804,6 +813,7 @@ void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ct
 void SemanticAnalysis::enterStmtExpression(SysYParser::StmtExpressionContext * ctx)
 {
     ctx->hasReturn = false;
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitStmtExpression(SysYParser::StmtExpressionContext * ctx)
@@ -1018,7 +1028,7 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
 
 void SemanticAnalysis::enterStmtReturn(SysYParser::StmtReturnContext * ctx)
 {
-
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitStmtReturn(SysYParser::StmtReturnContext * ctx)
@@ -1059,6 +1069,7 @@ void SemanticAnalysis::enterSubStmtAssignment(SysYParser::SubStmtAssignmentConte
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContext * ctx)
@@ -1136,6 +1147,7 @@ void SemanticAnalysis::enterSubStmtExpression(SysYParser::SubStmtExpressionConte
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitSubStmtExpression(SysYParser::SubStmtExpressionContext * ctx)
@@ -1361,6 +1373,7 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
 
 void SemanticAnalysis::enterSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
 {
+    ctx->exp()->commVal = nullptr;
 }
 
 void SemanticAnalysis::exitSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
@@ -1420,6 +1433,9 @@ void SemanticAnalysis::exitExp(SysYParser::ExpContext *ctx) {
     ctx->metaDataType = ctx->addExp()->metaDataType;
     ctx->operand = ctx->addExp()->operand;
     ctx->sizeNum = ctx->addExp()->sizeNum;
+    if (ctx->commVal) {
+        ctx->commVal->shareValue = ctx->sizeNum;
+    }
 }
 
 // Cond
@@ -1446,7 +1462,9 @@ void SemanticAnalysis::enterLVal(SysYParser::LValContext * ctx)
     ctx->indexOperand = nullptr;
     if (ctx->fromVarDecl) {
         for (auto it : ctx->exp()) {
+            it->commVal = nullptr;
             it->fromVarDecl = true;
+            it->commVal = nullptr;
         }
     }
 }
@@ -1544,6 +1562,7 @@ void SemanticAnalysis::enterPrimaryExpNestExp(SysYParser::PrimaryExpNestExpConte
     ctx->shape = {};
     ctx->metaDataType = MetaDataType::VOID;
     ctx->exp()->indexOperand = ctx->indexOperand;
+    ctx->exp()->commVal = nullptr;
     if (ctx->fromVarDecl) {
         ctx->exp()->fromVarDecl = true;
     }
@@ -1763,6 +1782,9 @@ void SemanticAnalysis::enterFuncRParams(SysYParser::FuncRParamsContext * ctx)
     ctx->isArrayList.clear();
     ctx->shapeList.clear();
     ctx->metaDataTypeList.clear();
+    for (auto it : ctx->exp()) {
+        it->commVal = nullptr;
+    }
 }
 
 void SemanticAnalysis::exitFuncRParams(SysYParser::FuncRParamsContext * ctx)
@@ -2227,18 +2249,6 @@ void SemanticAnalysis::exitLOrExpLOrExp(SysYParser::LOrExpLOrExpContext * ctx)
     ctx->operand = result;
 }
 
-
-// ConstExp
-void SemanticAnalysis::enterConstExpNumber(SysYParser::ConstExpNumberContext * ctx)
-{
-    ctx->metaDataType = MetaDataType::VOID;
-
-}
-void SemanticAnalysis::exitConstExpNumber(SysYParser::ConstExpNumberContext * ctx)
-{
-    ctx->metaDataType = ctx->number()->metaDataType;
-    ctx->val = ctx->getText();
-}
 
 // Number
 void SemanticAnalysis::enterNumberIntConst(SysYParser::NumberIntConstContext * ctx)

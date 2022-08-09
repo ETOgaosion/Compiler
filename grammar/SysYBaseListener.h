@@ -2,6 +2,7 @@
     #include "../src/SymbolTable.h"
     #include "../src/IROperands.h"
     #include "../src/IRCode.h"
+    #include "../src/comm.h"
     #include <vector>
     #include <unordered_map>
 
@@ -193,9 +194,6 @@ public:
 
   virtual void enterLOrExpLOrExp(SysYParser::LOrExpLOrExpContext * /*ctx*/) override { }
   virtual void exitLOrExpLOrExp(SysYParser::LOrExpLOrExpContext * /*ctx*/) override { }
-
-  virtual void enterConstExpNumber(SysYParser::ConstExpNumberContext * /*ctx*/) override { }
-  virtual void exitConstExpNumber(SysYParser::ConstExpNumberContext * /*ctx*/) override { }
 
   virtual void enterNumberIntConst(SysYParser::NumberIntConstContext * /*ctx*/) override { }
   virtual void exitNumberIntConst(SysYParser::NumberIntConstContext * /*ctx*/) override { }

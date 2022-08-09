@@ -9,6 +9,7 @@ options {
     #include "../src/SymbolTable.h"
     #include "../src/IROperands.h"
     #include "../src/IRCode.h"
+    #include "../src/comm.h"
     #include <vector>
     #include <unordered_map>
 }
@@ -47,7 +48,7 @@ constDef
         bool isArray,
         IRValue* value
     ]
-    : Ident ('[' constExp ']')* ('=' constInitVal)?
+    : Ident ('[' exp ']')* ('=' constInitVal)?
     ;
 
 constInitVal
@@ -57,9 +58,10 @@ constInitVal
         std::vector<std::size_t> shape,
         bool isArray,
         std::vector<std::string> vals,
-        IRValue* value
+        IRValue* value,
+        std::vector<Comm *> commVal
     ]
-    : constExp                                      #constInitValOfVar
+    : exp                                      #constInitValOfVar
     | '{' (constInitVal (',' constInitVal)*)? '}'   #constInitValOfArray
     ;
 
@@ -76,7 +78,7 @@ varDef
         bool isArray,
         IROperand* value
     ]
-    : Ident ('[' constExp ']')* ('=' initVal)?
+    : Ident ('[' exp ']')* ('=' initVal)?
     ;
 
 initVal
@@ -86,7 +88,8 @@ initVal
         std::vector<std::size_t> shape,
         bool isArray,
         std::vector<std::string> vals,
-        IROperand* value
+        IROperand* value,
+        std::vector<Comm *> commVal
     ]
     : exp                                   #initValOfVar
     | '{' (initVal (',' initVal)*)? '}'     #initValOfArray
@@ -214,7 +217,8 @@ exp
         IROperand* operand,
         IROperand* indexOperand,
         bool fromVarDecl,
-        int sizeNum
+        int sizeNum,
+        Comm *commVal
     ]
     : addExp
     ;
@@ -360,14 +364,6 @@ lOrExp
     ]
     : lAndExp                       #lOrExpLAndExp
     | lOrExp ('||') lAndExp         #lOrExpLOrExp
-    ;
-
-constExp
-    locals[
-        MetaDataType metaDataType,
-        std::string val
-    ]
-    : number            #constExpNumber
     ;
 
 number

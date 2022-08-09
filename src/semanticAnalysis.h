@@ -190,9 +190,6 @@ public:
      void enterLOrExpLOrExp(SysYParser::LOrExpLOrExpContext *ctx) override;
      void exitLOrExpLOrExp(SysYParser::LOrExpLOrExpContext *ctx) override;
 
-     void enterConstExpNumber(SysYParser::ConstExpNumberContext *ctx) override;
-     void exitConstExpNumber(SysYParser::ConstExpNumberContext *ctx) override;
-
      void enterNumberIntConst(SysYParser::NumberIntConstContext *ctx) override;
      void exitNumberIntConst(SysYParser::NumberIntConstContext *ctx) override;
 

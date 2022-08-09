@@ -2,6 +2,7 @@
     #include "../src/SymbolTable.h"
     #include "../src/IROperands.h"
     #include "../src/IRCode.h"
+    #include "../src/comm.h"
     #include <vector>
     #include <unordered_map>
 

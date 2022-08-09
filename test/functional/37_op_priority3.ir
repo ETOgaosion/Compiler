@@ -1,0 +1,32 @@
+============ global var ================
+============ imm value ================
+============ functions ================
+----------- funcDef -----------
+main() => 1:
+----------- paramVars -----------
+----------- localVars -----------
+b := symbol type: 1; data type: 1; initValue: 0
+
+a := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_6:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+main:
+	a = 0;
+	b = 0;
+	t_0 = 10;
+	t_1 = 30;
+	t_2 =  - 5;
+	t_3 = t_0 - t_2;
+	t_4 = t_3 + t_1;
+	t_5 =  - 5;
+	t_6 = t_4 + t_5;
+	addparam t_6,1;
+	call putint; 
+	return 0;
+
