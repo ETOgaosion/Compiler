@@ -1,17 +1,9 @@
-//test continue
+//test domain of global var define and local define
+int a = 3;
+int b = 5;
+
 int main(){
-    int i;
-    i = 0;
-    int sum;
-    sum = 0;
-    while(i < 100){
-        if(i == 50){
-            i = i + 1;
-            continue;
-        }
-        sum = sum + i;
-        i = i + 1;
-    }
-    putint(sum);
+    int a = 5;
+    putint(a + b);
     return 0;
 }

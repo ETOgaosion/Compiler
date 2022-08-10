@@ -183,6 +183,11 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
             }
         }
     }
+    else {
+        if (ctx->constInitVal()) {
+            ctx->constInitVal()->commVal.clear();
+        }
+    }
 }
 
 void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
@@ -220,6 +225,12 @@ void SemanticAnalysis::enterConstInitValOfVar(SysYParser::ConstInitValOfVarConte
     ctx->type = MetaDataType::VOID;
     ctx->isArray = false;
     ctx->value = nullptr;
+    if (ctx->outside && ctx->commVal.empty()) {
+        ctx->exp()->fromVarDecl = false;
+    }
+    else {
+        ctx->exp()->fromVarDecl = true;
+    }
     ctx->exp()->commVal = nullptr;
     ctx->shape.clear();
 }
@@ -362,6 +373,11 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
             }
         }
     }
+    else {
+        if (ctx->initVal()) {
+            ctx->initVal()->commVal.clear();
+        }
+    }
 }
 
 void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
@@ -398,7 +414,12 @@ void SemanticAnalysis::enterInitValOfVar(SysYParser::InitValOfVarContext *ctx) {
     ctx->isArray = false;
     ctx->value = nullptr;
     ctx->vals.clear();
-    ctx->exp()->fromVarDecl = true;
+    if (ctx->outside && ctx->commVal.empty()) {
+        ctx->exp()->fromVarDecl = false;
+    }
+    else {
+        ctx->exp()->fromVarDecl = true;
+    }
     ctx->exp()->commVal = nullptr;
 }
 
