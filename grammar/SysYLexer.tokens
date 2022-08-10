@@ -36,8 +36,8 @@ IntConst=35
 DigitSequence=36
 FloatConst=37
 DoubleConst=38
-NewLine=39
-WhiteSpace=40
+Whitespace=39
+Newline=40
 BlockComment=41
 LineComment=42
 'const'=1
@@ -73,3 +73,4 @@ LineComment=42
 '!='=31
 '&&'=32
 '||'=33
+'\n'=40

@@ -3808,14 +3808,15 @@ std::vector<std::string> SysYParser::_literalNames = {
   "", "'const'", "','", "';'", "'int'", "'float'", "'['", "']'", "'='", 
   "'{'", "'}'", "'('", "')'", "'void'", "'if'", "'else'", "'while'", "'return'", 
   "'break'", "'continue'", "'+'", "'-'", "'!'", "'*'", "'/'", "'%'", "'<'", 
-  "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'"
+  "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'", "", "", "", "", 
+  "", "", "'\n'"
 };
 
 std::vector<std::string> SysYParser::_symbolicNames = {
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Ident", 
-  "IntConst", "DigitSequence", "FloatConst", "DoubleConst", "NewLine", "WhiteSpace", 
-  "BlockComment", "LineComment"
+  "IntConst", "DigitSequence", "FloatConst", "DoubleConst", "Whitespace", 
+  "Newline", "BlockComment", "LineComment"
 };
 
 dfa::Vocabulary SysYParser::_vocabulary(_literalNames, _symbolicNames);

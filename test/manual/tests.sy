@@ -1,7 +1,18 @@
-//test rem
-int main(){
-    int a;
-    a = 0xa;
-    putint(a%3);
-    return 0;
+// ???  // ????
+  				// ?????
+/*
+a 1
+*/
+int main() {
+  int arr[100], i = 0, sum = 0;
+  while (getint()) {
+  	arr[i] = getint();
+    i = i + 1;
+  }
+	while (i) {
+    i = i - 1;
+    sum = sum + arr[i];
+  }
+  putint(sum % 79);
+  return 0;
 }

@@ -457,22 +457,22 @@ ExponentPart
     : ('e' | 'E')('+' | '-')? DigitSequence
     ;
 
-NewLine
-    : ('\r' '\n'? | '\n') 
-      -> skip
+Whitespace
+    :   (' ' | '\t')+
+        -> skip
     ;
 
-WhiteSpace
-    : [ \t]+ 
-      -> skip
+Newline
+    :   '\n'
+        -> skip
     ;
 
 BlockComment
-    : '/*' .*? '*/'
-      -> skip
+    :   '/*' .*? '*/'
+        -> skip
     ;
 
 LineComment
-    : '//' ~[\r\n]*
-      -> skip
+    :   '//' ~[\n]*
+        -> skip
     ;

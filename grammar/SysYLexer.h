@@ -26,7 +26,7 @@ public:
     T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
     T__26 = 27, T__27 = 28, T__28 = 29, T__29 = 30, T__30 = 31, T__31 = 32, 
     T__32 = 33, Ident = 34, IntConst = 35, DigitSequence = 36, FloatConst = 37, 
-    DoubleConst = 38, NewLine = 39, WhiteSpace = 40, BlockComment = 41, 
+    DoubleConst = 38, Whitespace = 39, Newline = 40, BlockComment = 41, 
     LineComment = 42
   };
 
