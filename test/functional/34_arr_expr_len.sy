@@ -7,5 +7,6 @@ int main() {
     sum = sum + arr[i];
     i = i + 1;
   }
-  return sum;
+  putint(sum);
+  return 0;
 }

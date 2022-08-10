@@ -1905,87 +1905,95 @@ void SemanticAnalysis::enterMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
 
 void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
 {
-    ctx->isArray = ctx->mulExp()->isArray;
     ctx->metaDataType = ctx->mulExp()->metaDataType;
-    ctx->shape = ctx->mulExp()->shape;
-    if (ctx->metaDataType != ctx->unaryExp()->metaDataType) {
-        throw std::runtime_error("[ERROR] > mul: type mismatch in calculation. " + std::to_string(static_cast<int>(ctx->metaDataType)) + std::to_string(static_cast<int>(ctx->unaryExp()->metaDataType)));
-    }
-    if (ctx->isArray) {
-        if (!ctx->unaryExp()->isArray) {
-            throw std::runtime_error("[ERROR] > mul: array:non-array calculation.\n");
+    if (!ctx->fromVarDecl) {
+        ctx->isArray = ctx->mulExp()->isArray;
+        ctx->shape = ctx->mulExp()->shape;
+        if (ctx->metaDataType != ctx->unaryExp()->metaDataType) {
+            throw std::runtime_error("[ERROR] > mul: type mismatch in calculation. " + std::to_string(static_cast<int>(ctx->metaDataType)) + std::to_string(static_cast<int>(ctx->unaryExp()->metaDataType)));
         }
-        if (ctx->shape != ctx->mulExp()->shape) {
-            throw std::runtime_error("[ERROR] > array size mismatch in calculation.\n");
-        }
-    }
-    else {
-        if (ctx->unaryExp()->isArray) {
-            throw std::runtime_error("[ERROR] > mul: non-array:array calculation.\n");
-        }
-    }
-
-//    TODO: "divisor equals zero"
-    if(ctx->mulOp()->getText() == "%"){
-        if(ctx->metaDataType != MetaDataType::INT)
-            throw std::runtime_error("[ERROR] > mod: operands not INT.\n");
-        if(!ctx->unaryExp()->isArray){
-            if(ctx->unaryExp()->operand->getValue() == "0")
-                throw std::runtime_error("[ERROR] > divisor is zero.\n");
-        } else {
-            for(auto &val : ctx->unaryExp()->operand->getValues()){
-                if(val == "0")
-                    throw std::runtime_error("[ERROR] > divisor is zero.\n");
+        if (ctx->isArray) {
+            if (!ctx->unaryExp()->isArray) {
+                throw std::runtime_error("[ERROR] > mul: array:non-array calculation.\n");
+            }
+            if (ctx->shape != ctx->mulExp()->shape) {
+                throw std::runtime_error("[ERROR] > array size mismatch in calculation.\n");
             }
         }
-    } else if (ctx->mulOp()->getText() == "/") {
-        if(!ctx->unaryExp()->isArray){
-            if(ctx->unaryExp()->operand->getValue() == "0")
-                throw std::runtime_error("[ERROR] > divisor is zero.\n");
-        } else {
-            for(auto &val : ctx->unaryExp()->operand->getValues()){
-                if(val == "0")
-                    throw std::runtime_error("[ERROR] > divisor is zero.\n");
+        else {
+            if (ctx->unaryExp()->isArray) {
+                throw std::runtime_error("[ERROR] > mul: non-array:array calculation.\n");
             }
         }
-    }
 
-    IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
-    IRCode* code = nullptr;
-    if (ctx->mulOp()->getText() == "*"){
-        switch (ctx->mulExp()->operand->getMetaDataType()) {
-            case MetaDataType::INT:
-                code = new IRMulI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
-                break;
-            case MetaDataType::FLOAT:
-                code = new IRMulF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
-                break;
-            default:
-                break;
+    //    TODO: "divisor equals zero"
+        if(ctx->mulOp()->getText() == "%"){
+            if(ctx->metaDataType != MetaDataType::INT)
+                throw std::runtime_error("[ERROR] > mod: operands not INT.\n");
+            if(!ctx->unaryExp()->isArray){
+                if(ctx->unaryExp()->operand->getValue() == "0")
+                    throw std::runtime_error("[ERROR] > divisor is zero.\n");
+            } else {
+                for(auto &val : ctx->unaryExp()->operand->getValues()){
+                    if(val == "0")
+                        throw std::runtime_error("[ERROR] > divisor is zero.\n");
+                }
+            }
+        } else if (ctx->mulOp()->getText() == "/") {
+            if(!ctx->unaryExp()->isArray){
+                if(ctx->unaryExp()->operand->getValue() == "0")
+                    throw std::runtime_error("[ERROR] > divisor is zero.\n");
+            } else {
+                for(auto &val : ctx->unaryExp()->operand->getValues()){
+                    if(val == "0")
+                        throw std::runtime_error("[ERROR] > divisor is zero.\n");
+                }
+            }
         }
-    }
-    else if (ctx->mulOp()->getText() == "/"){
-        switch (ctx->mulExp()->operand->getMetaDataType()) {
-            case MetaDataType::INT:
-                code = new IRDivI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand, irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName()));
-                break;
-            case MetaDataType::FLOAT:
-                code = new IRDivF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
-                break;
-            default:
-                break;
+
+        IRTempVariable* result = irGenerator->addTempVariable(ctx->metaDataType);
+        IRCode* code = nullptr;
+        if (ctx->mulOp()->getText() == "*"){
+            switch (ctx->mulExp()->operand->getMetaDataType()) {
+                case MetaDataType::INT:
+                    code = new IRMulI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
+                    break;
+                case MetaDataType::FLOAT:
+                    code = new IRMulF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
+                    break;
+                default:
+                    break;
+            }
         }
+        else if (ctx->mulOp()->getText() == "/"){
+            switch (ctx->mulExp()->operand->getMetaDataType()) {
+                case MetaDataType::INT:
+                    code = new IRDivI(result, ctx->mulExp()->operand, ctx->unaryExp()->operand, irGenerator->ir->getSymbolFunction(irGenerator->currentIRFunc->getFunctionName()));
+                    break;
+                case MetaDataType::FLOAT:
+                    code = new IRDivF(result, ctx->mulExp()->operand, ctx->unaryExp()->operand);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (ctx->mulOp()->getText() == "%"){
+            code = new IRMod(result, ctx->mulExp()->operand, ctx->unaryExp()->operand, irGenerator->ir->getSymbolFunction(curSymbolTable->getFuncName()));
+        }
+        else
+            throw std::runtime_error("[ERROR] > mulop illegal.\n");
+        irGenerator->addCode(code);
+        ctx->operand = result;
     }
-    else if (ctx->mulOp()->getText() == "%"){
-        code = new IRMod(result, ctx->mulExp()->operand, ctx->unaryExp()->operand, irGenerator->ir->getSymbolFunction(curSymbolTable->getFuncName()));
-    }
-    else
-        throw std::runtime_error("[ERROR] > mulop illegal.\n");
-    irGenerator->addCode(code);
-    ctx->operand = result;
 
     if (ctx->mulOp()->getText() == "*") {
         ctx->sizeNum = ctx->mulExp()->sizeNum * ctx->unaryExp()->sizeNum;
+    }
+    else if (ctx->mulOp()->getText() == "/") {
+        ctx->sizeNum = ctx->mulExp()->sizeNum / ctx->unaryExp()->sizeNum;
+    }
+    else {
+        ctx->sizeNum = ctx->mulExp()->sizeNum % ctx->unaryExp()->sizeNum;
     }
 }
 

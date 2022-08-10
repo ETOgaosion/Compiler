@@ -1,7 +1,7 @@
 ============ global var ================
-b := symbol type: 1; data type: 1; initValue: b: 5
+arr := symbol type: 1; data type: 1; initValue: arr: 1
 
-a := symbol type: 1; data type: 1; initValue: a: 3
+N := symbol type: 2; data type: 1; initValue: N: -1
 
 ============ imm value ================
 ============ functions ================
@@ -9,15 +9,38 @@ a := symbol type: 1; data type: 1; initValue: a: 3
 main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
-a := symbol type: 1; data type: 1; initValue: 5
+sum := symbol type: 1; data type: 1; initValue: 0
+
+i := symbol type: 1; data type: 1; initValue: 0
 
 ----------- tempVars ------------
+t_6:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_3:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
 t_0:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	a = 5;
-	t_0 = a + b;
-	addparam t_0, 1;
+	i = 0;
+	sum = 0;
+L_1_main:
+	t_9 = phi t_7, i;
+	t_11 = phi t_5, sum;
+	t_0 = t_9 < 6;
+	beqz t_0 L_0_main;
+	t_1 = t_9;
+	t_2 = t_9;
+	t_3 = arr[t_2];
+	t_4 = t_11 + t_3;
+	t_5 = t_4;
+	t_6 = t_9 + 1;
+	t_7 = t_6;
+	goto L_1_main;
+L_0_main:
+	t_8 = phi t_7, i;
+	t_10 = phi t_5, sum;
+	addparam t_11, 1;
 	call putint; 
 	return 0;
 
