@@ -143,7 +143,7 @@ bool Code::isImm8(int offset) {
         return highestBit - lowestBit + 1 <= 8 && lowestBit % 2 == 0;
     }
     else {
-        return (min(33 - highestBit + lowestBit) <= 8 && highestBit % 2 == 0) || (highestBit - lowestBit + 1 <= 8 && lowestBit % 2 == 0);
+        return ((33 - highestBit + lowestBit) <= 8 && highestBit % 2 == 0) || (highestBit - lowestBit + 1 <= 8 && lowestBit % 2 == 0);
     }
 }
 
