@@ -841,7 +841,10 @@ void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ct
 void SemanticAnalysis::enterStmtExpression(SysYParser::StmtExpressionContext * ctx)
 {
     ctx->hasReturn = false;
-    ctx->exp()->commVal = nullptr;
+    if (ctx->exp()) {
+        ctx->exp()->commVal = nullptr;
+        ctx->exp()->fromVarDecl = false;
+    }
 }
 
 void SemanticAnalysis::exitStmtExpression(SysYParser::StmtExpressionContext * ctx)
@@ -1176,7 +1179,10 @@ void SemanticAnalysis::enterSubStmtExpression(SysYParser::SubStmtExpressionConte
 {
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
-    ctx->exp()->commVal = nullptr;
+    if (ctx->exp()) {
+        ctx->exp()->commVal = nullptr;
+        ctx->exp()->fromVarDecl = false;
+    }
 }
 
 void SemanticAnalysis::exitSubStmtExpression(SysYParser::SubStmtExpressionContext * ctx)
@@ -1578,18 +1584,20 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
         }
     }
     
-    IROperand *idInitValue = symVar->getInitialValue();
-    if (idInitValue->getIsArray()) {
-        std::vector<std::size_t> arrShape = symVar->getArrayShape();
-        int totalSize = 0, tmpWidth = 1;
-        for (int i = ctx->exp().size() - 1; i >= 0; i--) {
-            totalSize += tmpWidth * ctx->exp(i)->sizeNum;
-            tmpWidth *= arrShape[i];
+    if (symVar->getInitialValue()) {
+        IROperand *idInitValue = symVar->getInitialValue();
+        if (idInitValue->getIsArray()) {
+            std::vector<std::size_t> arrShape = symVar->getArrayShape();
+            int totalSize = 0, tmpWidth = 1;
+            for (int i = ctx->exp().size() - 1; i >= 0; i--) {
+                totalSize += tmpWidth * ctx->exp(i)->sizeNum;
+                tmpWidth *= arrShape[i];
+            }
+            ctx->sizeNum = std::stoi(idInitValue->getValue(totalSize));
         }
-        ctx->sizeNum = std::stoi(idInitValue->getValue(totalSize));
-    }
-    else {
-        ctx->sizeNum = std::stoi(idInitValue->getValue());
+        else {
+            ctx->sizeNum = std::stoi(idInitValue->getValue());
+        }
     }
 }
 

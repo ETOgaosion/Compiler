@@ -7,5 +7,6 @@ int main(){
 	int b;
 	a = 10;
 	b = func(a);
-	return b;
+	putint(b);
+    return 0;
 }

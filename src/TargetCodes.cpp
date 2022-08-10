@@ -376,7 +376,7 @@ void Code::print() const {
             cout << "\tblt\t" << label << endl;
             break;
         case ASMOperation::ADR:
-            cout << "\tadr" << Code::condToString(cond) << "\t" << rd->getAliasName() << ", " << label << endl;
+            cout << "\tadrl" << Code::condToString(cond) << "\t" << rd->getAliasName() << ", " << label << endl;
             break;
         case ASMOperation::LDR:
             cout << "\tldr" << Code::condToString(cond) << "\t" << rd->getAliasName() << ", ";
