@@ -1989,10 +1989,10 @@ void SemanticAnalysis::exitMulExpMulExp(SysYParser::MulExpMulExpContext * ctx)
     if (ctx->mulOp()->getText() == "*") {
         ctx->sizeNum = ctx->mulExp()->sizeNum * ctx->unaryExp()->sizeNum;
     }
-    else if (ctx->mulOp()->getText() == "/") {
+    else if (ctx->mulOp()->getText() == "/" && ctx->unaryExp()->sizeNum != 0) {
         ctx->sizeNum = ctx->mulExp()->sizeNum / ctx->unaryExp()->sizeNum;
     }
-    else {
+    else if (ctx->mulOp()->getText() == "%" && ctx->unaryExp()->sizeNum != 0) {
         ctx->sizeNum = ctx->mulExp()->sizeNum % ctx->unaryExp()->sizeNum;
     }
 }
