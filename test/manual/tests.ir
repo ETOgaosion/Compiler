@@ -1,7 +1,7 @@
 ============ global var ================
 ============ imm value ================
-ImmValue_3: {7, 6, 3, 4, 5, 6, 7, 8}
-ImmValue_2: {1, 2, 3, 0, 5, 7, 8}
+ImmValue_3: {0, 6, 3, 4, 5, 6, 7, 8}
+ImmValue_2: {1, 2, 3, 0, 5, 0, 7, 8}
 ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8}
 ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0}
 ============ functions ================
@@ -9,9 +9,9 @@ ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0}
 main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
-e := symbol type: 1; data type: 1; initValue: ImmValue_3: {7, 6, 3, 4, 5, 6, 7, 8}
+e := symbol type: 1; data type: 1; initValue: ImmValue_3: {0, 6, 3, 4, 5, 6, 7, 8}
 
-d := symbol type: 1; data type: 1; initValue: ImmValue_2: {1, 2, 3, 0, 5, 7, 8}
+d := symbol type: 1; data type: 1; initValue: ImmValue_2: {1, 2, 3, 0, 5, 0, 7, 8}
 
 c := symbol type: 1; data type: 1; initValue: ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8}
 
@@ -40,8 +40,8 @@ main:
 	a = ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0};
 	b = ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8};
 	c = ImmValue_1: {1, 2, 3, 4, 5, 6, 7, 8};
-	d = ImmValue_2: {1, 2, 3, 0, 5, 7, 8};
-	e = ImmValue_3: {7, 6, 3, 4, 5, 6, 7, 8};
+	d = ImmValue_2: {1, 2, 3, 0, 5, 0, 7, 8};
+	e = ImmValue_3: {0, 6, 3, 4, 5, 6, 7, 8};
 	t_0 = 1;
 	t_1 = 1;
 	t_2 = 3 * 2;

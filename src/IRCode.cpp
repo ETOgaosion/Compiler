@@ -139,7 +139,7 @@ IRDivF::IRDivF(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : IRDiv(newResult, newArg1, newArg2) {}
 
 IRMod::IRMod(IROperand *newResult, IROperand *newArg1, IROperand *newArg2, IROperand *newCurFunc)
-        : IRCode(IROperation::DIV, newResult, newArg1, newArg2) {
+        : IRCode(IROperation::MOD, newResult, newArg1, newArg2) {
     curFunc = newCurFunc;
 }
 
@@ -148,7 +148,7 @@ IRLsl::IRLsl(IROperand *newResult, IROperand *newArg1, IROperand *newArg2) : IRC
 IRAsr::IRAsr(IROperand *newResult, IROperand *newArg1, IROperand *newArg2) : IRCode(IROperation::ASR, newResult, newArg1, newArg2) {}
 
 IRNot::IRNot(IROperand *newResult, IROperand *newArg1)
-        : IRCode(IROperation::DIV, newResult, newArg1, nullptr) {}
+        : IRCode(IROperation::NOT, newResult, newArg1, nullptr) {}
 
 IROr::IROr(IROperand *newResult, IROperand *newArg1, IROperand *newArg2)
         : IRCode(IROperation::OR, newResult, newArg1, newArg2) {}
@@ -651,11 +651,12 @@ void IRDivI::genTargetCode(TargetCodes *t) {
     t->addCodeSub(sp, sp, curFunc->getFrameSize());
     t->addCodeBl("__aeabi_idiv");
     t->addCodeAdd(sp, sp, curFunc->getFrameSize());
+    t->setRegisterFree(sp);
     t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
+    result->storeFrom(t, resultReg);
     t->setRegisterFree(resultReg);
-    t->setRegisterFree(sp);
 }
 
 void IRDivF::genTargetCode(TargetCodes *t) {
@@ -692,11 +693,11 @@ void IRMod::genTargetCode(TargetCodes *t) {
     t->addCodeBl("__aeabi_idivmod");
     t->addCodeAdd(sp, sp, curFunc->getFrameSize());
     t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
-    result->storeFrom(t, resultReg);
+    t->setRegisterFree(sp);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
+    result->storeFrom(t, resultReg);
     t->setRegisterFree(resultReg);
-    t->setRegisterFree(sp);
 }
 
 void IRLsl::genTargetCode(TargetCodes *t) {
