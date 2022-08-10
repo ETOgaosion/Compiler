@@ -514,6 +514,7 @@ void SemanticAnalysis::enterFuncDef(SysYParser::FuncDefContext * ctx)
     }
 
     SymbolTable *funcSymbolTable = new FuncSymbolTable(ctx->Ident()->getText(), returnType);
+    ctx->funcBlock()->returnType = returnType;
     if (!curSymbolTable->insertFuncSymbolTableSafely(funcSymbolTable)) {
         throw std::runtime_error("[ERROR] > Redefine function of same name.\n");
     }
@@ -627,6 +628,9 @@ void SemanticAnalysis::enterFuncBlock(SysYParser::FuncBlockContext * ctx)
             it->docLVal = true;
         }
     }
+    for(auto it : ctx->funcBlockItem()) {
+        it->returnType = ctx->returnType;
+    }
 }
 
 void SemanticAnalysis::exitFuncBlock(SysYParser::FuncBlockContext * ctx)
@@ -634,15 +638,7 @@ void SemanticAnalysis::exitFuncBlock(SysYParser::FuncBlockContext * ctx)
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     for (auto & it : ctx->funcBlockItem()) {
         if (it->hasReturn) {
-            if (ctx->hasReturn) {
-                if (ctx->returnType != it->returnType) {
-                    throw std::runtime_error("[ERROR] > return type mismatch");
-                }
-            }
-            else {
-                ctx->hasReturn = true;
-                ctx->returnType = it->returnType;
-            }
+            ctx->hasReturn = true;
         }
     }
     std::unordered_map<IROperand *, std::vector<IROperand *>> toJoinVarDoc;
@@ -670,13 +666,15 @@ void SemanticAnalysis::enterFuncBlockItem(SysYParser::FuncBlockItemContext * ctx
         ctx->stmt()->docLVal = true;
         ctx->stmt()->lValDoc.clear();
     }
+    if (ctx->stmt()) {
+        ctx->stmt()->returnType = ctx->returnType;
+    }
 }
 
 void SemanticAnalysis::exitFuncBlockItem(SysYParser::FuncBlockItemContext * ctx)
 {
     if (ctx->stmt() && ctx->stmt()->hasReturn) {
         ctx->hasReturn = true;
-        ctx->returnType = ctx->stmt()->returnType;
     }
     if (ctx->stmt() && ctx->docLVal) {
         ctx->lValDoc = ctx->stmt()->lValDoc;
@@ -697,24 +695,16 @@ void SemanticAnalysis::enterBlock(SysYParser::BlockContext * ctx)
             it->docLVal = true;
         }
     }
+    for(auto it : ctx->blockItem()) {
+        it->returnType = ctx->returnType;
+    }
 }
 
 void SemanticAnalysis::exitBlock(SysYParser::BlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     for (auto & it : ctx->blockItem()) {
-        if (it->hasReturn) {
-            throw std::runtime_error("[NO ERROR] Block return");
-            if (ctx->hasReturn) {
-                if (ctx->returnType != it->returnType) {
-                    throw std::runtime_error("[ERROR] > return type mismatch.  " + it->getText());
-                }
-            }
-            else {
-                ctx->hasReturn = true;
-                ctx->returnType = it->returnType;
-            }
-        }
+        ctx->hasReturn = it->hasReturn;
     }
 
     block--;
@@ -744,14 +734,15 @@ void SemanticAnalysis::enterBlockItem(SysYParser::BlockItemContext * ctx)
         ctx->subStmt()->docLVal = true;
         ctx->subStmt()->lValDoc.clear();
     }
+    if (ctx->subStmt()) {
+        ctx->subStmt()->returnType = ctx->returnType;
+    }
 }
 
 void SemanticAnalysis::exitBlockItem(SysYParser::BlockItemContext * ctx)
 {
     if (ctx->subStmt() && ctx->subStmt()->hasReturn) {
-        throw std::runtime_error("[NO ERROR] Block item return");
         ctx->hasReturn = true;
-        ctx->returnType = ctx->subStmt()->returnType;
     }
     if (ctx->subStmt() && ctx->docLVal) {
         ctx->lValDoc = ctx->subStmt()->lValDoc;
@@ -863,16 +854,17 @@ void SemanticAnalysis::enterStmtBlock(SysYParser::StmtBlockContext * ctx)
         ctx->funcBlock()->docLVal = true;
         ctx->funcBlock()->lValDoc.clear();
     }
+    if (ctx->funcBlock()) {
+        ctx->funcBlock()->returnType = ctx->returnType;
+    }
 }
 
 void SemanticAnalysis::exitStmtBlock(SysYParser::StmtBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
-    if (ctx->funcBlock() && ctx->funcBlock()->hasReturn) {
-        ctx->hasReturn = true;
-        ctx->returnType = ctx->funcBlock()->returnType;
+    if (ctx->funcBlock()) {
+        ctx->hasReturn = ctx->funcBlock()->hasReturn;
     }
-
     if(!ctx->codes.empty())
         irGenerator->addCodes(ctx->codes);
 
@@ -936,6 +928,10 @@ void SemanticAnalysis::enterStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
     if (ctx->subStmt()) {
         ctx->subStmt()->docLVal = true;
         ctx->subStmt()->lValDoc.clear();
+        ctx->subStmt()->returnType = ctx->returnType;
+    }
+    for (auto it : ctx->stmt()) {
+        it->returnType = ctx->returnType;
     }
 }
 
@@ -949,7 +945,6 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
     }
     if (ctx->subStmt() && ctx->subStmt()->hasReturn) {
         ctx->hasReturn = true;
-        ctx->returnType = ctx->subStmt()->returnType;
     }
 
     if (ctx->getText().rfind("while", 0) == 0){
@@ -1059,7 +1054,10 @@ void SemanticAnalysis::exitStmtCtrlSeq(SysYParser::StmtCtrlSeqContext * ctx)
 
 void SemanticAnalysis::enterStmtReturn(SysYParser::StmtReturnContext * ctx)
 {
-    ctx->exp()->commVal = nullptr;
+    if (ctx->exp()) {
+        ctx->exp()->commVal = nullptr;
+        ctx->exp()->fromVarDecl = false;
+    }
 }
 
 void SemanticAnalysis::exitStmtReturn(SysYParser::StmtReturnContext * ctx)
@@ -1072,8 +1070,11 @@ void SemanticAnalysis::exitStmtReturn(SysYParser::StmtReturnContext * ctx)
             throw std::runtime_error("[ERROR] > stmt return type mismatch." + std::to_string(static_cast<int>(curSymbolTable->getSymbolTableType())));
         }
     }
+    MetaDataType expReturnType = ctx->exp() ? ctx->exp()->metaDataType : MetaDataType::VOID;
+    if (ctx->returnType != expReturnType) {
+        throw std::runtime_error("[ERROR] > wrong return type");
+    }
     ctx->hasReturn = true;
-    ctx->returnType = ctx->exp() ? ctx->exp()->metaDataType : MetaDataType::VOID;
 
     IRCode *code = nullptr;
 
@@ -1197,7 +1198,7 @@ void SemanticAnalysis::enterSubStmtBlock(SysYParser::SubStmtBlockContext * ctx)
     curSymbolTable->insertBlockSymbolTable(blkSymbolTable);
     curSymbolTable = blkSymbolTable;
     ctx->hasReturn = false;
-    ctx->returnType = MetaDataType::VOID;
+    ctx->block()->returnType = ctx->returnType;
     if (ctx->docLVal) {
         ctx->block()->docLVal = true;
         ctx->block()->lValDoc.clear();
@@ -1208,12 +1209,6 @@ void SemanticAnalysis::exitSubStmtBlock(SysYParser::SubStmtBlockContext * ctx)
 {
     curSymbolTable = curSymbolTable->getParentSymbolTable();
     ctx->hasReturn = ctx->block()->hasReturn;
-    ctx->returnType = ctx->block()->returnType;
-    if (ctx->hasReturn && curSymbolTable->getSymbolTableType() == TableType::FUNC) {
-        if (ctx->returnType != curSymbolTable->getReturnType()) {
-            throw std::runtime_error("[ERROR] > SubStmtBlock return type mismatch.  " + ctx->getText());
-        }
-    }
     if(!ctx->codes.empty())
         irGenerator->addCodes(ctx->codes);
 
@@ -1225,7 +1220,6 @@ void SemanticAnalysis::exitSubStmtBlock(SysYParser::SubStmtBlockContext * ctx)
 void SemanticAnalysis::enterSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ctx)
 {
     ctx->hasReturn = false;
-    ctx->returnType = MetaDataType::VOID;
 
     if (ctx->cond()) {
         IRLabel* falseLabel = irGenerator->addLabel();
@@ -1274,6 +1268,7 @@ void SemanticAnalysis::enterSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * c
     for (auto it : ctx->subStmt()) {
         it->docLVal = true;
         it->lValDoc.clear();
+        it->returnType = ctx->returnType;
     }
 }
 
@@ -1281,22 +1276,7 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
 {
     for (auto & s : ctx->subStmt()) {
         if (s->hasReturn) {
-            if (curSymbolTable->getSymbolTableType() == TableType::FUNC) {
-                if (s->returnType != curSymbolTable->getReturnType()) {
-                    throw std::runtime_error("[ERROR] > return type mismatch.  " + s->getText());
-                }
-            }
-            else {
-                if (ctx->hasReturn) {
-                    if (s->returnType != ctx->returnType) {
-                        throw std::runtime_error("[ERROR] > return type mismatch.  " + s->getText());
-                    }
-                }
-                else {
-                    ctx->hasReturn = true;
-                    ctx->returnType = s->returnType;
-                }
-            }
+            ctx->hasReturn = true;
         }
     }
 
@@ -1408,7 +1388,10 @@ void SemanticAnalysis::exitSubStmtCtrlSeq(SysYParser::SubStmtCtrlSeqContext * ct
 
 void SemanticAnalysis::enterSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
 {
-    ctx->exp()->commVal = nullptr;
+    if (ctx->exp()) {
+        ctx->exp()->commVal = nullptr;
+        ctx->exp()->fromVarDecl = false;
+    }
 }
 
 void SemanticAnalysis::exitSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
@@ -1423,11 +1406,15 @@ void SemanticAnalysis::exitSubStmtReturn(SysYParser::SubStmtReturnContext * ctx)
     }
     else {
         ctx->hasReturn = true;
+        MetaDataType expMetaDataType;
         if (ctx->exp()){
-            ctx->returnType = ctx->exp()->metaDataType;
+            expMetaDataType = ctx->exp()->metaDataType;
         }
         else {
-            ctx->returnType = MetaDataType::VOID;
+            expMetaDataType = MetaDataType::VOID;
+        }
+        if (ctx->returnType != expMetaDataType) {
+            throw std::runtime_error("[ERROR] > SubStmtReturn return type mismatch.\n");
         }
     }
 
@@ -1818,7 +1805,7 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExp
             code = new IRNot(result, ctx->unaryExp()->operand);
         }
         else {
-            code = new IRAssign(result, ctx->unaryExp()->operand);
+            code = new IRAssignI(result, ctx->unaryExp()->operand);
         }
         irGenerator->addCode(code);
         ctx->operand = result;

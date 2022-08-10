@@ -692,7 +692,7 @@ void IRMod::genTargetCode(TargetCodes *t) {
     t->addCodeSub(sp, sp, curFunc->getFrameSize());
     t->addCodeBl("__aeabi_idivmod");
     t->addCodeAdd(sp, sp, curFunc->getFrameSize());
-    t->addCodeMv(resultReg, nullptr, arg1Reg, 0);
+    t->addCodeMv(resultReg, nullptr, arg2Reg, 0);
     t->setRegisterFree(sp);
     t->setRegisterFree(arg1Reg);
     t->setRegisterFree(arg2Reg);
