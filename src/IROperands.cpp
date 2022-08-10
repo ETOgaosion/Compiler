@@ -446,14 +446,12 @@ Register *IRSymbolVariable::loadTo(TargetCodes *t, const string &regName, bool i
                     targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
                     tmpRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
                     t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
-                    t->addCodeLdr(tmpRegister, tmpRegister);
                     t->addCodeLdr(targetRegister, tmpRegister, 0);
                     t->setRegisterFree(tmpRegister);
                     break;
                 case MetaDataType::FLOAT:
                     tmpRegister = t->getNextFreeRegister(true, false, hasFreeRegister);
                     t->addCodeLdr(tmpRegister, symbol->getSymbolName(), true);
-                    t->addCodeLdr(tmpRegister, tmpRegister);
                     if (isGeneralPurposeRegister) {
                         targetRegister = t->tryGetCertainRegister(true, regName, hasFreeRegister);
                         t->addCodeLdr(targetRegister, tmpRegister, 0);

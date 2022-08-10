@@ -1,8 +1,6 @@
-//test div
+//test divc
+const int a = 10;
 int main(){
-    int a, b;
-    a = 10;
-    b = 5;
-    putint(a/b);
+    putint(a/5);
     return 0;
 }
