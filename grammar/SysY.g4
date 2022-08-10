@@ -43,7 +43,8 @@ constDef
         bool withType,
         std::vector<std::size_t> shape,
         bool isArray,
-        IRValue* value
+        IRValue* value,
+        std::vector<Comm *> commVal
     ]
     : Ident ('[' exp ']')* ('=' constInitVal)?
     ;
@@ -73,7 +74,8 @@ varDef
         bool withType,
         std::vector<std::size_t> shape,
         bool isArray,
-        IROperand* value
+        IROperand* value,
+        std::vector<Comm *> commVal
     ]
     : Ident ('[' exp ']')* ('=' initVal)?
     ;

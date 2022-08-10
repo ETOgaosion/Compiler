@@ -174,9 +174,11 @@ void SemanticAnalysis::enterConstDef(SysYParser::ConstDefContext * ctx)
     ctx->value = nullptr;
     ctx->constInitVal()->outside = true;
     if (!ctx->exp().empty()) {
-        if (ctx->constInitVal()) {
-            for (auto val : ctx->exp()) {
-                val->commVal = new Comm();
+        for (auto val : ctx->exp()) {
+            val->fromVarDecl = true;
+            val->commVal = new Comm();
+            ctx->commVal.push_back(val->commVal);
+            if (ctx->constInitVal()) {
                 ctx->constInitVal()->commVal.push_back(val->commVal);
             }
         }
@@ -190,9 +192,8 @@ void SemanticAnalysis::exitConstDef(SysYParser::ConstDefContext * ctx)
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
-        ctx->shape.clear();
-        for (auto it : ctx->exp()) {
-            ctx->shape.push_back(std::stoi(it->getText()));
+        for (auto it : ctx->commVal) {
+            ctx->shape.push_back(it->shareValue);
         }
     }
     if (ctx->constInitVal()) {
@@ -352,9 +353,11 @@ void SemanticAnalysis::enterVarDef(SysYParser::VarDefContext * ctx)
         ctx->initVal()->shape.clear();
     }
     if (ctx->exp().size() > 0) {
-        if (ctx->initVal()) {
-            for (auto val : ctx->exp()) {
-                val->commVal = new Comm();
+        for (auto val : ctx->exp()) {
+            val->commVal = new Comm();
+            val->fromVarDecl = true;
+            ctx->commVal.push_back(val->commVal);
+            if (ctx->initVal()) {
                 ctx->initVal()->commVal.push_back(val->commVal);
             }
         }
@@ -368,7 +371,9 @@ void SemanticAnalysis::exitVarDef(SysYParser::VarDefContext * ctx)
         ctx->isArray = false;
     } else {
         ctx->isArray = true;
-        ctx->shape = std::move(ctx->initVal()->shape);
+        for (auto it : ctx->commVal) {
+            ctx->shape.push_back(it->shareValue);
+        }
     }
     if (ctx->initVal()) {
         ctx->withType = true;
