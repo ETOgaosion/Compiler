@@ -741,6 +741,7 @@ void SemanticAnalysis::enterStmtAssignment(SysYParser::StmtAssignmentContext * c
 {
     ctx->hasReturn = false;
     ctx->exp()->commVal = nullptr;
+    ctx->exp()->fromVarDecl = false;
 }
 
 void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ctx)
@@ -1076,6 +1077,7 @@ void SemanticAnalysis::enterSubStmtAssignment(SysYParser::SubStmtAssignmentConte
     ctx->hasReturn = false;
     ctx->returnType = MetaDataType::VOID;
     ctx->exp()->commVal = nullptr;
+    ctx->exp()->fromVarDecl = false;
 }
 
 void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContext * ctx)
@@ -2097,6 +2099,7 @@ void SemanticAnalysis::exitAddOp(SysYParser::AddOpContext *ctx) {}
 void SemanticAnalysis::enterRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
+    ctx->addExp()->fromVarDecl = false;
 }
 
 void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
@@ -2169,6 +2172,7 @@ void SemanticAnalysis::exitRelExpRelExp(SysYParser::RelExpRelExpContext * ctx)
 void SemanticAnalysis::enterRelExpAddExp(SysYParser::RelExpAddExpContext * ctx)
 {
     ctx->metaDataType = MetaDataType::VOID;
+    ctx->addExp()->fromVarDecl = false;
 }
 
 void SemanticAnalysis::exitRelExpAddExp(SysYParser::RelExpAddExpContext * ctx)
