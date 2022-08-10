@@ -1817,6 +1817,9 @@ void SemanticAnalysis::exitUnaryExpNestUnaryExp(SysYParser::UnaryExpNestUnaryExp
         else if(ctx->unaryOp()->getText() == "!"){
             code = new IRNot(result, ctx->unaryExp()->operand);
         }
+        else {
+            code = new IRAssign(result, ctx->unaryExp()->operand);
+        }
         irGenerator->addCode(code);
         ctx->operand = result;
     }
