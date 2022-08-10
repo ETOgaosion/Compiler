@@ -96,6 +96,9 @@ string Code::condToString(Cond inCond) {
 }
 
 bool Code::isImm8(int offset) {
+    if (offset < 0) {
+        offset = -offset;
+    }
     int scanner = 0x1, highestBit = 0, lowestBit = 0;
     for (int i = 31; i >= 0; i--) {
         if (offset & (scanner << i)) {
@@ -137,13 +140,13 @@ bool Code::isImm8(int offset) {
     }
 
     if (midAllZero && !outSideAllZero) {
-        return 33 - highestBit + lowestBit <= 8 && highestBit % 2 == 0;
+        return 33 - highestBit + lowestBit <= 8 && (highestBit <= 8 || highestBit % 2 == 0);
     }
     else if (!midAllZero && outSideAllZero) {
-        return highestBit - lowestBit + 1 <= 8 && lowestBit % 2 == 0;
+        return highestBit - lowestBit + 1 <= 8 && (lowestBit <= 8 || lowestBit % 2 == 0);
     }
     else {
-        return ((33 - highestBit + lowestBit) <= 8 && highestBit % 2 == 0) || (highestBit - lowestBit + 1 <= 8 && lowestBit % 2 == 0);
+        return ((33 - highestBit + lowestBit) <= 8 && (highestBit <= 8 || highestBit % 2 == 0)) || (highestBit - lowestBit + 1 <= 8 && (lowestBit <= 8 || lowestBit % 2 == 0));
     }
 }
 

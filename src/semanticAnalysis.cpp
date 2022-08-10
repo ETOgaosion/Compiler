@@ -1581,7 +1581,9 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
     if (!ctx->fromVarDecl) {
         if (searchLVal->getIsArray() && ctx->exp().empty()) {
             ctx->isArray = true;
-            ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
+            if (searchLVal->getSymbolType() != SymbolType::PARAM) {
+                ctx->shape = std::move(searchLVal->getShape());
+            }
         }
         else if (searchLVal->getIsArray()) {
             if (searchLVal->getSymbolType() != SymbolType::PARAM) {

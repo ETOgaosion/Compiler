@@ -1167,7 +1167,7 @@ void IRAddParamA::genTargetCode(TargetCodes *t) {
             t->addCodeStr(sp, arg1Reg, -arg1Reg->getTmpStoreOffset(), false);
             t->setRegisterFree(sp);
         }
-        t->addCodeLdr(arg1Reg, arg1->getSymbolName(), true);
+        t->addCodeLdr(arg1Reg, arg1->getInitialValue()->getValueLabel(), true);
         t->setRegisterFree(arg1Reg);
     }
     else {
@@ -1180,7 +1180,7 @@ void IRAddParamA::genTargetCode(TargetCodes *t) {
             arg1Reg->setTmpStored(true);
             t->addCodeStr(sp, arg1Reg, -arg1Reg->getTmpStoreOffset(), false);
         }
-        t->addCodeLdr(arg1Reg, arg1->getSymbolName(), true);
+        t->addCodeLdr(arg1Reg, arg1->getInitialValue()->getValueLabel(), true);
         t->addCodeStr(sp, arg1Reg, -curFunc->getFrameSize() + 4 * (stoi(arg2->getValue(), nullptr, 0) - 5), false);
         t->setRegisterFree(arg1Reg);
         t->setRegisterFree(sp);

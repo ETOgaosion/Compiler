@@ -1,58 +1,180 @@
 ============ global var ================
+n := symbol type: 1; data type: 1; initValue: n: 0
+
 ============ imm value ================
-ImmValue_0: {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 ============ functions ================
 ----------- funcDef -----------
 main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
-d := symbol type: 1; data type: 1; initValue: 0
+tmp := symbol type: 1; data type: 1; initValue: 0
 
-c := symbol type: 1; data type: 1; initValue: ImmValue_0: {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+i := symbol type: 1; data type: 1; initValue: 0
 
-b := symbol type: 2; data type: 1; initValue: 20
-
-a := symbol type: 1; data type: 1; initValue: 2
+a := symbol type: 1; data type: 1; initValue: ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 ----------- tempVars ------------
-t_13:= symbol type: TEMP VAR; data type: 1
-t_0:= symbol type: TEMP VAR; data type: 1
-t_8:= symbol type: TEMP VAR; data type: 1
-t_11:= symbol type: TEMP VAR; data type: 1
-t_12:= symbol type: TEMP VAR; data type: 1
-t_1:= symbol type: TEMP VAR; data type: 1
-t_2:= symbol type: TEMP VAR; data type: 1
+t_19:= symbol type: TEMP VAR; data type: 1
+t_6:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_28:= symbol type: TEMP VAR; data type: 1
+t_16:= symbol type: TEMP VAR; data type: 1
 t_3:= symbol type: TEMP VAR; data type: 1
 t_10:= symbol type: TEMP VAR; data type: 1
-t_4:= symbol type: TEMP VAR; data type: 1
-t_5:= symbol type: TEMP VAR; data type: 1
-t_6:= symbol type: TEMP VAR; data type: 1
+t_23:= symbol type: TEMP VAR; data type: 1
+t_9:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
 t_7:= symbol type: TEMP VAR; data type: 1
+t_22:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_12:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_14:= symbol type: TEMP VAR; data type: 1
+t_13:= symbol type: TEMP VAR; data type: 1
+t_15:= symbol type: TEMP VAR; data type: 1
+t_17:= symbol type: TEMP VAR; data type: 1
+t_18:= symbol type: TEMP VAR; data type: 1
+t_24:= symbol type: TEMP VAR; data type: 1
+t_0:= symbol type: TEMP VAR; data type: 1
+t_20:= symbol type: TEMP VAR; data type: 1
+t_25:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
 main:
-	a = 2;
-	b = 20;
-	c = ImmValue_0: {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	d = 0;
-	t_0 = a;
-	t_1 = a;
-	t_2 = a;
-	t_3 = a;
-	t_4 = c[t_3];
-	c[t_1] = t_4;
-	t_5 = a;
-	t_6 = a;
-	t_7 = c[t_6];
-	t_8 = d + t_7;
-	t_9 = t_8;
-	t_10 = a;
-	t_11 = a;
-	t_12 = c[t_11];
-	addparam t_12, 1;
+	n = 10;
+	a = ImmValue_0: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	t_0 = 0;
+	t_1 = 0;
+	a[t_1] = 4;
+	t_2 = 1;
+	t_3 = 1;
+	a[t_3] = 3;
+	t_4 = 2;
+	t_5 = 2;
+	a[t_5] = 9;
+	t_6 = 3;
+	t_7 = 3;
+	a[t_7] = 2;
+	t_8 = 4;
+	t_9 = 4;
+	a[t_9] = 0;
+	t_10 = 5;
+	t_11 = 5;
+	a[t_11] = 1;
+	t_12 = 6;
+	t_13 = 6;
+	a[t_13] = 6;
+	t_14 = 7;
+	t_15 = 7;
+	a[t_15] = 5;
+	t_16 = 8;
+	t_17 = 8;
+	a[t_17] = 7;
+	t_18 = 9;
+	t_19 = 9;
+	a[t_19] = 8;
+	i = 0;
+	addparam a, 1;
+	call bubblesort; 
+	t_20 =  return ;
+	t_21 = t_20;
+L_1_main:
+	t_31 = phi t_29, i;
+	t_33 = phi t_26, tmp, t_27, tmp;
+	t_22 = t_31 < n;
+	beqz t_22 L_0_main;
+	tmp = 0;
+	t_23 = t_31;
+	t_24 = t_31;
+	t_25 = a[t_24];
+	t_26 = t_25;
+	addparam t_26, 1;
 	call putint; 
-	addparam 10, 1;
+	t_27 = 10;
+	addparam t_27, 1;
 	call putch; 
-	t_13 = a + 1;
-	t_14 = t_13;
-	return t_9;
+	t_28 = t_31 + 1;
+	t_29 = t_28;
+	goto L_1_main;
+L_0_main:
+	t_30 = phi t_29, i;
+	t_32 = phi t_26, tmp, t_27, tmp;
+	return 0;
+
+----------- funcDef -----------
+bubblesort(1) => 1:
+----------- paramVars -----------
+arr := symbol type: 0; data type: 1
+----------- localVars -----------
+tmp := symbol type: 1; data type: 1; initValue: 0
+
+j := symbol type: 1; data type: 1; initValue: 0
+
+i := symbol type: 1; data type: 1; initValue: 0
+
+----------- tempVars ------------
+t_6:= symbol type: TEMP VAR; data type: 1
+t_5:= symbol type: TEMP VAR; data type: 1
+t_4:= symbol type: TEMP VAR; data type: 1
+t_23:= symbol type: TEMP VAR; data type: 1
+t_9:= symbol type: TEMP VAR; data type: 1
+t_2:= symbol type: TEMP VAR; data type: 1
+t_7:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
+t_11:= symbol type: TEMP VAR; data type: 1
+t_8:= symbol type: TEMP VAR; data type: 1
+t_15:= symbol type: TEMP VAR; data type: 1
+----------- Codes ------------
+bubblesort:
+	arr =  param 1;
+	i = 0;
+	j = 0;
+	t_0 = 0;
+L_1_bubblesort:
+	t_26 = phi t_24, i;
+	t_28 = phi t_17, arr;
+	t_30 = phi t_19, tmp;
+	t_32 = phi t_3, j, t_21;
+	t_1 = n - 1;
+	t_2 = t_26 < t_1;
+	beqz t_2 L_0_bubblesort;
+	t_3 = 0;
+L_3_bubblesort:
+	t_18 = phi t_14, arr;
+	t_20 = phi t_13, tmp;
+	t_22 = phi t_16, j;
+	t_4 = n - i;
+	t_5 = t_4 - 1;
+	t_6 = t_22 < t_5;
+	beqz t_6 L_2_bubblesort;
+	t_7 = t_22 + 1;
+	t_8 = t_18 > arr;
+	beqz t_8 L_4_bubblesort;
+	tmp = 0;
+	t_9 = t_22 + 1;
+	t_10 = t_18;
+	t_11 = t_22 + 1;
+	arr = t_18;
+	t_12 = t_10;
+L_4_bubblesort:
+	t_13 = phi t_10, tmp;
+	t_14 = phi arr, t_12, arr;
+	t_15 = t_22 + 1;
+	t_16 = t_15;
+	goto L_3_bubblesort;
+L_2_bubblesort:
+	t_17 = phi t_14;
+	t_19 = phi t_13;
+	t_21 = phi t_16, j;
+	t_23 = t_26 + 1;
+	t_24 = t_23;
+	goto L_1_bubblesort;
+L_0_bubblesort:
+	t_25 = phi t_24, i;
+	t_27 = phi t_17;
+	t_29 = phi t_19;
+	t_31 = phi t_3, j, t_21;
+	return 0;
 
