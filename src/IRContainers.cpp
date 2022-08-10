@@ -3146,11 +3146,6 @@ void IRProgram::initializeFields(string newProgramName, SymbolTable *newGlobalSy
 }
 
 IRSymbolVariable* IRProgram::addGlobalVariable(AbstractSymbol* symbol, IROperand *newValue) {
-    string valueKey = {};
-    for (const auto &val : newValue->getValues()) {
-        valueKey += (val + ",");
-    }
-    immValues.erase(valueKey);
     newValue = new IRValue(newValue->getMetaDataType(), newValue->getValues(), symbol->getSymbolName(), false);
     auto glbSymVar = new IRSymbolVariable(symbol, newValue, true);
     globalVariables.emplace(glbSymVar->getSymbolName(), glbSymVar);
@@ -3168,50 +3163,32 @@ bool IRProgram::addSymbolFunction(IRSymbolFunction *funcSymbol) {
 }
 
 IRValue *IRProgram::addImmValue(MetaDataType inMetaDataType, const string &inValue) {
-    if (immValues.find(inValue) != immValues.end()) {
-        return immValues[inValue];
-    }
     auto *newValue = new IRValue(inMetaDataType, inValue, "ImmValue_" + to_string(valueCount++), false);
-    immValues[inValue] = newValue;
+    immValues.push_back(newValue);
     return newValue;
 }
 
 IRValue *IRProgram::addImmValue(const string &inLabel, MetaDataType inMetaDataType, const string &inValue) {
-    if (immValues.find(inValue) != immValues.end()) {
-        return immValues[inValue];
-    }
     auto *newValue = new IRValue(inMetaDataType, inValue, inLabel, false);
-    immValues[inValue] = newValue;
+    immValues.push_back(newValue);
     return newValue;
 }
 
 IRValue *IRProgram::addMulSameImmValue(MetaDataType inMetaDataType, const string &inValue, const std::vector<std::size_t>& shape) {
-    string valueKey = {};
     vector<string> values;
     for (unsigned long i : shape) {
         for (int j = 0; j < i; j++) {
-            valueKey += (inValue + ",");
             values.push_back(inValue);
         }
     }
-    if (immValues.find(valueKey) != immValues.end()) {
-        return immValues[valueKey];
-    }
     auto *newValue = new IRValue(inMetaDataType, values, "ImmValue_" + to_string(valueCount++), true);
-    immValues[valueKey] = newValue;
+    immValues.push_back(newValue);
     return newValue;
 }
 
 IRValue *IRProgram::addMulImmValue(MetaDataType inMetaDataType, vector<string> &inValues) {
-    string valueKey = {};
-    for (auto &value : inValues) {
-        valueKey += (value + ",");
-    }
-    if (immValues.find(valueKey) != immValues.end()) {
-        return immValues[valueKey];
-    }
     auto *newValue = new IRValue(inMetaDataType, inValues, "ImmValue_" + to_string(valueCount++), true);
-    immValues[valueKey] = newValue;
+    immValues.push_back(newValue);
     return newValue;
 }
 
@@ -3230,17 +3207,8 @@ IRSymbolFunction *IRProgram::getSymbolFunction(const string& functionName){
     return funcSymbols.at(functionName);
 }
 
-IRValue *IRProgram::getImmValue(const string &inImmValue) {
-    return immValues.at(inImmValue);
-    return nullptr;
-}
-
-IRValue *IRProgram::getImmValue(const vector<string>& inImmValues) {
-    string valueKey = {};
-    for (auto &value : inImmValues) {
-        valueKey += value;
-    }
-    return immValues.at(valueKey);
+IRValue *IRProgram::getImmValue(int i) {
+    return immValues.at(i);
 }
 
 void IRProgram::print() {
@@ -3250,7 +3218,7 @@ void IRProgram::print() {
     }
     cout << "============ imm value ================" << endl;
     for (auto &imm : immValues) {
-        imm.second->print();
+        imm->print();
     }
     cout << "============ functions ================" << endl;
     for (const auto& func : functions) {
@@ -3277,7 +3245,7 @@ void IRProgram::targetGen(TargetCodes *t, int inOptimizeLevel) {
         globalVar.second->genTargetGlobalValue(t);
     }
     for (auto &imm : immValues) {
-        imm.second->genTargetValue(t);
+        imm->genTargetValue(t);
     }
     for (const auto& func : functions) {
         if (!func.second->getFunctionInLib()) {

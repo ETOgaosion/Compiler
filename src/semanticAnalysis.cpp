@@ -1617,7 +1617,7 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
 
     // assigned
     if (!ctx->fromVarDecl) {
-        if(!ctx->exp().empty()){
+        if(!ctx->exp().empty() && searchLVal->getSymbolType() != SymbolType::PARAM){
             std::vector<size_t> shape = symVar->getArrayShape();
             int width = shape.back();
             IRTempVariable *mulTemp = irGenerator->addTempVariable(MetaDataType::INT);

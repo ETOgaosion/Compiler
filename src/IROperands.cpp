@@ -263,6 +263,10 @@ void IRValue::genTargetValue(TargetCodes *t) const {
         stream << endl;
     }
     else {
+        t->addCodeDirectives(".data");
+        t->addCodeDirectives(".globl\t" + valueLabel);
+        t->addCodeDirectives(".type\t" + valueLabel + ", %object");
+
         t->addCodeLabel(valueLabel);
         for (const auto& value : values) {
             switch (metaDataType) {

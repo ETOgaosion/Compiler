@@ -15,7 +15,6 @@ b := symbol type: 2; data type: 1; initValue: 20
 a := symbol type: 1; data type: 1; initValue: 2
 
 ----------- tempVars ------------
-t_14:= symbol type: TEMP VAR; data type: 1
 t_13:= symbol type: TEMP VAR; data type: 1
 t_0:= symbol type: TEMP VAR; data type: 1
 t_8:= symbol type: TEMP VAR; data type: 1
@@ -23,8 +22,8 @@ t_11:= symbol type: TEMP VAR; data type: 1
 t_12:= symbol type: TEMP VAR; data type: 1
 t_1:= symbol type: TEMP VAR; data type: 1
 t_2:= symbol type: TEMP VAR; data type: 1
-t_9:= symbol type: TEMP VAR; data type: 1
 t_3:= symbol type: TEMP VAR; data type: 1
+t_10:= symbol type: TEMP VAR; data type: 1
 t_4:= symbol type: TEMP VAR; data type: 1
 t_5:= symbol type: TEMP VAR; data type: 1
 t_6:= symbol type: TEMP VAR; data type: 1
@@ -35,34 +34,25 @@ main:
 	b = 20;
 	c = ImmValue_0: {1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	d = 0;
-L_1_main:
-	t_17 = phi t_15, a;
-	t_19 = phi t_10, d;
-	t_0 = t_17 < b;
-	beqz t_0 L_0_main;
-	t_1 = t_17;
-	t_2 = t_17;
-	t_3 = t_17;
-	t_4 = t_17;
-	t_5 = c[t_4];
-	c[t_2] = t_5;
-	t_6 = t_17;
-	t_7 = t_17;
-	t_8 = c[t_7];
-	t_9 = t_19 + t_8;
-	t_10 = t_9;
-	t_11 = t_17;
-	t_12 = t_17;
-	t_13 = c[t_12];
-	addparam t_13, 1;
+	t_0 = a;
+	t_1 = a;
+	t_2 = a;
+	t_3 = a;
+	t_4 = c[t_3];
+	c[t_1] = t_4;
+	t_5 = a;
+	t_6 = a;
+	t_7 = c[t_6];
+	t_8 = d + t_7;
+	t_9 = t_8;
+	t_10 = a;
+	t_11 = a;
+	t_12 = c[t_11];
+	addparam t_12, 1;
 	call putint; 
 	addparam 10, 1;
 	call putch; 
-	t_14 = t_17 + 1;
-	t_15 = t_14;
-	goto L_1_main;
-L_0_main:
-	t_16 = phi t_15, a;
-	t_18 = phi t_10, d;
-	return t_19;
+	t_13 = a + 1;
+	t_14 = t_13;
+	return t_9;
 

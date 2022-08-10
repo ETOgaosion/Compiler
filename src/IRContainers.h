@@ -166,7 +166,7 @@ private:
     /* also use unordered map to store */
     /* key is actual value, to avoid repetition */
     /* @example: 1's key is "1", 0.99's key is "0.99", {1, 2, 3}'s key is "1,2,3" */
-    std::unordered_map<std::string, IRValue *> immValues;                   // immediate value that must be stored globally
+    std::vector<IRValue *> immValues;                   // immediate value that must be stored globally
 
     int valueCount;                                                         // counter for immediate value, used for their label
     
@@ -187,8 +187,7 @@ public:
     IRSymbolVariable *getGlobalVariable(const std::string& varName);
     IRFunction *getFunction(const std::string& functionName);
     IRSymbolFunction *getSymbolFunction(const std::string& functionName);
-    IRValue *getImmValue(const std::string& inImmValue);
-    IRValue *getImmValue(const std::vector<std::string>& inImmValues);
+    IRValue *getImmValue(int i);
 
     void print();
     void write(const std::string &path);
