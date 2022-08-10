@@ -126,17 +126,34 @@ void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
             if(const_def->value){
                 IRCode* code = nullptr;
                 const_def->value->setMetaDataType(type);
-                switch (type) {
-                    case MetaDataType::INT:
-                        code = new IRAssignI(newConst, const_def->value);
-                        newConst->setInitialValue(const_def->value);
-                        break;
-                    case MetaDataType::FLOAT:
-                        code = new IRAssignF(newConst, const_def->value);
-                        newConst->setInitialValue(const_def->value);
-                        break;
-                    default:
-                        break;
+                if (const_def->value->getOperandType() != OperandType::VALUE){
+                    switch (type)
+                    {
+                        case MetaDataType::INT:
+                            code = new IRAssignI(newConst, const_def->value);
+                            newConst->setInitialValue(new IRValue(MetaDataType::INT, "0", {}, false));
+                            break;
+                        case MetaDataType::FLOAT:
+                            code = new IRAssignF(newConst, const_def->value);
+                            newConst->setInitialValue(new IRValue(MetaDataType::FLOAT, "0", {}, false));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else {
+                    switch (type) {
+                        case MetaDataType::INT:
+                            code = new IRAssignI(newConst, const_def->value);
+                            newConst->setInitialValue(const_def->value);
+                            break;
+                        case MetaDataType::FLOAT:
+                            code = new IRAssignF(newConst, const_def->value);
+                            newConst->setInitialValue(const_def->value);
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 irGenerator->addCode(code);
             }
@@ -287,7 +304,7 @@ void SemanticAnalysis::exitConstInitValOfArray(SysYParser::ConstInitValOfArrayCo
                 ctx->vals.push_back(it->vals[0]);
             }
         }
-        if (ctx->vals.size() != totalSize) {
+        while (ctx->vals.size() != totalSize) {
             ctx->vals.push_back("0");
         }
     } else {
@@ -333,17 +350,33 @@ void SemanticAnalysis::exitVarDecl(SysYParser::VarDeclContext * ctx)
             IRCode* code = nullptr;
             var_def->value->setMetaDataType(type);
             if(var_def->value){
-                switch (type) {
-                    case MetaDataType::INT:
-                        code = new IRAssignI(newVar, var_def->value);
-                        newVar->setInitialValue(var_def->value);
-                        break;
-                    case MetaDataType::FLOAT:
-                        code = new IRAssignF(newVar, var_def->value);
-                        newVar->setInitialValue(var_def->value);
-                        break;
-                    default:
-                        break;
+                if (var_def->value->getOperandType() != OperandType::VALUE) {
+                    switch (type) {
+                        case MetaDataType::INT:
+                            code = new IRAssignI(newVar, var_def->value);
+                            newVar->setInitialValue(new IRValue(MetaDataType::INT, "0", {}, false));
+                            break;
+                        case MetaDataType::FLOAT:
+                            code = new IRAssignF(newVar, var_def->value);
+                            newVar->setInitialValue(new IRValue(MetaDataType::FLOAT, "0", {}, false));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else {
+                    switch (type) {
+                        case MetaDataType::INT:
+                            code = new IRAssignI(newVar, var_def->value);
+                            newVar->setInitialValue(var_def->value);
+                            break;
+                        case MetaDataType::FLOAT:
+                            code = new IRAssignF(newVar, var_def->value);
+                            newVar->setInitialValue(var_def->value);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
             irGenerator->addCode(code);
@@ -467,7 +500,7 @@ void SemanticAnalysis::exitInitValOfArray(SysYParser::InitValOfArrayContext *ctx
                 ctx->vals.push_back(it->vals[0]);
             }
         }
-        if (ctx->vals.size() != totalSize) {
+        while (ctx->vals.size() != totalSize) {
             ctx->vals.push_back("0");
         }
     } else {
@@ -817,15 +850,29 @@ void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ct
             }
         }
         IRCode *assignCode = nullptr;
-        switch (ctx->lVal()->lValMetaDataType) {
-            case MetaDataType::INT:
-                assignCode = new IRAssignI(operand, ctx->exp()->operand);
-                break;
-            case MetaDataType::FLOAT:
-                assignCode = new IRAssignF(operand, ctx->exp()->operand);
-                break;
-            default:
-                break;
+        if (!ctx->lVal()->isArray) {
+            switch (ctx->lVal()->lValMetaDataType) {
+                case MetaDataType::INT:
+                    assignCode = new IRAssignI(operand, ctx->exp()->operand);
+                    break;
+                case MetaDataType::FLOAT:
+                    assignCode = new IRAssignF(operand, ctx->exp()->operand);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            switch (ctx->lVal()->lValMetaDataType) {
+                case MetaDataType::INT:
+                    assignCode = new IRAssignArrayElemI(operand, ctx->exp()->operand, ctx->lVal()->indexOperand);
+                    break;
+                case MetaDataType::FLOAT:
+                    assignCode = new IRAssignArrayElemF(operand, ctx->exp()->operand, ctx->lVal()->indexOperand);
+                    break;
+                default:
+                    break;
+            }
         }
         irGenerator->addCode(assignCode);
     }
@@ -1165,15 +1212,29 @@ void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContex
             }
         }
         IRCode *assignCode = nullptr;
-        switch (ctx->lVal()->lValMetaDataType) {
-            case MetaDataType::INT:
-                assignCode = new IRAssignI(operand, ctx->exp()->operand);
-                break;
-            case MetaDataType::FLOAT:
-                assignCode = new IRAssignF(operand, ctx->exp()->operand);
-                break;
-            default:
-                break;
+        if (!ctx->lVal()->isArray) {
+            switch (ctx->lVal()->lValMetaDataType) {
+                case MetaDataType::INT:
+                    assignCode = new IRAssignI(operand, ctx->exp()->operand);
+                    break;
+                case MetaDataType::FLOAT:
+                    assignCode = new IRAssignF(operand, ctx->exp()->operand);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            switch (ctx->lVal()->lValMetaDataType) {
+                case MetaDataType::INT:
+                    assignCode = new IRAssignArrayElemI(operand, ctx->exp()->operand, ctx->lVal()->indexOperand);
+                    break;
+                case MetaDataType::FLOAT:
+                    assignCode = new IRAssignArrayElemF(operand, ctx->exp()->operand, ctx->lVal()->indexOperand);
+                    break;
+                default:
+                    break;
+            }
         }
         irGenerator->addCode(assignCode);
     }
