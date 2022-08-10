@@ -5,75 +5,16 @@
 main() => 1:
 ----------- paramVars -----------
 ----------- localVars -----------
------------ tempVars ------------
-t_0:= symbol type: TEMP VAR; data type: 1
------------ Codes ------------
-main:
-	call ifElseIf; 
-	t_0 =  return ;
-	addparam t_0, 1;
-	call putint; 
-	return 0;
-
------------ funcDef -----------
-ifElseIf() => 1:
------------ paramVars -----------
------------ localVars -----------
-b := symbol type: 1; data type: 1; initValue: 0
-
 a := symbol type: 1; data type: 1; initValue: 0
 
 ----------- tempVars ------------
-t_15:= symbol type: TEMP VAR; data type: 1
-t_13:= symbol type: TEMP VAR; data type: 1
-t_11:= symbol type: TEMP VAR; data type: 1
-t_12:= symbol type: TEMP VAR; data type: 1
-t_2:= symbol type: TEMP VAR; data type: 1
-t_9:= symbol type: TEMP VAR; data type: 1
-t_3:= symbol type: TEMP VAR; data type: 1
-t_16:= symbol type: TEMP VAR; data type: 1
-t_10:= symbol type: TEMP VAR; data type: 1
-t_4:= symbol type: TEMP VAR; data type: 1
-t_5:= symbol type: TEMP VAR; data type: 1
-t_6:= symbol type: TEMP VAR; data type: 1
-t_7:= symbol type: TEMP VAR; data type: 1
+t_1:= symbol type: TEMP VAR; data type: 1
 ----------- Codes ------------
-ifElseIf:
+main:
 	a = 0;
-	t_0 = 5;
-	b = 0;
-	t_1 = 10;
-	t_2 = t_0 == 6;
-	t_3 = t_1 == 0xb;
-	t_4 = t_2 || t_3;
-	beqz t_4 L_0_ifElseIf;
-	return t_0;
-	goto L_1_ifElseIf;
-L_0_ifElseIf:
-	t_5 = t_1 == 10;
-	t_6 = t_0 == 1;
-	t_7 = t_5 && t_6;
-	beqz t_7 L_2_ifElseIf;
-	t_8 = 25;
-	goto L_3_ifElseIf;
-L_2_ifElseIf:
-	t_9 = t_1 == 10;
-	t_10 =  - 5;
-	t_11 = t_8 == t_10;
-	t_12 = t_9 && t_11;
-	beqz t_12 L_4_ifElseIf;
-	t_13 = t_8 + 15;
-	t_14 = t_13;
-	goto L_5_ifElseIf;
-L_4_ifElseIf:
-	t_15 = t_14;
-	t_16 =  - t_15;
-	t_17 = t_16;
-L_5_ifElseIf:
-L_3_ifElseIf:
-	t_18 = phi t_14, a, t_17;
-	t_19 = phi t_8, a, t_18;
-L_1_ifElseIf:
-	t_20 = phi t_19;
-	return t_20;
+	t_0 = 0xa;
+	t_1 = t_0 % 3;
+	addparam t_1, 1;
+	call putint; 
+	return 0;
 

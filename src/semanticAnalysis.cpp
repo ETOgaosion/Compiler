@@ -104,7 +104,7 @@ void SemanticAnalysis::exitConstDecl(SysYParser::ConstDeclContext * ctx)
             std::vector<std::string> value = const_def->value->getValues();
             if (type == MetaDataType::INT) {
                 for (auto &val: value) {
-                    val = std::to_string(std::stoi(val));
+                    val = std::to_string(std::stoi(val, nullptr, 0));
                 }
             }
             else {
@@ -610,7 +610,7 @@ void SemanticAnalysis::enterBrackets(SysYParser::BracketsContext * ctx) {}
 
 void SemanticAnalysis::exitBrackets(SysYParser::BracketsContext * ctx) {
     for (auto it : ctx->exp()) {
-        ctx->shape.push_back(stoi(it->operand->getValue()));
+        ctx->shape.push_back(stoi(it->operand->getValue(), nullptr, 0));
         it->commVal = nullptr;
     }
 }
@@ -1580,10 +1580,10 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
                 totalSize += tmpWidth * ctx->exp(i)->sizeNum;
                 tmpWidth *= arrShape[i];
             }
-            ctx->sizeNum = std::stoi(idInitValue->getValue(totalSize));
+            ctx->sizeNum = std::stoi(idInitValue->getValue(totalSize), nullptr, 0);
         }
         else {
-            ctx->sizeNum = std::stoi(idInitValue->getValue());
+            ctx->sizeNum = std::stoi(idInitValue->getValue(), nullptr, 0);
         }
     }
 }
@@ -1684,7 +1684,7 @@ void SemanticAnalysis::exitPrimaryExpNumber(SysYParser::PrimaryExpNumberContext 
             }
         }
     }
-    ctx->sizeNum = stoi(ctx->number()->getText());
+    ctx->sizeNum = stoi(ctx->number()->getText(), nullptr, 0);
 }
 
 

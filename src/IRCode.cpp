@@ -479,17 +479,17 @@ void IRAddI::genTargetCode(TargetCodes *t) {
     }
     if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() != OperandType::VALUE) {
         Register *arg2Reg = arg2->load(t, true);
-        if (stoi(arg1->getValue()) > 2048 || stoi(arg1->getValue()) < -2048) {
-            t->addCodeLdr(resultReg, stoi(arg1->getValue()));
+        if (stoi(arg1->getValue(), nullptr, 0) > 2048 || stoi(arg1->getValue(), nullptr, 0) < -2048) {
+            t->addCodeLdr(resultReg, stoi(arg1->getValue(), nullptr, 0));
         }
         else {
-            t->addCodeAdd(resultReg, arg2Reg, stoi(arg1->getValue()));
+            t->addCodeAdd(resultReg, arg2Reg, stoi(arg1->getValue(), nullptr, 0));
         }
         t->setRegisterFree(arg2Reg);
     }
     else if (arg1->getOperandType() != OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
         Register *arg1Reg = arg1->load(t, true);
-        int val = stoi(arg2->getValue());
+        int val = stoi(arg2->getValue(), nullptr, 0);
         if (val > 2048 || val < -2048) {
             t->addCodeLdr(resultReg, val);
         }
@@ -499,8 +499,8 @@ void IRAddI::genTargetCode(TargetCodes *t) {
         t->setRegisterFree(arg1Reg);
     }
     else if (arg1->getOperandType() == OperandType::VALUE && arg2->getOperandType() == OperandType::VALUE) {
-        int val = stoi(arg2->getValue()) + stoi(arg2->getValue());
-        t->addCodeLdr(resultReg, stoi(arg1->getValue()));
+        int val = stoi(arg2->getValue(), nullptr, 0) + stoi(arg2->getValue(), nullptr, 0);
+        t->addCodeLdr(resultReg, stoi(arg1->getValue(), nullptr, 0));
     }
     else {
         Register *arg1Reg = arg1->load(t, true);
@@ -1114,7 +1114,7 @@ void IRAddLabel::genTargetCode(TargetCodes *t) {
 
 void IRAddParamI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    if (stoi(arg2->getValue()) <= 4) {
+    if (stoi(arg2->getValue(), nullptr, 0) <= 4) {
         Register *arg1Reg = t->tryGetCertainRegister(true, "a" + arg2->getValue(), hasFreeRegister);
         if (arg1Reg->getOccupied()) {
             Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
@@ -1126,7 +1126,7 @@ void IRAddParamI::genTargetCode(TargetCodes *t) {
         t->setRegisterFree(arg1Reg);
     }
     else {
-        if (stoi(arg2->getValue()) == 5) {
+        if (stoi(arg2->getValue(), nullptr, 0) == 5) {
             curFunc->setFrameSize(curFunc->getFrameSize() + 4 * allParamNum);
         }
         Register *arg1Reg = t->getNextFreeRegister(true, false, hasFreeRegister);
@@ -1138,7 +1138,7 @@ void IRAddParamI::genTargetCode(TargetCodes *t) {
         t->setRegisterFree(sp);
         arg1->loadTo(t, arg1Reg);
         sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-        t->addCodeStr(sp, arg1Reg, -curFunc->getFrameSize() + 4 * (stoi(arg2->getValue()) - 5), false);
+        t->addCodeStr(sp, arg1Reg, -curFunc->getFrameSize() + 4 * (stoi(arg2->getValue(), nullptr, 0) - 5), false);
         t->setRegisterFree(arg1Reg);
         t->setRegisterFree(sp);
     }
@@ -1159,7 +1159,7 @@ void IRAddParamF::genTargetCode(TargetCodes *t) {
 
 void IRAddParamA::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    if (stoi(arg2->getValue()) <= 4) {
+    if (stoi(arg2->getValue(), nullptr, 0) <= 4) {
         Register *arg1Reg = t->tryGetCertainRegister(true, "a" + arg2->getValue(), hasFreeRegister);
         if (arg1Reg->getOccupied()) {
             Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
@@ -1171,7 +1171,7 @@ void IRAddParamA::genTargetCode(TargetCodes *t) {
         t->setRegisterFree(arg1Reg);
     }
     else {
-        if (stoi(arg2->getValue()) == 5) {
+        if (stoi(arg2->getValue(), nullptr, 0) == 5) {
             curFunc->setFrameSize(curFunc->getFrameSize() + 4 * allParamNum);
         }
         Register *arg1Reg = t->getNextFreeRegister(true, false, hasFreeRegister);
@@ -1181,7 +1181,7 @@ void IRAddParamA::genTargetCode(TargetCodes *t) {
             t->addCodeStr(sp, arg1Reg, -arg1Reg->getTmpStoreOffset(), false);
         }
         t->addCodeLdr(arg1Reg, arg1->getSymbolName(), true);
-        t->addCodeStr(sp, arg1Reg, -curFunc->getFrameSize() + 4 * (stoi(arg2->getValue()) - 5), false);
+        t->addCodeStr(sp, arg1Reg, -curFunc->getFrameSize() + 4 * (stoi(arg2->getValue(), nullptr, 0) - 5), false);
         t->setRegisterFree(arg1Reg);
         t->setRegisterFree(sp);
     }
@@ -1189,15 +1189,15 @@ void IRAddParamA::genTargetCode(TargetCodes *t) {
 
 void IRGetParamI::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    if (stoi(arg1->getValue()) < 5) {
-        Register *resultArg = t->tryGetCertainRegister(true, "a" + to_string(stoi(arg1->getValue())), hasFreeRegister);
+    if (stoi(arg1->getValue(), nullptr, 0) < 5) {
+        Register *resultArg = t->tryGetCertainRegister(true, "a" + to_string(stoi(arg1->getValue(), nullptr, 0)), hasFreeRegister);
         result->storeFrom(t, resultArg);
         t->setRegisterFree(resultArg);
     }
     else {
         Register *resultArg = t->getNextFreeRegister(true, false, hasFreeRegister);
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-        t->addCodeLdr(resultArg, sp, 4 * (stoi(arg1->getValue()) - 5));
+        t->addCodeLdr(resultArg, sp, 4 * (stoi(arg1->getValue(), nullptr, 0) - 5));
         t->setRegisterFree(sp);
         result->storeFrom(t, resultArg);
         t->setRegisterFree(resultArg);
@@ -1213,7 +1213,7 @@ void IRGetParamF::genTargetCode(TargetCodes *t) {
 
 void IRGetParamA::genTargetCode(TargetCodes *t) {
     bool hasFreeRegister;
-    if (stoi(arg1->getValue()) < 5) {
+    if (stoi(arg1->getValue(), nullptr, 0) < 5) {
         Register *resultArg = t->tryGetCertainRegister(true, "a" + arg1->getValue(), hasFreeRegister);
         arg1->storeFrom(t, resultArg);
         t->setRegisterFree(resultArg);
@@ -1221,7 +1221,7 @@ void IRGetParamA::genTargetCode(TargetCodes *t) {
     else {
         Register *resultArg = t->getNextFreeRegister(true, false, hasFreeRegister);
         Register *sp = t->tryGetCertainRegister(true, "sp", hasFreeRegister);
-        t->addCodeLdr(resultArg, sp, 4 * (stoi(arg1->getValue()) - 5));
+        t->addCodeLdr(resultArg, sp, 4 * (stoi(arg1->getValue(), nullptr, 0) - 5));
         t->setRegisterFree(sp);
         result->storeFrom(t, resultArg);
         t->setRegisterFree(resultArg);

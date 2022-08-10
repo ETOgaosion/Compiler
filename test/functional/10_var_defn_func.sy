@@ -4,5 +4,5 @@ int defn(){
 
 int main(){
     int a=defn();
-    return a;
+    putint(a);
 }

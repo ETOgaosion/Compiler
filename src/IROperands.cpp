@@ -88,7 +88,7 @@ Register *IRValue::load(TargetCodes *t, bool isGeneralPurposeRegister) {
                 t->addCodeMv(freeRegister, nullptr, zero, 0);
             }
             else {
-                t->addCodeLdr(freeRegister, stoi(values.front()));
+                t->addCodeLdr(freeRegister, stoi(values.front(), nullptr, 0));
             }
         }
         else {
@@ -142,7 +142,7 @@ Register *IRValue::loadTo(TargetCodes *t, const string &regName, bool isGeneralP
             t->addCodeMv(targetRegister, nullptr, zero, 0);
         }
         else {
-            t->addCodeLdr(targetRegister, stoi(values.front()));
+            t->addCodeLdr(targetRegister, stoi(values.front(), nullptr, 0));
         }
         t->setRegisterFree(zero);
         return targetRegister;
@@ -182,12 +182,12 @@ Register *IRValue::loadTo(TargetCodes *t, Register *inReg) {
             t->addCodeMv(inReg, nullptr, zero, 0);
         }
         else {
-            if (stoi(values.front()) > -2048 && stoi(values.front()) < 2048) {
+            if (stoi(values.front(), nullptr, 0) > -2048 && stoi(values.front(), nullptr, 0) < 2048) {
                 t->addCodeEor(zero, zero, zero);
-                t->addCodeAdd(inReg, zero, stoi(values.front()));
+                t->addCodeAdd(inReg, zero, stoi(values.front(), nullptr, 0));
             }
             else {
-                t->addCodeLdr(inReg, stoi(values.front()));
+                t->addCodeLdr(inReg, stoi(values.front(), nullptr, 0));
             }
         }
         t->setRegisterFree(zero);
@@ -252,7 +252,7 @@ void IRValue::genTargetValue(TargetCodes *t) const {
         stream << "\t.equ\t" << valueLabel << ", ";
         switch (metaDataType) {
             case MetaDataType::INT:
-                stream << "0x" << hex << stoi(values.front());
+                stream << "0x" << hex << stoi(values.front(), nullptr, 0);
                 break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
@@ -267,7 +267,7 @@ void IRValue::genTargetValue(TargetCodes *t) const {
         for (const auto& value : values) {
             switch (metaDataType) {
                 case MetaDataType::INT:
-                    stream << "\t.word\t0x" << hex << stoi(value);
+                    stream << "\t.word\t0x" << hex << stoi(value, nullptr, 0);
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
@@ -618,7 +618,7 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
         stream << "\t.equ\t" << initialValue->getValueLabel() << ", ";
         switch (initialValue->getMetaDataType()) {
             case MetaDataType::INT:
-                stream << "0x" << hex << stoi(values.front());
+                stream << "0x" << hex << stoi(values.front(), nullptr, 0);
                 break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
@@ -633,7 +633,7 @@ void IRSymbolVariable::genTargetValue(TargetCodes *t) const {
         for (const auto& value : values) {
             switch (initialValue->getMetaDataType()) {
                 case MetaDataType::INT:
-                    stream << "\t.word\t0x" << hex << stoi(value);
+                    stream << "\t.word\t0x" << hex << stoi(value, nullptr, 0);
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));
@@ -655,7 +655,7 @@ void IRSymbolVariable::genTargetGlobalValue(TargetCodes *t) const {
         stream << "\t.word\t";
         switch (initialValue->getMetaDataType()) {
             case MetaDataType::INT:
-                stream << "0x" << hex << stoi(values.front());
+                stream << "0x" << hex << stoi(values.front(), nullptr, 0);
                 break;
             case MetaDataType::FLOAT:
                 stream << Tools::ftoIEEE754s(stof(values.front()));
@@ -670,7 +670,7 @@ void IRSymbolVariable::genTargetGlobalValue(TargetCodes *t) const {
         for (const auto& value : values) {
             switch (initialValue->getMetaDataType()) {
                 case MetaDataType::INT:
-                    stream << "\t.word\t0x" << hex << stoi(value);
+                    stream << "\t.word\t0x" << hex << stoi(value, nullptr, 0);
                     break;
                 case MetaDataType::FLOAT:
                     stream << "\t.word\t" << Tools::ftoIEEE754s(stof(value));

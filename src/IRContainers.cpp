@@ -39,10 +39,10 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
     MetaDataType type2 = op2->getMetaDataType();
     IRValue* retVal = nullptr;
     if(type1 == MetaDataType::INT){
-        int val_a = stoi(op1->getValue());
+        int val_a = stoi(op1->getValue(), nullptr, 0);
         switch(type2){
             case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
+                int val_b_i = stoi(op2->getValue(), nullptr, 0);
                 if(op == IROperation::ADD) {
                     retVal = new IRValue(MetaDataType::INT, to_string(val_a + val_b_i), {}, false);
                 }
@@ -68,7 +68,7 @@ IRValue* IRFunction::immAddSub(IROperand* op1, IROperand* op2, IROperation op){
         float val_a = stof(op1->getValue());
         switch(type2){
             case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
+                int val_b_i = stoi(op2->getValue(), nullptr, 0);
                 if(op == IROperation::ADD)
                     retVal = ir->addImmValue(MetaDataType::FLOAT, to_string(val_a + val_b_i));
                 else if (op == IROperation::SUB)
@@ -95,10 +95,10 @@ IRValue* IRFunction::immMov(IROperand* op1, IROperand* op2, IROperation op){
     MetaDataType type2 = op2->getMetaDataType();
     IRValue* retVal = nullptr;
     if(type1 == MetaDataType::INT){
-        int val_a = stoi(op1->getValue());
+        int val_a = stoi(op1->getValue(), nullptr, 0);
         switch(type2){
             case MetaDataType::INT: {
-                int val_b_i = stoi(op2->getValue());
+                int val_b_i = stoi(op2->getValue(), nullptr, 0);
                 if(op == IROperation::LSL) {
                     retVal = new IRValue(MetaDataType::INT, to_string(val_a << val_b_i), {}, false);
                 }
@@ -119,8 +119,8 @@ IRValue* IRFunction::immMul(IROperand* op1, IROperand* op2){
     MetaDataType type2 = op2->getMetaDataType();
     IRValue* retVal = nullptr;
     if(type1 == MetaDataType::INT){
-        int val_a = stoi(op1->getValue());
-        int val_b = stoi(op2->getValue());
+        int val_a = stoi(op1->getValue(), nullptr, 0);
+        int val_b = stoi(op2->getValue(), nullptr, 0);
         retVal = new IRValue(MetaDataType::INT, to_string(val_a * val_b), {}, false);
     } else if (type1 == MetaDataType::FLOAT){
         float val_a = stof(op1->getValue());
@@ -135,8 +135,8 @@ IRValue* IRFunction::immDiv(IROperand* op1, IROperand* op2){
     MetaDataType type2 = op2->getMetaDataType();
     IRValue* retVal = nullptr;
     if(type1 == MetaDataType::INT){
-        int val_a = stoi(op1->getValue());
-        int val_b = stoi(op2->getValue());
+        int val_a = stoi(op1->getValue(), nullptr, 0);
+        int val_b = stoi(op2->getValue(), nullptr, 0);
         retVal = new IRValue(MetaDataType::INT, to_string(val_a / val_b), {}, false);
     } else if (type1 == MetaDataType::FLOAT){
         float val_a = stof(op1->getValue());
@@ -150,8 +150,8 @@ IRValue* IRFunction::immCmp(IROperand* op1, IROperand* op2, IROperation op){
     MetaDataType type = op1->getMetaDataType();
     IRValue* retVal = nullptr;
     if (type == MetaDataType::INT) {
-        int val_a = stoi(op1->getValue());
-        int val_b = stoi(op2->getValue());
+        int val_a = stoi(op1->getValue(), nullptr, 0);
+        int val_b = stoi(op2->getValue(), nullptr, 0);
         switch(op){
             case IROperation::SLT:
                 if(val_a < val_b)
@@ -452,7 +452,7 @@ void IRFunction::constFolding() {
                 IRValue* new_value = nullptr;
                 switch(arg1->getMetaDataType()){
                     case MetaDataType::INT:{
-                        int val = stoi(arg1->getValue());
+                        int val = stoi(arg1->getValue(), nullptr, 0);
                         new_value = new IRValue(MetaDataType::INT, std::to_string(0 - val), {}, false);
                         break;
                     }
@@ -498,7 +498,7 @@ void IRFunction::constFolding() {
             } else if (op == IROperation::BEQZ) {
                 if(arg1->getOperandType() != OperandType::VALUE)
                     continue;
-                int beqzArg = stoi(arg1->getValue());
+                int beqzArg = stoi(arg1->getValue(), nullptr, 0);
                 if (beqzArg == 0) {
                     code = new IRGoto(arg2);
                     block[i] = code;
@@ -538,8 +538,8 @@ void IRFunction::constFolding() {
                 } else if (op == IROperation::DIV) {
                     new_value = immDiv(arg1, arg2);
                 } else if (op == IROperation::MOD) {
-                    int val_a = stoi(arg1->getValue());
-                    int val_b = stoi(arg2->getValue());
+                    int val_a = stoi(arg1->getValue(), nullptr, 0);
+                    int val_b = stoi(arg2->getValue(), nullptr, 0);
                     new_value = new IRValue(MetaDataType::INT, to_string(val_a % val_b), {}, false);
                 } else if (op == IROperation::OR) {
                     if(arg1->getValue() == "1" || arg2->getValue() == "1")
@@ -1715,7 +1715,7 @@ void IRFunction::JumpThreading(){
         }
 
         if(I->getOperation() == IROperation::BEQZ && I->getArg1()->getOperandType() == OperandType::VALUE){
-            if(stoi(I->getArg1()->getValue()) == 0){
+            if(stoi(I->getArg1()->getValue(), nullptr, 0) == 0){
                 IRGoto* newcode = new IRGoto(I->getArg2());
                 basicBlocks[i].pop_back();
                 codes.erase(codes.begin() + entrances[i + 1] - 1);
