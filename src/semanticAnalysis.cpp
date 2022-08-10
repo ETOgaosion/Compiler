@@ -1584,16 +1584,18 @@ void SemanticAnalysis::exitLVal(SysYParser::LValContext * ctx)
             ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
         }
         else if (searchLVal->getIsArray()) {
-            if (ctx->exp().size() < searchLVal->getShape().size()) {
-                ctx->isArray = true;
-                ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
-            }
-            else if (ctx->exp().size() == searchLVal->getShape().size()) {
-                ctx->isArray = true;
-                ctx->shape = {};
-            }
-            else {
-                throw std::runtime_error("[ERROR] > array shape not match\n");
+            if (searchLVal->getSymbolType() != SymbolType::PARAM) {
+                if (ctx->exp().size() < searchLVal->getShape().size()) {
+                    ctx->isArray = true;
+                    ctx->shape = std::vector<size_t>(searchLVal->getShape().begin() + ctx->exp().size(), searchLVal->getShape().end());
+                }
+                else if (ctx->exp().size() == searchLVal->getShape().size()) {
+                    ctx->isArray = true;
+                    ctx->shape = {};
+                }
+                else {
+                    throw std::runtime_error("[ERROR] > array shape not match\n");
+                }
             }
         }
         else {

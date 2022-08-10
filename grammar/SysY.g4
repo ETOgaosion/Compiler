@@ -458,12 +458,14 @@ ExponentPart
     ;
 
 Whitespace
-    :   (' ' | '\t')+
+    :   [ \t]+
         -> skip
     ;
 
 Newline
-    :   '\n'
+    :   (   '\r' '\n'?
+        |   '\n'
+        )
         -> skip
     ;
 
@@ -473,6 +475,6 @@ BlockComment
     ;
 
 LineComment
-    :   '//' ~[\n]*
+    :   '//' ~[\r\n]*
         -> skip
     ;
