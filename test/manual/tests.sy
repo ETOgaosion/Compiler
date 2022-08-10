@@ -1,8 +1,9 @@
 // ???  // ????
   				// ?????
 /*
-a 1
-*/
+
+    i = i + 1;
+  */
 int main() {
   int arr[100], i = 0, sum = 0;
   while (getint()) {

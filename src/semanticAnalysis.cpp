@@ -507,13 +507,17 @@ void SemanticAnalysis::enterFuncDef(SysYParser::FuncDefContext * ctx)
         throw std::runtime_error("[ERROR] > Data Type not supported.\n");
     }
 
-    if (ctx->Ident()->getText() == "main") {
+    std::string funcName = ctx->Ident()->getText();
+
+    std::cout << funcName << std::endl;
+
+    if (funcName == "main") {
         if (returnType != MetaDataType::INT || ctx->funcFParams()) {
             throw std::runtime_error("[ERROR] > wrong definition of main function");
         }
     }
 
-    SymbolTable *funcSymbolTable = new FuncSymbolTable(ctx->Ident()->getText(), returnType);
+    SymbolTable *funcSymbolTable = new FuncSymbolTable(funcName, returnType);
     ctx->funcBlock()->returnType = returnType;
     if (!curSymbolTable->insertFuncSymbolTableSafely(funcSymbolTable)) {
         throw std::runtime_error("[ERROR] > Redefine function of same name.\n");
@@ -754,6 +758,7 @@ void SemanticAnalysis::enterStmtAssignment(SysYParser::StmtAssignmentContext * c
     ctx->hasReturn = false;
     ctx->exp()->commVal = nullptr;
     ctx->exp()->fromVarDecl = false;
+    ctx->lVal()->fromVarDecl = false;
 }
 
 void SemanticAnalysis::exitStmtAssignment(SysYParser::StmtAssignmentContext * ctx)
@@ -1103,6 +1108,7 @@ void SemanticAnalysis::enterSubStmtAssignment(SysYParser::SubStmtAssignmentConte
     ctx->returnType = MetaDataType::VOID;
     ctx->exp()->commVal = nullptr;
     ctx->exp()->fromVarDecl = false;
+    ctx->lVal()->fromVarDecl = false;
 }
 
 void SemanticAnalysis::exitSubStmtAssignment(SysYParser::SubStmtAssignmentContext * ctx)
